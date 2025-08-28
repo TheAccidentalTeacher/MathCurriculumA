@@ -1,55 +1,40 @@
-// inspect-db.ts - Quick script to check what's in our database
-import Database from 'better-sqlite3';
+// inspect-db.ts - Quick script to check what's in our PostgreSQL database using Prisma
+import { db } from './src/lib/db';
 
-const db = new Database('curriculum.db');
+async function inspectDatabase() {
+  console.log('=== DATABASE INSPECTION ===\n');
 
-console.log('=== DATABASE INSPECTION ===\n');
+  try {
+    // Check documents
+    const docCount = await db.document.count();
+    console.log(`Documents: ${docCount}`);
 
-// Check documents
-const docs = db.prepare('SELECT COUNT(*) as count FROM documents').get();
-console.log(`Documents: ${docs.count}`);
+    if (docCount > 0) {
+      const docs = await db.document.findMany({
+        select: { id: true, filename: true, title: true }
+      });
+      docs.forEach(doc => {
+        console.log(`  - ${doc.filename}: "${doc.title}"`);
+      });
+    }
 
-if (docs.count > 0) {
-  const docDetails = db.prepare('SELECT id, filename, title FROM documents').all();
-  docDetails.forEach((doc: any) => {
-    console.log(`  - ${doc.filename}: "${doc.title}"`);
-  });
+    // Check sections
+    const sectionCount = await db.section.count();
+    console.log(`\nSections: ${sectionCount}`);
+
+    // Check topics
+    const topicCount = await db.topic.count();
+    console.log(`Topics: ${topicCount}`);
+
+    // Check keywords
+    const keywordCount = await db.keyword.count();
+    console.log(`Keywords: ${keywordCount}`);
+
+  } catch (error) {
+    console.error('Database inspection failed:', error);
+  } finally {
+    await db.$disconnect();
+  }
 }
 
-// Check sections
-const sections = db.prepare('SELECT COUNT(*) as count FROM sections').get();
-console.log(`\nSections: ${sections.count}`);
-
-// Check topics
-const topics = db.prepare('SELECT COUNT(*) as count FROM topics').get();
-console.log(`Topics: ${topics.count}`);
-
-// Check keywords
-const keywords = db.prepare('SELECT COUNT(*) as count FROM keywords').get();
-console.log(`Keywords: ${keywords.count}`);
-
-// Sample some content
-if (topics.count > 0) {
-  console.log('\n=== SAMPLE TOPICS ===');
-  const sampleTopics = db.prepare(`
-    SELECT t.title, LENGTH(t.content) as content_length, s.title as section_title, d.filename
-    FROM topics t 
-    JOIN sections s ON t.section_id = s.id 
-    JOIN documents d ON s.document_id = d.id 
-    LIMIT 5
-  `).all();
-  
-  sampleTopics.forEach(topic => {
-    console.log(`${topic.filename} > ${topic.section_title} > ${topic.title}`);
-    console.log(`  Content length: ${topic.content_length} chars`);
-  });
-}
-
-// Check total content size
-const totalContent = db.prepare(`
-  SELECT SUM(LENGTH(content)) as total_chars 
-  FROM topics WHERE content IS NOT NULL
-`).get();
-console.log(`\nTotal content characters: ${totalContent.total_chars}`);
-
-db.close();
+inspectDatabase().catch(console.error);

@@ -9,13 +9,9 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const sectionId = parseInt(id);
     
-    if (isNaN(sectionId)) {
-      return NextResponse.json({ error: "Invalid section ID" }, { status: 400 });
-    }
-    
-    const section = await curriculumService.getSectionById(sectionId);
+    // In Prisma with PostgreSQL, IDs are strings (cuid), not numbers
+    const section = await curriculumService.getSectionById(id);
     
     if (!section) {
       return NextResponse.json({ error: "Section not found" }, { status: 404 });

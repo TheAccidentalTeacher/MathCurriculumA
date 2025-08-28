@@ -1,5 +1,4 @@
-import { db, schema } from '@/lib/db';
-import { eq, like, or, desc, asc } from 'drizzle-orm';
+import { db } from '@/lib/db';
 
 export interface SearchFilters {
   grade?: number;
@@ -12,153 +11,202 @@ export interface SearchFilters {
 export class CurriculumService {
   
   async getAllDocuments() {
-    return await db.select().from(schema.documents).orderBy(asc(schema.documents.grade));
+    return await db.document.findMany({
+      orderBy: { grade_level: 'asc' },
+      include: {
+        sections: {
+          take: 3, // Preview of first 3 sections
+          orderBy: { order_index: 'asc' }
+        }
+      }
+    });
   }
 
-  async getDocumentById(id: number) {
-    const [doc] = await db.select()
-      .from(schema.documents)
-      .where(eq(schema.documents.id, id));
-    
-    if (!doc) return null;
-
-    const sections = await db.select()
-      .from(schema.sections)
-      .where(eq(schema.sections.documentId, id))
-      .orderBy(asc(schema.sections.id));
-
-    return { ...doc, sections };
+  async getDocumentById(id: string) {
+    return await db.document.findUnique({
+      where: { id },
+      include: {
+        sections: {
+          orderBy: { order_index: 'asc' },
+          include: {
+            topics: {
+              orderBy: { order_index: 'asc' }
+            }
+          }
+        }
+      }
+    });
   }
 
-  async getSectionById(id: number) {
-    const [section] = await db.select()
-      .from(schema.sections)
-      .where(eq(schema.sections.id, id));
-    
-    if (!section) return null;
-
-    const topics = await db.select()
-      .from(schema.topics)
-      .where(eq(schema.topics.sectionId, id))
-      .orderBy(asc(schema.topics.id));
-
-    return { ...section, topics };
+  async getSectionById(id: string) {
+    return await db.section.findUnique({
+      where: { id },
+      include: {
+        document: true,
+        topics: {
+          orderBy: { order_index: 'asc' },
+          include: {
+            keywords: {
+              include: {
+                keyword: true
+              }
+            }
+          }
+        }
+      }
+    });
   }
 
   async searchContent(query: string, filters: SearchFilters = {}) {
-    const searchTerm = `%${query.toLowerCase()}%`;
+    const whereClause: any = {};
     
-    // Build the where conditions
-    let whereConditions: any[] = [];
-    
+    // Build search conditions
     if (query) {
-      whereConditions.push(
-        or(
-          like(schema.documents.title, searchTerm),
-          like(schema.sections.title, searchTerm),
-          like(schema.sections.content, searchTerm),
-          like(schema.topics.title, searchTerm),
-          like(schema.topics.content, searchTerm)
-        )
-      );
+      whereClause.OR = [
+        { title: { contains: query, mode: 'insensitive' } },
+        { content: { contains: query, mode: 'insensitive' } },
+        { sections: { some: { 
+          OR: [
+            { title: { contains: query, mode: 'insensitive' } },
+            { content: { contains: query, mode: 'insensitive' } }
+          ]
+        }}},
+        { sections: { some: { topics: { some: {
+          OR: [
+            { title: { contains: query, mode: 'insensitive' } },
+            { content: { contains: query, mode: 'insensitive' } }
+          ]
+        }}}}},
+      ];
     }
 
+    // Apply filters
     if (filters.grade) {
-      whereConditions.push(eq(schema.documents.grade, filters.grade));
+      whereClause.grade_level = filters.grade.toString();
     }
-
+    
     if (filters.subject) {
-      whereConditions.push(eq(schema.documents.subject, filters.subject));
+      whereClause.subject = { contains: filters.subject, mode: 'insensitive' };
     }
 
-    if (filters.difficulty) {
-      whereConditions.push(eq(schema.topics.difficulty, filters.difficulty));
-    }
+    const documents = await db.document.findMany({
+      where: whereClause,
+      include: {
+        sections: {
+          where: filters.sectionType ? { section_type: filters.sectionType } : undefined,
+          include: {
+            topics: {
+              where: {
+                ...(filters.difficulty && { difficulty: filters.difficulty }),
+                ...(filters.topicType && { topic_type: filters.topicType })
+              },
+              take: 5 // Limit topics per section for search results
+            }
+          },
+          take: 10 // Limit sections per document
+        }
+      },
+      take: 20 // Limit documents
+    });
 
-    if (filters.topicType) {
-      whereConditions.push(eq(schema.topics.topicType, filters.topicType));
-    }
-
-    if (filters.sectionType) {
-      whereConditions.push(eq(schema.sections.sectionType, filters.sectionType));
-    }
-
-    // Search across documents, sections, and topics
-    const results = await db.select({
-      documentId: schema.documents.id,
-      documentTitle: schema.documents.title,
-      documentGrade: schema.documents.grade,
-      sectionId: schema.sections.id,
-      sectionTitle: schema.sections.title,
-      sectionType: schema.sections.sectionType,
-      topicId: schema.topics.id,
-      topicTitle: schema.topics.title,
-      topicContent: schema.topics.content,
-      topicType: schema.topics.topicType,
-      difficulty: schema.topics.difficulty,
-    })
-    .from(schema.documents)
-    .leftJoin(schema.sections, eq(schema.sections.documentId, schema.documents.id))
-    .leftJoin(schema.topics, eq(schema.topics.sectionId, schema.sections.id))
-    .where(whereConditions.length > 0 ? whereConditions.reduce((a, b) => 
-      whereConditions.indexOf(a) === 0 ? a : or(a, b)
-    ) : undefined)
-    .limit(50);
+    // Flatten results for easier display
+    const results: any[] = [];
+    documents.forEach(doc => {
+      doc.sections.forEach(section => {
+        section.topics.forEach(topic => {
+          results.push({
+            documentId: doc.id,
+            documentTitle: doc.title,
+            documentGrade: doc.grade_level,
+            sectionId: section.id,
+            sectionTitle: section.title,
+            sectionType: section.section_type,
+            topicId: topic.id,
+            topicTitle: topic.title,
+            topicContent: topic.content.substring(0, 500) + '...', // Truncate for display
+            topicType: topic.topic_type,
+            difficulty: topic.difficulty,
+          });
+        });
+      });
+    });
 
     return results;
   }
 
   async getKeywords(limit = 50) {
-    return await db.select()
-      .from(schema.keywords)
-      .orderBy(desc(schema.keywords.frequency))
-      .limit(limit);
+    return await db.keyword.findMany({
+      include: {
+        topics: {
+          include: {
+            topic: {
+              include: {
+                section: {
+                  include: {
+                    document: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      take: limit,
+      orderBy: { word: 'asc' }
+    });
   }
 
   async getTopicsByKeyword(keyword: string) {
-    const results = await db.select({
-      topicId: schema.topics.id,
-      topicTitle: schema.topics.title,
-      topicContent: schema.topics.content,
-      topicType: schema.topics.topicType,
-      difficulty: schema.topics.difficulty,
-      sectionTitle: schema.sections.title,
-      documentTitle: schema.documents.title,
-      documentGrade: schema.documents.grade,
-    })
-    .from(schema.topics)
-    .leftJoin(schema.topicKeywords, eq(schema.topicKeywords.topicId, schema.topics.id))
-    .leftJoin(schema.keywords, eq(schema.keywords.id, schema.topicKeywords.keywordId))
-    .leftJoin(schema.sections, eq(schema.sections.id, schema.topics.sectionId))
-    .leftJoin(schema.documents, eq(schema.documents.id, schema.sections.documentId))
-    .where(eq(schema.keywords.keyword, keyword))
-    .limit(20);
+    const results = await db.topic.findMany({
+      where: {
+        keywords: {
+          some: {
+            keyword: {
+              word: { contains: keyword, mode: 'insensitive' }
+            }
+          }
+        }
+      },
+      include: {
+        section: {
+          include: {
+            document: true
+          }
+        },
+        keywords: {
+          include: {
+            keyword: true
+          }
+        }
+      },
+      take: 20
+    });
 
-    return results;
+    return results.map(topic => ({
+      topicId: topic.id,
+      topicTitle: topic.title,
+      topicContent: topic.content,
+      topicType: topic.topic_type,
+      difficulty: topic.difficulty,
+      sectionTitle: topic.section.title,
+      documentTitle: topic.section.document.title,
+      documentGrade: topic.section.document.grade_level,
+    }));
   }
 
   async getStats() {
-    const [docCount] = await db.select({
-      count: schema.documents.id
-    }).from(schema.documents);
-
-    const [sectionCount] = await db.select({
-      count: schema.sections.id
-    }).from(schema.sections);
-
-    const [topicCount] = await db.select({
-      count: schema.topics.id
-    }).from(schema.topics);
-
-    const [keywordCount] = await db.select({
-      count: schema.keywords.id
-    }).from(schema.keywords);
+    const [docCount, sectionCount, topicCount, keywordCount] = await Promise.all([
+      db.document.count(),
+      db.section.count(),
+      db.topic.count(),
+      db.keyword.count(),
+    ]);
 
     return {
-      documents: docCount?.count || 0,
-      sections: sectionCount?.count || 0,
-      topics: topicCount?.count || 0,
-      keywords: keywordCount?.count || 0,
+      documents: docCount,
+      sections: sectionCount,
+      topics: topicCount,
+      keywords: keywordCount,
     };
   }
 }

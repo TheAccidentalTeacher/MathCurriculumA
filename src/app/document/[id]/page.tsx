@@ -6,13 +6,9 @@ const curriculumService = new CurriculumService();
 
 export default async function DocumentPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const docId = parseInt(id);
   
-  if (isNaN(docId)) {
-    notFound();
-  }
-  
-  const document = await curriculumService.getDocumentById(docId);
+  // In Prisma with PostgreSQL, IDs are strings (cuid), not numbers
+  const document = await curriculumService.getDocumentById(id);
   
   if (!document) {
     notFound();
@@ -31,14 +27,12 @@ export default async function DocumentPage({ params }: { params: Promise<{ id: s
           <h1 className="text-3xl font-bold mb-4">{document.title}</h1>
           <div className="grid md:grid-cols-2 gap-4 text-slate-300">
             <div>
-              <div><span className="text-slate-400">Grade:</span> {document.grade}</div>
+              <div><span className="text-slate-400">Grade:</span> {document.grade_level}</div>
               <div><span className="text-slate-400">Subject:</span> {document.subject}</div>
-              <div><span className="text-slate-400">Publisher:</span> {document.publisher}</div>
             </div>
             <div>
               <div><span className="text-slate-400">Version:</span> {document.version}</div>
-              <div><span className="text-slate-400">Pages:</span> {document.totalPages}</div>
-              <div><span className="text-slate-400">Extracted:</span> {new Date(document.extractedAt).toLocaleDateString()}</div>
+              <div><span className="text-slate-400">Created:</span> {new Date(document.created_at).toLocaleDateString()}</div>
             </div>
           </div>
         </div>

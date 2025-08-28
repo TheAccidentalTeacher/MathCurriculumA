@@ -6,13 +6,9 @@ const curriculumService = new CurriculumService();
 
 export default async function SectionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const sectionId = parseInt(id);
   
-  if (isNaN(sectionId)) {
-    notFound();
-  }
-  
-  const section = await curriculumService.getSectionById(sectionId);
+  // In Prisma with PostgreSQL, IDs are strings (cuid), not numbers
+  const section = await curriculumService.getSectionById(id);
   
   if (!section) {
     notFound();
@@ -42,20 +38,14 @@ export default async function SectionPage({ params }: { params: Promise<{ id: st
         
         <div className="bg-slate-800 border border-slate-700 rounded-lg p-6 mb-8">
           <h1 className="text-3xl font-bold mb-4">
-            {section.sectionNumber && `${section.sectionNumber}. `}
             {section.title}
           </h1>
           <div className="flex gap-4 text-sm text-slate-300 mb-4">
-            <span className={`px-3 py-1 rounded-full text-white ${section.sectionType === 'chapter' ? 'bg-blue-600' : 
-              section.sectionType === 'unit' ? 'bg-green-600' : 
-              section.sectionType === 'lesson' ? 'bg-purple-600' : 'bg-slate-600'}`}>
-              {section.sectionType}
+            <span className={`px-3 py-1 rounded-full text-white ${section.section_type === 'chapter' ? 'bg-blue-600' : 
+              section.section_type === 'unit' ? 'bg-green-600' : 
+              section.section_type === 'lesson' ? 'bg-purple-600' : 'bg-slate-600'}`}>
+              {section.section_type}
             </span>
-            {section.startPage && section.endPage && (
-              <span className="px-3 py-1 bg-slate-700 rounded-full">
-                Pages {section.startPage}-{section.endPage}
-              </span>
-            )}
           </div>
           
           {section.content && (
