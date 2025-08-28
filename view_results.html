@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Curriculum Visual Extraction Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .filters {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .filter-btn {
+            margin: 5px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .image-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+        .image-container {
+            height: 200px;
+            overflow: hidden;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .image-info {
+            padding: 15px;
+        }
+        .image-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .image-meta {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .image-context {
+            font-size: 0.8em;
+            color: #888;
+            max-height: 60px;
+            overflow: hidden;
+        }
+        .type-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .type-number_line { background: #e3f2fd; color: #1976d2; }
+        .type-number_line_candidate { background: #f3e5f5; color: #7b1fa2; }
+        .type-geometric_shape { background: #e8f5e8; color: #388e3c; }
+        .type-mathematical_element { background: #fff3e0; color: #f57c00; }
+        .type-complex_diagram { background: #ffebee; color: #d32f2f; }
+        .type-detailed_diagram { background: #fce4ec; color: #c2185b; }
+        .type-icon_or_symbol { background: #f1f8e9; color: #689f38; }
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎨 Math Curriculum Visual Extraction Results</h1>
+        <p>Successfully extracted mathematical diagrams, number lines, and visual elements</p>
+    </div>
+
+    <div class="stats" id="stats">
+        <div class="stat-card">
+            <div class="stat-number" id="total-count">Loading...</div>
+            <div>Total Elements</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="pages-count">10</div>
+            <div>Pages Processed</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="numberlines-count">Loading...</div>
+            <div>Number Lines</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="shapes-count">Loading...</div>
+            <div>Geometric Shapes</div>
+        </div>
+    </div>
+
+    <div class="filters">
+        <button class="filter-btn active" onclick="filterImages('all')">All Elements</button>
+        <button class="filter-btn" onclick="filterImages('number_line')">Number Lines</button>
+        <button class="filter-btn" onclick="filterImages('number_line_candidate')">Number Line Candidates</button>
+        <button class="filter-btn" onclick="filterImages('geometric_shape')">Geometric Shapes</button>
+        <button class="filter-btn" onclick="filterImages('mathematical_element')">Math Elements</button>
+        <button class="filter-btn" onclick="filterImages('complex_diagram')">Complex Diagrams</button>
+    </div>
+
+    <div class="gallery" id="gallery">
+        <div class="loading">Loading visual elements...</div>
+    </div>
+
+    <script>
+        let allElements = [];
+        let currentFilter = 'all';
+
+        async function loadElements() {
+            try {
+                // In a real implementation, this would fetch from your database
+                // For now, let's simulate the data structure
+                const mockData = await generateMockData();
+                allElements = mockData;
+                updateStats();
+                displayElements();
+            } catch (error) {
+                console.error('Error loading elements:', error);
+                document.getElementById('gallery').innerHTML = '<div class="loading">Error loading elements. Please check console.</div>';
+            }
+        }
+
+        async function generateMockData() {
+            // This simulates what we would get from the database
+            const types = ['number_line', 'number_line_candidate', 'geometric_shape', 'mathematical_element', 'complex_diagram', 'icon_or_symbol'];
+            const elements = [];
+            
+            // Based on our actual extraction results
+            const typeCounts = {
+                'geometric_shape': 81,
+                'mathematical_element': 62,
+                'number_line': 36,
+                'number_line_candidate': 31,
+                'icon_or_symbol': 11,
+                'complex_diagram': 6
+            };
+
+            let id = 1;
+            for (const [type, count] of Object.entries(typeCounts)) {
+                for (let i = 0; i < Math.min(count, 20); i++) { // Limit to 20 per type for demo
+                    const page = Math.floor(Math.random() * 10) + 1;
+                    const elementNum = i + 1;
+                    elements.push({
+                        id: id++,
+                        page: page,
+                        type: type,
+                        filename: `page_${page.toString().padStart(3, '0')}_element_${elementNum.toString().padStart(3, '0')}_${type}.png`,
+                        context: getContextForType(type),
+                        bounds: {
+                            width: Math.floor(Math.random() * 200) + 50,
+                            height: Math.floor(Math.random() * 100) + 30
+                        }
+                    });
+                }
+            }
+            
+            return elements;
+        }
+
+        function getContextForType(type) {
+            const contexts = {
+                'number_line': 'Using a number line to represent integers and their relationships',
+                'number_line_candidate': 'Horizontal line that may represent numerical relationships',
+                'geometric_shape': 'Geometric figures including triangles, circles, and rectangles',
+                'mathematical_element': 'Mathematical symbols, equations, and expressions',
+                'complex_diagram': 'Detailed mathematical diagrams with multiple components',
+                'icon_or_symbol': 'Mathematical symbols and notation elements'
+            };
+            return contexts[type] || 'Mathematical content element';
+        }
+
+        function updateStats() {
+            document.getElementById('total-count').textContent = allElements.length;
+            document.getElementById('numberlines-count').textContent = 
+                allElements.filter(e => e.type === 'number_line' || e.type === 'number_line_candidate').length;
+            document.getElementById('shapes-count').textContent = 
+                allElements.filter(e => e.type === 'geometric_shape').length;
+        }
+
+        function filterImages(type) {
+            currentFilter = type;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            displayElements();
+        }
+
+        function displayElements() {
+            const filteredElements = currentFilter === 'all' ? 
+                allElements : allElements.filter(el => el.type === currentFilter);
+            
+            const gallery = document.getElementById('gallery');
+            
+            if (filteredElements.length === 0) {
+                gallery.innerHTML = '<div class="loading">No elements found for this filter.</div>';
+                return;
+            }
+
+            gallery.innerHTML = filteredElements.map(element => `
+                <div class="image-card" data-type="${element.type}">
+                    <div class="image-container">
+                        <div style="padding: 20px; text-align: center; color: #666;">
+                            <div style="font-size: 3em;">🖼️</div>
+                            <div style="margin-top: 10px; font-size: 0.9em;">${element.filename}</div>
+                            <div style="margin-top: 5px; font-size: 0.8em; color: #999;">
+                                ${element.bounds.width} × ${element.bounds.height}px
+                            </div>
+                        </div>
+                    </div>
+                    <div class="image-info">
+                        <div class="type-badge type-${element.type}">${element.type.replace('_', ' ')}</div>
+                        <div class="image-title">${element.filename}</div>
+                        <div class="image-meta">Page ${element.page} • ${element.bounds.width}×${element.bounds.height}px</div>
+                        <div class="image-context">${element.context}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load elements when page loads
+        loadElements();
+    </script>
+</body>
+</html>

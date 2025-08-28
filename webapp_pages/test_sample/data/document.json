@@ -1,0 +1,208 @@
+{
+  "id": "test-sample",
+  "title": "Test Sample",
+  "filename": "test_sample",
+  "source_pdf": "test_sample.pdf",
+  "processing_date": "2025-08-28T05:41:01.249415",
+  "total_pages": 10,
+  "resolution_dpi": 150,
+  "pages": [
+    {
+      "page_number": 1,
+      "filename": "page_001.png",
+      "image_path": "pages/page_001.png",
+      "dimensions": {
+        "width": 1275,
+        "height": 1632
+      },
+      "word_count": 58,
+      "has_significant_content": true,
+      "file_size_kb": 78.2,
+      "text_preview": "Mathematics Grade 7 • Volume 1 NOT FOR RESALE",
+      "keywords": [
+        "volume",
+        "mean"
+      ],
+      "page_type": "cover"
+    },
+    {
+      "page_number": 2,
+      "filename": "page_002.png",
+      "image_path": "pages/page_002.png",
+      "dimensions": {
+        "width": 1275,
+        "height": 1632
+      },
+      "word_count": 108,
+      "has_significant_content": true,
+      "file_size_kb": 518.2,
+      "text_preview": "Explore Digital Resources for Students In addition to the instruction and practice provided",
+      "keywords": [],
+      "page_type": "frontmatter"
+    },
+    {
+      "page_number": 3,
+      "filename": "page_003.png",
+      "image_path": "pages/page_003.png",
+      "dimensions": {
+        "width": 1275,
+        "height": 1632
+      },
+      "word_count": 136,
+      "has_significant_content": true,
+      "file_size_kb": 428.8,
+      "text_preview": "Online Student Worktext English/Spanish My Videos (Instructional Videos) Glossaries Multiple Languages",
+      "keywords": [
+        "fraction",
+        "graph",
+        "number line",
+        "geometry",
+        "area"
+      ],
+      "page_type": "frontmatter"
+    },
+    {
+      "page_number": 4,
+      "filename": "page_004.png",
+      "image_path": "pages/page_004.png",
+      "dimensions": {
+        "width": 1275,
+        "height": 1632
+      },
+      "word_count": 860,
+      "has_significant_content": true,
+      "file_size_kb": 499.4,
+      "text_preview": "Proportional Relationships Ratios, Rates, and Circles Unit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ....",
+      "keywords": [
+        "fraction",
+        "ratio",
+        "proportion",
+        "circle",
+        "area"
+      ],
+      "page_type": "contents"
+    },
+    {
+      "page_number": 5,
+      "filename": "page_005.png",
+      "image_path": "pages/page_005.png",
+      "dimensions": {
+        "width": 1275,
+        "height": 1632
+      },
+      "word_count": 755,
+      "has_significant_content": true,
+      "file_size_kb": 1009.6,
+      "text_preview": "Numbers and Operations Add and Subtract Rational Numbers Unit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ....",
+      "keywords": [
+        "ratio",
+        "integer",
+        "rational"
+      ],
+      "page_type": "assessment"
+    },
+    {
+      "page_number": 6,
+      "filename": "page_006.png",
+      "image_path": "pages/page_006.png",
+      "dimensions": {
+        "width": 1275,
+        "height": 1632
+      },
+      "word_count": 762,
+      "has_significant_content": true,
+      "file_size_kb": 240.0,
+      "text_preview": "Contents (continued) Numbers and Operations Multiply and Divide Rational Numbers",
+      "keywords": [
+        "decimal",
+        "ratio",
+        "integer",
+        "rational"
+      ],
+      "page_type": "contents"
+    },
+    {
+      "page_number": 7,
+      "filename": "page_007.png",
+      "image_path": "pages/page_007.png",
+      "dimensions": {
+        "width": 1275,
+        "height": 1632
+      },
+      "word_count": 803,
+      "has_significant_content": true,
+      "file_size_kb": 938.9,
+      "text_preview": "Algebraic Thinking Expressions, Equations, and Inequalities Unit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ....",
+      "keywords": [
+        "ratio",
+        "equation",
+        "expression",
+        "rational"
+      ],
+      "page_type": "assessment"
+    },
+    {
+      "page_number": 8,
+      "filename": "page_008.png",
+      "image_path": "pages/page_008.png",
+      "dimensions": {
+        "width": 1275,
+        "height": 1632
+      },
+      "word_count": 837,
+      "has_significant_content": true,
+      "file_size_kb": 604.8,
+      "text_preview": "Contents (continued) Proportional Reasoning Percents and Statistical Samples",
+      "keywords": [
+        "percent",
+        "proportion"
+      ],
+      "page_type": "backmatter"
+    },
+    {
+      "page_number": 9,
+      "filename": "page_009.png",
+      "image_path": "pages/page_009.png",
+      "dimensions": {
+        "width": 1275,
+        "height": 1632
+      },
+      "word_count": 821,
+      "has_significant_content": true,
+      "file_size_kb": 269.9,
+      "text_preview": "Solids, Triangles, and Angles Unit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ....",
+      "keywords": [
+        "geometry",
+        "triangle",
+        "angle",
+        "area",
+        "volume"
+      ],
+      "page_type": "backmatter"
+    },
+    {
+      "page_number": 10,
+      "filename": "page_010.png",
+      "image_path": "pages/page_010.png",
+      "dimensions": {
+        "width": 1275,
+        "height": 1632
+      },
+      "word_count": 1026,
+      "has_significant_content": true,
+      "file_size_kb": 791.1,
+      "text_preview": "Contents (continued) Probability Theoretical Probability, Experimental",
+      "keywords": [
+        "probability",
+        "mode"
+      ],
+      "page_type": "backmatter"
+    }
+  ],
+  "stats": {
+    "total_words": 6166,
+    "content_pages": 10,
+    "file_size_mb": 5.3,
+    "avg_words_per_page": 617
+  }
+}

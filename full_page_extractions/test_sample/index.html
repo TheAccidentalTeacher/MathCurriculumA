@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test_sample - Full Page View</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .pages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+        }
+        .page-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .page-card:hover {
+            transform: translateY(-5px);
+        }
+        .page-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-bottom: 2px solid #eee;
+        }
+        .page-info {
+            padding: 20px;
+        }
+        .page-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .page-meta {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+        .page-preview {
+            color: #888;
+            font-size: 0.8em;
+            max-height: 60px;
+            overflow: hidden;
+            line-height: 1.4;
+        }
+        .download-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+        .download-btn:hover {
+            background: #5a6fd8;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📄 test_sample</h1>
+        <p>Full page extractions • 10 pages • 200 DPI</p>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-number">10</div>
+            <div>Total Pages</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">200</div>
+            <div>DPI Quality</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">10</div>
+            <div>Content Pages</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">6,166</div>
+            <div>Total Words</div>
+        </div>
+    </div>
+
+    <div class="pages-grid">
+        <div class="page-card">
+            <img src="page_001.png" alt="Page 1" class="page-image">
+            <div class="page-info">
+                <div class="page-title">Page 1</div>
+                <div class="page-meta">
+                    1700 × 2175 pixels<br>
+                    58 words
+                </div>
+                <div class="page-preview">Mathematics
+Grade 7 • Volume 1
+NOT FOR RESALE
+978-1-7280-4676-1
+©2024–Curriculum Associates, LLC
+North Billerica, MA 01862
+No part of this book may be reproduced  
+by any means without written permiss...</div>
+                <a href="page_001.png" download class="download-btn">Download PNG</a>
+            </div>
+        </div>
+        <div class="page-card">
+            <img src="page_002.png" alt="Page 2" class="page-image">
+            <div class="page-info">
+                <div class="page-title">Page 2</div>
+                <div class="page-meta">
+                    1700 × 2175 pixels<br>
+                    108 words
+                </div>
+                <div class="page-preview">ii
+©Curriculum Associates, LLC  Copying is not permitted.
+Explore Digital Resources  
+for Students
+In addition to the instruction and practice provided 
+in this Student Worktext, you have access to di...</div>
+                <a href="page_002.png" download class="download-btn">Download PNG</a>
+            </div>
+        </div>
+        <div class="page-card">
+            <img src="page_003.png" alt="Page 3" class="page-image">
+            <div class="page-info">
+                <div class="page-title">Page 3</div>
+                <div class="page-meta">
+                    1700 × 2175 pixels<br>
+                    136 words
+                </div>
+                <div class="page-preview">iii
+©Curriculum Associates, LLC  Copying is not permitted.
+   Online Student Worktext English/Spanish 
+   My Videos (Instructional Videos)
+   Glossaries Multiple Languages 
+   Family Resources Multipl...</div>
+                <a href="page_003.png" download class="download-btn">Download PNG</a>
+            </div>
+        </div>
+        <div class="page-card">
+            <img src="page_004.png" alt="Page 4" class="page-image">
+            <div class="page-info">
+                <div class="page-title">Page 4</div>
+                <div class="page-meta">
+                    1700 × 2175 pixels<br>
+                    860 words
+                </div>
+                <div class="page-preview">©Curriculum Associates, LLC  Copying is not permitted.
+iv
+Contents
+UNIT
+Proportional Relationships
+Ratios, Rates, and Circles
+Unit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ....</div>
+                <a href="page_004.png" download class="download-btn">Download PNG</a>
+            </div>
+        </div>
+        <div class="page-card">
+            <img src="page_005.png" alt="Page 5" class="page-image">
+            <div class="page-info">
+                <div class="page-title">Page 5</div>
+                <div class="page-meta">
+                    1700 × 2175 pixels<br>
+                    755 words
+                </div>
+                <div class="page-preview">UNIT
+v
+©Curriculum Associates, LLC  Copying is not permitted.
+Numbers and Operations
+Add and Subtract Rational Numbers
+Unit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . ...</div>
+                <a href="page_005.png" download class="download-btn">Download PNG</a>
+            </div>
+        </div>
+        <div class="page-card">
+            <img src="page_006.png" alt="Page 6" class="page-image">
+            <div class="page-info">
+                <div class="page-title">Page 6</div>
+                <div class="page-meta">
+                    1700 × 2175 pixels<br>
+                    762 words
+                </div>
+                <div class="page-preview">©Curriculum Associates, LLC  Copying is not permitted.
+vi
+UNIT
+Contents (continued)
+Numbers and Operations
+Multiply and Divide Rational Numbers
+Unit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ....</div>
+                <a href="page_006.png" download class="download-btn">Download PNG</a>
+            </div>
+        </div>
+        <div class="page-card">
+            <img src="page_007.png" alt="Page 7" class="page-image">
+            <div class="page-info">
+                <div class="page-title">Page 7</div>
+                <div class="page-meta">
+                    1700 × 2175 pixels<br>
+                    803 words
+                </div>
+                <div class="page-preview">vii
+UNIT
+©Curriculum Associates, LLC  Copying is not permitted.
+Algebraic Thinking
+Expressions, Equations, and Inequalities
+Unit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ...</div>
+                <a href="page_007.png" download class="download-btn">Download PNG</a>
+            </div>
+        </div>
+        <div class="page-card">
+            <img src="page_008.png" alt="Page 8" class="page-image">
+            <div class="page-info">
+                <div class="page-title">Page 8</div>
+                <div class="page-meta">
+                    1700 × 2175 pixels<br>
+                    837 words
+                </div>
+                <div class="page-preview">©Curriculum Associates, LLC  Copying is not permitted.
+viii
+UNIT
+Contents (continued)
+Proportional Reasoning
+Percents and Statistical Samples
+Unit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ...</div>
+                <a href="page_008.png" download class="download-btn">Download PNG</a>
+            </div>
+        </div>
+        <div class="page-card">
+            <img src="page_009.png" alt="Page 9" class="page-image">
+            <div class="page-info">
+                <div class="page-title">Page 9</div>
+                <div class="page-meta">
+                    1700 × 2175 pixels<br>
+                    821 words
+                </div>
+                <div class="page-preview">©Curriculum Associates, LLC  Copying is not permitted.
+ix
+UNIT
+Geometry
+Solids, Triangles, and Angles
+Unit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ....</div>
+                <a href="page_009.png" download class="download-btn">Download PNG</a>
+            </div>
+        </div>
+        <div class="page-card">
+            <img src="page_010.png" alt="Page 10" class="page-image">
+            <div class="page-info">
+                <div class="page-title">Page 10</div>
+                <div class="page-meta">
+                    1700 × 2175 pixels<br>
+                    1026 words
+                </div>
+                <div class="page-preview">©Curriculum Associates, LLC  Copying is not permitted.
+x
+UNIT
+Contents (continued)
+Probability
+Theoretical Probability, Experimental  
+Probability, and Compound Events
+Unit Opener  .  .  .  .  .  .  ....</div>
+                <a href="page_010.png" download class="download-btn">Download PNG</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add click to zoom functionality
+        document.querySelectorAll('.page-image').forEach(img => {
+            img.addEventListener('click', function() {
+                window.open(this.src, '_blank');
+            });
+            img.style.cursor = 'pointer';
+            img.title = 'Click to view full size';
+        });
+    </script>
+</body>
+</html>

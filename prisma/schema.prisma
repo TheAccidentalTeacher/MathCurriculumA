@@ -24,6 +24,7 @@ model Document {
   updated_at  DateTime  @updatedAt
   
   units       Unit[]
+  page_images PageImage[]
   
   @@map("documents")
 }
@@ -137,6 +138,29 @@ model VisualElement {
   problem       Problem? @relation(fields: [problem_id], references: [id], onDelete: Cascade)
   
   @@map("visual_elements")
+}
+
+model PageImage {
+  id            String   @id @default(cuid())
+  document_id   String
+  page_number   Int
+  filename      String   // "page_001.png"
+  image_data    Bytes    // Store PNG data directly in database
+  width         Int
+  height        Int
+  file_size_kb  Float
+  page_type     String   // "cover", "lesson", "practice", "assessment"
+  word_count    Int      @default(0)
+  text_preview  String?  @db.Text
+  keywords      String[] // Mathematical terms found on page
+  created_at    DateTime @default(now())
+  
+  document      Document @relation(fields: [document_id], references: [id], onDelete: Cascade)
+  
+  @@unique([document_id, page_number])
+  @@index([document_id, page_number])
+  @@index([page_type])
+  @@map("page_images")
 }
 
 model Topic {

@@ -1,0 +1,20 @@
+{
+  "document_id": "test-sample",
+  "title": "Test Sample",
+  "pages_count": 10,
+  "content_pages": 10,
+  "total_words": 6166,
+  "file_size_mb": 5.3,
+  "integration": {
+    "pages_directory": "pages/",
+    "data_file": "data/document.json",
+    "database_file": "data/document.db",
+    "image_format": "PNG",
+    "resolution_dpi": 150
+  },
+  "api_endpoints": {
+    "get_page": "/api/documents/test-sample/page/[pageNumber]",
+    "get_info": "/api/documents/test-sample/info",
+    "search": "/api/documents/test-sample/search"
+  }
+}

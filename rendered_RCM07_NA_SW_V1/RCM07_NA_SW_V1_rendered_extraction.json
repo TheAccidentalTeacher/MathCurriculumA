@@ -1,0 +1,2199 @@
+{
+  "source_pdf": "RCM07_NA_SW_V1.pdf",
+  "extraction_date": "2025-08-28T05:20:31.261510",
+  "pages_processed": 5,
+  "visual_elements": [
+    {
+      "page": 1,
+      "diagram_index": 1,
+      "type": "complex_diagram",
+      "filename": "page_001_diagram_001_complex_diagram.png",
+      "bounds": {
+        "x0": 0.0,
+        "y0": 0.0,
+        "x1": 612.0,
+        "y1": 783.0,
+        "width": 612.0,
+        "height": 783.0
+      },
+      "context": "Mathematics\nGrade 7 • Volume 1\nNOT FOR RESALE\n978-1-7280-4676-1\n©2024–Curriculum Associates, LLC\nNorth Billerica, MA 01862\nNo part of this book may be reproduced  \nby any means without written permiss",
+      "drawing_elements": 1
+    },
+    {
+      "page": 1,
+      "diagram_index": 2,
+      "type": "complex_diagram",
+      "filename": "page_001_diagram_002_complex_diagram.png",
+      "bounds": {
+        "x0": 34.0,
+        "y0": 34.0,
+        "x1": 578.0,
+        "y1": 749.0,
+        "width": 544.0,
+        "height": 715.0
+      },
+      "context": "Mathematics\nGrade 7 • Volume 1\nNOT FOR RESALE\n978-1-7280-4676-1\n©2024–Curriculum Associates, LLC\nNorth Billerica, MA 01862\nNo part of this book may be reproduced  \nby any means without written permiss",
+      "drawing_elements": 1
+    },
+    {
+      "page": 1,
+      "diagram_index": 7,
+      "type": "small_element",
+      "filename": "page_001_diagram_007_small_element.png",
+      "bounds": {
+        "x0": 180.37159729003906,
+        "y0": 241.19769287109375,
+        "x1": 194.32260131835938,
+        "y1": 256.0386962890625,
+        "width": 13.951004028320312,
+        "height": 14.84100341796875
+      },
+      "context": "Mathe",
+      "drawing_elements": 18
+    },
+    {
+      "page": 1,
+      "diagram_index": 12,
+      "type": "small_element",
+      "filename": "page_001_diagram_012_small_element.png",
+      "bounds": {
+        "x0": 235.8303985595703,
+        "y0": 244.6911163330078,
+        "x1": 247.46139526367188,
+        "y1": 256.03912353515625,
+        "width": 11.630996704101562,
+        "height": 11.348007202148438
+      },
+      "context": "Mathem",
+      "drawing_elements": 8
+    },
+    {
+      "page": 1,
+      "diagram_index": 13,
+      "type": "small_element",
+      "filename": "page_001_diagram_013_small_element.png",
+      "bounds": {
+        "x0": 248.26820373535156,
+        "y0": 244.6911163330078,
+        "x1": 259.8992004394531,
+        "y1": 256.03912353515625,
+        "width": 11.630996704101562,
+        "height": 11.348007202148438
+      },
+      "context": "athem",
+      "drawing_elements": 8
+    },
+    {
+      "page": 1,
+      "diagram_index": 14,
+      "type": "small_element",
+      "filename": "page_001_diagram_014_small_element.png",
+      "bounds": {
+        "x0": 261.3307189941406,
+        "y0": 244.69056701660156,
+        "x1": 277.49371337890625,
+        "y1": 255.77357482910156,
+        "width": 16.162994384765625,
+        "height": 11.0830078125
+      },
+      "context": "athema",
+      "drawing_elements": 30
+    },
+    {
+      "page": 1,
+      "diagram_index": 15,
+      "type": "small_element",
+      "filename": "page_001_diagram_015_small_element.png",
+      "bounds": {
+        "x0": 199.11009216308594,
+        "y0": 244.68798828125,
+        "x1": 210.53309631347656,
+        "y1": 256.0169677734375,
+        "width": 11.423004150390625,
+        "height": 11.3289794921875
+      },
+      "context": "Mathem",
+      "drawing_elements": 20
+    },
+    {
+      "page": 1,
+      "diagram_index": 16,
+      "type": "small_element",
+      "filename": "page_001_diagram_016_small_element.png",
+      "bounds": {
+        "x0": 127.16350555419922,
+        "y0": 244.69700622558594,
+        "x1": 138.1735076904297,
+        "y1": 256.0260009765625,
+        "width": 11.010002136230469,
+        "height": 11.328994750976562
+      },
+      "context": "Math",
+      "drawing_elements": 17
+    },
+    {
+      "page": 1,
+      "diagram_index": 17,
+      "type": "small_element",
+      "filename": "page_001_diagram_017_small_element.png",
+      "bounds": {
+        "x0": 151.7089080810547,
+        "y0": 241.4462127685547,
+        "x1": 163.0198974609375,
+        "y1": 256.0172119140625,
+        "width": 11.310989379882812,
+        "height": 14.570999145507812
+      },
+      "context": "Mathe",
+      "drawing_elements": 19
+    },
+    {
+      "page": 1,
+      "diagram_index": 18,
+      "type": "small_element",
+      "filename": "page_001_diagram_018_small_element.png",
+      "bounds": {
+        "x0": 139.08518981933594,
+        "y0": 244.68798828125,
+        "x1": 150.50819396972656,
+        "y1": 256.0169677734375,
+        "width": 11.423004150390625,
+        "height": 11.3289794921875
+      },
+      "context": "Math",
+      "drawing_elements": 20
+    },
+    {
+      "page": 1,
+      "diagram_index": 19,
+      "type": "small_element",
+      "filename": "page_001_diagram_019_small_element.png",
+      "bounds": {
+        "x0": 164.1024932861328,
+        "y0": 244.97000122070312,
+        "x1": 174.82550048828125,
+        "y1": 260.01300048828125,
+        "width": 10.723007202148438,
+        "height": 15.042999267578125
+      },
+      "context": "Mathe",
+      "drawing_elements": 16
+    },
+    {
+      "page": 1,
+      "diagram_index": 24,
+      "type": "small_element",
+      "filename": "page_001_diagram_024_small_element.png",
+      "bounds": {
+        "x0": 116.2665023803711,
+        "y0": 241.45037841796875,
+        "x1": 126.81550598144531,
+        "y1": 255.75936889648438,
+        "width": 10.549003601074219,
+        "height": 14.308990478515625
+      },
+      "context": "Math",
+      "drawing_elements": 25
+    },
+    {
+      "page": 1,
+      "diagram_index": 26,
+      "type": "small_element",
+      "filename": "page_001_diagram_026_small_element.png",
+      "bounds": {
+        "x0": 216.6110076904297,
+        "y0": 718.4805297851562,
+        "x1": 226.65499877929688,
+        "y1": 731.4525146484375,
+        "width": 10.043991088867188,
+        "height": 12.97198486328125
+      },
+      "context": "1 2 3 4 5 6 7 8 9 10 11 12 13 14",
+      "drawing_elements": 14
+    },
+    {
+      "page": 1,
+      "diagram_index": 36,
+      "type": "small_element",
+      "filename": "page_001_diagram_036_small_element.png",
+      "bounds": {
+        "x0": 308.1470031738281,
+        "y0": 718.5874633789062,
+        "x1": 319.84600830078125,
+        "y1": 731.345458984375,
+        "width": 11.699005126953125,
+        "height": 12.75799560546875
+      },
+      "context": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15   24 23 22",
+      "drawing_elements": 11
+    },
+    {
+      "page": 2,
+      "diagram_index": 1,
+      "type": "complex_diagram",
+      "filename": "page_002_diagram_001_complex_diagram.png",
+      "bounds": {
+        "x0": -13.5,
+        "y0": -13.5,
+        "x1": 1237.5,
+        "y1": 796.5,
+        "width": 1251.0,
+        "height": 810.0
+      },
+      "context": "ii\n©Curriculum Associates, LLC Copying is not permitted.\nExplore Digital Resources  \nfor Students\nIn addition to the instruction and practice provided \nin this Student Worktext, you have access to dig",
+      "drawing_elements": 1
+    },
+    {
+      "page": 2,
+      "diagram_index": 2,
+      "type": "complex_diagram",
+      "filename": "page_002_diagram_002_complex_diagram.png",
+      "bounds": {
+        "x0": 27.899999618530273,
+        "y0": 39.20001220703125,
+        "x1": 1200.780029296875,
+        "y1": 741.2000122070312,
+        "width": 1172.8800296783447,
+        "height": 702.0
+      },
+      "context": "ii\n©Curriculum Associates, LLC Copying is not permitted.\nExplore Digital Resources  \nfor Students\nIn addition to the instruction and practice provided \nin this Student Worktext, you have access to dig",
+      "drawing_elements": 1
+    },
+    {
+      "page": 2,
+      "diagram_index": 3,
+      "type": "complex_diagram",
+      "filename": "page_002_diagram_003_complex_diagram.png",
+      "bounds": {
+        "x0": 36.0,
+        "y0": 47.0999755859375,
+        "x1": 1188.5,
+        "y1": 729.0,
+        "width": 1152.5,
+        "height": 681.9000244140625
+      },
+      "context": "ii\n©Curriculum Associates, LLC Copying is not permitted.\nExplore Digital Resources  \nfor Students\nIn addition to the instruction and practice provided \nin this Student Worktext, you have access to dig",
+      "drawing_elements": 1
+    },
+    {
+      "page": 2,
+      "diagram_index": 4,
+      "type": "number_line_candidate",
+      "filename": "page_002_diagram_004_number_line_candidate.png",
+      "bounds": {
+        "x0": 70.01300048828125,
+        "y0": 259.13897705078125,
+        "x1": 569.3330078125,
+        "y1": 299.8189697265625,
+        "width": 499.32000732421875,
+        "height": 40.67999267578125
+      },
+      "context": "the digital resources available on the \nStudent Dashboard.\nTo Do\nSee your digital assignments on your dashboard. English/Spanish\nMy Path (when available) uses the Diagnostic \nto provide lessons custom",
+      "drawing_elements": 1
+    },
+    {
+      "page": 2,
+      "diagram_index": 5,
+      "type": "number_line_candidate",
+      "filename": "page_002_diagram_005_number_line_candidate.png",
+      "bounds": {
+        "x0": 72.375,
+        "y0": 259.8599853515625,
+        "x1": 567.0,
+        "y1": 295.8599853515625,
+        "width": 494.625,
+        "height": 36.0
+      },
+      "context": "the digital resources available on the \nStudent Dashboard.\nTo Do\nSee your digital assignments on your dashboard. English/Spanish\nMy Path (when available) uses the Diagnostic \nto provide lessons custom",
+      "drawing_elements": 1
+    },
+    {
+      "page": 2,
+      "diagram_index": 53,
+      "type": "complex_diagram",
+      "filename": "page_002_diagram_053_complex_diagram.png",
+      "bounds": {
+        "x0": 72.375,
+        "y0": 260.23541259765625,
+        "x1": 566.625,
+        "y1": 694.0004272460938,
+        "width": 494.25,
+        "height": 433.7650146484375
+      },
+      "context": "the digital resources available on the \nStudent Dashboard.\nTo Do\nSee your digital assignments on your dashboard. English/Spanish\nMy Path (when available) uses the Diagnostic \nto provide lessons custom",
+      "drawing_elements": 5
+    },
+    {
+      "page": 2,
+      "diagram_index": 55,
+      "type": "small_element",
+      "filename": "page_002_diagram_055_small_element.png",
+      "bounds": {
+        "x0": 89.62229919433594,
+        "y0": 267.47198486328125,
+        "x1": 107.12429809570312,
+        "y1": 288.2679748535156,
+        "width": 17.501998901367188,
+        "height": 20.795989990234375
+      },
+      "context": "Student Dashboard.\nTo Do\nSee your\nPersonalized Instructio\n(when available) can he",
+      "drawing_elements": 8
+    },
+    {
+      "page": 2,
+      "diagram_index": 56,
+      "type": "small_element",
+      "filename": "page_002_diagram_056_small_element.png",
+      "bounds": {
+        "x0": 91.19169616699219,
+        "y0": 268.8703918457031,
+        "x1": 107.12369537353516,
+        "y1": 288.18438720703125,
+        "width": 15.931999206542969,
+        "height": 19.313995361328125
+      },
+      "context": "Student Dashboard.\nTo Do\nSee your\nPersonalized Instructio\n(when available) can he",
+      "drawing_elements": 8
+    },
+    {
+      "page": 2,
+      "diagram_index": 61,
+      "type": "small_element",
+      "filename": "page_002_diagram_061_small_element.png",
+      "bounds": {
+        "x0": 89.59510040283203,
+        "y0": 267.42376708984375,
+        "x1": 107.15509796142578,
+        "y1": 288.29376220703125,
+        "width": 17.55999755859375,
+        "height": 20.8699951171875
+      },
+      "context": "Student Dashboard.\nTo Do\nSee your\nPersonalized Instructio\n(when available) can he",
+      "drawing_elements": 8
+    },
+    {
+      "page": 2,
+      "diagram_index": 62,
+      "type": "mathematical_diagram",
+      "filename": "page_002_diagram_062_mathematical_diagram.png",
+      "bounds": {
+        "x0": 108.98359680175781,
+        "y0": 330.4921875,
+        "x1": 207.4835968017578,
+        "y1": 444.4921875,
+        "width": 98.5,
+        "height": 114.0
+      },
+      "context": "To Do\nSee your digital assignments o\nPersonalized Instruction lessons \n(when available) can help increase \nyour understanding of math concepts.",
+      "drawing_elements": 3
+    },
+    {
+      "page": 2,
+      "diagram_index": 64,
+      "type": "mathematical_diagram",
+      "filename": "page_002_diagram_064_mathematical_diagram.png",
+      "bounds": {
+        "x0": 395.0,
+        "y0": 331.00421142578125,
+        "x1": 531.5,
+        "y1": 451.90020751953125,
+        "width": 136.5,
+        "height": 120.89599609375
+      },
+      "context": "ts on your dashboard. English/Spanish\nMy Path (when available) uses the Diagnostic \nto provide lessons customized to your math \nlearning needs.",
+      "drawing_elements": 3
+    },
+    {
+      "page": 2,
+      "diagram_index": 66,
+      "type": "mathematical_diagram",
+      "filename": "page_002_diagram_066_mathematical_diagram.png",
+      "bounds": {
+        "x0": 108.98359680175781,
+        "y0": 478.32470703125,
+        "x1": 207.4835968017578,
+        "y1": 625.3306884765625,
+        "width": 98.5,
+        "height": 147.0059814453125
+      },
+      "context": "Interactive Practice helps you \nreinforce skills and concepts while \nproviding you helpful feedback.",
+      "drawing_elements": 3
+    },
+    {
+      "page": 2,
+      "diagram_index": 68,
+      "type": "mathematical_diagram",
+      "filename": "page_002_diagram_068_mathematical_diagram.png",
+      "bounds": {
+        "x0": 296.0001220703125,
+        "y0": 514.4923095703125,
+        "x1": 531.5001220703125,
+        "y1": 628.5003051757812,
+        "width": 235.5,
+        "height": 114.00799560546875
+      },
+      "context": "helps you \noncepts while \nul feedback. \nComprehension Checks provide \ndigital assessments on lesson and \nunit topics.",
+      "drawing_elements": 3
+    },
+    {
+      "page": 2,
+      "diagram_index": 70,
+      "type": "number_line_candidate",
+      "filename": "page_002_diagram_070_number_line_candidate.png",
+      "bounds": {
+        "x0": 328.5199890136719,
+        "y0": 316.3399963378906,
+        "x1": 542.5999755859375,
+        "y1": 368.29998779296875,
+        "width": 214.07998657226562,
+        "height": 51.959991455078125
+      },
+      "context": "ital assignments on your dashboard. English/Spanish\nMy Path (when available) uses the Diagnostic \nto provide lessons customized to your math \nlearning needs. \nssons \nncrease \nh concepts.",
+      "drawing_elements": 1
+    },
+    {
+      "page": 2,
+      "diagram_index": 71,
+      "type": "number_line_candidate",
+      "filename": "page_002_diagram_071_number_line_candidate.png",
+      "bounds": {
+        "x0": 327.0,
+        "y0": 314.860107421875,
+        "x1": 539.0,
+        "y1": 364.735107421875,
+        "width": 212.0,
+        "height": 49.875
+      },
+      "context": "ital assignments on your dashboard. English/Spanish\nMy Path (when available) uses the Diagnostic \nto provide lessons customized to your math \nlearning needs. \nessons \nncrease \nh concepts.",
+      "drawing_elements": 8
+    },
+    {
+      "page": 2,
+      "diagram_index": 72,
+      "type": "number_line_candidate",
+      "filename": "page_002_diagram_072_number_line_candidate.png",
+      "bounds": {
+        "x0": 101.8949966430664,
+        "y0": 624.97998046875,
+        "x1": 274.3349914550781,
+        "y1": 676.9400024414062,
+        "width": 172.43999481201172,
+        "height": 51.96002197265625
+      },
+      "context": "Interactive Practice helps you \nreinforce skills and concepts while \nproviding you helpful feedback.",
+      "drawing_elements": 1
+    },
+    {
+      "page": 2,
+      "diagram_index": 73,
+      "type": "number_line_candidate",
+      "filename": "page_002_diagram_073_number_line_candidate.png",
+      "bounds": {
+        "x0": 100.375,
+        "y0": 623.5001831054688,
+        "x1": 270.79998779296875,
+        "y1": 673.3751831054688,
+        "width": 170.42498779296875,
+        "height": 49.875
+      },
+      "context": "Interactive Practice helps you \nreinforce skills and concepts while \nproviding you helpful feedback.",
+      "drawing_elements": 8
+    },
+    {
+      "page": 2,
+      "diagram_index": 74,
+      "type": "number_line_candidate",
+      "filename": "page_002_diagram_074_number_line_candidate.png",
+      "bounds": {
+        "x0": 377.5419921875,
+        "y0": 624.97998046875,
+        "x1": 542.5419921875,
+        "y1": 676.9400024414062,
+        "width": 165.0,
+        "height": 51.96002197265625
+      },
+      "context": "Comprehension Checks provide \ndigital assessments on lesson and \nunit topics.",
+      "drawing_elements": 1
+    },
+    {
+      "page": 2,
+      "diagram_index": 75,
+      "type": "number_line_candidate",
+      "filename": "page_002_diagram_075_number_line_candidate.png",
+      "bounds": {
+        "x0": 376.0220031738281,
+        "y0": 623.5001831054688,
+        "x1": 539.0,
+        "y1": 673.3751831054688,
+        "width": 162.97799682617188,
+        "height": 49.875
+      },
+      "context": "Comprehension Checks provide \ndigital assessments on lesson and \nunit topics.",
+      "drawing_elements": 8
+    },
+    {
+      "page": 2,
+      "diagram_index": 76,
+      "type": "number_line_candidate",
+      "filename": "page_002_diagram_076_number_line_candidate.png",
+      "bounds": {
+        "x0": 101.8949966430664,
+        "y0": 316.3399963378906,
+        "x1": 287.8949890136719,
+        "y1": 368.29998779296875,
+        "width": 185.99999237060547,
+        "height": 51.959991455078125
+      },
+      "context": "To Do\nSee your digital assignments on your dashboard\nMy Path (wh\nto provide le\nlearning nee\nPersonalized Instruction lessons \n(when available) can help increase \nyour understanding of math concepts.",
+      "drawing_elements": 1
+    },
+    {
+      "page": 2,
+      "diagram_index": 77,
+      "type": "number_line_candidate",
+      "filename": "page_002_diagram_077_number_line_candidate.png",
+      "bounds": {
+        "x0": 100.375,
+        "y0": 314.860107421875,
+        "x1": 284.375,
+        "y1": 364.735107421875,
+        "width": 184.0,
+        "height": 49.875
+      },
+      "context": "To Do\nSee your digital assignments on your dashboard\nMy Path (wh\nto provide le\nlearning nee\nPersonalized Instruction lessons \n(when available) can help increase \nyour understanding of math concepts.",
+      "drawing_elements": 8
+    },
+    {
+      "page": 3,
+      "diagram_index": 1,
+      "type": "number_line",
+      "filename": "page_003_diagram_001_number_line.png",
+      "bounds": {
+        "x0": -625.5,
+        "y0": -13.5,
+        "x1": 625.5,
+        "y1": 796.5,
+        "width": 1251.0,
+        "height": 810.0
+      },
+      "context": "iii\n©Curriculum Associates, LLC Copying is not permitted.\n  Online Student Worktext English/Spanish \n  My Videos (Instructional Videos)\n  Glossaries Multiple Languages \n  Family Resources Multiple Lan",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 2,
+      "type": "number_line",
+      "filename": "page_003_diagram_002_number_line.png",
+      "bounds": {
+        "x0": -584.0999755859375,
+        "y0": 39.20001220703125,
+        "x1": 588.780029296875,
+        "y1": 741.2000122070312,
+        "width": 1172.8800048828125,
+        "height": 702.0
+      },
+      "context": "iii\n©Curriculum Associates, LLC Copying is not permitted.\n  Online Student Worktext English/Spanish \n  My Videos (Instructional Videos)\n  Glossaries Multiple Languages \n  Family Resources Multiple Lan",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 3,
+      "type": "number_line",
+      "filename": "page_003_diagram_003_number_line.png",
+      "bounds": {
+        "x0": -576.0,
+        "y0": 47.0999755859375,
+        "x1": 576.5,
+        "y1": 729.0,
+        "width": 1152.5,
+        "height": 681.9000244140625
+      },
+      "context": "iii\n©Curriculum Associates, LLC Copying is not permitted.\n  Online Student Worktext English/Spanish \n  My Videos (Instructional Videos)\n  Glossaries Multiple Languages \n  Family Resources Multiple Lan",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 4,
+      "type": "number_line",
+      "filename": "page_003_diagram_004_number_line.png",
+      "bounds": {
+        "x0": 52.01300048828125,
+        "y0": 79.13800048828125,
+        "x1": 543.052978515625,
+        "y1": 119.8179931640625,
+        "width": 491.03997802734375,
+        "height": 40.67999267578125
+      },
+      "context": "Online Student Worktext English/Spanish \n  My Videos (Instructional Videos)\n  Glossaries Multiple Languages \nStudent Bookshelf\nAccess your books, videos, and more!",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 5,
+      "type": "number_line",
+      "filename": "page_003_diagram_005_number_line.png",
+      "bounds": {
+        "x0": 54.375,
+        "y0": 79.8599853515625,
+        "x1": 540.75,
+        "y1": 115.8599853515625,
+        "width": 486.375,
+        "height": 36.0
+      },
+      "context": "Online Student Worktext English/Spanish \n  My Videos (Instructional Videos)\nStudent Bookshelf\nAccess your books, videos, and more!",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 53,
+      "type": "number_line",
+      "filename": "page_003_diagram_053_number_line.png",
+      "bounds": {
+        "x0": 54.375,
+        "y0": 80.2349853515625,
+        "x1": 540.375,
+        "y1": 270.2349853515625,
+        "width": 486.0,
+        "height": 190.0
+      },
+      "context": "Online Student Worktext English/Spanish \n  My Videos (Instructional Videos)\n  Glossaries Multiple Languages \n  Family Resources Multiple Languages \n  Student Handbook English/Spanish \n  Additional too",
+      "drawing_elements": 5
+    },
+    {
+      "page": 3,
+      "diagram_index": 54,
+      "type": "number_line",
+      "filename": "page_003_diagram_054_number_line.png",
+      "bounds": {
+        "x0": 69.375,
+        "y0": 129.1099853515625,
+        "x1": 81.3759994506836,
+        "y1": 141.1099853515625,
+        "width": 12.000999450683594,
+        "height": 12.0
+      },
+      "context": "Online Student Workte\n  My Videos (Instruction\n  Glossaries Multiple Langua\n  Family Resources Multip\nStudent Boo",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 56,
+      "type": "number_line",
+      "filename": "page_003_diagram_056_number_line.png",
+      "bounds": {
+        "x0": 69.375,
+        "y0": 147.6099853515625,
+        "x1": 81.3759994506836,
+        "y1": 159.6099853515625,
+        "width": 12.000999450683594,
+        "height": 12.0
+      },
+      "context": "Online Student Workte\n  My Videos (Instruction\n  Glossaries Multiple Langua\n  Family Resources Multip\n  Student Handbook Eng\nStudent Boo",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 58,
+      "type": "number_line",
+      "filename": "page_003_diagram_058_number_line.png",
+      "bounds": {
+        "x0": 69.375,
+        "y0": 166.1099853515625,
+        "x1": 81.3759994506836,
+        "y1": 178.1099853515625,
+        "width": 12.000999450683594,
+        "height": 12.0
+      },
+      "context": "Online Student Workte\n  My Videos (Instruction\n  Glossaries Multiple Langua\n  Family Resources Multip\n  Student Handbook Eng\n  Additional tools availa",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 60,
+      "type": "number_line",
+      "filename": "page_003_diagram_060_number_line.png",
+      "bounds": {
+        "x0": 69.375,
+        "y0": 184.6090087890625,
+        "x1": 81.3759994506836,
+        "y1": 196.6099853515625,
+        "width": 12.000999450683594,
+        "height": 12.0009765625
+      },
+      "context": "Online Student Workte\n  My Videos (Instruction\n  Glossaries Multiple Langua\n  Family Resources Multip\n  Student Handbook Eng\n  Additional tools availa\ntext-to-speech, highlig",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 62,
+      "type": "number_line",
+      "filename": "page_003_diagram_062_number_line.png",
+      "bounds": {
+        "x0": 69.375,
+        "y0": 203.1099853515625,
+        "x1": 81.3759994506836,
+        "y1": 215.1099853515625,
+        "width": 12.000999450683594,
+        "height": 12.0
+      },
+      "context": "My Videos (Instruction\n  Glossaries Multiple Langua\n  Family Resources Multip\n  Student Handbook Eng\n  Additional tools availa\ntext-to-speech, highlig",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 64,
+      "type": "number_line",
+      "filename": "page_003_diagram_064_number_line.png",
+      "bounds": {
+        "x0": 69.375,
+        "y0": 221.6090087890625,
+        "x1": 81.3759994506836,
+        "y1": 233.6099853515625,
+        "width": 12.000999450683594,
+        "height": 12.0009765625
+      },
+      "context": "Glossaries Multiple Langua\n  Family Resources Multip\n  Student Handbook Eng\n  Additional tools availa\ntext-to-speech, highlig",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 67,
+      "type": "number_line",
+      "filename": "page_003_diagram_067_number_line.png",
+      "bounds": {
+        "x0": 414.239990234375,
+        "y0": 127.67999267578125,
+        "x1": 451.708984375,
+        "y1": 211.0,
+        "width": 37.468994140625,
+        "height": 83.32000732421875
+      },
+      "context": "oks, videos, and more!",
+      "drawing_elements": 3
+    },
+    {
+      "page": 3,
+      "diagram_index": 68,
+      "type": "number_line",
+      "filename": "page_003_diagram_068_number_line.png",
+      "bounds": {
+        "x0": 320.2539978027344,
+        "y0": 125.36102294921875,
+        "x1": 425.3739929199219,
+        "y1": 213.2010498046875,
+        "width": 105.1199951171875,
+        "height": 87.84002685546875
+      },
+      "context": "/Spanish \ns)\nes \nh \nh as note-taking,  \nnd a calculator\nelf\nAccess your books, videos, and more!",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 70,
+      "type": "number_line",
+      "filename": "page_003_diagram_070_number_line.png",
+      "bounds": {
+        "x0": 71.11830139160156,
+        "y0": 87.77860260009766,
+        "x1": 89.39730072021484,
+        "y1": 109.8456039428711,
+        "width": 18.27899932861328,
+        "height": 22.067001342773438
+      },
+      "context": "Online Student Worktex\n  My Videos (Instructional\nStudent Book",
+      "drawing_elements": 12
+    },
+    {
+      "page": 3,
+      "diagram_index": 71,
+      "type": "number_line",
+      "filename": "page_003_diagram_071_number_line.png",
+      "bounds": {
+        "x0": 72.52100372314453,
+        "y0": 88.9225845336914,
+        "x1": 89.50199890136719,
+        "y1": 109.85358428955078,
+        "width": 16.980995178222656,
+        "height": 20.930999755859375
+      },
+      "context": "Online Student Worktex\n  My Videos (Instructional\nStudent Book",
+      "drawing_elements": 16
+    },
+    {
+      "page": 3,
+      "diagram_index": 73,
+      "type": "number_line",
+      "filename": "page_003_diagram_073_number_line.png",
+      "bounds": {
+        "x0": 71.11840057373047,
+        "y0": 87.7635726928711,
+        "x1": 89.47940063476562,
+        "y1": 110.02857971191406,
+        "width": 18.361000061035156,
+        "height": 22.26500701904297
+      },
+      "context": "Online Student Worktex\n  My Videos (Instructional\nStudent Book",
+      "drawing_elements": 19
+    },
+    {
+      "page": 3,
+      "diagram_index": 74,
+      "type": "number_line",
+      "filename": "page_003_diagram_074_number_line.png",
+      "bounds": {
+        "x0": 52.01300048828125,
+        "y0": 300.4590148925781,
+        "x1": 543.052978515625,
+        "y1": 341.1390075683594,
+        "width": 491.03997802734375,
+        "height": 40.67999267578125
+      },
+      "context": "Digital Math Tools\nExplore mathematical concepts with digital tools. English/Spanish\nGraphing Calculator \npowered by Desmos \nGrades 2–8\nGeometry Tool \npowered by Desmos \nGrades 6–8\nScientific Calculat",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 75,
+      "type": "number_line",
+      "filename": "page_003_diagram_075_number_line.png",
+      "bounds": {
+        "x0": 54.375,
+        "y0": 301.17999267578125,
+        "x1": 540.75,
+        "y1": 337.17999267578125,
+        "width": 486.375,
+        "height": 36.0
+      },
+      "context": "Digital Math Tools\nExplore mathematical concepts with digital tools. English/Spanish\nGraphing Calculator \npowered by Desmos \nGrades 2–8\nGeometry Tool \npowered by Desmos \nGrades 6–8\nScientific Calculat",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 123,
+      "type": "number_line",
+      "filename": "page_003_diagram_123_number_line.png",
+      "bounds": {
+        "x0": 54.375,
+        "y0": 301.55511474609375,
+        "x1": 540.375,
+        "y1": 506.18011474609375,
+        "width": 486.0,
+        "height": 204.625
+      },
+      "context": "Digital Math Tools\nExplore mathematical concepts with digital tools. English/Spanish\nMultiplication \nModels  \nGrades 2–8\nBase-Ten Blocks  \nGrades 1–8\nGraphing Calculator \npowered by Desmos \nGrades 2–8",
+      "drawing_elements": 5
+    },
+    {
+      "page": 3,
+      "diagram_index": 125,
+      "type": "number_line",
+      "filename": "page_003_diagram_125_number_line.png",
+      "bounds": {
+        "x0": 70.88909912109375,
+        "y0": 310.6601867675781,
+        "x1": 89.87210083007812,
+        "y1": 327.7001953125,
+        "width": 18.983001708984375,
+        "height": 17.040008544921875
+      },
+      "context": "Digital Math T\nGraphing Calcula\npowered by Desm\nGrades 2–8",
+      "drawing_elements": 3
+    },
+    {
+      "page": 3,
+      "diagram_index": 126,
+      "type": "number_line",
+      "filename": "page_003_diagram_126_number_line.png",
+      "bounds": {
+        "x0": 68.94110107421875,
+        "y0": 308.7174987792969,
+        "x1": 91.80909729003906,
+        "y1": 329.6545104980469,
+        "width": 22.867996215820312,
+        "height": 20.93701171875
+      },
+      "context": "Digital Math T\nGraphing Calcula\npowered by Desm\nGrades 2–8",
+      "drawing_elements": 14
+    },
+    {
+      "page": 3,
+      "diagram_index": 127,
+      "type": "number_line",
+      "filename": "page_003_diagram_127_number_line.png",
+      "bounds": {
+        "x0": 69.91829681396484,
+        "y0": 309.68798828125,
+        "x1": 91.81329345703125,
+        "y1": 329.64300537109375,
+        "width": 21.894996643066406,
+        "height": 19.95501708984375
+      },
+      "context": "Digital Math T\nGraphing Calcula\npowered by Desm\nGrades 2–8",
+      "drawing_elements": 19
+    },
+    {
+      "page": 3,
+      "diagram_index": 128,
+      "type": "number_line",
+      "filename": "page_003_diagram_128_number_line.png",
+      "bounds": {
+        "x0": 68.94110107421875,
+        "y0": 308.7174987792969,
+        "x1": 91.80909729003906,
+        "y1": 329.6545104980469,
+        "width": 22.867996215820312,
+        "height": 20.93701171875
+      },
+      "context": "Digital Math T\nGraphing Calcula\npowered by Desm\nGrades 2–8",
+      "drawing_elements": 14
+    },
+    {
+      "page": 3,
+      "diagram_index": 133,
+      "type": "number_line",
+      "filename": "page_003_diagram_133_number_line.png",
+      "bounds": {
+        "x0": 70.99500274658203,
+        "y0": 406.1719970703125,
+        "x1": 95.32500457763672,
+        "y1": 417.62200927734375,
+        "width": 24.330001831054688,
+        "height": 11.45001220703125
+      },
+      "context": "Multiplication \nModels  \nGrades 2–8\nBase-Ten Blocks  \nGraphing Calculat\npowered by Desm\nGrades 2–8",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 134,
+      "type": "number_line",
+      "filename": "page_003_diagram_134_number_line.png",
+      "bounds": {
+        "x0": 70.99500274658203,
+        "y0": 419.0530090332031,
+        "x1": 95.32500457763672,
+        "y1": 437.65802001953125,
+        "width": 24.330001831054688,
+        "height": 18.605010986328125
+      },
+      "context": "Multiplication \nModels  \nGrades 2–8\nBase-Ten Blocks  \nGrades 1–8\npowered by Desm\nGrades 2–8",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 135,
+      "type": "number_line",
+      "filename": "page_003_diagram_135_number_line.png",
+      "bounds": {
+        "x0": 96.75599670410156,
+        "y0": 406.1719970703125,
+        "x1": 108.20499420166016,
+        "y1": 417.62200927734375,
+        "width": 11.448997497558594,
+        "height": 11.45001220703125
+      },
+      "context": "Multiplication \nModels  \nGrades 2–8\nBase-Ten Blocks  \nGraphing Calculator \npowered by Desmos\nGrades 2–8",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 136,
+      "type": "number_line",
+      "filename": "page_003_diagram_136_number_line.png",
+      "bounds": {
+        "x0": 96.75599670410156,
+        "y0": 419.0530090332031,
+        "x1": 108.20499420166016,
+        "y1": 437.65802001953125,
+        "width": 11.448997497558594,
+        "height": 18.605010986328125
+      },
+      "context": "Multiplication \nModels  \nGrades 2–8\nBase-Ten Blocks  \nGrades 1–8\npowered by Desmos\nGrades 2–8",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 137,
+      "type": "number_line",
+      "filename": "page_003_diagram_137_number_line.png",
+      "bounds": {
+        "x0": 70.46400451660156,
+        "y0": 463.1390075683594,
+        "x1": 95.06800079345703,
+        "y1": 487.7430114746094,
+        "width": 24.60399627685547,
+        "height": 24.60400390625
+      },
+      "context": "Multiplication \nModels  \nGrades 2–8\nBase-Ten Blocks  \nGrades 1–8",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 140,
+      "type": "number_line",
+      "filename": "page_003_diagram_140_number_line.png",
+      "bounds": {
+        "x0": 72.00900268554688,
+        "y0": 350.83099365234375,
+        "x1": 107.66400146484375,
+        "y1": 386.4859924316406,
+        "width": 35.654998779296875,
+        "height": 35.654998779296875
+      },
+      "context": "Digital Math Too\nMultiplication \nModels  \nGrades 2–8\nGraphing Calculator\npowered by Desmos\nGrades 2–8",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 141,
+      "type": "number_line",
+      "filename": "page_003_diagram_141_number_line.png",
+      "bounds": {
+        "x0": 74.77639770507812,
+        "y0": 350.8316955566406,
+        "x1": 104.89640045166016,
+        "y1": 379.3096923828125,
+        "width": 30.12000274658203,
+        "height": 28.477996826171875
+      },
+      "context": "Digital Math To\nMultiplication \nModels  \nGrades 2–8\nGraphing Calculator\npowered by Desmos\nGrades 2–8",
+      "drawing_elements": 2
+    },
+    {
+      "page": 3,
+      "diagram_index": 143,
+      "type": "number_line",
+      "filename": "page_003_diagram_143_number_line.png",
+      "bounds": {
+        "x0": 230.15859985351562,
+        "y0": 408.13641357421875,
+        "x1": 268.4325866699219,
+        "y1": 435.69342041015625,
+        "width": 38.27398681640625,
+        "height": 27.5570068359375
+      },
+      "context": "ultiplication \nodels  \nades 2–8\nse-Ten Blocks  \nades 1–8\naphing Calculator \nwered by Desmos \nades 2–8\nCounters and \nConnecting Cubes  \nGrades K–8\nFraction Models  \nGrades 3–8\nGeometry Tool \npowered by",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 151,
+      "type": "number_line",
+      "filename": "page_003_diagram_151_number_line.png",
+      "bounds": {
+        "x0": 250.04849243164062,
+        "y0": 457.3857116699219,
+        "x1": 267.3695068359375,
+        "y1": 483.4277038574219,
+        "width": 17.321014404296875,
+        "height": 26.0419921875
+      },
+      "context": "ication \n  \n2–8\nen Blocks  \n1–8\nCounters and \nConnecting Cubes  \nGrades K–8\nFraction Models  \nGrades 3–8",
+      "drawing_elements": 4
+    },
+    {
+      "page": 3,
+      "diagram_index": 152,
+      "type": "number_line",
+      "filename": "page_003_diagram_152_number_line.png",
+      "bounds": {
+        "x0": 231.22149658203125,
+        "y0": 457.3857116699219,
+        "x1": 248.54249572753906,
+        "y1": 483.4277038574219,
+        "width": 17.320999145507812,
+        "height": 26.0419921875
+      },
+      "context": "ultiplication \nodels  \nades 2–8\nse-Ten Blocks  \nades 1–8\nCounters and \nConnecting Cub\nGrades K–8\nFraction Models\nGrades 3–8",
+      "drawing_elements": 4
+    },
+    {
+      "page": 3,
+      "diagram_index": 153,
+      "type": "number_line",
+      "filename": "page_003_diagram_153_number_line.png",
+      "bounds": {
+        "x0": 233.83470153808594,
+        "y0": 475.82080078125,
+        "x1": 264.7567138671875,
+        "y1": 493.4947814941406,
+        "width": 30.922012329101562,
+        "height": 17.673980712890625
+      },
+      "context": "dels  \ndes 2–8\ne-Ten Blocks  \ndes 1–8\nConnecting Cubes  \nGrades K–8\nFraction Models  \nGrades 3–8\nPlay fun games to practice mat",
+      "drawing_elements": 4
+    },
+    {
+      "page": 3,
+      "diagram_index": 154,
+      "type": "number_line",
+      "filename": "page_003_diagram_154_number_line.png",
+      "bounds": {
+        "x0": 233.02508544921875,
+        "y0": 352.1002197265625,
+        "x1": 265.6510925292969,
+        "y1": 384.7261962890625,
+        "width": 32.626007080078125,
+        "height": 32.6259765625
+      },
+      "context": "al Math Tools\nExplore mathematical conce\nltiplication \ndels  \ndes 2–8\nphing Calculator \nwered by Desmos \ndes 2–8\nCounters and \nConnecting Cubes  \nGrades K–8\nGeometry Tool \npowered by Desmos\nGrades 6–8",
+      "drawing_elements": 4
+    },
+    {
+      "page": 3,
+      "diagram_index": 155,
+      "type": "number_line",
+      "filename": "page_003_diagram_155_number_line.png",
+      "bounds": {
+        "x0": 233.02520751953125,
+        "y0": 355.4012145996094,
+        "x1": 265.60821533203125,
+        "y1": 368.4132080078125,
+        "width": 32.5830078125,
+        "height": 13.011993408203125
+      },
+      "context": "al Math Tools\nExplore mathematical conce\nltiplication \ndels  \nphing Calculator \nwered by Desmos \ndes 2–8\nCounters and \nConnecting Cubes  \nGeometry Tool \npowered by Desmos\nGrades 6–8",
+      "drawing_elements": 3
+    },
+    {
+      "page": 3,
+      "diagram_index": 162,
+      "type": "number_line",
+      "filename": "page_003_diagram_162_number_line.png",
+      "bounds": {
+        "x0": 393.7239990234375,
+        "y0": 407.1490173339844,
+        "x1": 412.03399658203125,
+        "y1": 424.8680114746094,
+        "width": 18.30999755859375,
+        "height": 17.718994140625
+      },
+      "context": "unters and \nnnecting Cubes  \ndes K–8\nction Models  \nometry Tool \nwered by Desmos \ndes 6–8\nPerimeter   \nand Area  \nGrades 2–8\nNumber Line \nScientific Calcula\npowered by Desm\nGrades 6–8",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 163,
+      "type": "number_line",
+      "filename": "page_003_diagram_163_number_line.png",
+      "bounds": {
+        "x0": 393.7250061035156,
+        "y0": 424.8680114746094,
+        "x1": 424.2760009765625,
+        "y1": 436.6809997558594,
+        "width": 30.550994873046875,
+        "height": 11.81298828125
+      },
+      "context": "unters and \nnnecting Cubes  \ndes K–8\nction Models  \ndes 3–8\nwered by Desmos \ndes 6–8\nPerimeter   \nand Area  \nGrades 2–8\nNumber Line \nGrades 2–8\npowered by Desmos\nGrades 6–8",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 176,
+      "type": "number_line",
+      "filename": "page_003_diagram_176_number_line.png",
+      "bounds": {
+        "x0": 396.94940185546875,
+        "y0": 462.5083923339844,
+        "x1": 424.16741943359375,
+        "y1": 479.9353942871094,
+        "width": 27.218017578125,
+        "height": 17.427001953125
+      },
+      "context": "nters and \nnecting Cubes  \ndes K–8\ntion Models  \ndes 3–8\nPerimeter   \nand Area  \nGrades 2–8\nNumber Line \nGrades 2–8",
+      "drawing_elements": 11
+    },
+    {
+      "page": 3,
+      "diagram_index": 179,
+      "type": "number_line",
+      "filename": "page_003_diagram_179_number_line.png",
+      "bounds": {
+        "x0": 390.1536865234375,
+        "y0": 362.1697082519531,
+        "x1": 427.845703125,
+        "y1": 379.0967102050781,
+        "width": 37.6920166015625,
+        "height": 16.927001953125
+      },
+      "context": "athematical concepts with digital tools. English/Spanish\nunters and \nnnecting Cubes  \nades K–8\nometry Tool \nwered by Desmos \nades 6–8\nPerimeter   \nand Area  \nGrades 2–8\nScientific Calculator \npowered ",
+      "drawing_elements": 4
+    },
+    {
+      "page": 3,
+      "diagram_index": 182,
+      "type": "number_line",
+      "filename": "page_003_diagram_182_number_line.png",
+      "bounds": {
+        "x0": 52.01300048828125,
+        "y0": 536.4039916992188,
+        "x1": 543.052978515625,
+        "y1": 577.083984375,
+        "width": 491.03997802734375,
+        "height": 40.67999267578125
+      },
+      "context": "Grades 1–8\nGrades 3–8\nGrades 2–8\nLearning Games\nPlay fun games to practice math facts and develop fluency.  \nEnglish/Spanish\nHungry Fish \nGrades K–8\nMatch  \nGrades K–8\nZoom  \nGrades K–8",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 183,
+      "type": "number_line",
+      "filename": "page_003_diagram_183_number_line.png",
+      "bounds": {
+        "x0": 54.375,
+        "y0": 537.125,
+        "x1": 540.75,
+        "y1": 573.125,
+        "width": 486.375,
+        "height": 36.0
+      },
+      "context": "Grades 1–8\nGrades 3–8\nGrades 2–8\nLearning Games\nPlay fun games to practice math facts and develop fluency.  \nEnglish/Spanish\nHungry Fish \nGrades K–8\nMatch  \nGrades K–8\nZoom  \nGrades K–8",
+      "drawing_elements": 1
+    },
+    {
+      "page": 3,
+      "diagram_index": 231,
+      "type": "number_line",
+      "filename": "page_003_diagram_231_number_line.png",
+      "bounds": {
+        "x0": 54.375,
+        "y0": 537.7503051757812,
+        "x1": 540.375,
+        "y1": 694.0003051757812,
+        "width": 486.0,
+        "height": 156.25
+      },
+      "context": "Grades 1–8\nGrades 3–8\nGrades 2–8\nLearning Games\nPlay fun games to practice math facts and develop fluency.  \nEnglish/Spanish\nBounce  \nGrades K–8\nHungry Fish \nGrades K–8\nCupcake \nGrades 2–8\nMatch  \nGra",
+      "drawing_elements": 5
+    },
+    {
+      "page": 3,
+      "diagram_index": 233,
+      "type": "number_line",
+      "filename": "page_003_diagram_233_number_line.png",
+      "bounds": {
+        "x0": 73.45690155029297,
+        "y0": 546.602294921875,
+        "x1": 91.13090515136719,
+        "y1": 564.2763061523438,
+        "width": 17.67400360107422,
+        "height": 17.67401123046875
+      },
+      "context": "Learning Gam\nHungry Fish \nGrades K–8",
+      "drawing_elements": 4
+    },
+    {
+      "page": 3,
+      "diagram_index": 236,
+      "type": "number_line",
+      "filename": "page_003_diagram_236_number_line.png",
+      "bounds": {
+        "x0": 69.61410522460938,
+        "y0": 546.5966186523438,
+        "x1": 91.13510131835938,
+        "y1": 564.2786254882812,
+        "width": 21.52099609375,
+        "height": 17.6820068359375
+      },
+      "context": "Learning Gam\nHungry Fish \nGrades K–8",
+      "drawing_elements": 19
+    },
+    {
+      "page": 3,
+      "diagram_index": 238,
+      "type": "number_line",
+      "filename": "page_003_diagram_238_number_line.png",
+      "bounds": {
+        "x0": 69.61430358886719,
+        "y0": 546.4686889648438,
+        "x1": 91.17530822753906,
+        "y1": 564.2776489257812,
+        "width": 21.561004638671875,
+        "height": 17.8089599609375
+      },
+      "context": "Learning Gam\nHungry Fish \nGrades K–8",
+      "drawing_elements": 23
+    },
+    {
+      "page": 4,
+      "diagram_index": 1,
+      "type": "number_line_candidate",
+      "filename": "page_004_diagram_001_number_line_candidate.png",
+      "bounds": {
+        "x0": 608.197998046875,
+        "y0": -14.22198486328125,
+        "x1": 1238.5579833984375,
+        "y1": 117.89801025390625,
+        "width": 630.3599853515625,
+        "height": 132.1199951171875
+      },
+      "context": "",
+      "drawing_elements": 1
+    },
+    {
+      "page": 4,
+      "diagram_index": 2,
+      "type": "number_line_candidate",
+      "filename": "page_004_diagram_002_number_line_candidate.png",
+      "bounds": {
+        "x0": 612.0,
+        "y0": -13.5,
+        "x1": 1237.5,
+        "y1": 114.0,
+        "width": 625.5,
+        "height": 127.5
+      },
+      "context": "",
+      "drawing_elements": 1
+    },
+    {
+      "page": 4,
+      "diagram_index": 190,
+      "type": "number_line_candidate",
+      "filename": "page_004_diagram_190_number_line_candidate.png",
+      "bounds": {
+        "x0": 113.75,
+        "y0": 162.25,
+        "x1": 566.75,
+        "y1": 269.75,
+        "width": 453.0,
+        "height": 107.5
+      },
+      "context": "UNIT\nProportional Relationships\nRatios, Rates, and Circles\nUnit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . ",
+      "drawing_elements": 5
+    },
+    {
+      "page": 4,
+      "diagram_index": 191,
+      "type": "number_line_candidate",
+      "filename": "page_004_diagram_191_number_line_candidate.png",
+      "bounds": {
+        "x0": -3.802000045776367,
+        "y0": -14.22198486328125,
+        "x1": 612.8779907226562,
+        "y1": 117.89801025390625,
+        "width": 616.6799907684326,
+        "height": 132.1199951171875
+      },
+      "context": "Contents\nUNIT",
+      "drawing_elements": 1
+    },
+    {
+      "page": 4,
+      "diagram_index": 192,
+      "type": "number_line_candidate",
+      "filename": "page_004_diagram_192_number_line_candidate.png",
+      "bounds": {
+        "x0": 0.0,
+        "y0": -13.5,
+        "x1": 612.0,
+        "y1": 114.0,
+        "width": 612.0,
+        "height": 127.5
+      },
+      "context": "Contents",
+      "drawing_elements": 1
+    },
+    {
+      "page": 4,
+      "diagram_index": 257,
+      "type": "geometric_shape",
+      "filename": "page_004_diagram_257_geometric_shape.png",
+      "bounds": {
+        "x0": -13.5,
+        "y0": -13.5,
+        "x1": 33.0,
+        "y1": 114.0,
+        "width": 46.5,
+        "height": 127.5
+      },
+      "context": "Co",
+      "drawing_elements": 1
+    },
+    {
+      "page": 4,
+      "diagram_index": 259,
+      "type": "geometric_shape",
+      "filename": "page_004_diagram_259_geometric_shape.png",
+      "bounds": {
+        "x0": 36.0,
+        "y0": 162.0,
+        "x1": 114.0,
+        "y1": 192.0,
+        "width": 78.0,
+        "height": 30.0
+      },
+      "context": "Conte\nUNIT\nProportio\nRatios, Rates,\nUnit Opener  .  .  .  .  .  . \n1",
+      "drawing_elements": 1
+    },
+    {
+      "page": 4,
+      "diagram_index": 262,
+      "type": "number_line_candidate",
+      "filename": "page_004_diagram_262_number_line_candidate.png",
+      "bounds": {
+        "x0": 126.0,
+        "y0": 319.0,
+        "x1": 207.0,
+        "y1": 334.0,
+        "width": 81.0,
+        "height": 15.0
+      },
+      "context": "STEM Stories: Spotlight on Noramay Ca\nSMP 1\nPrepare for Unit 1  . .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . \nLESSON 1\n Solve Problems Invol\nSMP 1, 2, 3, 4, 5, 6, 7, 8\nLESSON ",
+      "drawing_elements": 1
+    },
+    {
+      "page": 4,
+      "diagram_index": 263,
+      "type": "number_line_candidate",
+      "filename": "page_004_diagram_263_number_line_candidate.png",
+      "bounds": {
+        "x0": 126.0,
+        "y0": 361.0,
+        "x1": 207.0,
+        "y1": 376.0,
+        "width": 81.0,
+        "height": 15.0
+      },
+      "context": "LESSON 1\n Solve Problems Invol\nSMP 1, 2, 3, 4, 5, 6, 7, 8\nLESSON 2\n Find Unit Rates Involv\nSMP 1, 2, 3, 4, 5, 6, 7\nLESSON 3\n Understand Proportio\nSMP 2, 3, 7",
+      "drawing_elements": 1
+    },
+    {
+      "page": 4,
+      "diagram_index": 264,
+      "type": "number_line_candidate",
+      "filename": "page_004_diagram_264_number_line_candidate.png",
+      "bounds": {
+        "x0": 126.0,
+        "y0": 403.0,
+        "x1": 207.0,
+        "y1": 418.0,
+        "width": 81.0,
+        "height": 15.0
+      },
+      "context": "LESSON 2\n Find Unit Rates Involv\nSMP 1, 2, 3, 4, 5, 6, 7\nLESSON 3\n Understand Proportio\nSMP 2, 3, 7\nLESSON 4\n Represent Proportion\nSMP 1, 2, 3, 4, 5, 6, 7",
+      "drawing_elements": 1
+    },
+    {
+      "page": 4,
+      "diagram_index": 265,
+      "type": "number_line_candidate",
+      "filename": "page_004_diagram_265_number_line_candidate.png",
+      "bounds": {
+        "x0": 126.0,
+        "y0": 445.0,
+        "x1": 207.0,
+        "y1": 460.0,
+        "width": 81.0,
+        "height": 15.0
+      },
+      "context": "LESSON 3\n Understand Proportio\nSMP 2, 3, 7\nLESSON 4\n Represent Proportion\nSMP 1, 2, 3, 4, 5, 6, 7\nLESSON 5\n Solve Proportional Re\nSMP 1, 2, 3, 4, 5, 6, 7",
+      "drawing_elements": 1
+    },
+    {
+      "page": 4,
+      "diagram_index": 266,
+      "type": "number_line_candidate",
+      "filename": "page_004_diagram_266_number_line_candidate.png",
+      "bounds": {
+        "x0": 126.0,
+        "y0": 487.0,
+        "x1": 207.0,
+        "y1": 502.0,
+        "width": 81.0,
+        "height": 15.0
+      },
+      "context": "LESSON 4\n Represent Proportion\nSMP 1, 2, 3, 4, 5, 6, 7\nLESSON 5\n Solve Proportional Re\nSMP 1, 2, 3, 4, 5, 6, 7\nLESSON 6\n Solve Area and Circum\nSMP 1, 2, 3, 4, 5, 6, 7",
+      "drawing_elements": 1
+    },
+    {
+      "page": 4,
+      "diagram_index": 267,
+      "type": "number_line_candidate",
+      "filename": "page_004_diagram_267_number_line_candidate.png",
+      "bounds": {
+        "x0": 126.0,
+        "y0": 529.0,
+        "x1": 207.0,
+        "y1": 544.0,
+        "width": 81.0,
+        "height": 15.0
+      },
+      "context": "LESSON 5\n Solve Proportional Re\nSMP 1, 2, 3, 4, 5, 6, 7\nLESSON 6\n Solve Area and Circum\nSMP 1, 2, 3, 4, 5, 6, 7\nMATH IN ACTION  Scale Drawings, Ratio\nSMP 1, 2, 3, 4, 5, 6, 7, 8",
+      "drawing_elements": 1
+    },
+    {
+      "page": 4,
+      "diagram_index": 268,
+      "type": "number_line_candidate",
+      "filename": "page_004_diagram_268_number_line_candidate.png",
+      "bounds": {
+        "x0": 126.0,
+        "y0": 571.0,
+        "x1": 207.0,
+        "y1": 586.0,
+        "width": 81.0,
+        "height": 15.0
+      },
+      "context": "LESSON 6\n Solve Area and Circum\nSMP 1, 2, 3, 4, 5, 6, 7\nMATH IN ACTION  Scale Drawings, Ratio\nSMP 1, 2, 3, 4, 5, 6, 7, 8\nSelf Reflection  . .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ",
+      "drawing_elements": 1
+    },
+    {
+      "page": 4,
+      "diagram_index": 269,
+      "type": "geometric_shape",
+      "filename": "page_004_diagram_269_geometric_shape.png",
+      "bounds": {
+        "x0": 36.25,
+        "y0": 191.75,
+        "x1": 113.75,
+        "y1": 269.25,
+        "width": 77.5,
+        "height": 77.5
+      },
+      "context": "UNIT\nProportio\nRatios, Rates,\nUnit Opener  .  .  .  .  .  . \nSTEM Stories: Spot\nSMP \nPrepare for Unit 1 \n1",
+      "drawing_elements": 1
+    },
+    {
+      "page": 4,
+      "diagram_index": 270,
+      "type": "geometric_shape",
+      "filename": "page_004_diagram_270_geometric_shape.png",
+      "bounds": {
+        "x0": 423.468994140625,
+        "y0": 20.13397216796875,
+        "x1": 555.948974609375,
+        "y1": 198.333984375,
+        "width": 132.47998046875,
+        "height": 178.20001220703125
+      },
+      "context": "s\nnships\n  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .   1",
+      "drawing_elements": 1
+    },
+    {
+      "page": 4,
+      "diagram_index": 271,
+      "type": "geometric_shape",
+      "filename": "page_004_diagram_271_geometric_shape.png",
+      "bounds": {
+        "x0": 243.21969604492188,
+        "y0": 676.7073974609375,
+        "x1": 366.0797119140625,
+        "y1": 739.6163940429688,
+        "width": 122.86001586914062,
+        "height": 62.90899658203125
+      },
+      "context": "©Curriculum Associates,\nf Reflection  . .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .",
+      "drawing_elements": 7
+    },
+    {
+      "page": 4,
+      "diagram_index": 272,
+      "type": "geometric_shape",
+      "filename": "page_004_diagram_272_geometric_shape.png",
+      "bounds": {
+        "x0": 252.74899291992188,
+        "y0": 682.3172607421875,
+        "x1": 355.4729919433594,
+        "y1": 731.6873168945312,
+        "width": 102.7239990234375,
+        "height": 49.37005615234375
+      },
+      "context": "©Curriculum Associa\nbulary Review  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ",
+      "drawing_elements": 6
+    },
+    {
+      "page": 4,
+      "diagram_index": 276,
+      "type": "geometric_shape",
+      "filename": "page_004_diagram_276_geometric_shape.png",
+      "bounds": {
+        "x0": 284.0849914550781,
+        "y0": 696.82080078125,
+        "x1": 304.2239990234375,
+        "y1": 730.7108154296875,
+        "width": 20.139007568359375,
+        "height": 33.8900146484375
+      },
+      "context": "©Cu\n Review  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  \nw  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ",
+      "drawing_elements": 13
+    },
+    {
+      "page": 4,
+      "diagram_index": 277,
+      "type": "geometric_shape",
+      "filename": "page_004_diagram_277_geometric_shape.png",
+      "bounds": {
+        "x0": 304.2359924316406,
+        "y0": 696.82080078125,
+        "x1": 324.375,
+        "y1": 730.7108154296875,
+        "width": 20.139007568359375,
+        "height": 33.8900146484375
+      },
+      "context": "©Curriculu\niew  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  \n .  .  .  .  .  .  .  .  .  . ",
+      "drawing_elements": 13
+    },
+    {
+      "page": 4,
+      "diagram_index": 278,
+      "type": "number_line_candidate",
+      "filename": "page_004_diagram_278_number_line_candidate.png",
+      "bounds": {
+        "x0": 254.59559631347656,
+        "y0": 716.6365966796875,
+        "x1": 300.44061279296875,
+        "y1": 731.53955078125,
+        "width": 45.84501647949219,
+        "height": 14.9029541015625
+      },
+      "context": "©C\n26 in.",
+      "drawing_elements": 14
+    },
+    {
+      "page": 4,
+      "diagram_index": 279,
+      "type": "number_line_candidate",
+      "filename": "page_004_diagram_279_number_line_candidate.png",
+      "bounds": {
+        "x0": 307.2904052734375,
+        "y0": 716.6365966796875,
+        "x1": 353.1353759765625,
+        "y1": 731.53955078125,
+        "width": 45.844970703125,
+        "height": 14.9029541015625
+      },
+      "context": "©Curriculum Associ\n26 in.",
+      "drawing_elements": 14
+    },
+    {
+      "page": 4,
+      "diagram_index": 280,
+      "type": "geometric_shape",
+      "filename": "page_004_diagram_280_geometric_shape.png",
+      "bounds": {
+        "x0": 293.1597900390625,
+        "y0": 689.9031372070312,
+        "x1": 315.22979736328125,
+        "y1": 710.380126953125,
+        "width": 22.07000732421875,
+        "height": 20.47698974609375
+      },
+      "context": "©Curric\neview  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  \n  .  .  .  .  .  .  .  .  .  .  .  . ",
+      "drawing_elements": 13
+    },
+    {
+      "page": 4,
+      "diagram_index": 281,
+      "type": "geometric_shape",
+      "filename": "page_004_diagram_281_geometric_shape.png",
+      "bounds": {
+        "x0": 264.8122253417969,
+        "y0": 699.544921875,
+        "x1": 287.8102111816406,
+        "y1": 722.181884765625,
+        "width": 22.99798583984375,
+        "height": 22.636962890625
+      },
+      "context": "view  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  \n26 in.",
+      "drawing_elements": 13
+    },
+    {
+      "page": 4,
+      "diagram_index": 282,
+      "type": "geometric_shape",
+      "filename": "page_004_diagram_282_geometric_shape.png",
+      "bounds": {
+        "x0": 320.1962890625,
+        "y0": 699.2326049804688,
+        "x1": 342.6912841796875,
+        "y1": 721.8446044921875,
+        "width": 22.4949951171875,
+        "height": 22.61199951171875
+      },
+      "context": "©Curriculum Ass\n .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  \n26 in.",
+      "drawing_elements": 13
+    },
+    {
+      "page": 4,
+      "diagram_index": 283,
+      "type": "geometric_shape",
+      "filename": "page_004_diagram_283_geometric_shape.png",
+      "bounds": {
+        "x0": 241.537109375,
+        "y0": 676.0487670898438,
+        "x1": 367.162109375,
+        "y1": 741.498779296875,
+        "width": 125.625,
+        "height": 65.45001220703125
+      },
+      "context": "©Curriculum Associates,\nf Reflection  . .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .",
+      "drawing_elements": 31
+    },
+    {
+      "page": 4,
+      "diagram_index": 284,
+      "type": "detailed_diagram",
+      "filename": "page_004_diagram_284_detailed_diagram.png",
+      "bounds": {
+        "x0": 251.81179809570312,
+        "y0": 686.845947265625,
+        "x1": 356.6968078613281,
+        "y1": 732.5909423828125,
+        "width": 104.885009765625,
+        "height": 45.7449951171875
+      },
+      "context": "©Curriculum Associa\nbulary Review  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ",
+      "drawing_elements": 145
+    },
+    {
+      "page": 4,
+      "diagram_index": 285,
+      "type": "geometric_shape",
+      "filename": "page_004_diagram_285_geometric_shape.png",
+      "bounds": {
+        "x0": 289.7528991699219,
+        "y0": 689.2838134765625,
+        "x1": 309.1708984375,
+        "y1": 711.1828002929688,
+        "width": 19.417999267578125,
+        "height": 21.89898681640625
+      },
+      "context": "©Curr\nReview  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . \n  .  .  .  .  .  .  .  .  .  .  .  .  .  .",
+      "drawing_elements": 31
+    },
+    {
+      "page": 4,
+      "diagram_index": 287,
+      "type": "geometric_shape",
+      "filename": "page_004_diagram_287_geometric_shape.png",
+      "bounds": {
+        "x0": 299.57391357421875,
+        "y0": 688.8610229492188,
+        "x1": 318.9669189453125,
+        "y1": 711.197998046875,
+        "width": 19.39300537109375,
+        "height": 22.33697509765625
+      },
+      "context": "©Curricu\nview  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . \n .  .  .  .  .  .  .  .  .  .  .  .",
+      "drawing_elements": 31
+    },
+    {
+      "page": 4,
+      "diagram_index": 292,
+      "type": "geometric_shape",
+      "filename": "page_004_diagram_292_geometric_shape.png",
+      "bounds": {
+        "x0": 264.0981140136719,
+        "y0": 706.8746948242188,
+        "x1": 286.3131103515625,
+        "y1": 722.272705078125,
+        "width": 22.214996337890625,
+        "height": 15.39801025390625
+      },
+      "context": "view  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . \n26 in.",
+      "drawing_elements": 30
+    },
+    {
+      "page": 4,
+      "diagram_index": 294,
+      "type": "geometric_shape",
+      "filename": "page_004_diagram_294_geometric_shape.png",
+      "bounds": {
+        "x0": 270.3370056152344,
+        "y0": 693.9935302734375,
+        "x1": 288.6629943847656,
+        "y1": 719.1635131835938,
+        "width": 18.32598876953125,
+        "height": 25.16998291015625
+      },
+      "context": "ary Review  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  \niew  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . ",
+      "drawing_elements": 31
+    },
+    {
+      "page": 4,
+      "diagram_index": 296,
+      "type": "geometric_shape",
+      "filename": "page_004_diagram_296_geometric_shape.png",
+      "bounds": {
+        "x0": 288.8385009765625,
+        "y0": 720.8961791992188,
+        "x1": 303.9914855957031,
+        "y1": 731.9981689453125,
+        "width": 15.152984619140625,
+        "height": 11.10198974609375
+      },
+      "context": "©Cu\n26 in.",
+      "drawing_elements": 12
+    },
+    {
+      "page": 4,
+      "diagram_index": 299,
+      "type": "geometric_shape",
+      "filename": "page_004_diagram_299_geometric_shape.png",
+      "bounds": {
+        "x0": 321.906494140625,
+        "y0": 706.89501953125,
+        "x1": 346.4164733886719,
+        "y1": 722.302001953125,
+        "width": 24.509979248046875,
+        "height": 15.406982421875
+      },
+      "context": "©Curriculum Asso\n  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . \n26 in.",
+      "drawing_elements": 32
+    },
+    {
+      "page": 4,
+      "diagram_index": 301,
+      "type": "geometric_shape",
+      "filename": "page_004_diagram_301_geometric_shape.png",
+      "bounds": {
+        "x0": 319.59259033203125,
+        "y0": 694.0181274414062,
+        "x1": 337.93359375,
+        "y1": 719.2061157226562,
+        "width": 18.34100341796875,
+        "height": 25.18798828125
+      },
+      "context": "©Curriculum A\n  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . \n .  .  .  .  .  .  ",
+      "drawing_elements": 32
+    },
+    {
+      "page": 4,
+      "diagram_index": 303,
+      "type": "geometric_shape",
+      "filename": "page_004_diagram_303_geometric_shape.png",
+      "bounds": {
+        "x0": 304.3621826171875,
+        "y0": 720.9025268554688,
+        "x1": 319.42120361328125,
+        "y1": 731.988525390625,
+        "width": 15.05902099609375,
+        "height": 11.08599853515625
+      },
+      "context": "©Curricu\n26 in.",
+      "drawing_elements": 12
+    },
+    {
+      "page": 4,
+      "diagram_index": 306,
+      "type": "detailed_diagram",
+      "filename": "page_004_diagram_306_detailed_diagram.png",
+      "bounds": {
+        "x0": 283.3489074707031,
+        "y0": 696.1470336914062,
+        "x1": 304.712890625,
+        "y1": 731.135009765625,
+        "width": 21.363983154296875,
+        "height": 34.98797607421875
+      },
+      "context": "©Cu\n Review  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  \nw  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ",
+      "drawing_elements": 51
+    },
+    {
+      "page": 4,
+      "diagram_index": 307,
+      "type": "detailed_diagram",
+      "filename": "page_004_diagram_307_detailed_diagram.png",
+      "bounds": {
+        "x0": 303.77239990234375,
+        "y0": 696.1290893554688,
+        "x1": 325.22039794921875,
+        "y1": 731.2120971679688,
+        "width": 21.447998046875,
+        "height": 35.0830078125
+      },
+      "context": "©Curriculu\niew  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . \n .  .  .  .  .  .  .  .  .  ",
+      "drawing_elements": 52
+    },
+    {
+      "page": 4,
+      "diagram_index": 309,
+      "type": "detailed_diagram",
+      "filename": "page_004_diagram_309_detailed_diagram.png",
+      "bounds": {
+        "x0": 254.97889709472656,
+        "y0": 716.58056640625,
+        "x1": 301.0828857421875,
+        "y1": 731.7755737304688,
+        "width": 46.10398864746094,
+        "height": 15.19500732421875
+      },
+      "context": "©C\n26 in.",
+      "drawing_elements": 64
+    },
+    {
+      "page": 4,
+      "diagram_index": 310,
+      "type": "detailed_diagram",
+      "filename": "page_004_diagram_310_detailed_diagram.png",
+      "bounds": {
+        "x0": 307.0223083496094,
+        "y0": 716.4660034179688,
+        "x1": 352.8952941894531,
+        "y1": 731.7579956054688,
+        "width": 45.87298583984375,
+        "height": 15.2919921875
+      },
+      "context": "©Curriculum Associ\n .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ",
+      "drawing_elements": 64
+    },
+    {
+      "page": 5,
+      "diagram_index": 1,
+      "type": "number_line_candidate",
+      "filename": "page_005_diagram_001_number_line_candidate.png",
+      "bounds": {
+        "x0": -3.802000045776367,
+        "y0": -14.22198486328125,
+        "x1": 626.5579833984375,
+        "y1": 117.89801025390625,
+        "width": 630.3599834442139,
+        "height": 132.1199951171875
+      },
+      "context": "UNIT\n–8°",
+      "drawing_elements": 1
+    },
+    {
+      "page": 5,
+      "diagram_index": 2,
+      "type": "number_line_candidate",
+      "filename": "page_005_diagram_002_number_line_candidate.png",
+      "bounds": {
+        "x0": 0.0,
+        "y0": -13.5,
+        "x1": 625.5,
+        "y1": 114.0,
+        "width": 625.5,
+        "height": 127.5
+      },
+      "context": "–8°",
+      "drawing_elements": 1
+    },
+    {
+      "page": 5,
+      "diagram_index": 190,
+      "type": "number_line_candidate",
+      "filename": "page_005_diagram_190_number_line_candidate.png",
+      "bounds": {
+        "x0": 134.75,
+        "y0": 162.25,
+        "x1": 587.75,
+        "y1": 269.75,
+        "width": 453.0,
+        "height": 107.5
+      },
+      "context": "UNIT\nNumbers and Operations\nAdd and Subtract Rational Numbers\nUnit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . ",
+      "drawing_elements": 5
+    },
+    {
+      "page": 5,
+      "diagram_index": 191,
+      "type": "number_line_candidate",
+      "filename": "page_005_diagram_191_number_line_candidate.png",
+      "bounds": {
+        "x0": -615.802001953125,
+        "y0": -14.22198486328125,
+        "x1": 0.87799072265625,
+        "y1": 117.89801025390625,
+        "width": 616.6799926757812,
+        "height": 132.1199951171875
+      },
+      "context": "UN",
+      "drawing_elements": 1
+    },
+    {
+      "page": 5,
+      "diagram_index": 192,
+      "type": "number_line_candidate",
+      "filename": "page_005_diagram_192_number_line_candidate.png",
+      "bounds": {
+        "x0": -612.0,
+        "y0": -13.5,
+        "x1": 0.0,
+        "y1": 114.0,
+        "width": 612.0,
+        "height": 127.5
+      },
+      "context": "",
+      "drawing_elements": 1
+    },
+    {
+      "page": 5,
+      "diagram_index": 258,
+      "type": "small_element",
+      "filename": "page_005_diagram_258_small_element.png",
+      "bounds": {
+        "x0": 57.0,
+        "y0": 162.0,
+        "x1": 135.0,
+        "y1": 192.0,
+        "width": 78.0,
+        "height": 30.0
+      },
+      "context": "UNIT\nNumbers \nAdd and Sub\nUnit Opener  .  .  .  .  .  . \n2",
+      "drawing_elements": 1
+    },
+    {
+      "page": 5,
+      "diagram_index": 261,
+      "type": "number_line_candidate",
+      "filename": "page_005_diagram_261_number_line_candidate.png",
+      "bounds": {
+        "x0": 147.0,
+        "y0": 319.0,
+        "x1": 228.0,
+        "y1": 334.0,
+        "width": 81.0,
+        "height": 15.0
+      },
+      "context": "STEM Stories: Spotlight on Larry Kwak \nSMP 8\nPrepare for Unit 2  . .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . \nLESSON 7\n Understand Addition\nSMP 2, 3, 7\nLESSON 8\n Add with Neg",
+      "drawing_elements": 1
+    },
+    {
+      "page": 5,
+      "diagram_index": 262,
+      "type": "number_line_candidate",
+      "filename": "page_005_diagram_262_number_line_candidate.png",
+      "bounds": {
+        "x0": 147.0,
+        "y0": 361.0,
+        "x1": 228.0,
+        "y1": 376.0,
+        "width": 81.0,
+        "height": 15.0
+      },
+      "context": "LESSON 7\n Understand Addition\nSMP 2, 3, 7\nLESSON 8\n Add with Negative N\nSMP 1, 2, 3, 4, 5, 6, 7\nLESSON 9\n Understand Subtract\nSMP 2, 3, 7",
+      "drawing_elements": 1
+    },
+    {
+      "page": 5,
+      "diagram_index": 263,
+      "type": "number_line_candidate",
+      "filename": "page_005_diagram_263_number_line_candidate.png",
+      "bounds": {
+        "x0": 147.0,
+        "y0": 403.0,
+        "x1": 228.0,
+        "y1": 418.0,
+        "width": 81.0,
+        "height": 15.0
+      },
+      "context": "LESSON 8\n Add with Negative N\nSMP 1, 2, 3, 4, 5, 6, 7\nLESSON 9\n Understand Subtract\nSMP 2, 3, 7\nLESSON 10\n Add and Subtract Pos\nSMP 1, 2, 3, 4, 5, 6, 7",
+      "drawing_elements": 1
+    },
+    {
+      "page": 5,
+      "diagram_index": 264,
+      "type": "number_line_candidate",
+      "filename": "page_005_diagram_264_number_line_candidate.png",
+      "bounds": {
+        "x0": 147.0,
+        "y0": 445.0,
+        "x1": 228.0,
+        "y1": 460.0,
+        "width": 81.0,
+        "height": 15.0
+      },
+      "context": "LESSON 9\n Understand Subtract\nSMP 2, 3, 7\nLESSON 10\n Add and Subtract Pos\nSMP 1, 2, 3, 4, 5, 6, 7\nMATH IN ACTION  Adding Positive and N\nSMP 1, 2, 3, 4, 6, 7, 8",
+      "drawing_elements": 1
+    },
+    {
+      "page": 5,
+      "diagram_index": 265,
+      "type": "number_line_candidate",
+      "filename": "page_005_diagram_265_number_line_candidate.png",
+      "bounds": {
+        "x0": 147.0,
+        "y0": 487.0,
+        "x1": 228.0,
+        "y1": 502.0,
+        "width": 81.0,
+        "height": 15.0
+      },
+      "context": "LESSON 10\n Add and Subtract Pos\nSMP 1, 2, 3, 4, 5, 6, 7\nMATH IN ACTION  Adding Positive and N\nSMP 1, 2, 3, 4, 6, 7, 8\nSelf Reflection  . .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ",
+      "drawing_elements": 1
+    },
+    {
+      "page": 5,
+      "diagram_index": 266,
+      "type": "small_element",
+      "filename": "page_005_diagram_266_small_element.png",
+      "bounds": {
+        "x0": 57.25,
+        "y0": 191.75,
+        "x1": 134.75,
+        "y1": 269.25,
+        "width": 77.5,
+        "height": 77.5
+      },
+      "context": "UNIT\nNumbers \nAdd and Sub\nUnit Opener  .  .  .  .  .  . \nSTEM Stories: Spot\nSMP \nPrepare for Unit 2 \n2",
+      "drawing_elements": 1
+    },
+    {
+      "page": 5,
+      "diagram_index": 267,
+      "type": "mathematical_diagram",
+      "filename": "page_005_diagram_267_mathematical_diagram.png",
+      "bounds": {
+        "x0": 457.7869873046875,
+        "y0": 18.218994140625,
+        "x1": 549.947021484375,
+        "y1": 234.93896484375,
+        "width": 92.1600341796875,
+        "height": 216.719970703125
+      },
+      "context": "ons\nmbers\n .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .   133\n .  .  .  .  .  .  .  .  .  .  .  ",
+      "drawing_elements": 1
+    },
+    {
+      "page": 5,
+      "diagram_index": 268,
+      "type": "small_element",
+      "filename": "page_005_diagram_268_small_element.png",
+      "bounds": {
+        "x0": 493.1483154296875,
+        "y0": 185.24581909179688,
+        "x1": 518.5933227539062,
+        "y1": 210.6928253173828,
+        "width": 25.44500732421875,
+        "height": 25.447006225585938
+      },
+      "context": "s\n .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .   133\n .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . ",
+      "drawing_elements": 4
+    },
+    {
+      "page": 5,
+      "diagram_index": 452,
+      "type": "small_element",
+      "filename": "page_005_diagram_452_small_element.png",
+      "bounds": {
+        "x0": 497.489501953125,
+        "y0": 185.81639099121094,
+        "x1": 514.25146484375,
+        "y1": 202.32838439941406,
+        "width": 16.761962890625,
+        "height": 16.511993408203125
+      },
+      "context": ".  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .   133\n–8°",
+      "drawing_elements": 4
+    },
+    {
+      "page": 5,
+      "diagram_index": 458,
+      "type": "number_line_candidate",
+      "filename": "page_005_diagram_458_number_line_candidate.png",
+      "bounds": {
+        "x0": 460.7584228515625,
+        "y0": 151.33322143554688,
+        "x1": 492.9634094238281,
+        "y1": 161.9732208251953,
+        "width": 32.204986572265625,
+        "height": 10.639999389648438
+      },
+      "context": "ons\nmbers\n–8°",
+      "drawing_elements": 11
+    }
+  ]
+}

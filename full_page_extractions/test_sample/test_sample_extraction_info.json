@@ -1,0 +1,159 @@
+{
+  "source_pdf": "test_sample.pdf",
+  "filename": "test_sample",
+  "extraction_date": "2025-08-28T05:39:45.127880",
+  "total_pages": 10,
+  "resolution_dpi": 200,
+  "pages": [
+    {
+      "page_number": 1,
+      "filename": "page_001.png",
+      "image_size": {
+        "width": 1700,
+        "height": 2175
+      },
+      "pdf_size": {
+        "width": 612.0,
+        "height": 783.0
+      },
+      "word_count": 58,
+      "has_content": true,
+      "text_preview": "Mathematics\nGrade 7 • Volume 1\nNOT FOR RESALE\n978-1-7280-4676-1\n©2024–Curriculum Associates, LLC\nNorth Billerica, MA 01862\nNo part of this book may be reproduced  \nby any means without written permiss..."
+    },
+    {
+      "page_number": 2,
+      "filename": "page_002.png",
+      "image_size": {
+        "width": 1700,
+        "height": 2175
+      },
+      "pdf_size": {
+        "width": 612.0,
+        "height": 783.0
+      },
+      "word_count": 108,
+      "has_content": true,
+      "text_preview": "ii\n©Curriculum Associates, LLC  Copying is not permitted.\nExplore Digital Resources  \nfor Students\nIn addition to the instruction and practice provided \nin this Student Worktext, you have access to di..."
+    },
+    {
+      "page_number": 3,
+      "filename": "page_003.png",
+      "image_size": {
+        "width": 1700,
+        "height": 2175
+      },
+      "pdf_size": {
+        "width": 612.0,
+        "height": 783.0
+      },
+      "word_count": 136,
+      "has_content": true,
+      "text_preview": "iii\n©Curriculum Associates, LLC  Copying is not permitted.\n   Online Student Worktext English/Spanish \n   My Videos (Instructional Videos)\n   Glossaries Multiple Languages \n   Family Resources Multipl..."
+    },
+    {
+      "page_number": 4,
+      "filename": "page_004.png",
+      "image_size": {
+        "width": 1700,
+        "height": 2175
+      },
+      "pdf_size": {
+        "width": 612.0,
+        "height": 783.0
+      },
+      "word_count": 860,
+      "has_content": true,
+      "text_preview": "©Curriculum Associates, LLC  Copying is not permitted.\niv\nContents\nUNIT\nProportional Relationships\nRatios, Rates, and Circles\nUnit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ...."
+    },
+    {
+      "page_number": 5,
+      "filename": "page_005.png",
+      "image_size": {
+        "width": 1700,
+        "height": 2175
+      },
+      "pdf_size": {
+        "width": 612.0,
+        "height": 783.0
+      },
+      "word_count": 755,
+      "has_content": true,
+      "text_preview": "UNIT\nv\n©Curriculum Associates, LLC  Copying is not permitted.\nNumbers and Operations\nAdd and Subtract Rational Numbers\nUnit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . ..."
+    },
+    {
+      "page_number": 6,
+      "filename": "page_006.png",
+      "image_size": {
+        "width": 1700,
+        "height": 2175
+      },
+      "pdf_size": {
+        "width": 612.0,
+        "height": 783.0
+      },
+      "word_count": 762,
+      "has_content": true,
+      "text_preview": "©Curriculum Associates, LLC  Copying is not permitted.\nvi\nUNIT\nContents (continued)\nNumbers and Operations\nMultiply and Divide Rational Numbers\nUnit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ...."
+    },
+    {
+      "page_number": 7,
+      "filename": "page_007.png",
+      "image_size": {
+        "width": 1700,
+        "height": 2175
+      },
+      "pdf_size": {
+        "width": 612.0,
+        "height": 783.0
+      },
+      "word_count": 803,
+      "has_content": true,
+      "text_preview": "vii\nUNIT\n©Curriculum Associates, LLC  Copying is not permitted.\nAlgebraic Thinking\nExpressions, Equations, and Inequalities\nUnit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ..."
+    },
+    {
+      "page_number": 8,
+      "filename": "page_008.png",
+      "image_size": {
+        "width": 1700,
+        "height": 2175
+      },
+      "pdf_size": {
+        "width": 612.0,
+        "height": 783.0
+      },
+      "word_count": 837,
+      "has_content": true,
+      "text_preview": "©Curriculum Associates, LLC  Copying is not permitted.\nviii\nUNIT\nContents (continued)\nProportional Reasoning\nPercents and Statistical Samples\nUnit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ..."
+    },
+    {
+      "page_number": 9,
+      "filename": "page_009.png",
+      "image_size": {
+        "width": 1700,
+        "height": 2175
+      },
+      "pdf_size": {
+        "width": 612.0,
+        "height": 783.0
+      },
+      "word_count": 821,
+      "has_content": true,
+      "text_preview": "©Curriculum Associates, LLC  Copying is not permitted.\nix\nUNIT\nGeometry\nSolids, Triangles, and Angles\nUnit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ...."
+    },
+    {
+      "page_number": 10,
+      "filename": "page_010.png",
+      "image_size": {
+        "width": 1700,
+        "height": 2175
+      },
+      "pdf_size": {
+        "width": 612.0,
+        "height": 783.0
+      },
+      "word_count": 1026,
+      "has_content": true,
+      "text_preview": "©Curriculum Associates, LLC  Copying is not permitted.\nx\nUNIT\nContents (continued)\nProbability\nTheoretical Probability, Experimental  \nProbability, and Compound Events\nUnit Opener  .  .  .  .  .  .  ...."
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "source_pdf": "test_sample.pdf",
+  "filename": "test_sample",
+  "processing_date": "2025-08-28T05:23:23.627242",
+  "total_pages": 10,
+  "total_visual_elements": 229,
+  "element_types": {
+    "complex_diagram": 6,
+    "number_line_candidate": 31,
+    "icon_or_symbol": 11,
+    "mathematical_element": 62,
+    "number_line": 36,
+    "geometric_shape": 81,
+    "detailed_diagram": 2
+  },
+  "database_path": "visual_extractions/test_sample/data/test_sample_visual_content.db",
+  "images_directory": "visual_extractions/test_sample/images"
+}
