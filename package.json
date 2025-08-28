@@ -10,7 +10,8 @@
     "extract": "tsx scripts/extract-curriculum.ts",
     "migrate": "tsx scripts/migrate-db.ts",
     "seed": "npm run migrate && npm run extract",
-    "typecheck": "tsc -p . --noEmit"
+    "typecheck": "tsc -p . --noEmit",
+    "process-pdfs": "npx tsc scripts/advanced-pdf-extractor.ts --outDir dist --moduleResolution node --target es2020 --module commonjs --esModuleInterop && node scripts/process-all-pdfs.js"
   },
   "dependencies": {
     "@prisma/client": "^6.15.0",
