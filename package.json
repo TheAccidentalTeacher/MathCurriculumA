@@ -1,0 +1,39 @@
+{
+  "name": "math-curriculum-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "extract": "tsx scripts/extract-curriculum.ts",
+    "migrate": "tsx scripts/migrate-db.ts",
+    "seed": "npm run migrate && npm run extract",
+    "typecheck": "tsc -p . --noEmit"
+  },
+  "dependencies": {
+    "next": "15.5.2",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "pdf-parse": "^1.1.1",
+    "pg": "^8.13.1",
+    "@vercel/postgres": "^0.10.0",
+    "prisma": "^6.1.0",
+    "@prisma/client": "^6.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/pg": "^8.11.10",
+    "typescript": "^5",
+    "tsx": "^4",
+    "tailwindcss": "^4",
+    "@tailwindcss/postcss": "^4",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
