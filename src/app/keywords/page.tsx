@@ -3,6 +3,9 @@ import Link from "next/link";
 
 const curriculumService = new CurriculumService();
 
+// Force dynamic rendering to avoid build-time database calls
+export const dynamic = 'force-dynamic';
+
 export default async function KeywordsPage({ searchParams }: { searchParams?: Promise<{ keyword?: string }> }) {
   const params = (await searchParams) || {};
   const { keyword } = params;

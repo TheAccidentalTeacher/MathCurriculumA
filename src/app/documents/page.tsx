@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import { curriculumService } from '@/lib/curriculum-service';
 
+// Force dynamic rendering to avoid build-time database calls
+export const dynamic = 'force-dynamic';
+
 export default async function DocumentsPage() {
   const documents = await curriculumService.getAllDocuments();
   const stats = await curriculumService.getStats();
