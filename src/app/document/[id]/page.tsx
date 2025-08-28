@@ -43,15 +43,15 @@ export default async function DocumentPage({ params }: { params: Promise<{ id: s
         <div>
           <h2 className="text-2xl font-semibold mb-6">Document Content</h2>
           <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
-            <div className="text-slate-300 whitespace-pre-wrap font-mono text-sm leading-relaxed max-h-96 overflow-y-auto">
-              {document.content ? document.content.slice(0, 5000) + (document.content.length > 5000 ? '\n\n... (truncated for display)' : '') : 'No content available'}
+            <div className="text-slate-300 whitespace-pre-wrap font-mono text-sm leading-relaxed max-h-screen overflow-y-auto">
+              {document.content || 'No content available'}
             </div>
           </div>
           
-          {document.content && document.content.length > 5000 && (
+          {document.content && (
             <div className="mt-4 text-center">
               <div className="text-sm text-slate-400">
-                Showing first 5,000 characters of {document.content.length.toLocaleString()} total characters
+                Showing full content: {document.content.length.toLocaleString()} characters
               </div>
             </div>
           )}

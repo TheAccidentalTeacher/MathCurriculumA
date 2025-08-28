@@ -63,7 +63,7 @@ export default async function KeywordsPage({ searchParams }: { searchParams?: Pr
                     )}
                   </div>
                   <p className="text-slate-300 line-clamp-3">
-                    {topic.topicContent.substring(0, 300)}...
+                    {topic.topicContent ? topic.topicContent.substring(0, 300) + '...' : 'No content preview available'}
                   </p>
                 </div>
               ))}
