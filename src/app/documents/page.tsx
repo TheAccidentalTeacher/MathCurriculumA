@@ -92,12 +92,18 @@ export default async function DocumentsPage() {
           </div>
         )}
         
-        <div className="mt-8 text-center">
+        <div className="mt-8 text-center space-x-4">
           <Link 
             href="/search" 
             className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold transition-colors inline-block"
           >
             🔍 Search Content
+          </Link>
+          <Link 
+            href="/debug" 
+            className="bg-orange-600 hover:bg-orange-700 px-6 py-3 rounded-lg font-semibold transition-colors inline-block"
+          >
+            🔧 System Debug
           </Link>
         </div>
       </div>
