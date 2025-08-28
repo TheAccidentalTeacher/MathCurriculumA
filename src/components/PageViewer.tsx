@@ -7,9 +7,10 @@ interface PageViewerProps {
   documentId: string;
   totalPages: number;
   initialPage?: number;
+  volumeName?: string;
 }
 
-export default function PageViewer({ documentId, totalPages, initialPage = 1 }: PageViewerProps) {
+export default function PageViewer({ documentId, totalPages, initialPage = 1, volumeName }: PageViewerProps) {
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [isLoading, setIsLoading] = useState(false);
   const [imageError, setImageError] = useState(false);

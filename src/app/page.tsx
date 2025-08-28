@@ -49,18 +49,27 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Se
         <div className="bg-blue-900 border border-blue-700 rounded-lg p-6 mb-8">
           <h2 className="text-xl font-semibold text-blue-200 mb-3">📚 Full PDF Viewer</h2>
           <p className="text-slate-300 mb-4">
-            View the complete Ready Classroom Mathematics Grade 7 curriculum with high-resolution page images. 
-            All 504 pages extracted with perfect visual fidelity.
+            View the complete Ready Classroom Mathematics Grade 7 curriculum with high-resolution page images.
           </p>
-          <Link 
-            href="/viewer"
-            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-          >
-            🔍 Open Page Viewer
-            <span className="ml-2">→</span>
-          </Link>
-          <div className="mt-3 text-sm text-blue-300">
-            <strong>Features:</strong> Navigate through all 504 pages • High-resolution images • Quick page jumping
+          
+          <div className="grid md:grid-cols-2 gap-4 mb-4">
+            <Link 
+              href="/viewer/volume1"
+              className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            >
+              � Volume 1 (504 pages)
+            </Link>
+            
+            <Link 
+              href="/viewer/volume2"
+              className="inline-flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+            >
+              📖 Volume 2 (440 pages)
+            </Link>
+          </div>
+          
+          <div className="text-sm text-blue-300">
+            <strong>Features:</strong> Navigate through all pages • High-resolution images • Quick page jumping
           </div>
         </div>
 
