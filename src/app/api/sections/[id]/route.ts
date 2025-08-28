@@ -10,14 +10,14 @@ export async function GET(
   try {
     const { id } = await params;
     
-    // In Prisma with PostgreSQL, IDs are strings (cuid), not numbers
-    const section = await curriculumService.getSectionById(id);
+    // Get document by ID instead of section
+    const document = await curriculumService.getDocumentById(id);
     
-    if (!section) {
-      return NextResponse.json({ error: "Section not found" }, { status: 404 });
+    if (!document) {
+      return NextResponse.json({ error: "Document not found" }, { status: 404 });
     }
     
-    return NextResponse.json(section);
+    return NextResponse.json(document);
   } catch (error) {
     console.error('API error:', error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

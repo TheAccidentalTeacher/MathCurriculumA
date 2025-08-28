@@ -31,48 +31,27 @@ export default async function DocumentPage({ params }: { params: Promise<{ id: s
               <div><span className="text-slate-400">Subject:</span> {document.subject}</div>
             </div>
             <div>
-              <div><span className="text-slate-400">Version:</span> {document.version}</div>
+              <div><span className="text-slate-400">Filename:</span> {document.filename}</div>
               <div><span className="text-slate-400">Created:</span> {new Date(document.created_at).toLocaleDateString()}</div>
             </div>
           </div>
         </div>
 
         <div>
-          <h2 className="text-2xl font-semibold mb-6">Sections ({document.sections?.length || 0})</h2>
-          <div className="space-y-4">
-            {document.sections?.map((section: any) => (
-              <Link key={section.id} href={`/section/${section.id}`}>
-                <div className="bg-slate-800 border border-slate-700 rounded-lg p-5 hover:bg-slate-750 transition-colors">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-blue-400">
-                        {section.sectionNumber && `${section.sectionNumber}. `}
-                        {section.title}
-                      </h3>
-                      <div className="text-sm text-slate-400 mt-1">
-                        {section.sectionType} 
-                        {section.startPage && section.endPage && (
-                          <span> • Pages {section.startPage}-{section.endPage}</span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="text-xs px-2 py-1 bg-slate-700 rounded text-slate-300">
-                      View Section →
-                    </div>
-                  </div>
-                  
-                  <p className="text-slate-300 line-clamp-2">
-                    {section.content 
-                      ? (section.content.length > 200 
-                         ? `${section.content.substring(0, 200)}...` 
-                         : section.content)
-                      : 'No preview available'
-                    }
-                  </p>
-                </div>
-              </Link>
-            ))}
+          <h2 className="text-2xl font-semibold mb-6">Document Content</h2>
+          <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+            <div className="text-slate-300 whitespace-pre-wrap font-mono text-sm leading-relaxed max-h-96 overflow-y-auto">
+              {document.content ? document.content.slice(0, 5000) + (document.content.length > 5000 ? '\n\n... (truncated for display)' : '') : 'No content available'}
+            </div>
           </div>
+          
+          {document.content && document.content.length > 5000 && (
+            <div className="mt-4 text-center">
+              <div className="text-sm text-slate-400">
+                Showing first 5,000 characters of {document.content.length.toLocaleString()} total characters
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </main>

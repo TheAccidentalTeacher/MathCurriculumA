@@ -8,16 +8,14 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const query = searchParams.get("q");
     const grade = searchParams.get("grade");
-    const difficulty = searchParams.get("difficulty");
-    const topicType = searchParams.get("topicType");
-    const sectionType = searchParams.get("sectionType");
+    const subject = searchParams.get("subject");
+    const filename = searchParams.get("filename");
 
     if (query) {
       const filters = {
-        ...(grade && { grade: parseInt(grade) }),
-        ...(difficulty && { difficulty: difficulty as any }),
-        ...(topicType && { topicType: topicType as any }),
-        ...(sectionType && { sectionType: sectionType as any }),
+        ...(grade && { grade: grade }),
+        ...(subject && { subject: subject }),
+        ...(filename && { filename: filename }),
       };
       
       const results = await curriculumService.searchContent(query, filters);

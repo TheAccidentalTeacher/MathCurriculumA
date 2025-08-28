@@ -12,10 +12,11 @@ export default async function KeywordsPage({ searchParams }: { searchParams?: Pr
 
   try {
     if (keyword) {
-      const result = await curriculumService.getTopicsByKeyword(keyword);
+      const result = await curriculumService.searchContent(keyword);
       topics = result;
     } else {
-      keywords = await curriculumService.getKeywords(100);
+      const stats = await curriculumService.getStats();
+      keywords = [`Total Documents: ${stats.totalDocuments}`];
     }
   } catch (error) {
     console.error('Error loading keywords:', error);

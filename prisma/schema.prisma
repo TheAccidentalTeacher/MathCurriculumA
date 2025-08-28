@@ -14,48 +14,140 @@ model Document {
   id          String    @id @default(cuid())
   filename    String    @unique
   title       String
-  grade_level String?
+  grade_level String?   // "7", "8"
+  volume      String?   // "V1", "V2"
   subject     String?
-  version     String?
-  content     String
+  publisher   String?   // "Ready Classroom Mathematics"
+  content     String    @db.Text
+  page_count  Int?
   created_at  DateTime  @default(now())
   updated_at  DateTime  @updatedAt
   
-  sections    Section[]
+  units       Unit[]
   
   @@map("documents")
 }
 
-model Section {
+model Unit {
   id          String   @id @default(cuid())
   document_id String
-  title       String
-  content     String
-  section_type String? // chapter, unit, lesson, etc.
+  unit_number String   // "1", "2", etc.
+  title       String   // "Proportional Relationships: Ratios, Rates, and Circles"
+  theme       String?  // Major category
+  page_start  Int?
+  page_end    Int?
   order_index Int      @default(0)
   created_at  DateTime @default(now())
   
   document    Document @relation(fields: [document_id], references: [id], onDelete: Cascade)
-  topics      Topic[]
+  lessons     Lesson[]
   
   @@index([document_id, order_index])
-  @@map("sections")
+  @@map("units")
+}
+
+model Lesson {
+  id              String   @id @default(cuid())
+  unit_id         String
+  lesson_number   String   // "1", "2", etc.
+  title           String   // "Solve Problems Involving Scale"
+  standards       String[] // ["7.G.A.1", "7.RP.A.1"] 
+  focus_type      String?  // "major", "supporting", "additional"
+  instructional_days Int?
+  page_start      Int?
+  page_end        Int?
+  order_index     Int      @default(0)
+  created_at      DateTime @default(now())
+  
+  unit            Unit @relation(fields: [unit_id], references: [id], onDelete: Cascade)
+  sessions        Session[]
+  
+  @@index([unit_id, order_index])
+  @@map("lessons")
+}
+
+model Session {
+  id            String   @id @default(cuid())
+  lesson_id     String
+  session_number String  // "1", "2", "3"
+  title         String?  // "Develop Solving Problems Involving Volume"
+  session_type  String?  // "explore", "develop", "refine"
+  content       String   @db.Text
+  page_start    Int?
+  page_end      Int?
+  order_index   Int      @default(0)
+  created_at    DateTime @default(now())
+  
+  lesson        Lesson @relation(fields: [lesson_id], references: [id], onDelete: Cascade)
+  activities    Activity[]
+  problems      Problem[]
+  
+  @@index([lesson_id, order_index])
+  @@map("sessions")
+}
+
+model Activity {
+  id            String   @id @default(cuid())
+  session_id    String
+  activity_type String   // "try_it", "develop", "solution", "math_toolkit"
+  title         String?
+  content       String   @db.Text
+  instructions  String?
+  order_index   Int      @default(0)
+  created_at    DateTime @default(now())
+  
+  session       Session @relation(fields: [session_id], references: [id], onDelete: Cascade)
+  visual_elements VisualElement[]
+  
+  @@index([session_id, order_index])
+  @@map("activities")
+}
+
+model Problem {
+  id            String   @id @default(cuid())
+  session_id    String
+  problem_number String  // "3", "4", etc.
+  content       String   @db.Text
+  solution      String?  @db.Text
+  difficulty    String?  // "basic", "intermediate", "advanced"
+  problem_type  String?  // "example", "practice", "assessment"
+  order_index   Int      @default(0)
+  created_at    DateTime @default(now())
+  
+  session       Session @relation(fields: [session_id], references: [id], onDelete: Cascade)
+  visual_elements VisualElement[]
+  keywords      ProblemKeyword[]
+  
+  @@index([session_id, order_index])
+  @@map("problems")
+}
+
+model VisualElement {
+  id            String   @id @default(cuid())
+  activity_id   String?
+  problem_id    String?
+  element_type  String   // "diagram", "chart", "image", "graph"
+  filename      String   // "gold_brick_diagram.png"
+  file_path     String   // Full path to extracted image
+  alt_text      String?  // Accessibility description
+  position_data String?  @db.Text // JSON: coordinates, dimensions
+  created_at    DateTime @default(now())
+  
+  activity      Activity? @relation(fields: [activity_id], references: [id], onDelete: Cascade)
+  problem       Problem? @relation(fields: [problem_id], references: [id], onDelete: Cascade)
+  
+  @@map("visual_elements")
 }
 
 model Topic {
   id          String   @id @default(cuid())
-  section_id  String
-  title       String
-  content     String
-  topic_type  String?  // instruction, practice, example, etc.
-  difficulty  String?  // basic, intermediate, advanced
-  order_index Int      @default(0)
+  name        String   @unique // "volume", "geometry", "ratios"
+  description String?
   created_at  DateTime @default(now())
   
-  section     Section  @relation(fields: [section_id], references: [id], onDelete: Cascade)
   keywords    TopicKeyword[]
+  problems    ProblemKeyword[]
   
-  @@index([section_id, order_index])
   @@map("topics")
 }
 
@@ -80,4 +172,15 @@ model TopicKeyword {
   
   @@id([topic_id, keyword_id])
   @@map("topic_keywords")
+}
+
+model ProblemKeyword {
+  problem_id String
+  topic_id   String
+  
+  problem    Problem @relation(fields: [problem_id], references: [id], onDelete: Cascade)
+  topic      Topic   @relation(fields: [topic_id], references: [id], onDelete: Cascade)
+  
+  @@id([problem_id, topic_id])
+  @@map("problem_keywords")
 }

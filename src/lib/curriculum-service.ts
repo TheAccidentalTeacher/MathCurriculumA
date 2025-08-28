@@ -1,212 +1,133 @@
 import { db } from '@/lib/db';
 
 export interface SearchFilters {
-  grade?: number;
+  grade?: string;
   subject?: string;
-  difficulty?: 'basic' | 'intermediate' | 'advanced';
-  topicType?: 'concept' | 'example' | 'exercise' | 'assessment';
-  sectionType?: 'chapter' | 'unit' | 'lesson' | 'appendix' | 'introduction';
+  filename?: string;
+}
+
+export interface DocumentSummary {
+  id: string;
+  filename: string;
+  title: string;
+  grade_level: string | null;
+  subject: string | null;
+  contentPreview: string;
+  created_at: Date;
 }
 
 export class CurriculumService {
   
-  async getAllDocuments() {
-    return await db.document.findMany({
+  async getAllDocuments(): Promise<DocumentSummary[]> {
+    const documents = await db.document.findMany({
       orderBy: { grade_level: 'asc' },
-      include: {
-        sections: {
-          take: 3, // Preview of first 3 sections
-          orderBy: { order_index: 'asc' }
-        }
+      select: {
+        id: true,
+        filename: true,
+        title: true,
+        grade_level: true,
+        subject: true,
+        content: true,
+        created_at: true
       }
     });
+
+    return documents.map(doc => ({
+      ...doc,
+      contentPreview: doc.content.slice(0, 200) + '...'
+    }));
   }
 
   async getDocumentById(id: string) {
     return await db.document.findUnique({
-      where: { id },
-      include: {
-        sections: {
-          orderBy: { order_index: 'asc' },
-          include: {
-            topics: {
-              orderBy: { order_index: 'asc' }
-            }
-          }
-        }
-      }
+      where: { id }
     });
   }
 
-  async getSectionById(id: string) {
-    return await db.section.findUnique({
-      where: { id },
-      include: {
-        document: true,
-        topics: {
-          orderBy: { order_index: 'asc' },
-          include: {
-            keywords: {
-              include: {
-                keyword: true
-              }
-            }
-          }
-        }
-      }
-    });
-  }
-
-  async searchContent(query: string, filters: SearchFilters = {}) {
-    const whereClause: any = {};
+  async searchContent(query: string, filters?: SearchFilters) {
+    const whereConditions: any = {};
     
-    // Build search conditions
     if (query) {
-      whereClause.OR = [
+      whereConditions.OR = [
         { title: { contains: query, mode: 'insensitive' } },
         { content: { contains: query, mode: 'insensitive' } },
-        { sections: { some: { 
-          OR: [
-            { title: { contains: query, mode: 'insensitive' } },
-            { content: { contains: query, mode: 'insensitive' } }
-          ]
-        }}},
-        { sections: { some: { topics: { some: {
-          OR: [
-            { title: { contains: query, mode: 'insensitive' } },
-            { content: { contains: query, mode: 'insensitive' } }
-          ]
-        }}}}},
+        { filename: { contains: query, mode: 'insensitive' } }
       ];
     }
 
-    // Apply filters
-    if (filters.grade) {
-      whereClause.grade_level = filters.grade.toString();
-    }
-    
-    if (filters.subject) {
-      whereClause.subject = { contains: filters.subject, mode: 'insensitive' };
+    if (filters?.grade) {
+      whereConditions.grade_level = { contains: filters.grade };
     }
 
-    const documents = await db.document.findMany({
-      where: whereClause,
-      include: {
-        sections: {
-          where: filters.sectionType ? { section_type: filters.sectionType } : undefined,
-          include: {
-            topics: {
-              where: {
-                ...(filters.difficulty && { difficulty: filters.difficulty }),
-                ...(filters.topicType && { topic_type: filters.topicType })
-              },
-              take: 5 // Limit topics per section for search results
-            }
-          },
-          take: 10 // Limit sections per document
-        }
-      },
-      take: 20 // Limit documents
+    if (filters?.subject) {
+      whereConditions.subject = { contains: filters.subject, mode: 'insensitive' };
+    }
+
+    if (filters?.filename) {
+      whereConditions.filename = { contains: filters.filename, mode: 'insensitive' };
+    }
+
+    return await db.document.findMany({
+      where: whereConditions,
+      orderBy: { created_at: 'desc' },
+      select: {
+        id: true,
+        filename: true,
+        title: true,
+        grade_level: true,
+        subject: true,
+        content: true,
+        created_at: true
+      }
     });
-
-    // Flatten results for easier display
-    const results: any[] = [];
-    documents.forEach(doc => {
-      doc.sections.forEach(section => {
-        section.topics.forEach(topic => {
-          results.push({
-            documentId: doc.id,
-            documentTitle: doc.title,
-            documentGrade: doc.grade_level,
-            sectionId: section.id,
-            sectionTitle: section.title,
-            sectionType: section.section_type,
-            topicId: topic.id,
-            topicTitle: topic.title,
-            topicContent: topic.content.substring(0, 500) + '...', // Truncate for display
-            topicType: topic.topic_type,
-            difficulty: topic.difficulty,
-          });
-        });
-      });
-    });
-
-    return results;
-  }
-
-  async getKeywords(limit = 50) {
-    return await db.keyword.findMany({
-      include: {
-        topics: {
-          include: {
-            topic: {
-              include: {
-                section: {
-                  include: {
-                    document: true
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      take: limit,
-      orderBy: { word: 'asc' }
-    });
-  }
-
-  async getTopicsByKeyword(keyword: string) {
-    const results = await db.topic.findMany({
-      where: {
-        keywords: {
-          some: {
-            keyword: {
-              word: { contains: keyword, mode: 'insensitive' }
-            }
-          }
-        }
-      },
-      include: {
-        section: {
-          include: {
-            document: true
-          }
-        },
-        keywords: {
-          include: {
-            keyword: true
-          }
-        }
-      },
-      take: 20
-    });
-
-    return results.map(topic => ({
-      topicId: topic.id,
-      topicTitle: topic.title,
-      topicContent: topic.content,
-      topicType: topic.topic_type,
-      difficulty: topic.difficulty,
-      sectionTitle: topic.section.title,
-      documentTitle: topic.section.document.title,
-      documentGrade: topic.section.document.grade_level,
-    }));
   }
 
   async getStats() {
-    const [docCount, sectionCount, topicCount, keywordCount] = await Promise.all([
-      db.document.count(),
-      db.section.count(),
-      db.topic.count(),
-      db.keyword.count(),
-    ]);
+    const documentCount = await db.document.count();
+    
+    const gradeDistribution = await db.document.groupBy({
+      by: ['grade_level'],
+      _count: {
+        grade_level: true
+      },
+      orderBy: {
+        grade_level: 'asc'
+      }
+    });
+
+    const subjectDistribution = await db.document.groupBy({
+      by: ['subject'],
+      _count: {
+        subject: true
+      }
+    });
 
     return {
-      documents: docCount,
-      sections: sectionCount,
-      topics: topicCount,
-      keywords: keywordCount,
+      totalDocuments: documentCount,
+      gradeDistribution,
+      subjectDistribution
     };
   }
+
+  // Helper method to extract content snippets around search terms
+  extractSnippets(content: string, query: string, maxSnippets: number = 3): string[] {
+    if (!query) return [];
+    
+    const words = query.toLowerCase().split(' ');
+    const snippets: string[] = [];
+    const sentences = content.split(/[.!?]+/);
+    
+    for (const sentence of sentences) {
+      const sentenceLower = sentence.toLowerCase();
+      const hasMatch = words.some(word => sentenceLower.includes(word));
+      
+      if (hasMatch && snippets.length < maxSnippets) {
+        snippets.push(sentence.trim());
+      }
+    }
+    
+    return snippets;
+  }
 }
+
+export const curriculumService = new CurriculumService();

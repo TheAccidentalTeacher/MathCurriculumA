@@ -6,14 +6,11 @@ const curriculumService = new CurriculumService();
 interface SearchParams {
   q?: string;
   grade?: string;
-  difficulty?: string;
-  topicType?: string;
-  sectionType?: string;
 }
 
 export default async function Home({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const params = (await searchParams) || {};
-  const { q, grade, difficulty, topicType, sectionType } = params;
+  const { q, grade } = params;
   
   let data: any = { documents: [], stats: { documents: 0, sections: 0, topics: 0, keywords: 0 } };
   let results: any[] = [];
@@ -21,10 +18,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Se
   try {
     if (q) {
       const filters: SearchFilters = {
-        ...(grade && { grade: parseInt(grade) }),
-        ...(difficulty && { difficulty: difficulty as any }),
-        ...(topicType && { topicType: topicType as any }),
-        ...(sectionType && { sectionType: sectionType as any }),
+        ...(grade && { grade: grade }),
       };
       results = await curriculumService.searchContent(q, filters);
     } else {
@@ -64,35 +58,16 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Se
           </div>
           
           {/* Filters */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <select name="grade" defaultValue={grade || ""} className="rounded-md bg-slate-700 border border-slate-600 px-3 py-2">
               <option value="">Any Grade</option>
-              <option value="7">Grade 7</option>
-              <option value="8">Grade 8</option>
+              <option value="Grade 7">Grade 7</option>
+              <option value="Grade 8">Grade 8</option>
             </select>
             
-            <select name="difficulty" defaultValue={difficulty || ""} className="rounded-md bg-slate-700 border border-slate-600 px-3 py-2">
-              <option value="">Any Difficulty</option>
-              <option value="basic">Basic</option>
-              <option value="intermediate">Intermediate</option>
-              <option value="advanced">Advanced</option>
-            </select>
-            
-            <select name="topicType" defaultValue={topicType || ""} className="rounded-md bg-slate-700 border border-slate-600 px-3 py-2">
-              <option value="">Any Topic Type</option>
-              <option value="concept">Concept</option>
-              <option value="example">Example</option>
-              <option value="exercise">Exercise</option>
-              <option value="assessment">Assessment</option>
-            </select>
-            
-            <select name="sectionType" defaultValue={sectionType || ""} className="rounded-md bg-slate-700 border border-slate-600 px-3 py-2">
-              <option value="">Any Section Type</option>
-              <option value="chapter">Chapter</option>
-              <option value="unit">Unit</option>
-              <option value="lesson">Lesson</option>
-              <option value="introduction">Introduction</option>
-              <option value="appendix">Appendix</option>
+            <select name="subject" className="rounded-md bg-slate-700 border border-slate-600 px-3 py-2">
+              <option value="">Any Subject</option>
+              <option value="Mathematics">Mathematics</option>
             </select>
           </div>
         </form>
