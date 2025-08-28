@@ -8,6 +8,7 @@
     "start": "next start",
     "postinstall": "prisma generate",
     "extract": "tsx scripts/extract-curriculum.ts",
+    "extract-v2": "tsx scripts/extract-volume2.ts",
     "migrate": "tsx scripts/migrate-db.ts",
     "seed": "npm run migrate && npm run extract",
     "typecheck": "tsc -p . --noEmit",
