@@ -52,19 +52,26 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Se
             View the complete Ready Classroom Mathematics Grade 7 curriculum with high-resolution page images.
           </p>
           
-          <div className="grid md:grid-cols-2 gap-4 mb-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
             <Link 
               href="/viewer/volume1"
               className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
             >
-              � Volume 1 (504 pages)
+              📘 Grade 7 Volume 1 (504 pages)
             </Link>
             
             <Link 
               href="/viewer/volume2"
               className="inline-flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
             >
-              📖 Volume 2 (440 pages)
+              � Grade 7 Volume 2 (440 pages)
+            </Link>
+            
+            <Link 
+              href="/viewer/grade8-volume1"
+              className="inline-flex items-center justify-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+            >
+              📙 Grade 8 Volume 1 (552 pages)
             </Link>
           </div>
           
