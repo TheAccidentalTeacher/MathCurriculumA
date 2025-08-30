@@ -42,8 +42,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 1,
         title: "Solve Problems Involving Scale",
         volume: 1,
-        startPage: 19,
-        endPage: 34,
+        startPage: 4,
+        endPage: 30,
         sessions: 4,
         majorWork: true,
         originalCode: "G7 U1 L1"
@@ -57,8 +57,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 2,
         title: "Find Unit Rates Involving Ratios of Fractions",
         volume: 1,
-        startPage: 45,
-        endPage: 58,
+        startPage: 31,
+        endPage: 46,
         sessions: 2,
         majorWork: true,
         originalCode: "G7 U1 L2"
@@ -72,8 +72,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 3,
         title: "Understand Proportional Relationships",
         volume: 1,
-        startPage: 63,
-        endPage: 78,
+        startPage: 47,
+        endPage: 58,
         sessions: 2,
         majorWork: true,
         originalCode: "G7 U1 L3"
@@ -87,8 +87,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 4,
         title: "Represent Proportional Relationships",
         volume: 1,
-        startPage: 73,
-        endPage: 94,
+        startPage: 59,
+        endPage: 80,
         sessions: 3,
         majorWork: true,
         originalCode: "G7 U1 L4"
@@ -102,8 +102,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 5,
         title: "Solve Proportional Relationship Problems",
         volume: 1,
-        startPage: 95,
-        endPage: 110,
+        startPage: 81,
+        endPage: 96,
         sessions: 2,
         majorWork: true,
         originalCode: "G7 U1 L5"
@@ -117,8 +117,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 6,
         title: "Solve Area and Circumference Problems Involving Circles",
         volume: 1,
-        startPage: 111,
-        endPage: 130,
+        startPage: 97,
+        endPage: 118,
         sessions: 3,
         majorWork: true,
         originalCode: "G7 U1 L6"
@@ -918,8 +918,33 @@ export class AcceleratedPathwayService {
       8: { 1: '/viewer/grade8-volume1', 2: '/viewer/grade8-volume2' }
     };
     
+    // Convert continuous page number to PDF page number
+    // The offset accounts for the difference between continuous page numbering and PDF page position
+    let pdfPageNumber = lesson.startPage;
+    
+    // Grade 7 Volume 1: pages 1-419, PDF starts at position where page 4 = PDF page 16
+    // So PDF page = continuous page + 12 (16 - 4 = 12)
+    if (lesson.grade === 7 && lesson.volume === 1) {
+      pdfPageNumber = lesson.startPage + 12;
+    }
+    // Grade 7 Volume 2: pages 420+, PDF starts at position where page 420 = PDF page 16  
+    // So PDF page = continuous page - 420 + 16 = continuous page - 404
+    else if (lesson.grade === 7 && lesson.volume === 2) {
+      pdfPageNumber = lesson.startPage - 404;
+    }
+    // Grade 8 Volume 1: pages 1-447, PDF starts at position where page 4 = PDF page 16
+    // So PDF page = continuous page + 12
+    else if (lesson.grade === 8 && lesson.volume === 1) {
+      pdfPageNumber = lesson.startPage + 12;
+    }
+    // Grade 8 Volume 2: pages 448+, PDF starts at position where page 448 = PDF page 16
+    // So PDF page = continuous page - 448 + 16 = continuous page - 432  
+    else if (lesson.grade === 8 && lesson.volume === 2) {
+      pdfPageNumber = lesson.startPage - 432;
+    }
+    
     const basePath = volumeMap[lesson.grade][lesson.volume];
-    return `${basePath}?page=${lesson.startPage}`;
+    return `${basePath}?page=${pdfPageNumber}`;
   }
   
   getEstimatedDuration(): number {

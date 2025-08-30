@@ -56,6 +56,22 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Se
             </summary>
             <div className="mt-3 space-y-2 text-sm text-slate-400 border-t border-slate-700 pt-3">
               <div className="flex gap-3">
+                <span className="text-cyan-400 font-mono">2025-08-30</span>
+                <span><strong>📋 PAGE MAPPING CORRECTED:</strong> Fixed lesson start pages - G7 U1 L1 now correctly starts at page 4 (not 19)</span>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-cyan-400 font-mono">2025-08-30</span>
+                <span>Verified: L1→p.4, L2→p.31, L3→p.47, L4→p.59, L5→p.81, L6→p.97 with PDF conversion working</span>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-yellow-400 font-mono">2025-08-30</span>
+                <span><strong>🔧 CRITICAL FIX:</strong> Fixed page mapping - continuous page numbers now correctly convert to PDF pages</span>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-yellow-400 font-mono">2025-08-30</span>
+                <span>G7 V1: pages 1-419 (PDF offset +12), G7 V2: pages 420+ (PDF offset -404), G8 similar pattern</span>
+              </div>
+              <div className="flex gap-3">
                 <span className="text-red-400 font-mono">2025-08-30</span>
                 <span><strong>🔄 MAJOR CORRECTION:</strong> Restructured accelerated pathway to match EXACT official scope and sequence (Units A-J)</span>
               </div>
