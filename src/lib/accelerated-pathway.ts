@@ -298,7 +298,7 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 20,
         title: "Solve Problems Involving Percents",
         volume: 2,
-        startPage: 420, // Volume 2 page numbers - need verification
+        startPage: 15, // Volume 2 page numbers - need verification
         endPage: 40,
         sessions: 4,
         majorWork: false, // Supporting work per scope
@@ -313,11 +313,56 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 21,
         title: "Solve Problems Involving Percent Change and Percent Error",
         volume: 2,
-        startPage: 447,
+        startPage: 43,
         endPage: 468,
         sessions: 3,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U5 L21"
+      },
+      {
+        id: "g7-u6-l22",
+        grade: 7,
+        unit: "Statistics and Probability",
+        unitNumber: 6,
+        lesson: "Understand Random Sampling",
+        lessonNumber: 22,
+        title: "Understand Random Sampling",
+        volume: 2,
+        startPage: 65,
+        endPage: 76,
+        sessions: 1,
+        majorWork: false, // Supporting work per scope
+        originalCode: "G7 U6 L22"
+      },
+      {
+        id: "g7-u6-l23",
+        grade: 7,
+        unit: "Statistics and Probability",
+        unitNumber: 6,
+        lesson: "Reason About Random Samples",
+        lessonNumber: 23,
+        title: "Reason About Random Samples",
+        volume: 2,
+        startPage: 77,
+        endPage: 98,
+        sessions: 2,
+        majorWork: false, // Supporting work per scope
+        originalCode: "G7 U6 L23"
+      },
+      {
+        id: "g7-u6-l24",
+        grade: 7,
+        unit: "Statistics and Probability",
+        unitNumber: 6,
+        lesson: "Compare Populations",
+        lessonNumber: 24,
+        title: "Compare Populations",
+        volume: 2,
+        startPage: 99,
+        endPage: 138,
+        sessions: 3,
+        majorWork: false, // Supporting work per scope
+        originalCode: "G7 U6 L24"
       }
     ]
   },
@@ -600,7 +645,7 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 19,
         title: "Apply Exponent Properties for Positive Integer Exponents",
         volume: 2,
-        startPage: 448,
+        startPage: 15,
         endPage: 468,
         sessions: 3,
         majorWork: true,
@@ -615,7 +660,7 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 20,
         title: "Apply Exponent Properties for All Integer Exponents",
         volume: 2,
-        startPage: 469,
+        startPage: 37,
         endPage: 490,
         sessions: 3,
         majorWork: true,
@@ -630,7 +675,7 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 21,
         title: "Express Numbers Using Integer Powers of 10",
         volume: 2,
-        startPage: 491,
+        startPage: 59,
         endPage: 512,
         sessions: 3,
         majorWork: true,
@@ -645,7 +690,7 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 22,
         title: "Work with Scientific Notation",
         volume: 2,
-        startPage: 513,
+        startPage: 81,
         endPage: 556,
         sessions: 3,
         majorWork: true,
@@ -668,7 +713,7 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 23,
         title: "Find Square Roots and Cube Roots to Solve Problems",
         volume: 2,
-        startPage: 557,
+        startPage: 127,
         endPage: 578,
         sessions: 3,
         majorWork: true,
@@ -683,7 +728,7 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 24,
         title: "Express Rational Numbers as Fractions and Decimals",
         volume: 2,
-        startPage: 579,
+        startPage: 149,
         endPage: 594,
         sessions: 2,
         majorWork: false, // Supporting work - "Just Develop"
@@ -698,11 +743,41 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 25,
         title: "Find Rational Approximations of Irrational Numbers",
         volume: 2,
-        startPage: 595,
+        startPage: 165,
         endPage: 618,
         sessions: 3,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G8 U6 L25"
+      },
+      {
+        id: "g8-u6-l26",
+        grade: 8,
+        unit: "Real Numbers",
+        unitNumber: 6,
+        lesson: "Understand the Pythagorean Theorem and Its Converse",
+        lessonNumber: 26,
+        title: "Understand the Pythagorean Theorem and Its Converse",
+        volume: 2,
+        startPage: 187,
+        endPage: 198,
+        sessions: 1,
+        majorWork: false, // Supporting work per scope
+        originalCode: "G8 U6 L26"
+      },
+      {
+        id: "g8-u6-l27",
+        grade: 8,
+        unit: "Real Numbers",
+        unitNumber: 6,
+        lesson: "Apply the Pythagorean Theorem",
+        lessonNumber: 27,
+        title: "Apply the Pythagorean Theorem",
+        volume: 2,
+        startPage: 199,
+        endPage: 226,
+        sessions: 2,
+        majorWork: false, // Supporting work per scope
+        originalCode: "G8 U6 L27"
       }
     ]
   },
@@ -721,7 +796,7 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 25,
         title: "Solve Problems Involving Area and Surface Area",
         volume: 2,
-        startPage: 542,
+        startPage: 139,
         endPage: 565,
         sessions: 3,
         majorWork: false, // Supporting work - "Just Develop"
@@ -736,7 +811,7 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 26,
         title: "Solve Problems Involving Volume",
         volume: 2,
-        startPage: 569,
+        startPage: 167,
         endPage: 590,
         sessions: 3,
         majorWork: false, // Supporting work - "Just Develop"
@@ -751,11 +826,101 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 27,
         title: "Describe Plane Sections of Three-Dimensional Figures",
         volume: 2,
-        startPage: 591,
+        startPage: 189,
         endPage: 612,
         sessions: 2,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G7 U6 L27"
+      },
+      {
+        id: "g7-u8-l28",
+        grade: 7,
+        unit: "Geometry",
+        unitNumber: 8,
+        lesson: "Find Unknown Angle Measures",
+        lessonNumber: 28,
+        title: "Find Unknown Angle Measures",
+        volume: 2,
+        startPage: 205,
+        endPage: 226,
+        sessions: 2,
+        majorWork: false, // Supporting work per scope
+        originalCode: "G7 U8 L28"
+      },
+      {
+        id: "g7-u8-l29",
+        grade: 7,
+        unit: "Geometry",
+        unitNumber: 8,
+        lesson: "Draw Plane Figures with Given Conditions",
+        lessonNumber: 29,
+        title: "Draw Plane Figures with Given Conditions",
+        volume: 2,
+        startPage: 227,
+        endPage: 272,
+        sessions: 3,
+        majorWork: false, // Supporting work per scope
+        originalCode: "G7 U8 L29"
+      },
+      {
+        id: "g7-u9-l30",
+        grade: 7,
+        unit: "Statistics and Probability",
+        unitNumber: 9,
+        lesson: "Understand Probability",
+        lessonNumber: 30,
+        title: "Understand Probability",
+        volume: 2,
+        startPage: 273,
+        endPage: 284,
+        sessions: 1,
+        majorWork: false, // Supporting work per scope
+        originalCode: "G7 U9 L30"
+      },
+      {
+        id: "g7-u9-l31",
+        grade: 7,
+        unit: "Statistics and Probability",
+        unitNumber: 9,
+        lesson: "Solve Problems Involving Experimental Probability",
+        lessonNumber: 31,
+        title: "Solve Problems Involving Experimental Probability",
+        volume: 2,
+        startPage: 285,
+        endPage: 306,
+        sessions: 2,
+        majorWork: false, // Supporting work per scope
+        originalCode: "G7 U9 L31"
+      },
+      {
+        id: "g7-u9-l32",
+        grade: 7,
+        unit: "Statistics and Probability",
+        unitNumber: 9,
+        lesson: "Solve Problems Involving Probability Models",
+        lessonNumber: 32,
+        title: "Solve Problems Involving Probability Models",
+        volume: 2,
+        startPage: 307,
+        endPage: 328,
+        sessions: 2,
+        majorWork: false, // Supporting work per scope
+        originalCode: "G7 U9 L32"
+      },
+      {
+        id: "g7-u9-l33",
+        grade: 7,
+        unit: "Statistics and Probability",
+        unitNumber: 9,
+        lesson: "Solve Problems Involving Compound Events",
+        lessonNumber: 33,
+        title: "Solve Problems Involving Compound Events",
+        volume: 2,
+        startPage: 329,
+        endPage: 360,
+        sessions: 3,
+        majorWork: false, // Supporting work per scope
+        originalCode: "G7 U9 L33"
       },
       {
         id: "g8-u6-l28",
@@ -766,11 +931,71 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 28,
         title: "Solve Problems with Volumes of Cylinders, Cones, and Spheres",
         volume: 2,
-        startPage: 657,
+        startPage: 227,
         endPage: 672,
         sessions: 2,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G8 U6 L28"
+      },
+      {
+        id: "g8-u7-l29",
+        grade: 8,
+        unit: "Statistics and Data Analysis",
+        unitNumber: 7,
+        lesson: "Analyze Scatter Plots and Fit a Linear Model to Data",
+        lessonNumber: 29,
+        title: "Analyze Scatter Plots and Fit a Linear Model to Data",
+        volume: 2,
+        startPage: 267,
+        endPage: 294,
+        sessions: 2,
+        majorWork: false, // Supporting work per scope
+        originalCode: "G8 U7 L29"
+      },
+      {
+        id: "g8-u7-l30",
+        grade: 8,
+        unit: "Statistics and Data Analysis",
+        unitNumber: 7,
+        lesson: "Write and Analyze an Equation for Fitting a Linear Model",
+        lessonNumber: 30,
+        title: "Write and Analyze an Equation for Fitting a Linear Model",
+        volume: 2,
+        startPage: 295,
+        endPage: 316,
+        sessions: 2,
+        majorWork: false, // Supporting work per scope
+        originalCode: "G8 U7 L30"
+      },
+      {
+        id: "g8-u8-l31",
+        grade: 8,
+        unit: "Statistics and Probability",
+        unitNumber: 8,
+        lesson: "Understand Two-Way Tables",
+        lessonNumber: 31,
+        title: "Understand Two-Way Tables",
+        volume: 2,
+        startPage: 317,
+        endPage: 328,
+        sessions: 1,
+        majorWork: false, // Supporting work per scope
+        originalCode: "G8 U8 L31"
+      },
+      {
+        id: "g8-u8-l32",
+        grade: 8,
+        unit: "Statistics and Probability",
+        unitNumber: 8,
+        lesson: "Construct and Interpret Two-Way Tables",
+        lessonNumber: 32,
+        title: "Construct and Interpret Two-Way Tables",
+        volume: 2,
+        startPage: 329,
+        endPage: 360,
+        sessions: 2,
+        majorWork: false, // Supporting work per scope
+        originalCode: "G8 U8 L32"
       }
     ]
   },
