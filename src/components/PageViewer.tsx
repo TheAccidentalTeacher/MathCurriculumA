@@ -183,17 +183,17 @@ const searchForLessonInPDF = async (searchPattern: string, fallbackPattern?: str
       )}
 
       {/* Page Navigation */}
-      <div className="flex items-center space-x-4 bg-white rounded-lg shadow-md p-4">
+      <div className="flex items-center space-x-4 bg-white border border-gray-200 rounded-lg shadow-lg p-6">
         <button
           onClick={prevPage}
           disabled={currentPage <= 1}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors"
+          className="px-6 py-2 bg-blue-500 text-white rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors font-medium"
         >
           ← Previous
         </button>
         
         <div className="flex items-center space-x-2">
-          <span className="text-gray-600">Page</span>
+          <span className="text-gray-700 font-medium">Page</span>
           <input
             type="number"
             min={1}
@@ -205,15 +205,24 @@ const searchForLessonInPDF = async (searchPattern: string, fallbackPattern?: str
                 goToPage(page);
               }
             }}
-            className="w-20 px-2 py-1 border border-gray-300 rounded text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                const page = parseInt(e.currentTarget.value);
+                if (page >= 1 && page <= totalPages) {
+                  goToPage(page);
+                }
+              }
+            }}
+            className="w-20 px-3 py-2 border-2 border-gray-300 rounded-md text-center text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
+            placeholder={currentPage.toString()}
           />
-          <span className="text-gray-600">of {totalPages}</span>
+          <span className="text-gray-700 font-medium">of {totalPages}</span>
         </div>
 
         <button
           onClick={nextPage}
           disabled={currentPage >= totalPages}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors"
+          className="px-6 py-2 bg-blue-500 text-white rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors font-medium"
         >
           Next →
         </button>
