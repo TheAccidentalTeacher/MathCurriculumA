@@ -57,35 +57,35 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Se
             <div className="mt-3 space-y-2 text-sm text-slate-400 border-t border-slate-700 pt-3">
               <div className="flex gap-3">
                 <span className="text-green-400 font-mono">2025-08-30</span>
-                <span><strong>✅ COMPLETED:</strong> Shuffled lesson system with 23+ lessons mapped, interactive UI, and PDF integration</span>
+                <span><strong>✅ MAJOR UPDATE:</strong> Added Grade 8 lessons per accelerated scope sequence (40+ total lessons)</span>
               </div>
               <div className="flex gap-3">
                 <span className="text-green-400 font-mono">2025-08-30</span>
-                <span>Added accurate page ranges and session counts for Grade 7 curriculum units</span>
+                <span>Integrated transformations, linear equations, and exponent properties from G8 curriculum</span>
               </div>
               <div className="flex gap-3">
                 <span className="text-green-400 font-mono">2025-08-30</span>
-                <span>Created interactive UI for browsing combined Grade 7/8 lesson sequence</span>
+                <span>Added Unit D (Geometry) and Unit E (Advanced Topics) with proper Grade 7/8 sequencing</span>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-green-400 font-mono">2025-08-30</span>
+                <span>Completed shuffled lesson system foundation with accurate page mapping</span>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-green-400 font-mono">2025-08-30</span>
+                <span>Added interactive UI for browsing combined Grade 7/8 lesson sequence</span>
               </div>
               <div className="flex gap-3">
                 <span className="text-green-400 font-mono">2025-08-30</span>
                 <span>Implemented lesson filtering (Major Work vs Supporting Work)</span>
               </div>
               <div className="flex gap-3">
-                <span className="text-green-400 font-mono">2025-08-30</span>
-                <span>Added change log tracking system</span>
-              </div>
-              <div className="flex gap-3">
-                <span className="text-green-400 font-mono">2025-08-30</span>
-                <span>Completed comprehensive curriculum analysis (Explore-Develop-Refine pedagogical model)</span>
-              </div>
-              <div className="flex gap-3">
                 <span className="text-blue-400 font-mono">NEXT</span>
-                <span>Add Grade 8 lessons to complete accelerated pathway (Volume 1 & 2)</span>
+                <span>Complete remaining G8 lessons from scope sequence (geometry, functions, statistics)</span>
               </div>
               <div className="flex gap-3">
                 <span className="text-blue-400 font-mono">FUTURE</span>
-                <span>Educator dashboard for customizable scope and sequence editing</span>
+                <span>Educator dashboard for drag-and-drop lesson customization</span>
               </div>
             </div>
           </details>
