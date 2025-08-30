@@ -1,6 +1,6 @@
 import { CurriculumService, SearchFilters } from "@/lib/curriculum-service";
 import { AcceleratedPathwayViewer } from "@/components/AcceleratedPathwayViewer";
-import { FullCurriculumViewer } from "@/components/FullCurriculumViewer";
+import { CurriculumTransformer } from "@/components/CurriculumTransformer";
 import Link from "next/link";
 
 const curriculumService = new CurriculumService();
@@ -128,13 +128,8 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Se
           </details>
         </div>
 
-        {/* Full Curriculum Viewer - Hidden Initially */}
-        <FullCurriculumViewer />
-
-        {/* Accelerated Pathway: Shuffled Lessons */}
-        <div className="mb-8">
-          <AcceleratedPathwayViewer />
-        </div>
+        {/* Interactive Curriculum Transformer */}
+        <CurriculumTransformer />
 
         {/* Search Form */}
         <form className="space-y-4 mb-8 bg-slate-800 p-6 rounded-lg border border-slate-700" action="/" method="get">
