@@ -23,6 +23,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const documentMap: { [key: string]: string } = {
       'rcm07-na-sw-v1': 'RCM07_NA_SW_V1',
       'RCM07_NA_SW_V2': 'RCM07_NA_SW_V2',
+      'rcm08-na-sw-v1': 'RCM08_NA_SW_V1',
       'test-sample': 'test_sample'
     };
 
