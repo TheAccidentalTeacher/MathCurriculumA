@@ -1239,27 +1239,19 @@ export class AcceleratedPathwayService {
   }
   
   getViewerUrl(lesson: LessonReference): string {
-    const volumeMap = {
-      7: { 1: '/viewer/volume1', 2: '/viewer/volume2' },
-      8: { 1: '/viewer/grade8-volume1', 2: '/viewer/grade8-volume2' }
+    // Map to document IDs for the new lesson viewer
+    const documentMap = {
+      7: { 1: 'RCM07_NA_SW_V1', 2: 'RCM07_NA_SW_V2' },
+      8: { 1: 'RCM08_NA_SW_V1', 2: 'RCM08_NA_SW_V2' }
     };
     
-    const basePath = volumeMap[lesson.grade]?.[lesson.volume];
-    if (!basePath) {
+    const documentId = documentMap[lesson.grade]?.[lesson.volume];
+    if (!documentId) {
       throw new Error(`Invalid grade/volume combination: Grade ${lesson.grade}, Volume ${lesson.volume}`);
     }
     
-    // New search-based navigation system
-    // Instead of unreliable page numbers, we'll search for the lesson pattern
-    const searchParams = new URLSearchParams({
-      navigationId: lesson.navigationId,
-      searchPattern: lesson.searchPattern,
-      lessonNumber: lesson.lessonNumber.toString(),
-      ...(lesson.fallbackPattern && { fallbackPattern: lesson.fallbackPattern }),
-      ...(lesson.estimatedPage && { estimatedPage: lesson.estimatedPage.toString() })
-    });
-    
-    return `${basePath}?${searchParams.toString()}`;
+    // Use the new lesson-focused viewer
+    return `/lesson/${documentId}/${lesson.lessonNumber}`;
   }
   
   getEstimatedDuration(): number {
