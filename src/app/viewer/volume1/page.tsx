@@ -1,6 +1,13 @@
 import PageViewer from '@/components/PageViewer';
 
-export default function Volume1ViewerPage() {
+interface PageProps {
+  searchParams?: Promise<{ page?: string }>;
+}
+
+export default async function Volume1ViewerPage({ searchParams }: PageProps) {
+  const params = (await searchParams) || {};
+  const initialPage = params.page ? parseInt(params.page, 10) : 1;
+  
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto py-8">
@@ -11,7 +18,7 @@ export default function Volume1ViewerPage() {
         <PageViewer 
           documentId="rcm07-na-sw-v1"
           totalPages={504}
-          initialPage={1}
+          initialPage={initialPage}
         />
       </div>
     </div>

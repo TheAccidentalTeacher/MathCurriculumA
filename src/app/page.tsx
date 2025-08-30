@@ -57,6 +57,14 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Se
             <div className="mt-3 space-y-2 text-sm text-slate-400 border-t border-slate-700 pt-3">
               <div className="flex gap-3">
                 <span className="text-green-400 font-mono">2025-08-30</span>
+                <span><strong>🔧 FIXED:</strong> Direct lesson navigation - all "View →" buttons now jump to specific lesson pages</span>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-green-400 font-mono">2025-08-30</span>
+                <span>Updated all 4 volume viewers to properly handle page query parameters</span>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-green-400 font-mono">2025-08-30</span>
                 <span><strong>✅ MAJOR UPDATE:</strong> Added Grade 8 lessons per accelerated scope sequence (40+ total lessons)</span>
               </div>
               <div className="flex gap-3">
@@ -72,16 +80,8 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Se
                 <span>Completed shuffled lesson system foundation with accurate page mapping</span>
               </div>
               <div className="flex gap-3">
-                <span className="text-green-400 font-mono">2025-08-30</span>
-                <span>Added interactive UI for browsing combined Grade 7/8 lesson sequence</span>
-              </div>
-              <div className="flex gap-3">
-                <span className="text-green-400 font-mono">2025-08-30</span>
-                <span>Implemented lesson filtering (Major Work vs Supporting Work)</span>
-              </div>
-              <div className="flex gap-3">
                 <span className="text-blue-400 font-mono">NEXT</span>
-                <span>Complete remaining G8 lessons from scope sequence (geometry, functions, statistics)</span>
+                <span>Add remaining G8 lessons from scope sequence (functions, statistics)</span>
               </div>
               <div className="flex gap-3">
                 <span className="text-blue-400 font-mono">FUTURE</span>
