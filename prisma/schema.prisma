@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -18,7 +18,7 @@ model Document {
   volume      String?   // "V1", "V2"
   subject     String?
   publisher   String?   // "Ready Classroom Mathematics"
-  content     String    @db.Text
+  content     String
   page_count  Int?
   created_at  DateTime  @default(now())
   updated_at  DateTime  @updatedAt
@@ -52,7 +52,7 @@ model Lesson {
   unit_id         String
   lesson_number   String   // "1", "2", etc.
   title           String   // "Solve Problems Involving Scale"
-  standards       String[] // ["7.G.A.1", "7.RP.A.1"] 
+  standards       String   // JSON array as string for SQLite 
   focus_type      String?  // "major", "supporting", "additional"
   instructional_days Int?
   page_start      Int?
@@ -73,7 +73,7 @@ model Session {
   session_number String  // "1", "2", "3"
   title         String?  // "Develop Solving Problems Involving Volume"
   session_type  String?  // "explore", "develop", "refine"
-  content       String   @db.Text
+  content       String
   page_start    Int?
   page_end      Int?
   order_index   Int      @default(0)
@@ -92,7 +92,7 @@ model Activity {
   session_id    String
   activity_type String   // "try_it", "develop", "solution", "math_toolkit"
   title         String?
-  content       String   @db.Text
+  content       String
   instructions  String?
   order_index   Int      @default(0)
   created_at    DateTime @default(now())
@@ -108,8 +108,8 @@ model Problem {
   id            String   @id @default(cuid())
   session_id    String
   problem_number String  // "3", "4", etc.
-  content       String   @db.Text
-  solution      String?  @db.Text
+  content       String
+  solution      String?
   difficulty    String?  // "basic", "intermediate", "advanced"
   problem_type  String?  // "example", "practice", "assessment"
   order_index   Int      @default(0)
@@ -131,7 +131,7 @@ model VisualElement {
   filename      String   // "gold_brick_diagram.png"
   file_path     String   // Full path to extracted image
   alt_text      String?  // Accessibility description
-  position_data String?  @db.Text // JSON: coordinates, dimensions
+  position_data String?  // JSON string for coordinates
   created_at    DateTime @default(now())
   
   activity      Activity? @relation(fields: [activity_id], references: [id], onDelete: Cascade)
@@ -151,8 +151,8 @@ model PageImage {
   file_size_kb  Float
   page_type     String   // "cover", "lesson", "practice", "assessment"
   word_count    Int      @default(0)
-  text_preview  String?  @db.Text
-  keywords      String[] // Mathematical terms found on page
+  text_preview  String?
+  keywords      String  // JSON array as string
   created_at    DateTime @default(now())
   
   document      Document @relation(fields: [document_id], references: [id], onDelete: Cascade)
