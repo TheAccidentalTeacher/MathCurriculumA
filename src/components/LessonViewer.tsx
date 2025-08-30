@@ -71,6 +71,7 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
 
   const getSessionTypeColor = (sessionType: string): string => {
     const colors: Record<string, string> = {
+      introduction: 'bg-indigo-500 hover:bg-indigo-600',
       explore: 'bg-green-500 hover:bg-green-600',
       develop: 'bg-blue-500 hover:bg-blue-600',
       refine: 'bg-purple-500 hover:bg-purple-600',

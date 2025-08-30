@@ -13,7 +13,7 @@ export interface LessonPage {
 export interface LessonSession {
   sessionNumber: number;
   sessionName: string;
-  sessionType: 'explore' | 'develop' | 'refine' | 'apply' | 'practice' | 'session';
+  sessionType: 'introduction' | 'explore' | 'develop' | 'refine' | 'apply' | 'practice' | 'session';
   startPage: number;
   endPage: number;
   pages: LessonPage[];
@@ -164,6 +164,7 @@ export class LessonService {
   private static parseLessonSessions(lessonPages: any[], lessonNumber: number): LessonSession[] {
     const sessions: LessonSession[] = [];
     let currentSession: LessonSession | null = null;
+    let introPages: any[] = [];
 
     for (const page of lessonPages) {
       const textPreview = page.text_preview || '';
@@ -172,6 +173,28 @@ export class LessonService {
       const sessionMatch = textPreview.match(/LESSON\s+\d+\s*\|\s*SESSION\s+(\d+)/i);
       if (sessionMatch) {
         const sessionNum = parseInt(sessionMatch[1]);
+        
+        // If we have intro pages before the first session, create an Introduction session
+        if (sessionNum === 1 && introPages.length > 0) {
+          const introSession: LessonSession = {
+            sessionNumber: 0,
+            sessionName: 'Introduction',
+            sessionType: 'introduction',
+            startPage: introPages[0].page_number,
+            endPage: introPages[introPages.length - 1].page_number,
+            pages: introPages.map(p => ({
+              pageNumber: p.page_number,
+              filename: p.filename,
+              imagePath: p.image_path,
+              textPreview: p.text_preview,
+              wordCount: p.word_count || 0,
+              hasSignificantContent: p.has_significant_content || false
+            })),
+            totalPages: introPages.length
+          };
+          sessions.push(introSession);
+          introPages = [];
+        }
         
         // If we have a current session, close it
         if (currentSession) {
@@ -192,7 +215,7 @@ export class LessonService {
         sessions.push(currentSession);
       }
 
-      // Add page to current session if we have one
+      // Add page to current session if we have one, or to intro pages if not
       if (currentSession) {
         currentSession.pages.push({
           pageNumber: page.page_number,
@@ -203,7 +226,31 @@ export class LessonService {
           hasSignificantContent: page.has_significant_content || false
         });
         currentSession.endPage = page.page_number;
+      } else {
+        // No session found yet, this might be intro content
+        introPages.push(page);
       }
+    }
+
+    // Handle any remaining intro pages (if no sessions were found)
+    if (introPages.length > 0 && sessions.length === 0) {
+      const introSession: LessonSession = {
+        sessionNumber: 0,
+        sessionName: 'Introduction',
+        sessionType: 'introduction',
+        startPage: introPages[0].page_number,
+        endPage: introPages[introPages.length - 1].page_number,
+        pages: introPages.map(p => ({
+          pageNumber: p.page_number,
+          filename: p.filename,
+          imagePath: p.image_path,
+          textPreview: p.text_preview,
+          wordCount: p.word_count || 0,
+          hasSignificantContent: p.has_significant_content || false
+        })),
+        totalPages: introPages.length
+      };
+      sessions.push(introSession);
     }
 
     // Finalize the last session
