@@ -162,6 +162,8 @@ function LessonCard({ lesson, index }: { lesson: LessonReference; index: number 
       <div className="flex gap-2 flex-shrink-0">
         <Link 
           href={viewerUrl}
+          target="_blank"
+          rel="noopener noreferrer"
           className="px-3 py-1 bg-purple-600 hover:bg-purple-500 rounded text-sm transition-colors"
         >
           View →
