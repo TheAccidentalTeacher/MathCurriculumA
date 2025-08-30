@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { LessonData, LessonSession } from '../lib/lesson-service';
+import KhanAcademyVideos from './KhanAcademyVideos';
 
 interface LessonViewerProps {
   documentId: string;
@@ -235,17 +236,19 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
 
       {/* Page Content */}
       <div className="flex-1 overflow-auto bg-gray-100">
-        <div className="max-w-5xl mx-auto p-6">
-          {currentPage && (
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-              {imageError ? (
-                <div className="bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg p-12 text-center">
-                  <div className="text-gray-500 text-lg mb-4">
-                    📄 Page could not be loaded
-                  </div>
-                  <p className="text-gray-400 text-sm mb-4">
-                    Page {currentPage.pageNumber} • {currentPage.filename}
-                  </p>
+        <div className="max-w-7xl mx-auto p-6 grid grid-cols-1 xl:grid-cols-3 gap-6">
+          {/* Main Content Area */}
+          <div className="xl:col-span-2">
+            {currentPage && (
+              <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                {imageError ? (
+                  <div className="bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg p-12 text-center">
+                    <div className="text-gray-500 text-lg mb-4">
+                      📄 Page could not be loaded
+                    </div>
+                    <p className="text-gray-400 text-sm mb-4">
+                      Page {currentPage.pageNumber} • {currentPage.filename}
+                    </p>
                   <button 
                     onClick={() => setImageError(false)}
                     className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
@@ -283,6 +286,16 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
               )}
             </div>
           )}
+          </div>
+          
+          {/* Khan Academy Videos Sidebar */}
+          <div className="xl:col-span-1">
+            <KhanAcademyVideos
+              documentId={documentId}
+              lessonNumber={lessonNumber}
+              lessonTitle={lessonData?.lessonTitle || `Lesson ${lessonNumber}`}
+            />
+          </div>
         </div>
       </div>
 

@@ -14,7 +14,9 @@
     "migrate": "tsx scripts/migrate-db.ts",
     "seed": "npm run migrate && npm run extract",
     "typecheck": "tsc -p . --noEmit",
-    "process-pdfs": "npx tsc scripts/advanced-pdf-extractor.ts --outDir dist --moduleResolution node --target es2020 --module commonjs --esModuleInterop && node scripts/process-all-pdfs.js"
+    "process-pdfs": "npx tsc scripts/advanced-pdf-extractor.ts --outDir dist --moduleResolution node --target es2020 --module commonjs --esModuleInterop && node scripts/process-all-pdfs.js",
+    "test-youtube": "tsx scripts/test-youtube-api.ts",
+    "batch-videos": "tsx scripts/batch-video-search.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.15.0",
