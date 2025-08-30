@@ -1,26 +1,63 @@
-import PageViewer from '@/components/PageViewer';
+import { Suspense } from 'react';
+import PageViewer from '../../../components/PageViewer';
+import Script from 'next/script';
 
 interface PageProps {
-  searchParams?: Promise<{ page?: string }>;
+  searchParams?: Promise<{ 
+    page?: string;
+    navigationId?: string;
+    searchPattern?: string;
+    lessonNumber?: string;
+    fallbackPattern?: string;
+    estimatedPage?: string;
+  }>;
 }
 
-export default async function Volume1ViewerPage({ searchParams }: PageProps) {
+export default async function Volume1Viewer({ searchParams }: PageProps) {
   const params = (await searchParams) || {};
+  
+  // Handle both old page-based and new search-based navigation
   const initialPage = params.page ? parseInt(params.page, 10) : 1;
   
+  // Extract search-based navigation parameters
+  const navigationParams = {
+    navigationId: params.navigationId,
+    searchPattern: params.searchPattern,
+    lessonNumber: params.lessonNumber ? parseInt(params.lessonNumber, 10) : undefined,
+    fallbackPattern: params.fallbackPattern,
+    estimatedPage: params.estimatedPage ? parseInt(params.estimatedPage, 10) : undefined,
+  };
+  
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto py-8">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
-          Ready Classroom Mathematics - Grade 7 • Volume 1
-        </h1>
+    <>
+      {/* Load PDF.js for text search functionality */}
+      <Script 
+        src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"
+        strategy="beforeInteractive"
+      />
+      <Script id="pdfjsWorker" strategy="beforeInteractive">
+        {`if (typeof window !== 'undefined' && window.pdfjsLib) {
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+          }`}
+      </Script>
+      
+      <div className="min-h-screen bg-gray-100">
+        <div className="bg-white border-b border-gray-200 px-4 py-3">
+          <h1 className="text-xl font-semibold text-gray-900">
+            Grade 7 Mathematics - Volume 1
+          </h1>
+        </div>
         
-        <PageViewer 
-          documentId="rcm07-na-sw-v1"
-          totalPages={504}
-          initialPage={initialPage}
-        />
+        <Suspense fallback={<div className="p-8">Loading...</div>}>
+          <PageViewer 
+            documentId="RCM07_NA_SW_V1"
+            totalPages={419}
+            volumeName="Grade 7 - Volume 1"
+            volume="volume1"
+            navigationParams={navigationParams}
+          />
+        </Suspense>
       </div>
-    </div>
+    </>
   );
 }

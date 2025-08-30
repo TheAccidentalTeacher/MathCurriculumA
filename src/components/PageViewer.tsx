@@ -1,21 +1,139 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
+
+// Import PDF.js for text search functionality
+declare const pdfjsLib: any;
 
 interface PageViewerProps {
   documentId: string;
   totalPages: number;
   initialPage?: number;
   volumeName?: string;
+  volume?: string;
+  navigationParams?: {
+    navigationId?: string;
+    searchPattern?: string;
+    lessonNumber?: number;
+    fallbackPattern?: string;
+    estimatedPage?: number;
+  };
 }
 
-export default function PageViewer({ documentId, totalPages, initialPage = 1, volumeName }: PageViewerProps) {
+export default function PageViewer({ 
+  documentId, 
+  totalPages, 
+  initialPage = 1, 
+  volumeName, 
+  volume,
+  navigationParams 
+}: PageViewerProps) {
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [isLoading, setIsLoading] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [searchStatus, setSearchStatus] = useState<string>('');
 
-  const goToPage = (pageNumber: number) => {
+  // Handle search-based navigation on component mount
+  useEffect(() => {
+    if (navigationParams?.searchPattern || navigationParams?.navigationId) {
+      handleSearchBasedNavigation();
+    }
+  }, []);
+
+  const handleSearchBasedNavigation = async () => {
+    if (!navigationParams || !navigationParams.searchPattern) return;
+
+    setSearchStatus('🔍 Searching for lesson...');
+    
+    try {
+      // Try to find the lesson using search pattern
+      let targetPage = await searchForLessonInPDF(
+        navigationParams.searchPattern,
+        navigationParams.fallbackPattern
+      );
+      
+      if (targetPage) {
+        setSearchStatus(`✅ Found lesson on page ${targetPage}`);
+        goToPage(targetPage);
+        // Clear status after 3 seconds
+        setTimeout(() => setSearchStatus(''), 3000);
+      } else {
+        setSearchStatus('❌ Lesson not found - using estimated page');
+        if (navigationParams.estimatedPage) {
+          goToPage(navigationParams.estimatedPage);
+        }
+        setTimeout(() => setSearchStatus(''), 5000);
+      }
+    } catch (error) {
+      setSearchStatus('⚠️ Search error - using estimated page');
+      if (navigationParams.estimatedPage) {
+        goToPage(navigationParams.estimatedPage);
+      }
+      setTimeout(() => setSearchStatus(''), 5000);
+    }
+  };
+
+// Mock search function - replace with actual PDF text search
+const searchForLessonInPDF = async (searchPattern: string, fallbackPattern?: string): Promise<number | null> => {
+  console.log(`🔍 Searching for: ${searchPattern}`);
+  
+  try {
+    // Construct the PDF URL for the current document
+    const pdfUrl = `/pdfs/${documentId}.pdf`;
+    
+    // Load the PDF document for text search
+    const pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
+    const numPages = pdfDoc.numPages;
+    
+    console.log(`📄 Searching ${numPages} pages...`);
+    
+    // Search through all pages for the pattern
+    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+      const page = await pdfDoc.getPage(pageNum);
+      const textContent = await page.getTextContent();
+      
+      // Combine all text items into a single string
+      const pageText = textContent.items
+        .map((item: any) => item.str)
+        .join(' ')
+        .toUpperCase();
+      
+      // Check for exact search pattern match first
+      if (pageText.includes(searchPattern.toUpperCase())) {
+        console.log(`✅ Found "${searchPattern}" on page ${pageNum}`);
+        return pageNum;
+      }
+    }
+    
+    // If exact pattern not found, try fallback pattern
+    if (fallbackPattern) {
+      console.log(`🔄 Primary search failed, trying fallback: ${fallbackPattern}`);
+      
+      for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+        const page = await pdfDoc.getPage(pageNum);
+        const textContent = await page.getTextContent();
+        
+        const pageText = textContent.items
+          .map((item: any) => item.str)
+          .join(' ')
+          .toUpperCase();
+        
+        if (pageText.includes(fallbackPattern.toUpperCase())) {
+          console.log(`✅ Found fallback "${fallbackPattern}" on page ${pageNum}`);
+          return pageNum;
+        }
+      }
+    }
+    
+    console.log('❌ Search pattern not found in PDF');
+    return null;
+    
+  } catch (error) {
+    console.error('❌ Error searching PDF:', error);
+    return null;
+  }
+};  const goToPage = (pageNumber: number) => {
     if (pageNumber >= 1 && pageNumber <= totalPages) {
       setCurrentPage(pageNumber);
       setIsLoading(true);
@@ -37,6 +155,33 @@ export default function PageViewer({ documentId, totalPages, initialPage = 1, vo
 
   return (
     <div className="flex flex-col items-center space-y-6 p-6">
+      {/* Search Status */}
+      {searchStatus && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md">
+          <div className="text-blue-800 text-center font-medium">
+            {searchStatus}
+          </div>
+        </div>
+      )}
+
+      {/* Lesson Navigation Info */}
+      {navigationParams && (navigationParams.searchPattern || navigationParams.navigationId) && (
+        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 max-w-2xl">
+          <h3 className="text-purple-800 font-semibold mb-2">📍 Lesson Navigation</h3>
+          <div className="text-sm text-purple-700">
+            {navigationParams.navigationId && (
+              <div><strong>ID:</strong> {navigationParams.navigationId}</div>
+            )}
+            {navigationParams.lessonNumber && (
+              <div><strong>Lesson:</strong> {navigationParams.lessonNumber}</div>
+            )}
+            {navigationParams.searchPattern && (
+              <div><strong>Searching for:</strong> {navigationParams.searchPattern}</div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Page Navigation */}
       <div className="flex items-center space-x-4 bg-white rounded-lg shadow-md p-4">
         <button

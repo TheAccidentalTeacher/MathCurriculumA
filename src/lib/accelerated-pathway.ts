@@ -10,8 +10,10 @@ export interface LessonReference {
   lessonNumber: number;
   title: string;
   volume: 1 | 2;
-  startPage: number;
-  endPage?: number;
+  navigationId: string; // New: unique identifier for search-based navigation
+  searchPattern: string; // New: primary search pattern (e.g., "LESSON 9 | UNDERSTAND SUBTRACTION")
+  fallbackPattern?: string; // New: backup search pattern
+  estimatedPage?: number; // Optional: rough page estimate for quick jumps
   sessions: number;
   majorWork: boolean; // true = Major Work, false = Supporting/Additional Work
   originalCode: string; // e.g., "G7 U1 L1"
@@ -42,8 +44,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 1,
         title: "Solve Problems Involving Scale",
         volume: 1,
-        startPage: 16,
-        endPage: 43,
+        navigationId: "lesson-1",
+        searchPattern: "LESSON 1 | SOLVE PROBLEMS INVOLVING SCALE",
+        fallbackPattern: "Solve Problems Involving Scale",
         sessions: 4,
         majorWork: true,
         originalCode: "G7 U1 L1"
@@ -57,8 +60,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 2,
         title: "Find Unit Rates Involving Ratios of Fractions",
         volume: 1,
-        startPage: 44,
-        endPage: 59,
+        navigationId: "lesson-2",
+        searchPattern: "LESSON 2 | FIND UNIT RATES INVOLVING RATIOS OF FRACTIONS",
+        fallbackPattern: "Find Unit Rates Involving Ratios of Fractions",
         sessions: 2,
         majorWork: true,
         originalCode: "G7 U1 L2"
@@ -72,8 +76,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 3,
         title: "Understand Proportional Relationships",
         volume: 1,
-        startPage: 60,
-        endPage: 71,
+        navigationId: "lesson-3",
+        searchPattern: "LESSON 3 | UNDERSTAND PROPORTIONAL RELATIONSHIPS",
+        fallbackPattern: "Understand Proportional Relationships",
         sessions: 2,
         majorWork: true,
         originalCode: "G7 U1 L3"
@@ -87,8 +92,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 4,
         title: "Represent Proportional Relationships",
         volume: 1,
-        startPage: 72,
-        endPage: 93,
+        navigationId: "lesson-4",
+        searchPattern: "LESSON 4 | REPRESENT PROPORTIONAL RELATIONSHIPS",
+        fallbackPattern: "Represent Proportional Relationships",
         sessions: 3,
         majorWork: true,
         originalCode: "G7 U1 L4"
@@ -102,8 +108,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 5,
         title: "Solve Proportional Relationship Problems",
         volume: 1,
-        startPage: 94,
-        endPage: 109,
+        navigationId: "lesson-5",
+        searchPattern: "LESSON 5 | SOLVE PROPORTIONAL RELATIONSHIP PROBLEMS",
+        fallbackPattern: "Solve Proportional Relationship Problems",
         sessions: 2,
         majorWork: true,
         originalCode: "G7 U1 L5"
@@ -117,8 +124,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 6,
         title: "Solve Area and Circumference Problems Involving Circles",
         volume: 1,
-        startPage: 110,
-        endPage: 149,
+        navigationId: "lesson-6",
+        searchPattern: "LESSON 6 | SOLVE AREA AND CIRCUMFERENCE PROBLEMS INVOLVING CIRCLES",
+        fallbackPattern: "Solve Area and Circumference Problems Involving Circles",
         sessions: 3,
         majorWork: true,
         originalCode: "G7 U1 L6"
@@ -140,8 +148,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 7,
         title: "Understand Addition with Negative Integers",
         volume: 1,
-        startPage: 150,
-        endPage: 161,
+        navigationId: "lesson-7",
+        searchPattern: "LESSON 7 | UNDERSTAND ADDITION WITH NEGATIVE INTEGERS",
+        fallbackPattern: "Understand Addition with Negative Integers",
         sessions: 2,
         majorWork: true,
         originalCode: "G7 U2 L7"
@@ -155,8 +164,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 8,
         title: "Add with Negative Numbers",
         volume: 1,
-        startPage: 162,
-        endPage: 183,
+        navigationId: "lesson-8",
+        searchPattern: "LESSON 8 | ADD WITH NEGATIVE NUMBERS",
+        fallbackPattern: "Add with Negative Numbers",
         sessions: 3,
         majorWork: true,
         originalCode: "G7 U2 L8"
@@ -170,8 +180,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 9,
         title: "Understand Subtraction with Negative Integers",
         volume: 1,
-        startPage: 184,
-        endPage: 195,
+        navigationId: "lesson-9",
+        searchPattern: "LESSON 9 | UNDERSTAND SUBTRACTION WITH NEGATIVE INTEGERS",
+        fallbackPattern: "Understand Subtraction with Negative Integers",
         sessions: 2,
         majorWork: true,
         originalCode: "G7 U2 L9"
@@ -185,8 +196,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 10,
         title: "Add and Subtract Positive and Negative Numbers",
         volume: 1,
-        startPage: 196,
-        endPage: 235,
+        navigationId: "lesson-10",
+        searchPattern: "LESSON 10 | ADD AND SUBTRACT POSITIVE AND NEGATIVE NUMBERS",
+        fallbackPattern: "Add and Subtract Positive and Negative Numbers",
         sessions: 3,
         majorWork: true,
         originalCode: "G7 U2 L10"
@@ -200,8 +212,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 11,
         title: "Understand Multiplication with Negative Integers",
         volume: 1,
-        startPage: 236,
-        endPage: 247,
+        navigationId: "lesson-11",
+        searchPattern: "LESSON 11 | UNDERSTAND MULTIPLICATION WITH NEGATIVE INTEGERS",
+        fallbackPattern: "Understand Multiplication with Negative Integers",
         sessions: 1,
         majorWork: true,
         originalCode: "G7 U3 L11"
@@ -215,8 +228,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 12,
         title: "Multiply and Divide with Negative Numbers",
         volume: 1,
-        startPage: 248,
-        endPage: 269,
+        navigationId: "lesson-12",
+        searchPattern: "LESSON 12 | MULTIPLY AND DIVIDE WITH NEGATIVE NUMBERS",
+        fallbackPattern: "Multiply and Divide with Negative Numbers",
         sessions: 3,
         majorWork: true,
         originalCode: "G7 U3 L12"
@@ -230,8 +244,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 13,
         title: "Express Rational Numbers as Terminating or Repeating Decimals",
         volume: 1,
-        startPage: 270,
-        endPage: 291,
+        navigationId: "lesson-13",
+        searchPattern: "LESSON 13 | EXPRESS RATIONAL NUMBERS AS TERMINATING OR REPEATING DECIMALS",
+        fallbackPattern: "Express Rational Numbers as Terminating or Repeating Decimals",
         sessions: 2,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U3 L13"
@@ -253,8 +268,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 14,
         title: "Use the Four Operations with Negative Numbers",
         volume: 1,
-        startPage: 292,
-        endPage: 325,
+        navigationId: "lesson-14",
+        searchPattern: "LESSON 14 | USE THE FOUR OPERATIONS WITH NEGATIVE NUMBERS",
+        fallbackPattern: "Use the Four Operations with Negative Numbers",
         sessions: 2,
         majorWork: true,
         originalCode: "G7 U3 L14"
@@ -268,8 +284,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 15,
         title: "Write Equivalent Expressions Involving Rational Numbers",
         volume: 1,
-        startPage: 326,
-        endPage: 347,
+        navigationId: "lesson-15",
+        searchPattern: "LESSON 15 | WRITE EQUIVALENT EXPRESSIONS INVOLVING RATIONAL NUMBERS",
+        fallbackPattern: "Write Equivalent Expressions Involving Rational Numbers",
         sessions: 3,
         majorWork: true,
         originalCode: "G7 U4 L15"
@@ -283,8 +300,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 16,
         title: "Understand Reasons for Rewriting Expressions",
         volume: 1,
-        startPage: 348,
-        endPage: 359,
+        navigationId: "lesson-16",
+        searchPattern: "LESSON 16 | UNDERSTAND REASONS FOR REWRITING EXPRESSIONS",
+        fallbackPattern: "Understand Reasons for Rewriting Expressions",
         sessions: 1,
         majorWork: true,
         originalCode: "G7 U4 L16"
@@ -298,8 +316,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 17,
         title: "Understand Multi-Step Equations",
         volume: 1,
-        startPage: 360,
-        endPage: 371,
+        navigationId: "lesson-17",
+        searchPattern: "LESSON 17 | UNDERSTAND MULTI-STEP EQUATIONS",
+        fallbackPattern: "Understand Multi-Step Equations",
         sessions: 1,
         majorWork: true,
         originalCode: "G7 U4 L17"
@@ -313,8 +332,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 18,
         title: "Write and Solve Multi-Step Equations",
         volume: 1,
-        startPage: 372,
-        endPage: 393,
+        navigationId: "lesson-18",
+        searchPattern: "LESSON 18 | WRITE AND SOLVE MULTI-STEP EQUATIONS",
+        fallbackPattern: "Write and Solve Multi-Step Equations",
         sessions: 2,
         majorWork: true,
         originalCode: "G7 U4 L18"
@@ -328,8 +348,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 19,
         title: "Write and Solve Inequalities",
         volume: 1,
-        startPage: 394,
-        endPage: 415,
+        navigationId: "lesson-19",
+        searchPattern: "LESSON 19 | WRITE AND SOLVE INEQUALITIES",
+        fallbackPattern: "Write and Solve Inequalities",
         sessions: 2,
         majorWork: true,
         originalCode: "G7 U4 L19"
@@ -343,8 +364,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 20,
         title: "Solve Problems Involving Percents",
         volume: 2,
-        startPage: 16,
-        endPage: 44,
+        navigationId: "lesson-20",
+        searchPattern: "LESSON 20 | SOLVE PROBLEMS INVOLVING PERCENTS",
+        fallbackPattern: "Solve Problems Involving Percents",
         sessions: 4,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U5 L20"
@@ -358,8 +380,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 21,
         title: "Solve Problems Involving Percent Change and Percent Error",
         volume: 2,
-        startPage: 45,
-        endPage: 65,
+        navigationId: "lesson-21",
+        searchPattern: "LESSON 21 | SOLVE PROBLEMS INVOLVING PERCENT CHANGE AND PERCENT ERROR",
+        fallbackPattern: "Solve Problems Involving Percent Change and Percent Error",
         sessions: 3,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U5 L21"
@@ -373,8 +396,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 22,
         title: "Understand Random Sampling",
         volume: 2,
-        startPage: 66,
-        endPage: 77,
+        navigationId: "lesson-22",
+        searchPattern: "LESSON 22 | UNDERSTAND RANDOM SAMPLING",
+        fallbackPattern: "Understand Random Sampling",
         sessions: 1,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U6 L22"
@@ -388,8 +412,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 23,
         title: "Reason About Random Samples",
         volume: 2,
-        startPage: 78,
-        endPage: 99,
+        navigationId: "lesson-23",
+        searchPattern: "LESSON 23 | REASON ABOUT RANDOM SAMPLES",
+        fallbackPattern: "Reason About Random Samples",
         sessions: 2,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U6 L23"
@@ -403,8 +428,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 24,
         title: "Compare Populations",
         volume: 2,
-        startPage: 100,
-        endPage: 139,
+        navigationId: "lesson-24",
+        searchPattern: "LESSON 24 | COMPARE POPULATIONS",
+        fallbackPattern: "Compare Populations",
         sessions: 3,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U6 L24"
@@ -426,8 +452,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 17,
         title: "Understand Multi-Step Equations",
         volume: 1,
-        startPage: 341,
-        endPage: 372,
+        navigationId: "lesson-17",
+        searchPattern: "LESSON 17 | UNIT D: ALGEBRAIC THINKING: SOLVING EQUATIONS AND INEQUALITIES",
+        fallbackPattern: "Unit D: Algebraic Thinking: Solving Equations and Inequalities",
         sessions: 2,
         majorWork: true,
         originalCode: "G7 U4 L17"
@@ -441,8 +468,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 18,
         title: "Write and Solve Multi-Step Equations",
         volume: 1,
-        startPage: 353,
-        endPage: 395,
+        navigationId: "lesson-18",
+        searchPattern: "LESSON 18 | WRITE AND SOLVE MULTI-STEP EQUATIONS",
+        fallbackPattern: "Write and Solve Multi-Step Equations",
         sessions: 3,
         majorWork: true,
         originalCode: "G7 U4 L18"
@@ -456,8 +484,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 10,
         title: "Solve Linear Equations in One Variable",
         volume: 1,
-        startPage: 243,
-        endPage: 264,
+        navigationId: "lesson-10",
+        searchPattern: "LESSON 10 | SOLVE LINEAR EQUATIONS IN ONE VARIABLE",
+        fallbackPattern: "Solve Linear Equations in One Variable",
         sessions: 2,
         majorWork: true,
         originalCode: "G8 U3 L10"
@@ -471,8 +500,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 11,
         title: "Determine the Number of Solutions to One-Variable Equations",
         volume: 1,
-        startPage: 265,
-        endPage: 284,
+        navigationId: "lesson-11",
+        searchPattern: "LESSON 11 | DETERMINE THE NUMBER OF SOLUTIONS TO ONE-VARIABLE EQUATIONS",
+        fallbackPattern: "Determine the Number of Solutions to One-Variable Equations",
         sessions: 2,
         majorWork: true,
         originalCode: "G8 U3 L11"
@@ -494,8 +524,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 28,
         title: "Find Unknown Angle Measures",
         volume: 2,
-        startPage: 607,
-        endPage: 628,
+        navigationId: "lesson-28",
+        searchPattern: "LESSON 28 | UNIT E: GEOMETRY: ANGLES, TRIANGLES, AND RIGID TRANSFORMATIONS",
+        fallbackPattern: "Unit E: Geometry: Angles, Triangles, and Rigid Transformations",
         sessions: 3,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G7 U6 L28"
@@ -509,8 +540,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 29,
         title: "Draw Plane Figures with Given Conditions",
         volume: 2,
-        startPage: 629,
-        endPage: 650,
+        navigationId: "lesson-29",
+        searchPattern: "LESSON 29 | DRAW PLANE FIGURES WITH GIVEN CONDITIONS",
+        fallbackPattern: "Draw Plane Figures with Given Conditions",
         sessions: 3,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G7 U6 L29"
@@ -524,8 +556,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 1,
         title: "Understand Rigid Transformations and Their Properties",
         volume: 1,
-        startPage: 1,
-        endPage: 28,
+        navigationId: "lesson-1",
+        searchPattern: "LESSON 1 | UNDERSTAND RIGID TRANSFORMATIONS AND THEIR PROPERTIES",
+        fallbackPattern: "Understand Rigid Transformations and Their Properties",
         sessions: 2,
         majorWork: true,
         originalCode: "G8 U1 L1"
@@ -539,8 +572,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 2,
         title: "Work with Single Rigid Transformations in the Coordinate Plane",
         volume: 1,
-        startPage: 29,
-        endPage: 56,
+        navigationId: "lesson-2",
+        searchPattern: "LESSON 2 | WORK WITH SINGLE RIGID TRANSFORMATIONS IN THE COORDINATE PLANE",
+        fallbackPattern: "Work with Single Rigid Transformations in the Coordinate Plane",
         sessions: 4,
         majorWork: true,
         originalCode: "G8 U1 L2"
@@ -554,8 +588,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 3,
         title: "Work with Sequences of Transformations and Congruence",
         volume: 1,
-        startPage: 57,
-        endPage: 84,
+        navigationId: "lesson-3",
+        searchPattern: "LESSON 3 | WORK WITH SEQUENCES OF TRANSFORMATIONS AND CONGRUENCE",
+        fallbackPattern: "Work with Sequences of Transformations and Congruence",
         sessions: 3,
         majorWork: true,
         originalCode: "G8 U1 L3"
@@ -577,8 +612,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 4,
         title: "Understand Dilations and Similarity",
         volume: 1,
-        startPage: 85,
-        endPage: 96,
+        navigationId: "lesson-4",
+        searchPattern: "LESSON 4 | UNIT F: PROPORTIONAL RELATIONSHIPS: DILATIONS, SIMILAR TRIANGLES, AND SLOPE",
+        fallbackPattern: "Unit F: Proportional Relationships: Dilations, Similar Triangles, and Slope",
         sessions: 1,
         majorWork: true,
         originalCode: "G8 U2 L4"
@@ -592,8 +628,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 5,
         title: "Perform and Describe Transformations Involving Dilations",
         volume: 1,
-        startPage: 97,
-        endPage: 124,
+        navigationId: "lesson-5",
+        searchPattern: "LESSON 5 | PERFORM AND DESCRIBE TRANSFORMATIONS INVOLVING DILATIONS",
+        fallbackPattern: "Perform and Describe Transformations Involving Dilations",
         sessions: 3,
         majorWork: true,
         originalCode: "G8 U2 L5"
@@ -607,8 +644,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 6,
         title: "Describe Angle Relationships",
         volume: 1,
-        startPage: 125,
-        endPage: 152,
+        navigationId: "lesson-6",
+        searchPattern: "LESSON 6 | DESCRIBE ANGLE RELATIONSHIPS",
+        fallbackPattern: "Describe Angle Relationships",
         sessions: 3,
         majorWork: true,
         originalCode: "G8 U2 L6"
@@ -622,8 +660,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 7,
         title: "Describe Angle Relationships in Triangles",
         volume: 1,
-        startPage: 153,
-        endPage: 180,
+        navigationId: "lesson-7",
+        searchPattern: "LESSON 7 | DESCRIBE ANGLE RELATIONSHIPS IN TRIANGLES",
+        fallbackPattern: "Describe Angle Relationships in Triangles",
         sessions: 3,
         majorWork: true,
         originalCode: "G8 U2 L7"
@@ -637,8 +676,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 8,
         title: "Graph Proportional Relationships and Define Slope",
         volume: 1,
-        startPage: 181,
-        endPage: 208,
+        navigationId: "lesson-8",
+        searchPattern: "LESSON 8 | GRAPH PROPORTIONAL RELATIONSHIPS AND DEFINE SLOPE",
+        fallbackPattern: "Graph Proportional Relationships and Define Slope",
         sessions: 3,
         majorWork: true,
         originalCode: "G8 U2 L8"
@@ -652,8 +692,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 9,
         title: "Derive and Graph Linear Equations of the Form y = mx + b",
         volume: 1,
-        startPage: 209,
-        endPage: 242,
+        navigationId: "lesson-9",
+        searchPattern: "LESSON 9 | DERIVE AND GRAPH LINEAR EQUATIONS OF THE FORM Y = MX + B",
+        fallbackPattern: "Derive and Graph Linear Equations of the Form y = mx + b",
         sessions: 4,
         majorWork: true,
         originalCode: "G8 U2 L9"
@@ -675,8 +716,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 19,
         title: "Apply Exponent Properties for Positive Integer Exponents",
         volume: 2,
-        startPage: 15,
-        endPage: 468,
+        navigationId: "lesson-19",
+        searchPattern: "LESSON 19 | UNIT G: INTEGER EXPONENTS: PROPERTIES AND SCIENTIFIC NOTATION",
+        fallbackPattern: "Unit G: Integer Exponents: Properties and Scientific Notation",
         sessions: 3,
         majorWork: true,
         originalCode: "G8 U5 L19"
@@ -690,8 +732,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 20,
         title: "Apply Exponent Properties for All Integer Exponents",
         volume: 2,
-        startPage: 37,
-        endPage: 490,
+        navigationId: "lesson-20",
+        searchPattern: "LESSON 20 | APPLY EXPONENT PROPERTIES FOR ALL INTEGER EXPONENTS",
+        fallbackPattern: "Apply Exponent Properties for All Integer Exponents",
         sessions: 3,
         majorWork: true,
         originalCode: "G8 U5 L20"
@@ -705,8 +748,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 21,
         title: "Express Numbers Using Integer Powers of 10",
         volume: 2,
-        startPage: 59,
-        endPage: 512,
+        navigationId: "lesson-21",
+        searchPattern: "LESSON 21 | EXPRESS NUMBERS USING INTEGER POWERS OF 10",
+        fallbackPattern: "Express Numbers Using Integer Powers of 10",
         sessions: 3,
         majorWork: true,
         originalCode: "G8 U5 L21"
@@ -720,8 +764,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 22,
         title: "Work with Scientific Notation",
         volume: 2,
-        startPage: 81,
-        endPage: 556,
+        navigationId: "lesson-22",
+        searchPattern: "LESSON 22 | WORK WITH SCIENTIFIC NOTATION",
+        fallbackPattern: "Work with Scientific Notation",
         sessions: 3,
         majorWork: true,
         originalCode: "G8 U5 L22"
@@ -743,8 +788,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 23,
         title: "Find Square Roots and Cube Roots to Solve Problems",
         volume: 2,
-        startPage: 127,
-        endPage: 578,
+        navigationId: "lesson-23",
+        searchPattern: "LESSON 23 | UNIT H: REAL NUMBERS: ROOTS, RATIONAL NUMBERS, AND IRRATIONAL NUMBERS",
+        fallbackPattern: "Unit H: Real Numbers: Roots, Rational Numbers, and Irrational Numbers",
         sessions: 3,
         majorWork: true,
         originalCode: "G8 U6 L23"
@@ -758,8 +804,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 24,
         title: "Express Rational Numbers as Fractions and Decimals",
         volume: 2,
-        startPage: 149,
-        endPage: 594,
+        navigationId: "lesson-24",
+        searchPattern: "LESSON 24 | EXPRESS RATIONAL NUMBERS AS FRACTIONS AND DECIMALS",
+        fallbackPattern: "Express Rational Numbers as Fractions and Decimals",
         sessions: 2,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G8 U6 L24"
@@ -773,8 +820,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 25,
         title: "Find Rational Approximations of Irrational Numbers",
         volume: 2,
-        startPage: 165,
-        endPage: 618,
+        navigationId: "lesson-25",
+        searchPattern: "LESSON 25 | FIND RATIONAL APPROXIMATIONS OF IRRATIONAL NUMBERS",
+        fallbackPattern: "Find Rational Approximations of Irrational Numbers",
         sessions: 3,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G8 U6 L25"
@@ -788,8 +836,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 26,
         title: "Understand the Pythagorean Theorem and Its Converse",
         volume: 2,
-        startPage: 187,
-        endPage: 198,
+        navigationId: "lesson-26",
+        searchPattern: "LESSON 26 | UNDERSTAND THE PYTHAGOREAN THEOREM AND ITS CONVERSE",
+        fallbackPattern: "Understand the Pythagorean Theorem and Its Converse",
         sessions: 1,
         majorWork: false, // Supporting work per scope
         originalCode: "G8 U6 L26"
@@ -803,8 +852,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 27,
         title: "Apply the Pythagorean Theorem",
         volume: 2,
-        startPage: 199,
-        endPage: 226,
+        navigationId: "lesson-27",
+        searchPattern: "LESSON 27 | APPLY THE PYTHAGOREAN THEOREM",
+        fallbackPattern: "Apply the Pythagorean Theorem",
         sessions: 2,
         majorWork: false, // Supporting work per scope
         originalCode: "G8 U6 L27"
@@ -826,8 +876,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 25,
         title: "Solve Problems Involving Area and Surface Area",
         volume: 2,
-        startPage: 140,
-        endPage: 167,
+        navigationId: "lesson-25",
+        searchPattern: "LESSON 25 | UNIT I: GEOMETRY: TWO- AND THREE-DIMENSIONAL FIGURES",
+        fallbackPattern: "Unit I: Geometry: Two- and Three-Dimensional Figures",
         sessions: 3,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G7 U6 L25"
@@ -841,8 +892,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 26,
         title: "Solve Problems Involving Volume",
         volume: 2,
-        startPage: 168,
-        endPage: 189,
+        navigationId: "lesson-26",
+        searchPattern: "LESSON 26 | SOLVE PROBLEMS INVOLVING VOLUME",
+        fallbackPattern: "Solve Problems Involving Volume",
         sessions: 3,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G7 U6 L26"
@@ -856,8 +908,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 27,
         title: "Describe Plane Sections of Three-Dimensional Figures",
         volume: 2,
-        startPage: 190,
-        endPage: 205,
+        navigationId: "lesson-27",
+        searchPattern: "LESSON 27 | DESCRIBE PLANE SECTIONS OF THREE-DIMENSIONAL FIGURES",
+        fallbackPattern: "Describe Plane Sections of Three-Dimensional Figures",
         sessions: 2,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G7 U6 L27"
@@ -871,8 +924,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 28,
         title: "Find Unknown Angle Measures",
         volume: 2,
-        startPage: 206,
-        endPage: 227,
+        navigationId: "lesson-28",
+        searchPattern: "LESSON 28 | FIND UNKNOWN ANGLE MEASURES",
+        fallbackPattern: "Find Unknown Angle Measures",
         sessions: 2,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U8 L28"
@@ -886,8 +940,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 29,
         title: "Draw Plane Figures with Given Conditions",
         volume: 2,
-        startPage: 228,
-        endPage: 273,
+        navigationId: "lesson-29",
+        searchPattern: "LESSON 29 | DRAW PLANE FIGURES WITH GIVEN CONDITIONS",
+        fallbackPattern: "Draw Plane Figures with Given Conditions",
         sessions: 3,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U8 L29"
@@ -901,8 +956,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 30,
         title: "Understand Probability",
         volume: 2,
-        startPage: 274,
-        endPage: 285,
+        navigationId: "lesson-30",
+        searchPattern: "LESSON 30 | UNDERSTAND PROBABILITY",
+        fallbackPattern: "Understand Probability",
         sessions: 1,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U9 L30"
@@ -916,8 +972,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 31,
         title: "Solve Problems Involving Experimental Probability",
         volume: 2,
-        startPage: 286,
-        endPage: 307,
+        navigationId: "lesson-31",
+        searchPattern: "LESSON 31 | SOLVE PROBLEMS INVOLVING EXPERIMENTAL PROBABILITY",
+        fallbackPattern: "Solve Problems Involving Experimental Probability",
         sessions: 2,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U9 L31"
@@ -931,8 +988,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 32,
         title: "Solve Problems Involving Probability Models",
         volume: 2,
-        startPage: 308,
-        endPage: 329,
+        navigationId: "lesson-32",
+        searchPattern: "LESSON 32 | SOLVE PROBLEMS INVOLVING PROBABILITY MODELS",
+        fallbackPattern: "Solve Problems Involving Probability Models",
         sessions: 2,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U9 L32"
@@ -946,8 +1004,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 33,
         title: "Solve Problems Involving Compound Events",
         volume: 2,
-        startPage: 330,
-        endPage: 365,
+        navigationId: "lesson-33",
+        searchPattern: "LESSON 33 | SOLVE PROBLEMS INVOLVING COMPOUND EVENTS",
+        fallbackPattern: "Solve Problems Involving Compound Events",
         sessions: 3,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U9 L33"
@@ -961,8 +1020,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 28,
         title: "Solve Problems with Volumes of Cylinders, Cones, and Spheres",
         volume: 2,
-        startPage: 227,
-        endPage: 672,
+        navigationId: "lesson-28",
+        searchPattern: "LESSON 28 | SOLVE PROBLEMS WITH VOLUMES OF CYLINDERS, CONES, AND SPHERES",
+        fallbackPattern: "Solve Problems with Volumes of Cylinders, Cones, and Spheres",
         sessions: 2,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G8 U6 L28"
@@ -976,8 +1036,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 29,
         title: "Analyze Scatter Plots and Fit a Linear Model to Data",
         volume: 2,
-        startPage: 267,
-        endPage: 294,
+        navigationId: "lesson-29",
+        searchPattern: "LESSON 29 | ANALYZE SCATTER PLOTS AND FIT A LINEAR MODEL TO DATA",
+        fallbackPattern: "Analyze Scatter Plots and Fit a Linear Model to Data",
         sessions: 2,
         majorWork: false, // Supporting work per scope
         originalCode: "G8 U7 L29"
@@ -991,8 +1052,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 30,
         title: "Write and Analyze an Equation for Fitting a Linear Model",
         volume: 2,
-        startPage: 295,
-        endPage: 316,
+        navigationId: "lesson-30",
+        searchPattern: "LESSON 30 | WRITE AND ANALYZE AN EQUATION FOR FITTING A LINEAR MODEL",
+        fallbackPattern: "Write and Analyze an Equation for Fitting a Linear Model",
         sessions: 2,
         majorWork: false, // Supporting work per scope
         originalCode: "G8 U7 L30"
@@ -1006,8 +1068,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 31,
         title: "Understand Two-Way Tables",
         volume: 2,
-        startPage: 317,
-        endPage: 328,
+        navigationId: "lesson-31",
+        searchPattern: "LESSON 31 | UNDERSTAND TWO-WAY TABLES",
+        fallbackPattern: "Understand Two-Way Tables",
         sessions: 1,
         majorWork: false, // Supporting work per scope
         originalCode: "G8 U8 L31"
@@ -1021,8 +1084,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 32,
         title: "Construct and Interpret Two-Way Tables",
         volume: 2,
-        startPage: 329,
-        endPage: 360,
+        navigationId: "lesson-32",
+        searchPattern: "LESSON 32 | CONSTRUCT AND INTERPRET TWO-WAY TABLES",
+        fallbackPattern: "Construct and Interpret Two-Way Tables",
         sessions: 2,
         majorWork: false, // Supporting work per scope
         originalCode: "G8 U8 L32"
@@ -1044,8 +1108,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 22,
         title: "Understand Random Sampling",
         volume: 2,
-        startPage: 469,
-        endPage: 480,
+        navigationId: "lesson-22",
+        searchPattern: "LESSON 22 | UNIT J: STATISTICS AND PROBABILITY: SAMPLING AND PROBABILITY",
+        fallbackPattern: "Unit J: Statistics and Probability: Sampling and Probability",
         sessions: 1,
         majorWork: false, // Supporting work - "Just Exp/Dev"
         originalCode: "G7 U5 L22"
@@ -1059,8 +1124,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 23,
         title: "Reason About Random Samples",
         volume: 2,
-        startPage: 481,
-        endPage: 502,
+        navigationId: "lesson-23",
+        searchPattern: "LESSON 23 | REASON ABOUT RANDOM SAMPLES",
+        fallbackPattern: "Reason About Random Samples",
         sessions: 2,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G7 U5 L23"
@@ -1074,8 +1140,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 24,
         title: "Compare Populations",
         volume: 2,
-        startPage: 503,
-        endPage: 530,
+        navigationId: "lesson-24",
+        searchPattern: "LESSON 24 | COMPARE POPULATIONS",
+        fallbackPattern: "Compare Populations",
         sessions: 3,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G7 U5 L24"
@@ -1089,8 +1156,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 30,
         title: "Understand Probability",
         volume: 2,
-        startPage: 673,
-        endPage: 684,
+        navigationId: "lesson-30",
+        searchPattern: "LESSON 30 | UNDERSTAND PROBABILITY",
+        fallbackPattern: "Understand Probability",
         sessions: 1,
         majorWork: false, // Supporting work - "Explore/Dev only"
         originalCode: "G7 U6 L30"
@@ -1104,8 +1172,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 31,
         title: "Solve Problems Involving Experimental Probability",
         volume: 2,
-        startPage: 685,
-        endPage: 706,
+        navigationId: "lesson-31",
+        searchPattern: "LESSON 31 | SOLVE PROBLEMS INVOLVING EXPERIMENTAL PROBABILITY",
+        fallbackPattern: "Solve Problems Involving Experimental Probability",
         sessions: 3,
         majorWork: false, // Supporting work - "Develop Only"
         originalCode: "G7 U6 L31"
@@ -1119,8 +1188,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 32,
         title: "Solve Problems Involving Probability Models",
         volume: 2,
-        startPage: 707,
-        endPage: 728,
+        navigationId: "lesson-32",
+        searchPattern: "LESSON 32 | SOLVE PROBLEMS INVOLVING PROBABILITY MODELS",
+        fallbackPattern: "Solve Problems Involving Probability Models",
         sessions: 3,
         majorWork: false, // Supporting work - "Develop Only"
         originalCode: "G7 U6 L32"
@@ -1134,8 +1204,9 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 33,
         title: "Solve Problems Involving Compound Events",
         volume: 2,
-        startPage: 729,
-        endPage: 756,
+        navigationId: "lesson-33",
+        searchPattern: "LESSON 33 | SOLVE PROBLEMS INVOLVING COMPOUND EVENTS",
+        fallbackPattern: "Solve Problems Involving Compound Events",
         sessions: 3,
         majorWork: false, // Supporting work - "Develop Only"
         originalCode: "G7 U6 L33"
@@ -1173,33 +1244,22 @@ export class AcceleratedPathwayService {
       8: { 1: '/viewer/grade8-volume1', 2: '/viewer/grade8-volume2' }
     };
     
-    // Convert continuous page number to PDF page number
-    // The offset accounts for the difference between continuous page numbering and PDF page position
-    let pdfPageNumber = lesson.startPage;
-    
-    // Grade 7 Volume 1: pages 1-419, PDF starts at position where page 4 = PDF page 16
-    // So PDF page = continuous page + 12 (16 - 4 = 12)
-    if (lesson.grade === 7 && lesson.volume === 1) {
-      pdfPageNumber = lesson.startPage + 12;
-    }
-    // Grade 7 Volume 2: pages 420+, PDF starts at position where page 420 = PDF page 16  
-    // So PDF page = continuous page - 420 + 16 = continuous page - 404
-    else if (lesson.grade === 7 && lesson.volume === 2) {
-      pdfPageNumber = lesson.startPage - 404;
-    }
-    // Grade 8 Volume 1: pages 1-447, PDF starts at position where page 4 = PDF page 16
-    // So PDF page = continuous page + 12
-    else if (lesson.grade === 8 && lesson.volume === 1) {
-      pdfPageNumber = lesson.startPage + 12;
-    }
-    // Grade 8 Volume 2: pages 448+, PDF starts at position where page 448 = PDF page 16
-    // So PDF page = continuous page - 448 + 16 = continuous page - 432  
-    else if (lesson.grade === 8 && lesson.volume === 2) {
-      pdfPageNumber = lesson.startPage - 432;
+    const basePath = volumeMap[lesson.grade]?.[lesson.volume];
+    if (!basePath) {
+      throw new Error(`Invalid grade/volume combination: Grade ${lesson.grade}, Volume ${lesson.volume}`);
     }
     
-    const basePath = volumeMap[lesson.grade][lesson.volume];
-    return `${basePath}?page=${pdfPageNumber}`;
+    // New search-based navigation system
+    // Instead of unreliable page numbers, we'll search for the lesson pattern
+    const searchParams = new URLSearchParams({
+      navigationId: lesson.navigationId,
+      searchPattern: lesson.searchPattern,
+      lessonNumber: lesson.lessonNumber.toString(),
+      ...(lesson.fallbackPattern && { fallbackPattern: lesson.fallbackPattern }),
+      ...(lesson.estimatedPage && { estimatedPage: lesson.estimatedPage.toString() })
+    });
+    
+    return `${basePath}?${searchParams.toString()}`;
   }
   
   getEstimatedDuration(): number {

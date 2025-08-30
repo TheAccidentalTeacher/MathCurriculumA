@@ -153,8 +153,8 @@ function LessonCard({ lesson, index }: { lesson: LessonReference; index: number 
         <div className="min-w-0">
           <div className="font-medium text-purple-100 truncate">{lesson.title}</div>
           <div className="text-xs text-purple-300">
-            {lesson.originalCode} • {lesson.sessions} sessions • Pages {lesson.startPage}
-            {lesson.endPage && `-${lesson.endPage}`}
+            {lesson.originalCode} • {lesson.sessions} sessions • Search: L{lesson.lessonNumber}
+            {lesson.estimatedPage && ` • ~p${lesson.estimatedPage}`}
           </div>
         </div>
       </div>
