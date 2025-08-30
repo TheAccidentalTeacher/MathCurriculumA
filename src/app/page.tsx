@@ -1,5 +1,6 @@
 import { CurriculumService, SearchFilters } from "@/lib/curriculum-service";
 import { AcceleratedPathwayViewer } from "@/components/AcceleratedPathwayViewer";
+import { FullCurriculumViewer } from "@/components/FullCurriculumViewer";
 import Link from "next/link";
 
 const curriculumService = new CurriculumService();
@@ -127,47 +128,8 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Se
           </details>
         </div>
 
-        {/* Quick Access to Full PDF Viewer */}
-        <div className="bg-blue-900 border border-blue-700 rounded-lg p-6 mb-8">
-          <h2 className="text-xl font-semibold text-blue-200 mb-3">📚 Full PDF Viewer</h2>
-          <p className="text-slate-300 mb-4">
-            View the complete Ready Classroom Mathematics curriculum with high-resolution page images.
-          </p>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-            <Link 
-              href="/viewer/volume1"
-              className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-            >
-              📘 Grade 7 Volume 1 (504 pages)
-            </Link>
-            
-            <Link 
-              href="/viewer/volume2"
-              className="inline-flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
-            >
-              📗 Grade 7 Volume 2 (440 pages)
-            </Link>
-            
-            <Link 
-              href="/viewer/grade8-volume1"
-              className="inline-flex items-center justify-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
-            >
-              📙 Grade 8 Volume 1 (552 pages)
-            </Link>
-            
-            <Link 
-              href="/viewer/grade8-volume2"
-              className="inline-flex items-center justify-center px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium"
-            >
-              📕 Grade 8 Volume 2 (456 pages)
-            </Link>
-          </div>
-          
-          <div className="text-sm text-blue-300">
-            <strong>Features:</strong> Navigate through all pages • High-resolution images • Quick page jumping
-          </div>
-        </div>
+        {/* Full Curriculum Viewer - Hidden Initially */}
+        <FullCurriculumViewer />
 
         {/* Accelerated Pathway: Shuffled Lessons */}
         <div className="mb-8">
