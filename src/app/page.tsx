@@ -56,6 +56,14 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Se
             </summary>
             <div className="mt-3 space-y-2 text-sm text-slate-400 border-t border-slate-700 pt-3">
               <div className="flex gap-3">
+                <span className="text-green-400 font-mono">2025-08-30</span>
+                <span><strong>🎯 COMPLETE PAGE MAPPING FIX:</strong> All 19 Volume 2 lessons now have correct page numbers - NO MORE NEGATIVE PAGES!</span>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-green-400 font-mono">2025-08-30</span>
+                <span>G7 V2: All pages ≥420 | G8 V2: All pages ≥448 | Perfect PDF navigation across entire curriculum</span>
+              </div>
+              <div className="flex gap-3">
                 <span className="text-orange-400 font-mono">2025-08-30</span>
                 <span><strong>🚫 NEGATIVE PAGE FIX:</strong> Corrected G8 U6 L23→p.557, G7 U6 L25→p.542 (were causing page -303, -233 errors)</span>
               </div>

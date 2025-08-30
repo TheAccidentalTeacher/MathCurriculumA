@@ -313,8 +313,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 21,
         title: "Solve Problems Involving Percent Change and Percent Error",
         volume: 2,
-        startPage: 41,
-        endPage: 62,
+        startPage: 447,
+        endPage: 468,
         sessions: 3,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U5 L21"
@@ -419,8 +419,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 28,
         title: "Find Unknown Angle Measures",
         volume: 2,
-        startPage: 235, // Approximate Volume 2 pages
-        endPage: 252,
+        startPage: 607,
+        endPage: 628,
         sessions: 3,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G7 U6 L28"
@@ -434,8 +434,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 29,
         title: "Draw Plane Figures with Given Conditions",
         volume: 2,
-        startPage: 253,
-        endPage: 270,
+        startPage: 629,
+        endPage: 650,
         sessions: 3,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G7 U6 L29"
@@ -600,8 +600,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 19,
         title: "Apply Exponent Properties for Positive Integer Exponents",
         volume: 2,
-        startPage: 17,
-        endPage: 38,
+        startPage: 448,
+        endPage: 468,
         sessions: 3,
         majorWork: true,
         originalCode: "G8 U5 L19"
@@ -615,8 +615,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 20,
         title: "Apply Exponent Properties for All Integer Exponents",
         volume: 2,
-        startPage: 39,
-        endPage: 60,
+        startPage: 469,
+        endPage: 490,
         sessions: 3,
         majorWork: true,
         originalCode: "G8 U5 L20"
@@ -630,8 +630,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 21,
         title: "Express Numbers Using Integer Powers of 10",
         volume: 2,
-        startPage: 61,
-        endPage: 82,
+        startPage: 491,
+        endPage: 512,
         sessions: 3,
         majorWork: true,
         originalCode: "G8 U5 L21"
@@ -645,8 +645,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 22,
         title: "Work with Scientific Notation",
         volume: 2,
-        startPage: 83,
-        endPage: 128,
+        startPage: 513,
+        endPage: 556,
         sessions: 3,
         majorWork: true,
         originalCode: "G8 U5 L22"
@@ -683,8 +683,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 24,
         title: "Express Rational Numbers as Fractions and Decimals",
         volume: 2,
-        startPage: 157,
-        endPage: 178,
+        startPage: 579,
+        endPage: 594,
         sessions: 2,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G8 U6 L24"
@@ -698,8 +698,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 25,
         title: "Find Rational Approximations of Irrational Numbers",
         volume: 2,
-        startPage: 179,
-        endPage: 206,
+        startPage: 595,
+        endPage: 618,
         sessions: 3,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G8 U6 L25"
@@ -736,8 +736,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 26,
         title: "Solve Problems Involving Volume",
         volume: 2,
-        startPage: 195,
-        endPage: 218,
+        startPage: 569,
+        endPage: 590,
         sessions: 3,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G7 U6 L26"
@@ -751,8 +751,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 27,
         title: "Describe Plane Sections of Three-Dimensional Figures",
         volume: 2,
-        startPage: 219,
-        endPage: 234,
+        startPage: 591,
+        endPage: 612,
         sessions: 2,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G7 U6 L27"
@@ -766,8 +766,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 28,
         title: "Solve Problems with Volumes of Cylinders, Cones, and Spheres",
         volume: 2,
-        startPage: 207,
-        endPage: 228,
+        startPage: 657,
+        endPage: 672,
         sessions: 2,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G8 U6 L28"
@@ -789,8 +789,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 22,
         title: "Understand Random Sampling",
         volume: 2,
-        startPage: 63, // Volume 2 pages
-        endPage: 74,
+        startPage: 469,
+        endPage: 480,
         sessions: 1,
         majorWork: false, // Supporting work - "Just Exp/Dev"
         originalCode: "G7 U5 L22"
@@ -804,8 +804,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 23,
         title: "Reason About Random Samples",
         volume: 2,
-        startPage: 75,
-        endPage: 96,
+        startPage: 481,
+        endPage: 502,
         sessions: 2,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G7 U5 L23"
@@ -819,8 +819,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 24,
         title: "Compare Populations",
         volume: 2,
-        startPage: 97,
-        endPage: 124,
+        startPage: 503,
+        endPage: 530,
         sessions: 3,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G7 U5 L24"
@@ -834,8 +834,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 30,
         title: "Understand Probability",
         volume: 2,
-        startPage: 271,
-        endPage: 282,
+        startPage: 673,
+        endPage: 684,
         sessions: 1,
         majorWork: false, // Supporting work - "Explore/Dev only"
         originalCode: "G7 U6 L30"
@@ -849,8 +849,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 31,
         title: "Solve Problems Involving Experimental Probability",
         volume: 2,
-        startPage: 283,
-        endPage: 306,
+        startPage: 685,
+        endPage: 706,
         sessions: 3,
         majorWork: false, // Supporting work - "Develop Only"
         originalCode: "G7 U6 L31"
@@ -864,8 +864,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 32,
         title: "Solve Problems Involving Probability Models",
         volume: 2,
-        startPage: 307,
-        endPage: 330,
+        startPage: 707,
+        endPage: 728,
         sessions: 3,
         majorWork: false, // Supporting work - "Develop Only"
         originalCode: "G7 U6 L32"
@@ -879,8 +879,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 33,
         title: "Solve Problems Involving Compound Events",
         volume: 2,
-        startPage: 331,
-        endPage: 364,
+        startPage: 729,
+        endPage: 756,
         sessions: 3,
         majorWork: false, // Supporting work - "Develop Only"
         originalCode: "G7 U6 L33"
