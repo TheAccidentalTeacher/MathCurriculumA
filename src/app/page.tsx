@@ -56,6 +56,14 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Se
             </summary>
             <div className="mt-3 space-y-2 text-sm text-slate-400 border-t border-slate-700 pt-3">
               <div className="flex gap-3">
+                <span className="text-red-400 font-mono">2025-08-30</span>
+                <span><strong>🔄 MAJOR CORRECTION:</strong> Restructured accelerated pathway to match EXACT official scope and sequence (Units A-J)</span>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-red-400 font-mono">2025-08-30</span>
+                <span>Fixed lesson order, pacing (109 total sessions), and Major Work designations per official document</span>
+              </div>
+              <div className="flex gap-3">
                 <span className="text-green-400 font-mono">2025-08-30</span>
                 <span><strong>🔧 FIXED:</strong> Direct lesson navigation - all "View →" buttons now jump to specific lesson pages</span>
               </div>

@@ -25,13 +25,13 @@ export interface AcceleratedUnit {
   estimatedDays: number;
 }
 
-// Accelerated pathway lesson sequence based on scope and sequence analysis
+// Accelerated pathway lesson sequence - CORRECTED to match official scope and sequence
 export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
   {
     id: "unit-a",
     title: "Unit A: Proportional Relationships: Ratios, Rates, and Circles",
     description: "Foundation concepts for proportional reasoning, essential for algebraic thinking",
-    estimatedDays: 25,
+    estimatedDays: 17,
     lessons: [
       {
         id: "g7-u1-l1",
@@ -59,7 +59,7 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         volume: 1,
         startPage: 45,
         endPage: 58,
-        sessions: 3,
+        sessions: 2,
         majorWork: true,
         originalCode: "G7 U1 L2"
       },
@@ -74,7 +74,7 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         volume: 1,
         startPage: 63,
         endPage: 78,
-        sessions: 3,
+        sessions: 2,
         majorWork: true,
         originalCode: "G7 U1 L3"
       },
@@ -89,7 +89,7 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         volume: 1,
         startPage: 73,
         endPage: 94,
-        sessions: 4,
+        sessions: 3,
         majorWork: true,
         originalCode: "G7 U1 L4"
       },
@@ -104,7 +104,7 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         volume: 1,
         startPage: 95,
         endPage: 110,
-        sessions: 3,
+        sessions: 2,
         majorWork: true,
         originalCode: "G7 U1 L5"
       },
@@ -120,7 +120,7 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         startPage: 111,
         endPage: 130,
         sessions: 3,
-        majorWork: false, // Supporting work
+        majorWork: true,
         originalCode: "G7 U1 L6"
       }
     ]
@@ -129,7 +129,7 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
     id: "unit-b",
     title: "Unit B: Numbers and Operations: Operations with Rational Numbers",
     description: "Essential number sense for algebraic manipulation",
-    estimatedDays: 30,
+    estimatedDays: 17,
     lessons: [
       {
         id: "g7-u2-l7",
@@ -192,25 +192,25 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         originalCode: "G7 U2 L10"
       },
       {
-        id: "g7-u2-l11",
+        id: "g7-u3-l11",
         grade: 7,
         unit: "Operations with Rational Numbers",
-        unitNumber: 2,
+        unitNumber: 3,
         lesson: "Understand Multiplication with Negative Integers",
         lessonNumber: 11,
         title: "Understand Multiplication with Negative Integers",
         volume: 1,
         startPage: 237,
         endPage: 248,
-        sessions: 2,
+        sessions: 1,
         majorWork: true,
-        originalCode: "G7 U2 L11"
+        originalCode: "G7 U3 L11"
       },
       {
-        id: "g7-u2-l12",
+        id: "g7-u3-l12",
         grade: 7,
         unit: "Operations with Rational Numbers",
-        unitNumber: 2,
+        unitNumber: 3,
         lesson: "Multiply and Divide with Negative Numbers",
         lessonNumber: 12,
         title: "Multiply and Divide with Negative Numbers",
@@ -219,52 +219,51 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         endPage: 270,
         sessions: 3,
         majorWork: true,
-        originalCode: "G7 U2 L12"
+        originalCode: "G7 U3 L12"
       },
       {
-        id: "g7-u2-l13",
+        id: "g7-u3-l13",
         grade: 7,
         unit: "Operations with Rational Numbers",
-        unitNumber: 2,
+        unitNumber: 3,
         lesson: "Express Rational Numbers as Terminating or Repeating Decimals",
         lessonNumber: 13,
         title: "Express Rational Numbers as Terminating or Repeating Decimals",
         volume: 1,
         startPage: 271,
         endPage: 292,
-        sessions: 3,
-        majorWork: false, // Supporting work
-        originalCode: "G7 U2 L13"
-      },
+        sessions: 2,
+        majorWork: false, // Supporting work per scope
+        originalCode: "G7 U3 L13"
+      }
+    ]
+  },
+  {
+    id: "unit-c",
+    title: "Unit C: Expressions and Equations: Applications of Rational Numbers",
+    description: "Bridge to algebraic reasoning and equation solving",
+    estimatedDays: 14,
+    lessons: [
       {
-        id: "g7-u2-l14",
+        id: "g7-u3-l14",
         grade: 7,
         unit: "Operations with Rational Numbers",
-        unitNumber: 2,
+        unitNumber: 3,
         lesson: "Use the Four Operations with Negative Numbers",
         lessonNumber: 14,
         title: "Use the Four Operations with Negative Numbers",
         volume: 1,
         startPage: 293,
         endPage: 310,
-        sessions: 3,
+        sessions: 2,
         majorWork: true,
-        originalCode: "G7 U2 L14"
-      }
-    ]
-  },
-  {
-    id: "unit-c",
-    title: "Unit C: Expressions and Equations: Algebraic Thinking",
-    description: "Bridge to algebraic reasoning and equation solving",
-    estimatedDays: 40,
-    lessons: [
-      // Grade 7 foundational content
+        originalCode: "G7 U3 L14"
+      },
       {
-        id: "g7-u3-l15",
+        id: "g7-u4-l15",
         grade: 7,
         unit: "Expressions and Equations",
-        unitNumber: 3,
+        unitNumber: 4,
         lesson: "Write Equivalent Expressions Involving Rational Numbers",
         lessonNumber: 15,
         title: "Write Equivalent Expressions Involving Rational Numbers",
@@ -273,37 +272,74 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         endPage: 348,
         sessions: 3,
         majorWork: true,
-        originalCode: "G7 U3 L15"
+        originalCode: "G7 U4 L15"
       },
       {
-        id: "g7-u3-l16",
+        id: "g7-u4-l16",
         grade: 7,
         unit: "Expressions and Equations",
-        unitNumber: 3,
+        unitNumber: 4,
         lesson: "Understand Reasons for Rewriting Expressions",
         lessonNumber: 16,
         title: "Understand Reasons for Rewriting Expressions",
         volume: 1,
         startPage: 349,
         endPage: 360,
-        sessions: 2,
+        sessions: 1,
         majorWork: true,
-        originalCode: "G7 U3 L16"
+        originalCode: "G7 U4 L16"
       },
-      // Grade 7 to Grade 8 transition content
+      {
+        id: "g7-u5-l20",
+        grade: 7,
+        unit: "Expressions and Equations",
+        unitNumber: 5,
+        lesson: "Solve Problems Involving Percents",
+        lessonNumber: 20,
+        title: "Solve Problems Involving Percents",
+        volume: 2,
+        startPage: 17, // Volume 2 page numbers - need verification
+        endPage: 40,
+        sessions: 4,
+        majorWork: false, // Supporting work per scope
+        originalCode: "G7 U5 L20"
+      },
+      {
+        id: "g7-u5-l21",
+        grade: 7,
+        unit: "Expressions and Equations",
+        unitNumber: 5,
+        lesson: "Solve Problems Involving Percent Change and Percent Error",
+        lessonNumber: 21,
+        title: "Solve Problems Involving Percent Change and Percent Error",
+        volume: 2,
+        startPage: 41,
+        endPage: 62,
+        sessions: 3,
+        majorWork: false, // Supporting work per scope
+        originalCode: "G7 U5 L21"
+      }
+    ]
+  },
+  {
+    id: "unit-d",
+    title: "Unit D: Algebraic Thinking: Solving Equations and Inequalities",
+    description: "Core algebraic skills for equation and inequality solving",
+    estimatedDays: 14,
+    lessons: [
       {
         id: "g7-u4-l17",
         grade: 7,
         unit: "Expressions and Equations",
         unitNumber: 4,
-        lesson: "Solve Problems Involving Percents",
+        lesson: "Understand Multi-Step Equations",
         lessonNumber: 17,
-        title: "Solve Problems Involving Percents",
+        title: "Understand Multi-Step Equations",
         volume: 1,
-        startPage: 450, // Approximate - needs verification
-        endPage: 465,
-        sessions: 3,
-        majorWork: false, // Supporting work per scope
+        startPage: 361,
+        endPage: 372,
+        sessions: 2,
+        majorWork: true,
         originalCode: "G7 U4 L17"
       },
       {
@@ -311,32 +347,16 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         grade: 7,
         unit: "Expressions and Equations",
         unitNumber: 4,
-        lesson: "Solve Problems Involving Percent Change and Percent Error",
+        lesson: "Write and Solve Multi-Step Equations",
         lessonNumber: 18,
-        title: "Solve Problems Involving Percent Change and Percent Error",
+        title: "Write and Solve Multi-Step Equations",
         volume: 1,
-        startPage: 466, // Approximate
-        endPage: 480,
+        startPage: 373,
+        endPage: 395,
         sessions: 3,
-        majorWork: false, // Supporting work per scope
+        majorWork: true,
         originalCode: "G7 U4 L18"
       },
-      {
-        id: "g7-u4-l19",
-        grade: 7,
-        unit: "Expressions and Equations",
-        unitNumber: 4,
-        lesson: "Understand Multi-Step Equations",
-        lessonNumber: 19,
-        title: "Understand Multi-Step Equations",
-        volume: 1,
-        startPage: 361,
-        endPage: 372,
-        sessions: 2,
-        majorWork: true,
-        originalCode: "G7 U4 L19"
-      },
-      // Grade 8 advanced algebraic content
       {
         id: "g8-u3-l10",
         grade: 8,
@@ -348,14 +368,14 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         volume: 1,
         startPage: 243,
         endPage: 264,
-        sessions: 4,
+        sessions: 2,
         majorWork: true,
         originalCode: "G8 U3 L10"
       },
       {
         id: "g8-u3-l11",
         grade: 8,
-        unit: "Linear Equations", 
+        unit: "Linear Equations",
         unitNumber: 3,
         lesson: "Determine the Number of Solutions to One-Variable Equations",
         lessonNumber: 11,
@@ -363,12 +383,12 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         volume: 1,
         startPage: 265,
         endPage: 284,
-        sessions: 3,
+        sessions: 2,
         majorWork: true,
         originalCode: "G8 U3 L11"
       },
       {
-        id: "g7-u4-l19b",
+        id: "g7-u4-l19",
         grade: 7,
         unit: "Expressions and Equations",
         unitNumber: 4,
@@ -385,15 +405,45 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
     ]
   },
   {
-    id: "unit-d",
-    title: "Unit D: Geometry: Transformations and Angle Relationships",
-    description: "Spatial reasoning and geometric transformations for coordinate geometry",
-    estimatedDays: 30,
+    id: "unit-e",
+    title: "Unit E: Geometry: Angles, Triangles, and Rigid Transformations",
+    description: "Spatial reasoning and geometric transformations",
+    estimatedDays: 11,
     lessons: [
+      {
+        id: "g7-u6-l28",
+        grade: 7,
+        unit: "Geometry",
+        unitNumber: 6,
+        lesson: "Find Unknown Angle Measures",
+        lessonNumber: 28,
+        title: "Find Unknown Angle Measures",
+        volume: 2,
+        startPage: 235, // Approximate Volume 2 pages
+        endPage: 252,
+        sessions: 3,
+        majorWork: false, // Supporting work - "Just Develop"
+        originalCode: "G7 U6 L28"
+      },
+      {
+        id: "g7-u6-l29",
+        grade: 7,
+        unit: "Geometry",
+        unitNumber: 6,
+        lesson: "Draw Plane Figures with Given Conditions",
+        lessonNumber: 29,
+        title: "Draw Plane Figures with Given Conditions",
+        volume: 2,
+        startPage: 253,
+        endPage: 270,
+        sessions: 3,
+        majorWork: false, // Supporting work - "Just Develop"
+        originalCode: "G7 U6 L29"
+      },
       {
         id: "g8-u1-l1",
         grade: 8,
-        unit: "Transformations and Angle Relationships",
+        unit: "Rigid Transformations",
         unitNumber: 1,
         lesson: "Understand Rigid Transformations and Their Properties",
         lessonNumber: 1,
@@ -401,14 +451,14 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         volume: 1,
         startPage: 17,
         endPage: 28,
-        sessions: 3,
+        sessions: 2,
         majorWork: true,
         originalCode: "G8 U1 L1"
       },
       {
         id: "g8-u1-l2",
         grade: 8,
-        unit: "Transformations and Angle Relationships",
+        unit: "Rigid Transformations",
         unitNumber: 1,
         lesson: "Work with Single Rigid Transformations in the Coordinate Plane",
         lessonNumber: 2,
@@ -421,47 +471,100 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         originalCode: "G8 U1 L2"
       },
       {
+        id: "g8-u1-l3",
+        grade: 8,
+        unit: "Rigid Transformations",
+        unitNumber: 1,
+        lesson: "Work with Sequences of Transformations and Congruence",
+        lessonNumber: 3,
+        title: "Work with Sequences of Transformations and Congruence",
+        volume: 1,
+        startPage: 57,
+        endPage: 84,
+        sessions: 3,
+        majorWork: true,
+        originalCode: "G8 U1 L3"
+      }
+    ]
+  },
+  {
+    id: "unit-f",
+    title: "Unit F: Proportional Relationships: Dilations, Similar Triangles, and Slope",
+    description: "Advanced proportional reasoning with coordinate geometry",
+    estimatedDays: 18,
+    lessons: [
+      {
         id: "g8-u2-l4",
         grade: 8,
-        unit: "Linear Relationships",
+        unit: "Dilations and Similarity",
         unitNumber: 2,
-        lesson: "Graph Proportional Relationships and Define Slope",
+        lesson: "Understand Dilations and Similarity",
         lessonNumber: 4,
-        title: "Graph Proportional Relationships and Define Slope", 
+        title: "Understand Dilations and Similarity",
         volume: 1,
-        startPage: 193,
-        endPage: 214,
-        sessions: 3,
+        startPage: 85,
+        endPage: 96,
+        sessions: 1,
         majorWork: true,
         originalCode: "G8 U2 L4"
       },
       {
         id: "g8-u2-l5",
         grade: 8,
-        unit: "Linear Relationships",
+        unit: "Dilations and Similarity",
         unitNumber: 2,
-        lesson: "Derive and Graph Linear Equations",
+        lesson: "Perform and Describe Transformations Involving Dilations",
         lessonNumber: 5,
-        title: "Derive and Graph Linear Equations of the Form y = mx + b",
+        title: "Perform and Describe Transformations Involving Dilations",
         volume: 1,
-        startPage: 215,
-        endPage: 242,
-        sessions: 4,
+        startPage: 97,
+        endPage: 124,
+        sessions: 3,
         majorWork: true,
         originalCode: "G8 U2 L5"
+      },
+      {
+        id: "g8-u2-l6",
+        grade: 8,
+        unit: "Dilations and Similarity",
+        unitNumber: 2,
+        lesson: "Describe Angle Relationships",
+        lessonNumber: 6,
+        title: "Describe Angle Relationships",
+        volume: 1,
+        startPage: 125,
+        endPage: 152,
+        sessions: 3,
+        majorWork: true,
+        originalCode: "G8 U2 L6"
+      },
+      {
+        id: "g8-u2-l7",
+        grade: 8,
+        unit: "Dilations and Similarity",
+        unitNumber: 2,
+        lesson: "Describe Angle Relationships in Triangles",
+        lessonNumber: 7,
+        title: "Describe Angle Relationships in Triangles",
+        volume: 1,
+        startPage: 153,
+        endPage: 180,
+        sessions: 3,
+        majorWork: true,
+        originalCode: "G8 U2 L7"
       },
       {
         id: "g8-u2-l8",
         grade: 8,
         unit: "Linear Relationships",
         unitNumber: 2,
-        lesson: "Solve Systems of Linear Equations",
+        lesson: "Graph Proportional Relationships and Define Slope",
         lessonNumber: 8,
-        title: "Solve Systems of Linear Equations Algebraically",
+        title: "Graph Proportional Relationships and Define Slope",
         volume: 1,
-        startPage: 299,
-        endPage: 326,
-        sessions: 4,
+        startPage: 181,
+        endPage: 208,
+        sessions: 3,
         majorWork: true,
         originalCode: "G8 U2 L8"
       },
@@ -470,23 +573,23 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         grade: 8,
         unit: "Linear Relationships",
         unitNumber: 2,
-        lesson: "Represent and Solve Problems with Systems",
+        lesson: "Derive and Graph Linear Equations of the Form y = mx + b",
         lessonNumber: 9,
-        title: "Represent and Solve Problems with Systems of Linear Equations",
+        title: "Derive and Graph Linear Equations of the Form y = mx + b",
         volume: 1,
-        startPage: 327,
-        endPage: 350,
-        sessions: 3,
+        startPage: 209,
+        endPage: 242,
+        sessions: 4,
         majorWork: true,
         originalCode: "G8 U2 L9"
       }
     ]
   },
   {
-    id: "unit-e",
-    title: "Unit E: Advanced Topics: Exponents and Scientific Notation",
-    description: "Advanced number concepts for algebra preparation", 
-    estimatedDays: 25,
+    id: "unit-g",
+    title: "Unit G: Integer Exponents: Properties and Scientific Notation",
+    description: "Essential exponent properties for algebraic manipulation",
+    estimatedDays: 13,
     lessons: [
       {
         id: "g8-u5-l19",
@@ -506,7 +609,7 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
       {
         id: "g8-u5-l20",
         grade: 8,
-        unit: "Integer Exponents", 
+        unit: "Integer Exponents",
         unitNumber: 5,
         lesson: "Apply Exponent Properties for All Integer Exponents",
         lessonNumber: 20,
@@ -538,52 +641,105 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         grade: 8,
         unit: "Integer Exponents",
         unitNumber: 5,
-        lesson: "Work with Scientific Notation", 
+        lesson: "Work with Scientific Notation",
         lessonNumber: 22,
         title: "Work with Scientific Notation",
         volume: 2,
         startPage: 83,
         endPage: 128,
-        sessions: 4,
+        sessions: 3,
         majorWork: true,
         originalCode: "G8 U5 L22"
       }
     ]
   },
   {
-    id: "unit-f",
-    title: "Unit F: Geometry and Measurement",
-    description: "Advanced geometry concepts and real-world applications",
-    estimatedDays: 20,
+    id: "unit-h",
+    title: "Unit H: Real Numbers: Roots, Rational Numbers, and Irrational Numbers",
+    description: "Advanced number system concepts",
+    estimatedDays: 8,
+    lessons: [
+      {
+        id: "g8-u6-l23",
+        grade: 8,
+        unit: "Real Numbers",
+        unitNumber: 6,
+        lesson: "Find Square Roots and Cube Roots to Solve Problems",
+        lessonNumber: 23,
+        title: "Find Square Roots and Cube Roots to Solve Problems",
+        volume: 2,
+        startPage: 129,
+        endPage: 156,
+        sessions: 3,
+        majorWork: true,
+        originalCode: "G8 U6 L23"
+      },
+      {
+        id: "g8-u6-l24",
+        grade: 8,
+        unit: "Real Numbers",
+        unitNumber: 6,
+        lesson: "Express Rational Numbers as Fractions and Decimals",
+        lessonNumber: 24,
+        title: "Express Rational Numbers as Fractions and Decimals",
+        volume: 2,
+        startPage: 157,
+        endPage: 178,
+        sessions: 2,
+        majorWork: false, // Supporting work - "Just Develop"
+        originalCode: "G8 U6 L24"
+      },
+      {
+        id: "g8-u6-l25",
+        grade: 8,
+        unit: "Real Numbers",
+        unitNumber: 6,
+        lesson: "Find Rational Approximations of Irrational Numbers",
+        lessonNumber: 25,
+        title: "Find Rational Approximations of Irrational Numbers",
+        volume: 2,
+        startPage: 179,
+        endPage: 206,
+        sessions: 3,
+        majorWork: false, // Supporting work - "Just Develop"
+        originalCode: "G8 U6 L25"
+      }
+    ]
+  },
+  {
+    id: "unit-i",
+    title: "Unit I: Geometry: Two- and Three-Dimensional Figures",
+    description: "Advanced geometry and measurement concepts",
+    estimatedDays: 10,
     lessons: [
       {
         id: "g7-u6-l25",
         grade: 7,
-        unit: "Geometry and Measurement", 
+        unit: "Geometry and Measurement",
         unitNumber: 6,
-        lesson: "Find Unknown Angle Measures",
+        lesson: "Solve Problems Involving Area and Surface Area",
         lessonNumber: 25,
-        title: "Find Unknown Angle Measures",
-        volume: 2, // This would be in Volume 2
-        startPage: 50, // Approximate
-        endPage: 70,
+        title: "Solve Problems Involving Area and Surface Area",
+        volume: 2,
+        startPage: 171, // Volume 2 page numbers
+        endPage: 194,
         sessions: 3,
-        majorWork: false, // Supporting work per scope
+        majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G7 U6 L25"
       },
       {
         id: "g7-u6-l26",
         grade: 7,
         unit: "Geometry and Measurement",
-        unitNumber: 6, 
-        lesson: "Draw Plane Figures with Given Conditions",
+        unitNumber: 6,
+        lesson: "Solve Problems Involving Volume",
         lessonNumber: 26,
-        title: "Draw Plane Figures with Given Conditions",
+        title: "Solve Problems Involving Volume",
         volume: 2,
-        startPage: 71,
-        endPage: 90,
+        startPage: 195,
+        endPage: 218,
         sessions: 3,
-        majorWork: false, // Supporting work per scope
+        majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G7 U6 L26"
       },
       {
@@ -591,15 +747,143 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         grade: 7,
         unit: "Geometry and Measurement",
         unitNumber: 6,
-        lesson: "Describe Plane Sections of Three-Dimensional Figures", 
+        lesson: "Describe Plane Sections of Three-Dimensional Figures",
         lessonNumber: 27,
         title: "Describe Plane Sections of Three-Dimensional Figures",
         volume: 2,
-        startPage: 91,
-        endPage: 110,
+        startPage: 219,
+        endPage: 234,
         sessions: 2,
-        majorWork: false, // Supporting work per scope
+        majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G7 U6 L27"
+      },
+      {
+        id: "g8-u6-l28",
+        grade: 8,
+        unit: "Volume and Surface Area",
+        unitNumber: 6,
+        lesson: "Solve Problems with Volumes of Cylinders, Cones, and Spheres",
+        lessonNumber: 28,
+        title: "Solve Problems with Volumes of Cylinders, Cones, and Spheres",
+        volume: 2,
+        startPage: 207,
+        endPage: 228,
+        sessions: 2,
+        majorWork: false, // Supporting work - "Just Develop"
+        originalCode: "G8 U6 L28"
+      }
+    ]
+  },
+  {
+    id: "unit-j",
+    title: "Unit J: Statistics and Probability: Sampling and Probability",
+    description: "Statistical reasoning and probability concepts",
+    estimatedDays: 16,
+    lessons: [
+      {
+        id: "g7-u5-l22",
+        grade: 7,
+        unit: "Statistics and Probability",
+        unitNumber: 5,
+        lesson: "Understand Random Sampling",
+        lessonNumber: 22,
+        title: "Understand Random Sampling",
+        volume: 2,
+        startPage: 63, // Volume 2 pages
+        endPage: 74,
+        sessions: 1,
+        majorWork: false, // Supporting work - "Just Exp/Dev"
+        originalCode: "G7 U5 L22"
+      },
+      {
+        id: "g7-u5-l23",
+        grade: 7,
+        unit: "Statistics and Probability",
+        unitNumber: 5,
+        lesson: "Reason About Random Samples",
+        lessonNumber: 23,
+        title: "Reason About Random Samples",
+        volume: 2,
+        startPage: 75,
+        endPage: 96,
+        sessions: 2,
+        majorWork: false, // Supporting work - "Just Develop"
+        originalCode: "G7 U5 L23"
+      },
+      {
+        id: "g7-u5-l24",
+        grade: 7,
+        unit: "Statistics and Probability",
+        unitNumber: 5,
+        lesson: "Compare Populations",
+        lessonNumber: 24,
+        title: "Compare Populations",
+        volume: 2,
+        startPage: 97,
+        endPage: 124,
+        sessions: 3,
+        majorWork: false, // Supporting work - "Just Develop"
+        originalCode: "G7 U5 L24"
+      },
+      {
+        id: "g7-u6-l30",
+        grade: 7,
+        unit: "Statistics and Probability",
+        unitNumber: 6,
+        lesson: "Understand Probability",
+        lessonNumber: 30,
+        title: "Understand Probability",
+        volume: 2,
+        startPage: 271,
+        endPage: 282,
+        sessions: 1,
+        majorWork: false, // Supporting work - "Explore/Dev only"
+        originalCode: "G7 U6 L30"
+      },
+      {
+        id: "g7-u6-l31",
+        grade: 7,
+        unit: "Statistics and Probability",
+        unitNumber: 6,
+        lesson: "Solve Problems Involving Experimental Probability",
+        lessonNumber: 31,
+        title: "Solve Problems Involving Experimental Probability",
+        volume: 2,
+        startPage: 283,
+        endPage: 306,
+        sessions: 3,
+        majorWork: false, // Supporting work - "Develop Only"
+        originalCode: "G7 U6 L31"
+      },
+      {
+        id: "g7-u6-l32",
+        grade: 7,
+        unit: "Statistics and Probability",
+        unitNumber: 6,
+        lesson: "Solve Problems Involving Probability Models",
+        lessonNumber: 32,
+        title: "Solve Problems Involving Probability Models",
+        volume: 2,
+        startPage: 307,
+        endPage: 330,
+        sessions: 3,
+        majorWork: false, // Supporting work - "Develop Only"
+        originalCode: "G7 U6 L32"
+      },
+      {
+        id: "g7-u6-l33",
+        grade: 7,
+        unit: "Statistics and Probability",
+        unitNumber: 6,
+        lesson: "Solve Problems Involving Compound Events",
+        lessonNumber: 33,
+        title: "Solve Problems Involving Compound Events",
+        volume: 2,
+        startPage: 331,
+        endPage: 364,
+        sessions: 3,
+        majorWork: false, // Supporting work - "Develop Only"
+        originalCode: "G7 U6 L33"
       }
     ]
   }
@@ -642,11 +926,16 @@ export class AcceleratedPathwayService {
     return ACCELERATED_PATHWAY.reduce((total, unit) => total + unit.estimatedDays, 0);
   }
   
+  getTotalSessions(): number {
+    return this.getAllLessons().reduce((total, lesson) => total + lesson.sessions, 0);
+  }
+  
   getProgressData() {
     const totalLessons = this.getAllLessons().length;
     const majorWorkLessons = this.getMajorWorkLessons().length;
     const grade7Lessons = this.getLessonsByGrade(7).length;
     const grade8Lessons = this.getLessonsByGrade(8).length;
+    const totalSessions = this.getTotalSessions();
     
     return {
       totalLessons,
@@ -654,7 +943,8 @@ export class AcceleratedPathwayService {
       supportingWorkLessons: totalLessons - majorWorkLessons,
       grade7Lessons,
       grade8Lessons,
-      estimatedDays: this.getEstimatedDuration()
+      estimatedDays: this.getEstimatedDuration(),
+      totalSessions
     };
   }
 }
