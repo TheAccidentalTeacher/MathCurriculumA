@@ -343,8 +343,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 20,
         title: "Solve Problems Involving Percents",
         volume: 2,
-        startPage: 15, // Volume 2 page numbers - need verification
-        endPage: 40,
+        startPage: 16,
+        endPage: 44,
         sessions: 4,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U5 L20"
@@ -358,8 +358,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 21,
         title: "Solve Problems Involving Percent Change and Percent Error",
         volume: 2,
-        startPage: 43,
-        endPage: 468,
+        startPage: 45,
+        endPage: 65,
         sessions: 3,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U5 L21"
@@ -373,8 +373,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 22,
         title: "Understand Random Sampling",
         volume: 2,
-        startPage: 65,
-        endPage: 76,
+        startPage: 66,
+        endPage: 77,
         sessions: 1,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U6 L22"
@@ -388,8 +388,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 23,
         title: "Reason About Random Samples",
         volume: 2,
-        startPage: 77,
-        endPage: 98,
+        startPage: 78,
+        endPage: 99,
         sessions: 2,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U6 L23"
@@ -403,8 +403,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 24,
         title: "Compare Populations",
         volume: 2,
-        startPage: 99,
-        endPage: 138,
+        startPage: 100,
+        endPage: 139,
         sessions: 3,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U6 L24"
@@ -826,8 +826,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 25,
         title: "Solve Problems Involving Area and Surface Area",
         volume: 2,
-        startPage: 139,
-        endPage: 565,
+        startPage: 140,
+        endPage: 167,
         sessions: 3,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G7 U6 L25"
@@ -841,8 +841,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 26,
         title: "Solve Problems Involving Volume",
         volume: 2,
-        startPage: 167,
-        endPage: 590,
+        startPage: 168,
+        endPage: 189,
         sessions: 3,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G7 U6 L26"
@@ -856,8 +856,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 27,
         title: "Describe Plane Sections of Three-Dimensional Figures",
         volume: 2,
-        startPage: 189,
-        endPage: 612,
+        startPage: 190,
+        endPage: 205,
         sessions: 2,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G7 U6 L27"
@@ -871,8 +871,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 28,
         title: "Find Unknown Angle Measures",
         volume: 2,
-        startPage: 205,
-        endPage: 226,
+        startPage: 206,
+        endPage: 227,
         sessions: 2,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U8 L28"
@@ -886,8 +886,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 29,
         title: "Draw Plane Figures with Given Conditions",
         volume: 2,
-        startPage: 227,
-        endPage: 272,
+        startPage: 228,
+        endPage: 273,
         sessions: 3,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U8 L29"
@@ -901,8 +901,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 30,
         title: "Understand Probability",
         volume: 2,
-        startPage: 273,
-        endPage: 284,
+        startPage: 274,
+        endPage: 285,
         sessions: 1,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U9 L30"
@@ -916,8 +916,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 31,
         title: "Solve Problems Involving Experimental Probability",
         volume: 2,
-        startPage: 285,
-        endPage: 306,
+        startPage: 286,
+        endPage: 307,
         sessions: 2,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U9 L31"
@@ -931,8 +931,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 32,
         title: "Solve Problems Involving Probability Models",
         volume: 2,
-        startPage: 307,
-        endPage: 328,
+        startPage: 308,
+        endPage: 329,
         sessions: 2,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U9 L32"
@@ -946,8 +946,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 33,
         title: "Solve Problems Involving Compound Events",
         volume: 2,
-        startPage: 329,
-        endPage: 360,
+        startPage: 330,
+        endPage: 365,
         sessions: 3,
         majorWork: false, // Supporting work per scope
         originalCode: "G7 U9 L33"
