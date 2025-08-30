@@ -1,4 +1,5 @@
 import { CurriculumService, SearchFilters } from "@/lib/curriculum-service";
+import { AcceleratedPathwayViewer } from "@/components/AcceleratedPathwayViewer";
 import Link from "next/link";
 
 const curriculumService = new CurriculumService();
@@ -45,11 +46,56 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Se
           </div>
         </div>
 
+        {/* Change Log */}
+        <div className="bg-slate-800 border border-slate-600 rounded-lg p-4 mb-6">
+          <details className="group">
+            <summary className="flex items-center gap-2 cursor-pointer text-slate-300 hover:text-white font-medium">
+              📋 Change Log 
+              <span className="text-xs bg-green-600 px-2 py-1 rounded">Active Development</span>
+              <span className="ml-auto group-open:rotate-90 transition-transform">▶</span>
+            </summary>
+            <div className="mt-3 space-y-2 text-sm text-slate-400 border-t border-slate-700 pt-3">
+              <div className="flex gap-3">
+                <span className="text-green-400 font-mono">2025-08-30</span>
+                <span><strong>✅ COMPLETED:</strong> Shuffled lesson system with 23+ lessons mapped, interactive UI, and PDF integration</span>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-green-400 font-mono">2025-08-30</span>
+                <span>Added accurate page ranges and session counts for Grade 7 curriculum units</span>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-green-400 font-mono">2025-08-30</span>
+                <span>Created interactive UI for browsing combined Grade 7/8 lesson sequence</span>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-green-400 font-mono">2025-08-30</span>
+                <span>Implemented lesson filtering (Major Work vs Supporting Work)</span>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-green-400 font-mono">2025-08-30</span>
+                <span>Added change log tracking system</span>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-green-400 font-mono">2025-08-30</span>
+                <span>Completed comprehensive curriculum analysis (Explore-Develop-Refine pedagogical model)</span>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-blue-400 font-mono">NEXT</span>
+                <span>Add Grade 8 lessons to complete accelerated pathway (Volume 1 & 2)</span>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-blue-400 font-mono">FUTURE</span>
+                <span>Educator dashboard for customizable scope and sequence editing</span>
+              </div>
+            </div>
+          </details>
+        </div>
+
         {/* Quick Access to Full PDF Viewer */}
         <div className="bg-blue-900 border border-blue-700 rounded-lg p-6 mb-8">
           <h2 className="text-xl font-semibold text-blue-200 mb-3">📚 Full PDF Viewer</h2>
           <p className="text-slate-300 mb-4">
-            View the complete Ready Classroom Mathematics Grade 7 curriculum with high-resolution page images.
+            View the complete Ready Classroom Mathematics curriculum with high-resolution page images.
           </p>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
@@ -85,6 +131,11 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Se
           <div className="text-sm text-blue-300">
             <strong>Features:</strong> Navigate through all pages • High-resolution images • Quick page jumping
           </div>
+        </div>
+
+        {/* Accelerated Pathway: Shuffled Lessons */}
+        <div className="mb-8">
+          <AcceleratedPathwayViewer />
         </div>
 
         {/* Search Form */}
