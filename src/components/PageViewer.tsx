@@ -74,63 +74,33 @@ export default function PageViewer({
     }
   };
 
-// Mock search function - replace with actual PDF text search
+// Professional search function using extracted document data
 const searchForLessonInPDF = async (searchPattern: string, fallbackPattern?: string): Promise<number | null> => {
-  console.log(`🔍 Searching for: ${searchPattern}`);
+  console.log(`🔍 Professional search for: ${searchPattern}`);
   
   try {
-    // Construct the PDF URL for the current document
-    const pdfUrl = `/pdfs/${documentId}.pdf`;
+    const response = await fetch(`/api/search/${documentId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        searchPattern,
+        fallbackPattern
+      })
+    });
     
-    // Load the PDF document for text search
-    const pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
-    const numPages = pdfDoc.numPages;
+    const result = await response.json();
     
-    console.log(`📄 Searching ${numPages} pages...`);
-    
-    // Search through all pages for the pattern
-    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-      const page = await pdfDoc.getPage(pageNum);
-      const textContent = await page.getTextContent();
-      
-      // Combine all text items into a single string
-      const pageText = textContent.items
-        .map((item: any) => item.str)
-        .join(' ')
-        .toUpperCase();
-      
-      // Check for exact search pattern match first
-      if (pageText.includes(searchPattern.toUpperCase())) {
-        console.log(`✅ Found "${searchPattern}" on page ${pageNum}`);
-        return pageNum;
-      }
+    if (result.success && result.pageNumber) {
+      console.log(`✅ Professional search found lesson at page: ${result.pageNumber}`);
+      return result.pageNumber;
+    } else {
+      console.warn(`❌ Professional search failed: ${result.error}`);
+      return null;
     }
-    
-    // If exact pattern not found, try fallback pattern
-    if (fallbackPattern) {
-      console.log(`🔄 Primary search failed, trying fallback: ${fallbackPattern}`);
-      
-      for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-        const page = await pdfDoc.getPage(pageNum);
-        const textContent = await page.getTextContent();
-        
-        const pageText = textContent.items
-          .map((item: any) => item.str)
-          .join(' ')
-          .toUpperCase();
-        
-        if (pageText.includes(fallbackPattern.toUpperCase())) {
-          console.log(`✅ Found fallback "${fallbackPattern}" on page ${pageNum}`);
-          return pageNum;
-        }
-      }
-    }
-    
-    console.log('❌ Search pattern not found in PDF');
-    return null;
-    
   } catch (error) {
-    console.error('❌ Error searching PDF:', error);
+    console.error('Professional search error:', error);
     return null;
   }
 };  const goToPage = (pageNumber: number) => {
