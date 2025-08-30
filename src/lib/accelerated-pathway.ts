@@ -668,8 +668,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 23,
         title: "Find Square Roots and Cube Roots to Solve Problems",
         volume: 2,
-        startPage: 129,
-        endPage: 156,
+        startPage: 557,
+        endPage: 578,
         sessions: 3,
         majorWork: true,
         originalCode: "G8 U6 L23"
@@ -721,8 +721,8 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         lessonNumber: 25,
         title: "Solve Problems Involving Area and Surface Area",
         volume: 2,
-        startPage: 171, // Volume 2 page numbers
-        endPage: 194,
+        startPage: 542,
+        endPage: 565,
         sessions: 3,
         majorWork: false, // Supporting work - "Just Develop"
         originalCode: "G7 U6 L25"

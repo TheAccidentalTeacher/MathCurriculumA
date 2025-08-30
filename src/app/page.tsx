@@ -56,6 +56,10 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Se
             </summary>
             <div className="mt-3 space-y-2 text-sm text-slate-400 border-t border-slate-700 pt-3">
               <div className="flex gap-3">
+                <span className="text-orange-400 font-mono">2025-08-30</span>
+                <span><strong>🚫 NEGATIVE PAGE FIX:</strong> Corrected G8 U6 L23→p.557, G7 U6 L25→p.542 (were causing page -303, -233 errors)</span>
+              </div>
+              <div className="flex gap-3">
                 <span className="text-cyan-400 font-mono">2025-08-30</span>
                 <span><strong>📋 PAGE MAPPING CORRECTED:</strong> Fixed lesson start pages - G7 U1 L1 now correctly starts at page 4 (not 19)</span>
               </div>
