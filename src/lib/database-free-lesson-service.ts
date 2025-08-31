@@ -177,87 +177,29 @@ export class DatabaseFreeLessonService {
   }
 
   /**
-   * Parse sessions within known lesson boundaries
+   * Parse sessions within known lesson boundaries - SIMPLIFIED to show entire lesson as one block
    */
   private static parseSessionsWithinBoundaries(lessonPages: any[], lessonNumber: number): LessonSession[] {
-    const sessions: LessonSession[] = [];
-    let currentSession: LessonSession | null = null;
-    let introPages: any[] = [];
+    console.log(`📚 Creating single unified session for ${lessonPages.length} pages (${lessonPages[0]?.page_number}-${lessonPages[lessonPages.length-1]?.page_number})`);
 
-    console.log(`📚 Parsing sessions for ${lessonPages.length} pages (${lessonPages[0]?.page_number}-${lessonPages[lessonPages.length-1]?.page_number})`);
-
-    for (const page of lessonPages) {
-      const textPreview = page.text_preview || '';
-      
-      // Look for explicit session markers
-      const sessionMatch = textPreview.match(/LESSON\s+\d+\s*\|\s*SESSION\s+(\d+)/i);
-      
-      if (sessionMatch) {
-        const sessionNum = parseInt(sessionMatch[1]);
-        
-        console.log(`   🎯 Found SESSION ${sessionNum} on page ${page.page_number}`);
-        
-        // Handle intro pages before first session
-        if (sessionNum === 1 && introPages.length > 0) {
-          const introSession = this.createIntroSession(introPages);
-          sessions.push(introSession);
-          console.log(`   📝 Created intro session: ${introPages.length} pages`);
-          introPages = [];
-        }
-        
-        // Close previous session
-        if (currentSession) {
-          currentSession.endPage = page.page_number - 1;
-          currentSession.totalPages = currentSession.pages.length;
-          console.log(`   ✅ Closed ${currentSession.sessionName}: ${currentSession.totalPages} pages`);
-        }
-
-        // Start new session
-        currentSession = {
-          sessionNumber: sessionNum,
-          sessionName: this.getSessionName(sessionNum),
-          sessionType: this.getSessionType(sessionNum),
-          startPage: page.page_number,
-          endPage: page.page_number,
-          pages: [],
-          totalPages: 0
-        };
-        sessions.push(currentSession);
-      }
-
-      // Add page to appropriate collection
-      if (currentSession) {
-        currentSession.pages.push(this.createLessonPage(page));
-        currentSession.endPage = page.page_number;
-      } else {
-        introPages.push(page);
-      }
+    if (lessonPages.length === 0) {
+      return [];
     }
 
-    // Finalize last session
-    if (currentSession) {
-      currentSession.totalPages = currentSession.pages.length;
-      console.log(`   ✅ Finalized ${currentSession.sessionName}: ${currentSession.totalPages} pages`);
-    }
+    // Create one single session containing all lesson pages
+    const unifiedSession: LessonSession = {
+      sessionNumber: 1,
+      sessionName: `Complete Lesson ${lessonNumber}`,
+      sessionType: 'complete_lesson',
+      startPage: lessonPages[0].page_number,
+      endPage: lessonPages[lessonPages.length - 1].page_number,
+      pages: lessonPages.map(page => this.createLessonPage(page)),
+      totalPages: lessonPages.length
+    };
 
-    // Handle case where no sessions found - create introduction
-    if (sessions.length === 0 && lessonPages.length > 0) {
-      console.log(`   ⚠️ No sessions found, creating single introduction session`);
-      const introSession = this.createIntroSession(lessonPages);
-      sessions.push(introSession);
-    }
+    console.log(`📊 Created unified session: ${unifiedSession.totalPages} pages (${unifiedSession.startPage}-${unifiedSession.endPage})`);
 
-    // Handle remaining intro pages if we have sessions but intro content
-    if (introPages.length > 0 && sessions.length > 0) {
-      const introSession = this.createIntroSession(introPages);
-      sessions.unshift(introSession); // Add at beginning
-      console.log(`   📝 Added intro session at beginning: ${introPages.length} pages`);
-    }
-
-    console.log(`📊 Final result: ${sessions.length} sessions, ${lessonPages.length} total pages`);
-    sessions.forEach(s => console.log(`   ${s.sessionNumber}: ${s.sessionName} (${s.totalPages} pages, ${s.startPage}-${s.endPage})`));
-
-    return sessions;
+    return [unifiedSession];
   }
 
   private static createIntroSession(pages: any[]): LessonSession {
@@ -309,25 +251,5 @@ export class DatabaseFreeLessonService {
     return volumeMap[documentId] || 'Unknown Volume';
   }
 
-  private static getSessionName(sessionNumber: number): string {
-    const sessionNames: Record<number, string> = {
-      1: 'Explore',
-      2: 'Develop',
-      3: 'Refine',
-      4: 'Apply', 
-      5: 'Practice'
-    };
-    return sessionNames[sessionNumber] || `Session ${sessionNumber}`;
-  }
 
-  private static getSessionType(sessionNumber: number): LessonSession['sessionType'] {
-    const sessionTypes: Record<number, LessonSession['sessionType']> = {
-      1: 'explore',
-      2: 'develop',
-      3: 'refine',
-      4: 'apply',
-      5: 'practice'
-    };
-    return sessionTypes[sessionNumber] || 'session';
-  }
 }
