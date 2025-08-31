@@ -17,6 +17,26 @@ interface VolumeCard {
 
 const volumes: VolumeCard[] = [
   {
+    id: 'grade6-volume1',
+    title: 'Grade 6 Volume 1',
+    pages: '512 pages',
+    color: 'bg-indigo-600',
+    hoverColor: 'hover:bg-indigo-700',
+    href: '/viewer/grade6-volume1',
+    grade: 'G6',
+    emoji: '📚'
+  },
+  {
+    id: 'grade6-volume2',
+    title: 'Grade 6 Volume 2',
+    pages: '408 pages',
+    color: 'bg-teal-600',
+    hoverColor: 'hover:bg-teal-700',
+    href: '/viewer/grade6-volume2',
+    grade: 'G6',
+    emoji: '📖'
+  },
+  {
     id: 'volume1',
     title: 'Grade 7 Volume 1',
     pages: '504 pages',
@@ -107,7 +127,7 @@ export function CurriculumTransformer() {
                 <div className="text-center">
                   <div className="text-6xl mb-4 animate-pulse">🎴</div>
                   <p className="text-blue-200 text-lg font-medium mb-6">
-                    Four volumes ready to be transformed into one accelerated pathway!
+                    Six volumes ready to be transformed into one accelerated pathway!
                   </p>
                   
                   <button
@@ -197,7 +217,7 @@ export function CurriculumTransformer() {
             {/* Traditional volume buttons when transformed */}
             {currentPhase === 'transformed' && (
               <div className="animate-fadeIn">
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                   {volumes.map((volume, index) => (
                     <Link
                       key={volume.id}
@@ -370,7 +390,7 @@ export function CurriculumTransformer() {
               <span className="text-2xl">⚡</span>
             </div>
             <p className="text-slate-400 mt-2 text-sm">
-              Four volumes have merged into one powerful accelerated pathway
+              Six volumes have merged into one powerful accelerated pathway
             </p>
           </div>
           

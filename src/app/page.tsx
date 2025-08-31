@@ -150,6 +150,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Se
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <select name="grade" defaultValue={grade || ""} className="rounded-md bg-slate-700 border border-slate-600 px-3 py-2">
               <option value="">Any Grade</option>
+              <option value="Grade 6">Grade 6</option>
               <option value="Grade 7">Grade 7</option>
               <option value="Grade 8">Grade 8</option>
             </select>

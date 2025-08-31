@@ -243,6 +243,8 @@ export class DatabaseFreeLessonService {
 
   private static getVolumeName(documentId: string): string {
     const volumeMap: Record<string, string> = {
+      'RCM06_NA_SW_V1': 'Grade 6 - Volume 1',
+      'RCM06_NA_SW_V2': 'Grade 6 - Volume 2',
       'RCM07_NA_SW_V1': 'Grade 7 - Volume 1',
       'RCM07_NA_SW_V2': 'Grade 7 - Volume 2', 
       'RCM08_NA_SW_V1': 'Grade 8 - Volume 1',
