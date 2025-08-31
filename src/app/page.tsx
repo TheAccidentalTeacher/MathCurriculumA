@@ -1,6 +1,6 @@
+import { CurriculumTransformer } from '@/components/CurriculumTransformer';
 import { CurriculumService, SearchFilters } from "@/lib/curriculum-service";
 import { AcceleratedPathwayViewer } from "@/components/AcceleratedPathwayViewer";
-import { CurriculumTransformer } from "@/components/CurriculumTransformer";
 import Link from "next/link";
 
 const curriculumService = new CurriculumService();
