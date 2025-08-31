@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { LessonService } from '../../../../../lib/lesson-service';
+import { DatabaseFreeLessonService } from '../../../../../lib/database-free-lesson-service';
 
 export async function GET(
   request: NextRequest,
@@ -16,7 +16,7 @@ export async function GET(
       );
     }
 
-    const lessonData = await LessonService.getLessonData(documentId, lessonNum);
+    const lessonData = await DatabaseFreeLessonService.getLessonData(documentId, lessonNum);
     
     return NextResponse.json({
       success: true,
@@ -52,11 +52,12 @@ export async function POST(
 ) {
   try {
     const { documentId } = await params;
-    const lessons = await LessonService.getAvailableLessons(documentId);
+    // For now, use the same method - we'll need to add this to ReliableLessonService
+    // const lessons = await ReliableLessonService.getAvailableLessons(documentId);
     
     return NextResponse.json({
       success: true,
-      lessons
+      lessons: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]  // Temporary
     });
   } catch (error) {
     console.error('Available lessons API error:', error);
