@@ -190,7 +190,7 @@ export class DatabaseFreeLessonService {
     const unifiedSession: LessonSession = {
       sessionNumber: 1,
       sessionName: `Complete Lesson ${lessonNumber}`,
-      sessionType: 'complete_lesson',
+      sessionType: 'session',
       startPage: lessonPages[0].page_number,
       endPage: lessonPages[lessonPages.length - 1].page_number,
       pages: lessonPages.map(page => this.createLessonPage(page)),
