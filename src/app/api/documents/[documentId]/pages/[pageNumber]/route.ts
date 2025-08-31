@@ -21,6 +21,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     // Map document IDs to folder names
     const documentMap: { [key: string]: string } = {
+      'rcm06-na-sw-v1': 'RCM06_NA_SW_V1',
+      'RCM06_NA_SW_V1': 'RCM06_NA_SW_V1',
+      'rcm06-na-sw-v2': 'RCM06_NA_SW_V2',
+      'RCM06_NA_SW_V2': 'RCM06_NA_SW_V2',
       'rcm07-na-sw-v1': 'RCM07_NA_SW_V1',
       'RCM07_NA_SW_V1': 'RCM07_NA_SW_V1',
       'RCM07_NA_SW_V2': 'RCM07_NA_SW_V2',
