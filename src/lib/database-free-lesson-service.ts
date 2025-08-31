@@ -40,26 +40,54 @@ export class DatabaseFreeLessonService {
   private static documentCache = new Map<string, any>();
   private static lessonBoundaries: Record<string, Record<number, { start: number; end: number; title: string }>> = {
     'RCM07_NA_SW_V1': {
-      1: { start: 127, end: 150, title: 'Solve Problems Involving Scale' },
-      2: { start: 151, end: 172, title: 'Scale Drawings' },
-      3: { start: 173, end: 194, title: 'Scale Factor and Scale Drawings' },
-      4: { start: 195, end: 216, title: 'Solve Problems with Proportional Relationships' },
-      5: { start: 217, end: 238, title: 'Understand and Use Rates' },
-      6: { start: 239, end: 260, title: 'Understand and Calculate Unit Price' },
-      7: { start: 261, end: 284, title: 'Circumference and Area of a Circle' },
-      8: { start: 285, end: 308, title: 'Finding the Area of Composite Shapes' },
-      9: { start: 309, end: 330, title: 'Understand Angle Relationships' },
-      10: { start: 331, end: 352, title: 'Solve for Unknown Angle Measures' },
-      11: { start: 353, end: 376, title: 'Draw Shapes with Given Conditions' },
-      12: { start: 377, end: 398, title: 'Two-Dimensional Shapes and Three-Dimensional Solids' },
-      13: { start: 399, end: 420, title: 'Surface Area of Solids' },
-      14: { start: 421, end: 442, title: 'Volume of Solids' },
-      15: { start: 443, end: 466, title: 'Solve Problems Involving Volume' },
-      16: { start: 467, end: 488, title: 'Probability Models' },
-      17: { start: 489, end: 504, title: 'Develop Probability Models' },
-      18: { start: 371, end: 392, title: 'Write and Solve Multi-Step Equations' },  // Actual boundaries from search
-      19: { start: 450, end: 470, title: 'Sample Spaces for Compound Events' },
-      20: { start: 480, end: 504, title: 'Understand Sampling' }
+      1: { start: 15, end: 58, title: 'Solve Problems Involving Scale' },
+      2: { start: 43, end: 58, title: 'Find Unit Rates Involving Ratios of Fractions' },
+      3: { start: 59, end: 70, title: 'Understand Proportional Relationships' },
+      4: { start: 71, end: 92, title: 'Represent Proportional Relationships' },
+      5: { start: 93, end: 108, title: 'Solve Proportional Relationship Problems' },
+      6: { start: 109, end: 160, title: 'Solve Area and Circumference Problems Involving Circles' },
+      7: { start: 139, end: 160, title: 'Find Unknown Angle Measures' },
+      8: { start: 161, end: 182, title: 'Add with Negative Numbers' },
+      9: { start: 183, end: 194, title: 'Understand Subtraction with Negative Integers' },
+      10: { start: 195, end: 268, title: 'Add and Subtract Positive and Negative Numbers' },
+      11: { start: 247, end: 268, title: 'Multiply and Divide Positive and Negative Numbers' },
+      12: { start: 247, end: 268, title: 'Multiply and Divide Rational Numbers' },
+      13: { start: 269, end: 290, title: 'Express Rational Numbers as Terminating or Repeating Decimals' },
+      14: { start: 291, end: 324, title: 'Use the Four Operations with Negative Numbers' },
+      15: { start: 325, end: 346, title: 'Write Equivalent Expressions Involving Rational Numbers' },
+      16: { start: 347, end: 358, title: 'Understand Reasons for Rewriting Expressions' },
+      17: { start: 359, end: 370, title: 'Understand Multi-Step Equations' },
+      18: { start: 371, end: 504, title: 'Write and Solve Multi-Step Equations' }
+    },
+    'RCM07_NA_SW_V2': {
+      15: { start: 139, end: 166, title: 'Write Equivalent Expressions Involving Rational Numbers' },
+      16: { start: 167, end: 188, title: 'Understand Reasons for Rewriting Expressions' },
+      17: { start: 189, end: 226, title: 'Understand Multi-Step Equations' },
+      18: { start: 227, end: 272, title: 'Write and Solve Multi-Step Equations' },
+      19: { start: 273, end: 284, title: 'Apply Exponent Properties for Positive Integer Exponents' },
+      20: { start: 285, end: 440, title: 'Express Numbers Using Integer Powers of 10' }
+    },
+    'RCM08_NA_SW_V1': {
+      1: { start: 15, end: 54, title: 'Understand Rigid Transformations and Their Properties' },
+      2: { start: 43, end: 54, title: 'Understand Rotation and Reflection' },
+      3: { start: 55, end: 94, title: 'Work with Sequences of Transformations and Congruence' },
+      4: { start: 95, end: 106, title: 'Understand Dilations and Similarity' },
+      5: { start: 107, end: 128, title: 'Perform and Describe Transformations Involving Dilations' },
+      6: { start: 129, end: 150, title: 'Describe Angle Relationships' },
+      7: { start: 151, end: 190, title: 'Describe Angle Relationships in Triangles' },
+      8: { start: 191, end: 212, title: 'Graph Proportional Relationships and Define Slope' },
+      9: { start: 213, end: 284, title: 'Derive and Graph Linear Equations of the Form y = mx + b' },
+      10: { start: 263, end: 284, title: 'Compare Proportional Relationships' },
+      11: { start: 263, end: 284, title: 'Analyze Linear Functions' },
+      12: { start: 285, end: 296, title: 'Understand Systems of Linear Equations in Two Variables' },
+      13: { start: 297, end: 324, title: 'Solve Systems of Linear Equations Algebraically' },
+      14: { start: 325, end: 552, title: 'Represent and Solve Problems with Systems of Linear Equations' }
+    },
+    'RCM08_NA_SW_V2': {
+      19: { start: 15, end: 58, title: 'Apply Exponent Properties for Positive Integer Exponents' },
+      20: { start: 47, end: 58, title: 'Express Numbers Using Scientific Notation' },
+      21: { start: 59, end: 226, title: 'Express Numbers Using Integer Powers of 10' },
+      32: { start: 329, end: 456, title: 'Construct and Interpret Two-Way Tables' }
     }
   };
 
