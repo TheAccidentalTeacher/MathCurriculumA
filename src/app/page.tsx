@@ -1,4 +1,3 @@
-import { CurriculumTransformer } from '@/components/CurriculumTransformer';
 import { CurriculumService, SearchFilters } from "@/lib/curriculum-service";
 import { AcceleratedPathwayViewer } from "@/components/AcceleratedPathwayViewer";
 import Link from "next/link";
@@ -129,7 +128,45 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Se
         </div>
 
         {/* Interactive Curriculum Transformer */}
-        <CurriculumTransformer />
+        {/* <CurriculumTransformer /> */}
+        <div className="bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 border border-blue-700 rounded-2xl p-8 mb-8">
+          <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200 mb-4">
+            🎴 Full Curriculum Viewer
+          </h2>
+          <p className="text-slate-300 mb-6 text-lg">
+            Transform six volumes into one powerful accelerated pathway
+          </p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Link href="/viewer/volume1" className="block p-4 bg-blue-600 text-white rounded-xl shadow-lg hover:bg-blue-700 transition-colors">
+              <div className="text-center">
+                <div className="text-3xl mb-2">📘</div>
+                <div className="font-bold text-lg">Grade 7 Volume 1</div>
+                <div className="text-sm opacity-90 mt-1">(504 pages)</div>
+              </div>
+            </Link>
+            <Link href="/viewer/volume2" className="block p-4 bg-green-600 text-white rounded-xl shadow-lg hover:bg-green-700 transition-colors">
+              <div className="text-center">
+                <div className="text-3xl mb-2">📗</div>
+                <div className="font-bold text-lg">Grade 7 Volume 2</div>
+                <div className="text-sm opacity-90 mt-1">(440 pages)</div>
+              </div>
+            </Link>
+            <Link href="/viewer/grade8-volume1" className="block p-4 bg-purple-600 text-white rounded-xl shadow-lg hover:bg-purple-700 transition-colors">
+              <div className="text-center">
+                <div className="text-3xl mb-2">📙</div>
+                <div className="font-bold text-lg">Grade 8 Volume 1</div>
+                <div className="text-sm opacity-90 mt-1">(552 pages)</div>
+              </div>
+            </Link>
+            <Link href="/viewer/grade8-volume2" className="block p-4 bg-orange-600 text-white rounded-xl shadow-lg hover:bg-orange-700 transition-colors">
+              <div className="text-center">
+                <div className="text-3xl mb-2">📕</div>
+                <div className="font-bold text-lg">Grade 8 Volume 2</div>
+                <div className="text-sm opacity-90 mt-1">(456 pages)</div>
+              </div>
+            </Link>
+          </div>
+        </div>
 
         {/* Search Form */}
         <form className="space-y-4 mb-8 bg-slate-800 p-6 rounded-lg border border-slate-700" action="/" method="get">

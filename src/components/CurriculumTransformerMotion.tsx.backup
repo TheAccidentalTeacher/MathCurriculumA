@@ -1,0 +1,684 @@
+'use client';
+
+import Link from "next/link";
+import { useState } from "react";
+import { motion, AnimatePresence, useAnimation } from "framer-motion";
+import { AcceleratedPathwayViewer } from "./AcceleratedPathwayViewer";
+
+// Define easing functions as constants
+const easeInOut = [0.4, 0.0, 0.2, 1] as const;
+const bounceOut = [0.68, -0.55, 0.265, 1.55] as const;
+
+interface VolumeCard {
+  id: string;
+  title: string;
+  pages: string;
+  color: string;
+  hoverColor: string;
+  href: string;
+  grade: string;
+  emoji: string;
+}
+
+const volumes: VolumeCard[] = [
+  {
+    id: 'grade6-volume1',
+    title: 'Grade 6 Volume 1',
+    pages: '512 pages',
+    color: 'bg-indigo-600',
+    hoverColor: 'hover:bg-indigo-700',
+    href: '/viewer/grade6-volume1',
+    grade: 'G6',
+    emoji: '📚'
+  },
+  {
+    id: 'grade6-volume2',
+    title: 'Grade 6 Volume 2',
+    pages: '408 pages',
+    color: 'bg-teal-600',
+    hoverColor: 'hover:bg-teal-700',
+    href: '/viewer/grade6-volume2',
+    grade: 'G6',
+    emoji: '📖'
+  },
+  {
+    id: 'volume1',
+    title: 'Grade 7 Volume 1',
+    pages: '504 pages',
+    color: 'bg-blue-600',
+    hoverColor: 'hover:bg-blue-700',
+    href: '/viewer/volume1',
+    grade: 'G7',
+    emoji: '📘'
+  },
+  {
+    id: 'volume2', 
+    title: 'Grade 7 Volume 2',
+    pages: '440 pages',
+    color: 'bg-green-600',
+    hoverColor: 'hover:bg-green-700',
+    href: '/viewer/volume2',
+    grade: 'G7',
+    emoji: '📗'
+  },
+  {
+    id: 'grade8-volume1',
+    title: 'Grade 8 Volume 1', 
+    pages: '552 pages',
+    color: 'bg-purple-600',
+    hoverColor: 'hover:bg-purple-700',
+    href: '/viewer/grade8-volume1',
+    grade: 'G8',
+    emoji: '📙'
+  },
+  {
+    id: 'grade8-volume2',
+    title: 'Grade 8 Volume 2',
+    pages: '456 pages', 
+    color: 'bg-orange-600',
+    hoverColor: 'hover:bg-orange-700',
+    href: '/viewer/grade8-volume2',
+    grade: 'G8',
+    emoji: '📕'
+  }
+];
+
+// Define animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.3
+    }
+  }
+};
+
+// Animation variants with proper typing
+const cardVariants = {
+  hidden: {
+    opacity: 0,
+    y: 50,
+    rotateX: -15,
+    scale: 0.9,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    rotateX: 0,
+    scale: 1,
+    transition: {
+      type: "spring" as const,
+      stiffness: 300,
+      damping: 20,
+      duration: 0.8,
+    },
+  },
+  hover: {
+    scale: 1.05,
+    y: -10,
+    rotateY: 5,
+    boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
+    transition: {
+      type: "spring" as const,
+      stiffness: 400,
+      damping: 10
+    }
+  },
+  shuffle: {
+    x: [0, -20, 15, -10, 8, -3, 0] as number[],
+    y: [0, -10, 12, -8, 5, -2, 0] as number[],
+    rotate: [0, -3, 2, -1.5, 1, -0.5, 0] as number[],
+    scale: [1, 1.02, 0.98, 1.01, 0.99, 1.005, 1] as number[],
+    transition: {
+      duration: 2.5,
+      ease: easeInOut as any,
+      times: [0, 0.15, 0.3, 0.45, 0.6, 0.8, 1] as number[],
+    },
+  },
+  merge: (index: number) => ({
+    x: index * -200,
+    y: -50,
+    scale: 0.8,
+    opacity: 0.7,
+    transition: {
+      type: "spring" as const,
+      stiffness: 200,
+      damping: 15,
+      delay: index * 0.1,
+    },
+  }),
+} as const;
+
+const buttonVariants = {
+  idle: {
+    scale: 1,
+    boxShadow: "0 10px 30px rgba(147, 51, 234, 0.3)"
+  },
+  hover: {
+    scale: 1.05,
+    boxShadow: "0 20px 40px rgba(147, 51, 234, 0.4)",
+    transition: {
+      type: "spring" as const,
+      stiffness: 400,
+      damping: 10
+    }
+  },
+  tap: {
+    scale: 0.95,
+    transition: {
+      type: "spring" as const,
+      stiffness: 600,
+      damping: 10
+    }
+  }
+};
+
+const magicVariants = {
+  hidden: { scale: 0, rotate: 0, opacity: 0 },
+  visible: {
+    scale: [0, 1.5, 1],
+    rotate: [0, 180, 360],
+    opacity: [0, 1, 0.8],
+    transition: {
+      duration: 3,
+      ease: "easeInOut",
+      repeat: Infinity,
+      repeatType: "reverse"
+    }
+  }
+};
+
+const particleVariants = {
+  hidden: { opacity: 0, scale: 0 },
+  visible: (i: number) => ({
+    opacity: [0, 1, 0],
+    scale: [0, 1, 0],
+    x: [0, Math.cos(i * 0.5) * 200],
+    y: [0, Math.sin(i * 0.5) * 200],
+    transition: {
+      duration: 2,
+      delay: i * 0.1,
+      ease: "easeOut",
+      repeat: Infinity,
+      repeatDelay: 1
+    }
+  })
+};
+
+export function CurriculumTransformerMotion() {
+  const [currentPhase, setCurrentPhase] = useState<'initial' | 'shuffling' | 'merging' | 'transformed'>('initial');
+  const controls = useAnimation();
+
+  const handleTransform = async () => {
+    setCurrentPhase('shuffling');
+    
+    // Phase 1: Epic shuffle
+    await new Promise(resolve => setTimeout(resolve, 2500));
+    setCurrentPhase('merging');
+    
+    // Phase 2: Magical merge
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    setCurrentPhase('transformed');
+  };
+
+  const handleReset = () => {
+    setCurrentPhase('initial');
+    controls.start('visible');
+  };
+
+  return (
+    <>
+      {/* Full Curriculum Viewer Section */}
+      <motion.div 
+        className="bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 border border-blue-700 rounded-2xl p-8 mb-8 relative overflow-hidden"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+      >
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 opacity-10">
+          {[...Array(8)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute text-4xl text-blue-300"
+              initial={{ opacity: 0 }}
+              animate={{
+                opacity: [0.1, 0.3, 0.1],
+                x: [0, Math.random() * 100 - 50],
+                y: [0, Math.random() * 100 - 50],
+                rotate: [0, 360]
+              }}
+              transition={{
+                duration: 10 + i * 2,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+            >
+              {['π', '∑', '∫', '√', '∞', '∆', '∂', '≈'][i]}
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="relative z-10">
+          <motion.h2 
+            className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200 mb-4"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+          >
+            🎴 Full Curriculum Viewer
+          </motion.h2>
+          
+          <motion.p 
+            className="text-slate-300 mb-6 text-lg"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+          >
+            Transform six volumes into one powerful accelerated pathway
+          </motion.p>
+
+          {/* Transformation Stage */}
+          <div className="relative min-h-[400px] mb-8 flex items-center justify-center">
+            
+            {/* Initial State */}
+            <AnimatePresence mode="wait">
+              {currentPhase === 'initial' && (
+                <motion.div 
+                  key="initial"
+                  className="text-center"
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  variants={containerVariants}
+                >
+                  <motion.div 
+                    className="text-8xl mb-6"
+                    animate={{
+                      rotateY: [0, 360],
+                      scale: [1, 1.1, 1],
+                    }}
+                    transition={{
+                      duration: 4,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    🎴
+                  </motion.div>
+                  
+                  <motion.p 
+                    className="text-blue-200 text-xl font-medium mb-8 max-w-md mx-auto leading-relaxed"
+                    variants={{
+                      hidden: { opacity: 0, y: 20 },
+                      visible: { opacity: 1, y: 0 }
+                    }}
+                  >
+                    Six volumes ready to be transformed into one accelerated pathway!
+                  </motion.p>
+                  
+                  <motion.button
+                    onClick={handleTransform}
+                    variants={buttonVariants}
+                    initial="idle"
+                    whileHover="hover"
+                    whileTap="tap"
+                    className="relative px-10 py-5 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 text-white rounded-2xl font-bold text-xl shadow-2xl overflow-hidden"
+                  >
+                    <motion.div 
+                      className="absolute inset-0 bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 opacity-0"
+                      whileHover={{ opacity: 0.3 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                    
+                    <span className="relative flex items-center gap-4">
+                      <motion.span 
+                        className="text-3xl"
+                        animate={{ rotate: [0, 360] }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                      >
+                        🎲
+                      </motion.span>
+                      <span>Transform the Curriculum!</span>
+                      <motion.span 
+                        className="text-3xl"
+                        animate={{ y: [0, -5, 0] }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
+                      >
+                        ⚡
+                      </motion.span>
+                    </span>
+                  </motion.button>
+                </motion.div>
+              )}
+
+              {/* Shuffling Phase */}
+              {currentPhase === 'shuffling' && (
+                <motion.div 
+                  key="shuffling"
+                  className="relative w-full h-full flex items-center justify-center"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  {/* Volume Cards */}
+                  <div className="relative w-96 h-96">
+                    {volumes.map((volume, index) => (
+                      <motion.div
+                        key={volume.id}
+                        className={`absolute w-40 h-28 ${volume.color} rounded-xl shadow-2xl border-2 border-white/30 flex items-center justify-center left-1/2 top-1/2`}
+                        style={{
+                          originX: 0.5,
+                          originY: 0.5,
+                          x: "-50%",
+                          y: "-50%"
+                        }}
+                        variants={cardVariants}
+                        initial="visible"
+                        animate="shuffle"
+                        custom={index}
+                      >
+                        <div className="text-center text-white">
+                          <motion.div 
+                            className="text-3xl mb-1"
+                            animate={{ rotate: [0, 360] }}
+                            transition={{ 
+                              duration: 1.5 + index * 0.3, 
+                              repeat: Infinity, 
+                              ease: "linear" 
+                            }}
+                          >
+                            {volume.emoji}
+                          </motion.div>
+                          <div className="text-sm font-bold">{volume.grade}</div>
+                          <div className="text-xs opacity-90">{volume.pages}</div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* Central Magic Effect */}
+                  <motion.div 
+                    className="absolute text-9xl"
+                    variants={magicVariants}
+                    initial="hidden"
+                    animate="visible"
+                    style={{ zIndex: 10 }}
+                  >
+                    ✨
+                  </motion.div>
+
+                  {/* Particle Effects */}
+                  {[...Array(12)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute w-2 h-2 bg-yellow-400 rounded-full"
+                      variants={particleVariants}
+                      initial="hidden"
+                      animate="visible"
+                      custom={i}
+                      style={{
+                        left: '50%',
+                        top: '50%',
+                      }}
+                    />
+                  ))}
+                  
+                  <motion.div 
+                    className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-center"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <div className="text-purple-300 font-bold text-lg animate-pulse">
+                      ⚡ SHUFFLING THE CURRICULUM ⚡
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+
+              {/* Merging Phase */}
+              {currentPhase === 'merging' && (
+                <motion.div 
+                  key="merging"
+                  className="relative w-full h-full flex items-center justify-center"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  {/* Cards Merging */}
+                  <div className="relative">
+                    {volumes.map((volume, index) => (
+                      <motion.div
+                        key={volume.id}
+                        className={`absolute w-40 h-28 ${volume.color} rounded-xl shadow-2xl border-2 border-white/30 flex items-center justify-center left-1/2 top-1/2`}
+                        style={{
+                          originX: 0.5,
+                          originY: 0.5,
+                          x: "-50%",
+                          y: "-50%"
+                        }}
+                        variants={cardVariants}
+                        initial="visible"
+                        animate="merge"
+                        custom={index}
+                      >
+                        <div className="text-center text-white">
+                          <div className="text-3xl mb-1">{volume.emoji}</div>
+                          <div className="text-sm font-bold">{volume.grade}</div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* Transformation Energy */}
+                  <motion.div 
+                    className="absolute text-9xl text-purple-400"
+                    animate={{
+                      scale: [1, 2, 1],
+                      rotate: [0, 360, 720],
+                      filter: [
+                        "drop-shadow(0 0 20px rgba(168, 85, 247, 0.8))",
+                        "drop-shadow(0 0 60px rgba(168, 85, 247, 1))",
+                        "drop-shadow(0 0 20px rgba(168, 85, 247, 0.8))"
+                      ]
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    🌟
+                  </motion.div>
+
+                  {/* Energy Waves */}
+                  {[...Array(3)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute border-2 border-purple-400 rounded-full"
+                      style={{
+                        width: 100 + i * 50,
+                        height: 100 + i * 50,
+                        left: '50%',
+                        top: '50%',
+                        x: '-50%',
+                        y: '-50%'
+                      }}
+                      animate={{
+                        scale: [1, 2, 1],
+                        opacity: [0.8, 0, 0.8],
+                      }}
+                      transition={{
+                        duration: 2,
+                        delay: i * 0.3,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    />
+                  ))}
+                  
+                  <motion.div 
+                    className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-center"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ 
+                      opacity: 1, 
+                      scale: 1,
+                      y: [0, -10, 0]
+                    }}
+                    transition={{ 
+                      delay: 1, 
+                      y: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                    }}
+                  >
+                    <div className="text-purple-300 font-bold text-xl">
+                      🔥 FUSION IN PROGRESS 🔥
+                    </div>
+                    <div className="text-purple-400 text-sm mt-2">
+                      Creating accelerated pathway...
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+
+              {/* Transformed State */}
+              {currentPhase === 'transformed' && (
+                <motion.div 
+                  key="transformed"
+                  className="w-full"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                >
+                  <motion.div 
+                    className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6"
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    {volumes.map((volume, index) => (
+                      <motion.div
+                        key={volume.id}
+                        variants={cardVariants}
+                        whileHover="hover"
+                        custom={index}
+                      >
+                        <Link
+                          href={volume.href}
+                          className={`block p-4 ${volume.color} text-white rounded-xl shadow-lg transition-all duration-300 transform perspective-1000`}
+                        >
+                          <div className="text-center">
+                            <div className="text-3xl mb-2">{volume.emoji}</div>
+                            <div className="font-bold text-lg">{volume.title}</div>
+                            <div className="text-sm opacity-90 mt-1">({volume.pages})</div>
+                          </div>
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="flex items-center justify-between"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8 }}
+                  >
+                    <div className="text-sm text-blue-300">
+                      <strong>Features:</strong> Navigate through all pages • High-resolution images • Quick page jumping
+                    </div>
+                    
+                    <motion.button
+                      onClick={handleReset}
+                      className="px-6 py-3 bg-gradient-to-r from-slate-700 to-slate-600 hover:from-slate-600 hover:to-slate-500 text-white rounded-xl font-medium transition-all duration-300"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      🔄 Transform Again
+                    </motion.button>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Accelerated Pathway - Only shows after transformation */}
+      <AnimatePresence>
+        {currentPhase === 'transformed' && (
+          <motion.div 
+            className="mt-8"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+          >
+            <motion.div 
+              className="mb-6 text-center"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ 
+                type: "spring", 
+                stiffness: 300, 
+                damping: 24, 
+                delay: 0.7 
+              }}
+            >
+              <div className="inline-flex items-center gap-3 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 text-white px-8 py-4 rounded-full font-bold text-xl shadow-2xl">
+                <motion.span 
+                  className="text-3xl"
+                  animate={{ rotate: [0, 360] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                >
+                  🚀
+                </motion.span>
+                <span>TRANSFORMATION COMPLETE!</span>
+                <motion.span 
+                  className="text-3xl"
+                  animate={{ 
+                    scale: [1, 1.3, 1],
+                    filter: [
+                      "drop-shadow(0 0 0px rgba(255, 255, 0, 0))",
+                      "drop-shadow(0 0 10px rgba(255, 255, 0, 0.8))",
+                      "drop-shadow(0 0 0px rgba(255, 255, 0, 0))"
+                    ]
+                  }}
+                  transition={{ 
+                    duration: 1.5, 
+                    repeat: Infinity, 
+                    ease: "easeInOut" 
+                  }}
+                >
+                  ⚡
+                </motion.span>
+              </div>
+              <motion.p 
+                className="text-slate-400 mt-3 text-lg"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1 }}
+              >
+                Six volumes have merged into one powerful accelerated pathway
+              </motion.p>
+            </motion.div>
+            
+            <motion.div 
+              className="mb-8"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 1.2 }}
+            >
+              <AcceleratedPathwayViewer />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { RealCurriculumService } from '@/lib/real-curriculum-service';
+
+// Import the real curriculum service (we'll need to create this import properly)
+const { RealCurriculumService } = require('@/lib/real-curriculum-service.js');
 
 interface PacingRequest {
   gradeRange: number[];
