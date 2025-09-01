@@ -290,19 +290,27 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
           )}
           </div>
           
-          {/* Right Sidebar: Khan Academy Videos + Virtual Tutor */}
-          <div className="xl:col-span-1 space-y-6">
-            {/* Khan Academy Videos - Keep this at the top */}
-            <div>
-              <KhanAcademyVideos
-                documentId={documentId}
-                lessonNumber={lessonNumber}
-                lessonTitle={lessonData?.lessonTitle || `Lesson ${lessonNumber}`}
-              />
-            </div>
-            
-            {/* Virtual Tutor Panel - Below Khan Academy */}
-            <div className="h-96">
+          {/* Right Sidebar: Khan Academy Videos Only */}
+          <div className="xl:col-span-1">
+            <KhanAcademyVideos
+              documentId={documentId}
+              lessonNumber={lessonNumber}
+              lessonTitle={lessonData?.lessonTitle || `Lesson ${lessonNumber}`}
+            />
+          </div>
+        </div>
+        
+        {/* Virtual Tutor Section - Below Main Content */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-6">
+          <div className="mb-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center">
+              <span className="text-2xl sm:text-3xl mr-2 sm:mr-3">🎓</span>
+              Virtual Tutor Assistant
+            </h2>
+            <p className="text-sm sm:text-base text-gray-600 mt-1">Get personalized help with this lesson from Mr. Somers or Gimli</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="h-[400px] sm:h-[500px]">
               <VirtualTutorPanel
                 documentId={documentId}
                 lessonNumber={lessonNumber}

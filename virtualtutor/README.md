@@ -18,8 +18,9 @@ The Virtual Tutor System is an AI-powered educational assistant featuring **Mr. 
 - **Accessibility**: WCAG 2.02 compliant design
 
 ### Integration Points
-- **Target Location**: Right sidebar (`xl:col-span-1`) in LessonViewer.tsx
-- **Current Replacement**: Enhance/replace KhanAcademyVideos.tsx component
+- **Target Location**: Below main content area in LessonViewer.tsx (improved layout)
+- **Previous Location**: Right sidebar (`xl:col-span-1`) - moved due to YouTube video compression
+- **Current Placement**: Full-width section below page content for optimal user experience
 - **API Route**: `/api/lessons/[documentId]/[lessonNumber]/virtualtutor`
 - **Character Assets**: `/public/animations/` and `/virtualtutor/`
 
@@ -42,10 +43,12 @@ The Virtual Tutor System is an AI-powered educational assistant featuring **Mr. 
 - [ ] Mobile-responsive design
 
 #### 1.3 Integration Testing
-- [ ] Replace KhanAcademyVideos in LessonViewer
-- [ ] Test lesson page rendering
-- [ ] Validate responsive behavior
-- [ ] Accessibility compliance testing
+- [x] Replace KhanAcademyVideos in LessonViewer
+- [x] Test lesson page rendering
+- [x] Validate responsive behavior
+- [x] Accessibility compliance testing
+- [x] **IMPROVED**: Relocated to below main content to prevent YouTube video compression
+- [x] **ENHANCED**: Added prominent section header and increased height (500px)
 
 **Deliverables**: Functional UI component with character display and basic chat interface
 

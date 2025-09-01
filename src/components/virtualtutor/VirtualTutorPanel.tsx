@@ -41,12 +41,12 @@ export default function VirtualTutorPanel({
   }
 
   return (
-    <div className="h-full bg-white rounded-lg border border-gray-200 flex flex-col">
+    <div className="h-full bg-white flex flex-col">
       {/* Header with character selection */}
       <div className="border-b border-gray-200 p-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold text-gray-900">Virtual Tutor</h3>
-          <div className="text-xs text-gray-500">
+          <h3 className="text-lg font-semibold text-gray-900">Choose Your Learning Assistant</h3>
+          <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
             Lesson {lessonNumber}
           </div>
         </div>
