@@ -310,7 +310,7 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
             <p className="text-sm sm:text-base text-gray-600 mt-1">Get personalized help with this lesson from Mr. Somers or Gimli</p>
           </div>
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <div className="h-[400px] sm:h-[500px]">
+            <div className="h-[500px] sm:h-[600px] lg:h-[650px]">
               <VirtualTutorPanel
                 documentId={documentId}
                 lessonNumber={lessonNumber}
