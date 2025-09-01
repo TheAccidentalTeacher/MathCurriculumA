@@ -120,7 +120,7 @@ export default function ChatInterface({ character, lessonContext }: ChatInterfac
   };
 
   return (
-    <div className="flex flex-col h-full relative z-10">
+    <div className="flex flex-col h-full">
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {messages.map((message) => (
@@ -169,14 +169,14 @@ export default function ChatInterface({ character, lessonContext }: ChatInterfac
       </div>
 
       {/* Input Area */}
-      <div className="border-t border-gray-200 p-4 bg-white relative z-20">
+      <div className="border-t border-gray-200 p-4">
         <div className="flex space-x-2">
           <textarea
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder={config.placeholderText}
-            className="flex-1 resize-none border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="flex-1 resize-none border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             rows={2}
             disabled={isTyping}
           />

@@ -28,7 +28,7 @@ export default function CharacterDisplay({ character, lessonContext }: Character
     },
     gimli: {
       name: 'Gimli',
-      primaryImage: '/animations/Gimbers.png',
+      primaryImage: '/animations/download-24.png', // Temporary - will replace with proper Gimli image
       altText: 'Gimli, your friendly learning companion',
       bgColor: 'bg-green-50',
       borderColor: 'border-green-200',
