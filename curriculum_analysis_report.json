@@ -1,0 +1,147 @@
+{
+  "database_overview": {
+    "tables": [
+      "documents",
+      "sqlite_sequence",
+      "sections",
+      "topics",
+      "keywords",
+      "document_keywords",
+      "topic_keywords"
+    ],
+    "table_counts": {
+      "documents": 4,
+      "sqlite_sequence": 6,
+      "sections": 3885,
+      "topics": 3885,
+      "keywords": 1761,
+      "document_keywords": 3382,
+      "topic_keywords": 8834
+    }
+  },
+  "content_quality": {
+    "documents": {
+      "total_documents": 4,
+      "by_grade": {
+        "7": 2,
+        "8": 2
+      },
+      "text_lengths": {
+        "RCM07_NA_SW_V1.pdf": 553684,
+        "RCM07_NA_SW_V2.pdf": 514845,
+        "RCM08_NA_SW_V1.pdf": 637621,
+        "RCM08_NA_SW_V2.pdf": 515342
+      },
+      "missing_data": []
+    },
+    "sections": {
+      "total_lessons": 89,
+      "by_grade": {
+        "7": 45,
+        "8": 44
+      },
+      "lesson_patterns": {
+        "7": [
+          "4",
+          "5",
+          "6"
+        ],
+        "8": [
+          "7",
+          "11",
+          "13"
+        ]
+      },
+      "content_quality": {},
+      "missing_structure": [
+        "Grade 7, Personalized Instruction lessons: Insufficient content (208 chars)",
+        "Grade 7, End of Lesson Checklist: Insufficient content (201 chars)",
+        "Grade 7, End of Lesson Checklist: Insufficient content (304 chars)",
+        "Grade 7, End of Lesson Checklist: Insufficient content (305 chars)",
+        "Grade 7, Solve Proportional Relationship Problems\u00a9Curriculum Associates, LLC Copying is not permitted.LESSON 5 Solve Proportional Relationship Problems82: Insufficient content (219 chars)",
+        "Grade 7, Solve Area and Circumference Problems Involving Circles\u00a9Curriculum Associates, LLC Copying is not permitted.LESSON 6 Solve Area and Circumference Problems Involving Circles98: Insufficient content (121 chars)",
+        "Grade 7, End of Lesson Checklist: Insufficient content (184 chars)",
+        "Grade 7, End of Lesson Checklist: Insufficient content (214 chars)",
+        "Grade 7, End of Lesson Checklist: Insufficient content (281 chars)",
+        "Grade 7, End of Lesson Checklist: Insufficient content (307 chars)",
+        "Grade 7, End of Lesson Checklist: Insufficient content (249 chars)",
+        "Grade 7, End of Lesson Checklist: Insufficient content (257 chars)",
+        "Grade 7, End of Lesson Checklist: Insufficient content (271 chars)",
+        "Grade 7, End of Lesson Checklist: Insufficient content (419 chars)",
+        "Grade 7, Personalized Instruction lessons: Insufficient content (208 chars)",
+        "Grade 7, End of Lesson Checklist: Insufficient content (393 chars)",
+        "Grade 7, End of Lesson Checklist: Insufficient content (325 chars)",
+        "Grade 7, End of Lesson Checklist: Insufficient content (265 chars)",
+        "Grade 7, End of Lesson Checklist: Insufficient content (250 chars)",
+        "Grade 7, End of Lesson Checklist: Insufficient content (234 chars)",
+        "Grade 7, End of Lesson Checklist: Insufficient content (207 chars)",
+        "Grade 7, End of Lesson Checklist: Insufficient content (333 chars)",
+        "Grade 7, End of Lesson Checklist: Insufficient content (320 chars)",
+        "Grade 7, End of Lesson Checklist: Insufficient content (335 chars)",
+        "Grade 7, End of Lesson Checklist: Insufficient content (347 chars)",
+        "Grade 8, Personalized Instruction lessons: Insufficient content (208 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (297 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (412 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (419 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (325 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (370 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (395 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (303 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (315 chars)",
+        "Grade 8, Determine the Number of Solutions to One-Variable Equations\u00a9Curriculum Associates, LLC Copying is not permitted.LESSON 11 Determine the Number of Solutions to One-Variable Equations248: Insufficient content (425 chars)",
+        "Grade 8, Solve Systems of Linear Equations Algebraically\u00a9Curriculum Associates, LLC Copying is not permitted.LESSON 13 Solve Systems of Linear Equations Algebraically282: Insufficient content (84 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (271 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (398 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (324 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (385 chars)",
+        "Grade 8, Personalized Instruction lessons: Insufficient content (208 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (239 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (218 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (190 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (296 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (196 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (324 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (273 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (276 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (392 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (323 chars)",
+        "Grade 8, End of Lesson Checklist: Insufficient content (468 chars)"
+      ]
+    },
+    "text_quality": {
+      "standards_references": 0,
+      "lesson_structures": 1334,
+      "mathematical_notation": 6,
+      "session_indicators": 47,
+      "problem_numbering": 736
+    }
+  },
+  "standards_coverage": {
+    "found_standards": [],
+    "by_grade": {},
+    "major_work_indicators": [],
+    "missing_mappings": []
+  },
+  "extraction_gaps": [
+    "Missing extraction for RCM06_NA_SW_V1.pdf",
+    "Missing extraction for RCM06_NA_SW_V2.pdf"
+  ],
+  "gpt5_readiness": {
+    "structure_completeness": 50,
+    "standards_coverage": 25,
+    "content_richness": 25,
+    "metadata_quality": 0,
+    "overall_score": 33,
+    "blocking_issues": [
+      "Insufficient standards mapping (0 standards)",
+      "Poor content extraction quality (avg 498 chars)"
+    ]
+  },
+  "recommendations": [
+    "\ud83d\udea8 CRITICAL: Complete re-extraction needed before GPT-5 integration",
+    "\ud83d\udcc4 Priority: Address 2 extraction gaps",
+    "   \u2022 Missing extraction for RCM06_NA_SW_V1.pdf",
+    "   \u2022 Missing extraction for RCM06_NA_SW_V2.pdf",
+    "\ud83d\udcca Improve standards reference extraction and parsing"
+  ]
+}

@@ -182,53 +182,64 @@ export default function PacingGeneratorPage() {
               {/* Grade Range */}
               <div>
                 <label className="block text-sm font-semibold text-slate-300 mb-3">
-                  Grade Range
+                  Grade Selection
                 </label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => setFormData({...formData, gradeRange: [6, 7, 8]})}
-                    className={`p-3 rounded-lg text-sm font-medium transition-all ${
-                      JSON.stringify(formData.gradeRange) === JSON.stringify([6, 7, 8])
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                    }`}
-                  >
-                    Grades 6-7-8
-                  </button>
-                  <button
-                    onClick={() => setFormData({...formData, gradeRange: [7, 8]})}
-                    className={`p-3 rounded-lg text-sm font-medium transition-all ${
-                      JSON.stringify(formData.gradeRange) === JSON.stringify([7, 8])
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                    }`}
-                  >
-                    Grades 7-8
-                  </button>
-                  <button
-                    onClick={() => setFormData({...formData, gradeRange: [6, 7]})}
-                    className={`p-3 rounded-lg text-sm font-medium transition-all ${
-                      JSON.stringify(formData.gradeRange) === JSON.stringify([6, 7])
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                    }`}
-                  >
-                    Grades 6-7
-                  </button>
-                  <button
-                    onClick={() => setFormData({...formData, gradeRange: [8]})}
-                    className={`p-3 rounded-lg text-sm font-medium transition-all ${
-                      JSON.stringify(formData.gradeRange) === JSON.stringify([8])
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                    }`}
-                  >
-                    Grade 8 Only
-                  </button>
+                <div className="space-y-3">
+                  {/* Individual Grade Checkboxes */}
+                  <div className="grid grid-cols-3 gap-3">
+                    {[6, 7, 8].map(grade => (
+                      <label key={grade} className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.gradeRange.includes(grade)}
+                          onChange={(e) => {
+                            const newGrades = e.target.checked 
+                              ? [...formData.gradeRange, grade].sort((a, b) => a - b)
+                              : formData.gradeRange.filter(g => g !== grade);
+                            setFormData({...formData, gradeRange: newGrades});
+                          }}
+                          className="w-4 h-4 text-purple-600 bg-slate-700 border-slate-600 rounded focus:ring-purple-500 focus:ring-2"
+                        />
+                        <span className="text-sm font-medium text-white">Grade {grade}</span>
+                      </label>
+                    ))}
+                  </div>
+                  
+                  {/* Quick Select Buttons */}
+                  <div className="grid grid-cols-2 gap-2 mt-3">
+                    <button
+                      type="button"
+                      onClick={() => setFormData({...formData, gradeRange: [6, 7, 8]})}
+                      className="p-2 text-sm bg-slate-700 text-slate-300 hover:bg-slate-600 rounded-lg font-medium transition-all"
+                    >
+                      Select All (6-7-8)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({...formData, gradeRange: [7, 8]})}
+                      className="p-2 text-sm bg-slate-700 text-slate-300 hover:bg-slate-600 rounded-lg font-medium transition-all"
+                    >
+                      Middle School (7-8)
+                    </button>
+                  </div>
                 </div>
-                {JSON.stringify(formData.gradeRange) === JSON.stringify([6, 7, 8]) && (
+                
+                {/* Selected Grades Display */}
+                <div className="mt-3 p-3 bg-slate-700/50 rounded-lg">
+                  <div className="text-sm text-slate-300">
+                    <strong>Selected Grades:</strong> {formData.gradeRange.length > 0 ? formData.gradeRange.join(', ') : 'None'}
+                  </div>
+                </div>
+                
+                {formData.gradeRange.includes(6) && (
                   <div className="text-sm text-amber-400 bg-amber-400/10 p-3 rounded-lg border border-amber-400/20 mt-2">
                     ⚠️ Note: Grade 6 data may be limited in current database
+                  </div>
+                )}
+                
+                {formData.gradeRange.length === 0 && (
+                  <div className="text-sm text-red-400 bg-red-400/10 p-3 rounded-lg border border-red-400/20 mt-2">
+                    ⚠️ Please select at least one grade level
                   </div>
                 )}
               </div>
@@ -294,13 +305,19 @@ export default function PacingGeneratorPage() {
               {/* Generate Button */}
               <button
                 onClick={handleGenerate}
-                disabled={loading}
-                className="w-full py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 text-white rounded-xl font-bold text-lg shadow-xl hover:shadow-purple-500/50 transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={loading || formData.gradeRange.length === 0}
+                className="w-full py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 text-white rounded-xl font-bold text-lg shadow-xl hover:shadow-purple-500/50 transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {loading ? (
                   <div className="flex items-center justify-center gap-3">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
                     <span>Analyzing Curriculum...</span>
+                  </div>
+                ) : formData.gradeRange.length === 0 ? (
+                  <div className="flex items-center justify-center gap-3">
+                    <span className="text-2xl">⚠️</span>
+                    <span>Please Select Grade Levels First</span>
+                    <span className="text-2xl">⚠️</span>
                   </div>
                 ) : (
                   <div className="flex items-center justify-center gap-3">

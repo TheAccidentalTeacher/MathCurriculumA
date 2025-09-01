@@ -1,0 +1,78 @@
+{
+  "extraction_date": "2025-09-01T05:39:12.219879",
+  "files_processed": {
+    "RCM06_NA_SW_V1.pdf": {
+      "document_id": 1,
+      "grade": 6,
+      "volume": "V1",
+      "total_pages": 512,
+      "text_length": 550328,
+      "units_extracted": 40,
+      "lessons_extracted": 729
+    },
+    "RCM06_NA_SW_V2.pdf": {
+      "document_id": 2,
+      "grade": 6,
+      "volume": "V2",
+      "total_pages": 408,
+      "text_length": 490207,
+      "units_extracted": 34,
+      "lessons_extracted": 577
+    },
+    "RCM07_NA_SW_V1.pdf": {
+      "document_id": 3,
+      "grade": 7,
+      "volume": "V1",
+      "total_pages": 504,
+      "text_length": 555281,
+      "units_extracted": 40,
+      "lessons_extracted": 701
+    },
+    "RCM07_NA_SW_V2.pdf": {
+      "document_id": 4,
+      "grade": 7,
+      "volume": "V2",
+      "total_pages": 440,
+      "text_length": 522149,
+      "units_extracted": 31,
+      "lessons_extracted": 604
+    },
+    "RCM08_NA_SW_V1.pdf": {
+      "document_id": 5,
+      "grade": 8,
+      "volume": "V1",
+      "total_pages": 552,
+      "text_length": 641566,
+      "units_extracted": 31,
+      "lessons_extracted": 750
+    },
+    "RCM08_NA_SW_V2.pdf": {
+      "document_id": 6,
+      "grade": 8,
+      "volume": "V2",
+      "total_pages": 456,
+      "text_length": 517267,
+      "units_extracted": 30,
+      "lessons_extracted": 600
+    }
+  },
+  "database_statistics": {
+    "documents": 6,
+    "units": 206,
+    "lessons": 3961,
+    "sessions": 5146,
+    "activities": 304,
+    "lesson_summaries": 3961
+  },
+  "gpt5_readiness": {
+    "overall_score": 30,
+    "total_lessons": 3961,
+    "quality_lessons": 2987,
+    "unique_standards": 0,
+    "recommendations": [
+      "Complete extraction pipeline",
+      "Validate standards mapping",
+      "Generate enhanced summaries"
+    ]
+  }
+}

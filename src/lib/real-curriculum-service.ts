@@ -44,6 +44,10 @@ interface LessonData {
   prerequisites: string[];
   standards: string[];
   unit: string;
+  isAdvanced?: boolean;
+  sequenceNumber?: number;
+  totalDaysAtThisPoint?: number;
+  tags?: string[];
 }
 
 export class RealCurriculumService {
@@ -196,6 +200,20 @@ export class RealCurriculumService {
       else unit = 'Unit F: Statistics and Data Analysis';
     }
 
+    // Generate tags based on lesson title and content
+    const tags: string[] = [];
+    const lowerTitle = cleanTitle.toLowerCase();
+    
+    if (lowerTitle.includes('proportion') || lowerTitle.includes('ratio')) tags.push('Proportional Reasoning');
+    if (lowerTitle.includes('equation') || lowerTitle.includes('solve')) tags.push('Algebraic Thinking');
+    if (lowerTitle.includes('graph') || lowerTitle.includes('coordinate')) tags.push('Graphing');
+    if (lowerTitle.includes('geometry') || lowerTitle.includes('angle')) tags.push('Geometry');
+    if (lowerTitle.includes('percent')) tags.push('Percent');
+    if (lowerTitle.includes('fraction') || lowerTitle.includes('decimal')) tags.push('Rational Numbers');
+    if (lowerTitle.includes('function')) tags.push('Functions');
+    if (lowerTitle.includes('statistics') || lowerTitle.includes('data')) tags.push('Statistics');
+    if (isMajorWork) tags.push('Major Work');
+    
     return {
       id: section.id,
       title: cleanTitle,
@@ -208,7 +226,8 @@ export class RealCurriculumService {
       estimatedDays,
       prerequisites: this.getPrerequisites(cleanTitle),
       standards: this.getStandards(grade, lessonNumber),
-      unit
+      unit,
+      tags
     };
   }
 
@@ -275,43 +294,105 @@ export class RealCurriculumService {
    */
   generateCustomPathway(parameters: {
     gradeRange: number[];
-    targetPopulation: 'accelerated' | 'standard' | 'scaffolded' | 'remedial';
+    targetPopulation: string;
     totalDays: number;
     majorWorkFocus: number; // percentage 0-100
     includePrerequisites: boolean;
-  }): LessonData[] {
-    let lessons = this.getLessonsByGrade(parameters.gradeRange);
+  }): any[] {
+    console.log('Generating pathway with parameters:', parameters);
     
-    // Filter based on major work focus
-    if (parameters.majorWorkFocus > 80) {
-      // High focus: prioritize major work
-      lessons = lessons.filter(lesson => lesson.majorWork || Math.random() < 0.3);
-    } else if (parameters.majorWorkFocus > 60) {
-      // Medium focus: include most lessons but prioritize major work
-      lessons = lessons.filter(lesson => lesson.majorWork || Math.random() < 0.7);
+    let lessons = this.getLessonsByGrade(parameters.gradeRange);
+    console.log(`Found ${lessons.length} lessons for grades ${parameters.gradeRange.join(', ')}`);
+    
+    if (lessons.length === 0) {
+      console.warn('No lessons found for the specified grades');
+      // Return empty array with proper structure
+      return [];
     }
     
+    // Don't filter lessons too aggressively - only filter if majorWorkFocus is very high
+    if (parameters.majorWorkFocus > 90) {
+      // Very high focus: only major work lessons
+      const majorWorkLessons = lessons.filter(lesson => lesson.majorWork);
+      if (majorWorkLessons.length > 0) {
+        lessons = majorWorkLessons;
+      }
+      console.log(`After major work filtering (>90%): ${lessons.length} lessons`);
+    } else if (parameters.majorWorkFocus > 85) {
+      // High focus: prioritize major work but include some supporting work
+      const majorWork = lessons.filter(lesson => lesson.majorWork);
+      const supportingWork = lessons.filter(lesson => !lesson.majorWork).slice(0, Math.floor(lessons.length * 0.3));
+      lessons = [...majorWork, ...supportingWork];
+      console.log(`After major work filtering (>85%): ${lessons.length} lessons`);
+    }
+    // For 85% or less, include all lessons
+    
+    // Sort lessons by grade and then by lesson number for proper sequencing
+    lessons.sort((a, b) => {
+      if (a.grade !== b.grade) {
+        return a.grade - b.grade;
+      }
+      const aNum = parseInt(a.lessonNumber) || 0;
+      const bNum = parseInt(b.lessonNumber) || 0;
+      return aNum - bNum;
+    });
+    
     // Adjust pacing based on target population
-    lessons.forEach(lesson => {
+    lessons.forEach((lesson, index) => {
       switch (parameters.targetPopulation) {
+        case 'accelerated-algebra-prep':
+          lesson.estimatedDays = Math.max(1, Math.ceil(lesson.estimatedDays * 0.6)); // Very fast
+          break;
         case 'accelerated':
           lesson.estimatedDays = Math.max(1, Math.ceil(lesson.estimatedDays * 0.75));
           break;
-        case 'scaffolded':
+        case 'intensive':
           lesson.estimatedDays = Math.ceil(lesson.estimatedDays * 1.5);
           break;
-        case 'remedial':
-          lesson.estimatedDays = Math.ceil(lesson.estimatedDays * 2);
-          break;
+        case 'standard':
         default:
-          // standard - no change
+          // No change for standard pacing
           break;
       }
       
       if (parameters.includePrerequisites) {
         lesson.estimatedDays += 1; // Add a day for prerequisite review
       }
+      
+      // Add advanced marking for accelerated populations
+      lesson.isAdvanced = parameters.targetPopulation.includes('accelerated');
+      
+      // Add sequence number and cumulative days
+      lesson.sequenceNumber = index + 1;
     });
+    
+    // Calculate cumulative days
+    let cumulativeDays = 0;
+    lessons.forEach(lesson => {
+      cumulativeDays += lesson.estimatedDays;
+      lesson.totalDaysAtThisPoint = cumulativeDays;
+    });
+    
+    // If total days exceed target, trim lessons or adjust pacing
+    const totalDays = lessons.reduce((sum, lesson) => sum + lesson.estimatedDays, 0);
+    if (totalDays > parameters.totalDays) {
+      console.log(`Total days (${totalDays}) exceeds target (${parameters.totalDays}), adjusting...`);
+      
+      // Strategy 1: Reduce days per lesson proportionally
+      const scaleFactor = parameters.totalDays / totalDays;
+      lessons.forEach(lesson => {
+        lesson.estimatedDays = Math.max(1, Math.floor(lesson.estimatedDays * scaleFactor));
+      });
+      
+      // Recalculate cumulative days
+      cumulativeDays = 0;
+      lessons.forEach(lesson => {
+        cumulativeDays += lesson.estimatedDays;
+        lesson.totalDaysAtThisPoint = cumulativeDays;
+      });
+    }
+    
+    console.log(`Final pathway: ${lessons.length} lessons, ${lessons.reduce((sum, l) => sum + l.estimatedDays, 0)} total days`);
     
     return lessons;
   }
