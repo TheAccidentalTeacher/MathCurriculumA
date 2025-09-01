@@ -123,7 +123,12 @@ export default function VirtualTutorPage() {
                 <CharacterDisplay 
                   character={selectedCharacter}
                   expression={characterExpression}
-                  size="large"
+                  onExpressionChange={setCharacterExpression}
+                  lessonContext={{
+                    documentId: "demo",
+                    lessonNumber: 1,
+                    lessonTitle: "Virtual Tutor Demo"
+                  }}
                 />
               </div>
 
