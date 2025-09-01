@@ -29,6 +29,25 @@ interface PrecisionLessonData {
   isAdvanced?: boolean;
 }
 
+interface Lesson {
+  id: number;
+  title: string;
+  lesson_number: number;
+  unit_number: number;
+  unit_title: string;
+  grade: number;
+  volume: string;
+  subject: string;
+  standards: string[];
+  unitTheme: string;
+  learningObjectives: string[];
+  keyVocabulary: string[];
+  contentSummary: string;
+  extractionConfidence: number;
+  sessionCount: number;
+  contentLength: number;
+}
+
 interface DatabaseStats {
   total_lessons: number;
   total_sessions: number;
@@ -143,109 +162,160 @@ export class PrecisionCurriculumService {
         volume_distribution: volumeDist
       };
     } else {
-      // Legacy database stats
-      const totalLessons = this.db.prepare("SELECT COUNT(*) as count FROM sections WHERE title LIKE '%LESSON%'").get() as any;
-      const totalSections = this.db.prepare("SELECT COUNT(*) as count FROM sections").get() as any;
-      const totalTopics = this.db.prepare("SELECT COUNT(*) as count FROM topics").get() as any;
-      const totalKeywords = this.db.prepare("SELECT COUNT(*) as count FROM keywords").get() as any;
+      // Legacy database stats - check for existing tables
+      try {
+        const totalLessons = this.db.prepare("SELECT COUNT(*) as count FROM lessons").get() as any;
+        const totalSessions = this.db.prepare("SELECT COUNT(*) as count FROM sessions").get() as any;
+        const totalTopics = this.db.prepare("SELECT COUNT(*) as count FROM topics").get() as any;
+        const totalKeywords = this.db.prepare("SELECT COUNT(*) as count FROM keywords").get() as any;
 
-      // Grade distribution for legacy db
-      const gradeDistQuery = this.db.prepare(`
-        SELECT d.grade, COUNT(s.id) as lesson_count
-        FROM documents d 
-        LEFT JOIN sections s ON d.id = s.document_id 
-        WHERE s.title LIKE '%LESSON%'
-        GROUP BY d.grade
-      `);
-      const gradeDist: Record<string, number> = {};
-      for (const row of gradeDistQuery.all() as any[]) {
-        gradeDist[`Grade ${row.grade}`] = row.lesson_count;
+        // If legacy database is empty, provide helpful default values
+        if (totalLessons.count === 0) {
+          console.warn('⚠️ Legacy database is empty - no curriculum data available');
+          this.statsCache = {
+            total_lessons: 0,
+            total_sessions: 0,
+            total_activities: 0,
+            total_problems: 0,
+            high_confidence_lessons: 0,
+            lessons_with_standards: 0,
+            grade_distribution: {},
+            volume_distribution: {}
+          };
+        } else {
+          // Grade distribution for legacy db (if it has data)
+          const gradeDistQuery = this.db.prepare(`
+            SELECT COALESCE(u.id, '6') as grade, COUNT(l.id) as lesson_count
+            FROM lessons l
+            LEFT JOIN units u ON l.unit_id = u.id
+            GROUP BY COALESCE(u.id, '6')
+          `);
+          const gradeDist: Record<string, number> = {};
+          for (const row of gradeDistQuery.all() as any[]) {
+            gradeDist[`Grade ${row.grade}`] = row.lesson_count;
+          }
+
+          this.statsCache = {
+            total_lessons: totalLessons.count,
+            total_sessions: totalSessions.count,
+            total_activities: totalTopics.count,
+            total_problems: totalKeywords.count,
+            high_confidence_lessons: Math.floor(totalLessons.count * 0.1), // Estimate
+            lessons_with_standards: 0, // Legacy db has no reliable standards
+            grade_distribution: gradeDist,
+            volume_distribution: { 'Volume V1': totalLessons.count }
+          };
+        }
+      } catch (error) {
+        console.warn('⚠️ Error querying legacy database:', error);
+        this.statsCache = {
+          total_lessons: 0,
+          total_sessions: 0,
+          total_activities: 0,
+          total_problems: 0,
+          high_confidence_lessons: 0,
+          lessons_with_standards: 0,
+          grade_distribution: {},
+          volume_distribution: {}
+        };
       }
-
-      this.statsCache = {
-        total_lessons: totalLessons.count,
-        total_sessions: totalSections.count,
-        total_activities: totalTopics.count,
-        total_problems: totalKeywords.count,
-        high_confidence_lessons: Math.floor(totalLessons.count * 0.1), // Estimate
-        lessons_with_standards: 0, // Legacy db has no standards
-        grade_distribution: gradeDist,
-        volume_distribution: { 'Volume V1': Math.floor(totalLessons.count * 0.6), 'Volume V2': Math.floor(totalLessons.count * 0.4) }
-      };
     }
 
     return this.statsCache;
   }
 
   /**
-   * Get all lessons with GPT-5 optimized summaries (precision db) or basic lessons (legacy db)
+   * Get all lessons with comprehensive data for precision analysis
    */
-  getAllLessons(): PrecisionLessonData[] {
-    const cacheKey = 'all_lessons';
-    if (this.lessonsCache.has(cacheKey)) {
-      return this.lessonsCache.get(cacheKey)!;
-    }
-
-    let lessons: PrecisionLessonData[];
-    
+  getAllLessons(): Lesson[] {
     if (this.isPrecisionDb) {
-      // Use precision database query
-      const query = this.db.prepare(`
-        SELECT 
-          ls.lesson_id,
-          ls.grade,
-          ls.lesson_number,
-          ls.title,
-          ls.standards_list,
-          ls.session_count,
-          ls.total_content_length,
-          ls.gpt5_context,
-          ls.extraction_confidence,
-          l.unit_theme,
-          l.estimated_days,
-          l.is_major_work
-        FROM lesson_summaries_gpt5 ls
-        JOIN lessons l ON ls.lesson_id = l.id
-        ORDER BY ls.grade, ls.lesson_number
-      `);
+      // Precision database with comprehensive lesson data
+      const query = `
+        SELECT DISTINCT
+          l.id, l.title, l.lesson_number, l.unit_number, l.unit_title, l.standards,
+          d.grade, d.volume, d.subject,
+          ls.unit_theme, ls.learning_objectives, ls.key_vocabulary, 
+          ls.content_summary, ls.extraction_confidence,
+          COUNT(s.id) as session_count,
+          SUM(LENGTH(COALESCE(s.content, ''))) as content_length
+        FROM lessons l
+        JOIN documents d ON l.document_id = d.id
+        LEFT JOIN lesson_summaries_gpt5 ls ON l.id = ls.lesson_id
+        LEFT JOIN sessions s ON l.id = s.lesson_id
+        GROUP BY l.id
+        ORDER BY d.grade, d.volume, l.unit_number, l.lesson_number
+      `;
 
-      lessons = (query.all() as any[]).map(row => this.processLessonRow(row));
+      const results = this.db.prepare(query).all() as any[];
+      console.log(`📚 Found ${results.length} precision lessons`);
+      
+      return results.map(row => ({
+        id: row.id,
+        title: row.title || 'Untitled Lesson',
+        lesson_number: row.lesson_number || 0,
+        unit_number: row.unit_number || 0,
+        unit_title: row.unit_title || 'Unknown Unit',
+        grade: parseInt(row.grade),
+        volume: row.volume || 'V1',
+        subject: row.subject || 'mathematics',
+        standards: this.parseJSON(row.standards) || [],
+        unitTheme: row.unit_theme || '',
+        learningObjectives: this.parseJSON(row.learning_objectives) || [],
+        keyVocabulary: this.parseJSON(row.key_vocabulary) || [],
+        contentSummary: row.content_summary || '',
+        extractionConfidence: parseFloat(row.extraction_confidence || '0'),
+        sessionCount: parseInt(row.session_count || '1'),
+        contentLength: parseInt(row.content_length || '0')
+      }));
     } else {
-      // Use legacy database query (adapt sections table to lesson format)
-      const query = this.db.prepare(`
-        SELECT 
-          s.id as lesson_id,
-          d.grade,
-          COALESCE(
-            CASE 
-              WHEN s.title LIKE '%LESSON%' THEN 
-                CAST(SUBSTR(s.title, INSTR(UPPER(s.title), 'LESSON') + 7, 3) AS INTEGER)
-              ELSE s.id % 100
-            END, 
-            s.id % 100
-          ) as lesson_number,
-          s.title,
-          '[]' as standards_list,
-          1 as session_count,
-          LENGTH(s.content) as total_content_length,
-          SUBSTR(s.content, 1, 500) as gpt5_context,
-          0.5 as extraction_confidence,
-          'General Mathematics' as unit_theme,
-          2 as estimated_days,
-          0 as is_major_work
-        FROM sections s
-        JOIN documents d ON s.document_id = d.id
-        WHERE s.title LIKE '%LESSON%'
-        ORDER BY d.grade, s.id
-      `);
+      // Legacy database fallback - check if there's any data
+      const lessonCount = this.db.prepare("SELECT COUNT(*) as count FROM lessons").get() as any;
+      
+      if (lessonCount.count === 0) {
+        console.warn('⚠️ Legacy database is empty - no lessons found. Consider using precision database.');
+        return [];
+      }
 
-      lessons = (query.all() as any[]).map(row => this.processLessonRow(row));
+      // Query legacy database structure
+      const query = `
+        SELECT DISTINCT
+          l.id, l.title, l.lesson_number, 
+          CAST(l.lesson_number as INTEGER) as unit_number,
+          'Unit ' || l.lesson_number as unit_title,
+          l.standards, u.id as grade,
+          'V1' as volume, 'mathematics' as subject,
+          '' as unit_theme, '' as learning_objectives, '' as key_vocabulary,
+          'Legacy lesson data - limited information available' as content_summary,
+          0.3 as extraction_confidence,
+          1 as session_count,
+          100 as content_length
+        FROM lessons l
+        LEFT JOIN units u ON l.unit_id = u.id
+        ORDER BY l.lesson_number
+      `;
+
+      const results = this.db.prepare(query).all() as any[];
+      console.log(`📚 Found ${results.length} legacy lessons (limited data)`);
+      
+      return results.map(row => ({
+        id: row.id,
+        title: row.title || 'Legacy Lesson',
+        lesson_number: parseInt(row.lesson_number || '0'),
+        unit_number: row.unit_number || 0,
+        unit_title: row.unit_title || 'Legacy Unit',
+        grade: parseInt(row.grade || '6'),
+        volume: row.volume || 'V1',
+        subject: row.subject || 'mathematics',
+        standards: this.parseJSON(row.standards) || [],
+        unitTheme: row.unit_theme || '',
+        learningObjectives: this.parseJSON(row.learning_objectives) || [],
+        keyVocabulary: this.parseJSON(row.key_vocabulary) || [],
+        contentSummary: row.content_summary || '',
+        extractionConfidence: parseFloat(row.extraction_confidence || '0'),
+        sessionCount: parseInt(row.session_count || '1'),
+        contentLength: parseInt(row.content_length || '0')
+      }));
     }
-    
-    this.lessonsCache.set(cacheKey, lessons);
-    
-    console.log(`📚 Loaded ${lessons.length} ${this.isPrecisionDb ? 'precision' : 'legacy'} lessons`);
-    return lessons;
   }
 
   /**
@@ -637,7 +707,7 @@ export class PrecisionCurriculumService {
       return {
         lesson: {
           ...lesson,
-          gpt5_context: lesson.content?.substring(0, 500) || '',
+          gpt5_context: (lesson as any).content?.substring(0, 500) || '',
           extraction_confidence: 0.3
         },
         sessions: [] // Empty for legacy database
@@ -648,6 +718,20 @@ export class PrecisionCurriculumService {
   close() {
     this.db.close();
     console.log('🔌 Closed precision database connection');
+  }
+
+  /**
+   * Safely parse JSON strings, return empty array on error
+   */
+  private parseJSON(jsonString: string | null): any[] {
+    if (!jsonString || jsonString.trim() === '' || jsonString === '[]') {
+      return [];
+    }
+    try {
+      return JSON.parse(jsonString);
+    } catch (e) {
+      return [];
+    }
   }
 }
 
