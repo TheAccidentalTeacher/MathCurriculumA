@@ -3,7 +3,7 @@
 
 [build]
   builder = "NIXPACKS"
-  buildCommand = "npm install && npx prisma generate && npm run build"
+  buildCommand = "npm install && cp prisma/curriculum.db ./ && npx prisma generate && npm run build"
 
 [deploy]
   startCommand = "npm start"
@@ -12,4 +12,5 @@
 
 [variables]
   NODE_ENV = "production"
+  DATABASE_URL = "file:./curriculum.db"
   YOUTUBE_API_KEY = "${{YOUTUBE_API_KEY}}"

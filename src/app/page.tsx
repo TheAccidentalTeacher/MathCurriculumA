@@ -18,19 +18,13 @@ export default function Home() {
 
   const loadInitialData = async () => {
     try {
-      const [documentsRes, statsRes] = await Promise.all([
-        fetch('/api/docs'),
-        fetch('/api/health')
-      ]);
-      
-      const documents = await documentsRes.json();
-      const health = await statsRes.json();
-      
-      const initialData = {
-        documents: documents,
-        stats: health.stats || { documents: 0, sections: 0, topics: 0, keywords: 0 }
-      };
-      setData(initialData);
+      const response = await fetch('/api/docs');
+      if (response.ok) {
+        const initialData = await response.json();
+        setData(initialData);
+      } else {
+        throw new Error(`API responded with status ${response.status}`);
+      }
     } catch (error) {
       console.error('Error loading data:', error);
       // Set fallback data
