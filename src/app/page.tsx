@@ -220,7 +220,7 @@ export default function Home() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
             {/* Grade 6 Volumes */}
             <Link href="/viewer/grade6-volume1" data-volume-card className="block p-4 bg-indigo-600 text-white rounded-xl shadow-lg hover:bg-indigo-700 transition-colors relative overflow-hidden group">
-              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/download (11).png)'}}></div>
+              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/download-11.png)'}}></div>
               <div className="text-center relative z-10">
                 <div className="text-3xl mb-2 drop-shadow-lg">📚</div>
                 <div className="font-bold text-lg drop-shadow-md">Grade 6 Volume 1</div>
@@ -228,7 +228,7 @@ export default function Home() {
               </div>
             </Link>
             <Link href="/viewer/grade6-volume2" data-volume-card className="block p-4 bg-teal-600 text-white rounded-xl shadow-lg hover:bg-teal-700 transition-colors relative overflow-hidden group">
-              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/download (12).png)'}}></div>
+              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/download-12.png)'}}></div>
               <div className="text-center relative z-10">
                 <div className="text-3xl mb-2 drop-shadow-lg">📖</div>
                 <div className="font-bold text-lg drop-shadow-md">Grade 6 Volume 2</div>
@@ -238,7 +238,7 @@ export default function Home() {
             
             {/* Grade 7 Volumes */}
             <Link href="/viewer/volume1" data-volume-card className="block p-4 bg-blue-600 text-white rounded-xl shadow-lg hover:bg-blue-700 transition-colors relative overflow-hidden group">
-              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/download (13).png)'}}></div>
+              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/download-13.png)'}}></div>
               <div className="text-center relative z-10">
                 <div className="text-3xl mb-2 drop-shadow-lg">📘</div>
                 <div className="font-bold text-lg drop-shadow-md">Grade 7 Volume 1</div>
@@ -246,7 +246,7 @@ export default function Home() {
               </div>
             </Link>
             <Link href="/viewer/volume2" data-volume-card className="block p-4 bg-green-600 text-white rounded-xl shadow-lg hover:bg-green-700 transition-colors relative overflow-hidden group">
-              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/download (14).png)'}}></div>
+              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/download-14.png)'}}></div>
               <div className="text-center relative z-10">
                 <div className="text-3xl mb-2 drop-shadow-lg">📗</div>
                 <div className="font-bold text-lg drop-shadow-md">Grade 7 Volume 2</div>
@@ -256,7 +256,7 @@ export default function Home() {
             
             {/* Grade 8 Volumes */}
             <Link href="/viewer/grade8-volume1" data-volume-card className="block p-4 bg-purple-600 text-white rounded-xl shadow-lg hover:bg-purple-700 transition-colors relative overflow-hidden group">
-              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/download (15).png)'}}></div>
+              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/download-15.png)'}}></div>
               <div className="text-center relative z-10">
                 <div className="text-3xl mb-2 drop-shadow-lg">📙</div>
                 <div className="font-bold text-lg drop-shadow-md">Grade 8 Volume 1</div>
@@ -264,7 +264,7 @@ export default function Home() {
               </div>
             </Link>
             <Link href="/viewer/grade8-volume2" data-volume-card className="block p-4 bg-orange-600 text-white rounded-xl shadow-lg hover:bg-orange-700 transition-colors relative overflow-hidden group">
-              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/download (16).png)'}}></div>
+              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/download-16.png)'}}></div>
               <div className="text-center relative z-10">
                 <div className="text-3xl mb-2 drop-shadow-lg">📕</div>
                 <div className="font-bold text-lg drop-shadow-md">Grade 8 Volume 2</div>
