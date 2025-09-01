@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 interface PacingRequest {
   gradeRange: number[];
+  volumes?: string[]; // Add volume selection
   targetPopulation: string;
   totalDays: number;
   majorWorkFocus: number;
@@ -50,6 +51,7 @@ interface PacingResponse {
 export default function PacingGeneratorPage() {
   const [formData, setFormData] = useState<PacingRequest>({
     gradeRange: [7, 8],
+    volumes: [], // Initialize empty, will show all volumes
     targetPopulation: 'accelerated',
     totalDays: 160,
     majorWorkFocus: 85,
@@ -242,6 +244,104 @@ export default function PacingGeneratorPage() {
                     ⚠️ Please select at least one grade level
                   </div>
                 )}
+              </div>
+
+              {/* Volume Selection */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-300 mb-3">
+                  📚 Volume Selection (Optional - leave empty for all volumes)
+                </label>
+                <div className="space-y-3">
+                  {/* Available volumes based on selected grades */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {formData.gradeRange.includes(7) && (
+                      <>
+                        <label className="flex items-center space-x-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={formData.volumes?.includes('V1') || false}
+                            onChange={(e) => {
+                              const currentVolumes = formData.volumes || [];
+                              const newVolumes = e.target.checked 
+                                ? [...currentVolumes, 'V1']
+                                : currentVolumes.filter(v => v !== 'V1');
+                              setFormData({...formData, volumes: newVolumes});
+                            }}
+                            className="w-4 h-4 text-purple-600 bg-slate-700 border-slate-600 rounded focus:ring-purple-500 focus:ring-2"
+                          />
+                          <span className="text-sm font-medium text-white">Grade 7 Volume 1</span>
+                        </label>
+                        <label className="flex items-center space-x-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={formData.volumes?.includes('V2') || false}
+                            onChange={(e) => {
+                              const currentVolumes = formData.volumes || [];
+                              const newVolumes = e.target.checked 
+                                ? [...currentVolumes, 'V2']
+                                : currentVolumes.filter(v => v !== 'V2');
+                              setFormData({...formData, volumes: newVolumes});
+                            }}
+                            className="w-4 h-4 text-purple-600 bg-slate-700 border-slate-600 rounded focus:ring-purple-500 focus:ring-2"
+                          />
+                          <span className="text-sm font-medium text-white">Grade 7 Volume 2</span>
+                        </label>
+                      </>
+                    )}
+                    {formData.gradeRange.includes(8) && (
+                      <>
+                        <label className="flex items-center space-x-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={formData.volumes?.includes('V1') || false}
+                            onChange={(e) => {
+                              const currentVolumes = formData.volumes || [];
+                              const newVolumes = e.target.checked 
+                                ? [...currentVolumes, 'V1']
+                                : currentVolumes.filter(v => v !== 'V1');
+                              setFormData({...formData, volumes: newVolumes});
+                            }}
+                            className="w-4 h-4 text-purple-600 bg-slate-700 border-slate-600 rounded focus:ring-purple-500 focus:ring-2"
+                          />
+                          <span className="text-sm font-medium text-white">Grade 8 Volume 1</span>
+                        </label>
+                        <label className="flex items-center space-x-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={formData.volumes?.includes('V2') || false}
+                            onChange={(e) => {
+                              const currentVolumes = formData.volumes || [];
+                              const newVolumes = e.target.checked 
+                                ? [...currentVolumes, 'V2']
+                                : currentVolumes.filter(v => v !== 'V2');
+                              setFormData({...formData, volumes: newVolumes});
+                            }}
+                            className="w-4 h-4 text-purple-600 bg-slate-700 border-slate-600 rounded focus:ring-purple-500 focus:ring-2"
+                          />
+                          <span className="text-sm font-medium text-white">Grade 8 Volume 2</span>
+                        </label>
+                      </>
+                    )}
+                  </div>
+                  
+                  {/* Volume info */}
+                  {formData.volumes && formData.volumes.length > 0 && (
+                    <div className="mt-3 p-3 bg-slate-700/50 rounded-lg">
+                      <div className="text-sm text-slate-300">
+                        <strong>Selected Volumes:</strong> {formData.volumes.join(', ')}
+                        <div className="text-xs text-slate-400 mt-1">
+                          This will limit lessons to specific curriculum volumes only
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {formData.volumes && formData.volumes.length === 0 && formData.gradeRange.length > 0 && (
+                    <div className="text-sm text-blue-400 bg-blue-400/10 p-3 rounded-lg border border-blue-400/20">
+                      💡 No volumes selected - will include all available volumes for selected grades
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Total Days */}

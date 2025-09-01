@@ -3,6 +3,7 @@ import { PrecisionCurriculumService } from '@/lib/precision-curriculum-service';
 
 interface PacingRequest {
   gradeRange: number[];
+  volumes?: string[]; // Add volume selection support
   targetPopulation: string;
   totalDays: number;
   majorWorkFocus: number;
@@ -22,6 +23,7 @@ export async function POST(request: NextRequest) {
     // Generate custom pathway using precision curriculum data
     const lessons = curriculumService.generateCustomPathway({
       gradeRange: body.gradeRange,
+      volumes: body.volumes, // Pass volume selection
       targetPopulation: body.targetPopulation,
       totalDays: body.totalDays,
       majorWorkFocus: body.majorWorkFocus,

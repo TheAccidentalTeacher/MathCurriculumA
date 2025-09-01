@@ -338,21 +338,88 @@ export class PrecisionCurriculumService {
         ls.session_count,
         ls.total_content_length,
         ls.gpt5_context,
-        ls.extraction_confidence,
-        l.unit_theme,
-        l.estimated_days,
-        l.is_major_work
+        ls.unit_theme,
+        ls.estimated_days,
+        ls.is_major_work,
+        ls.extraction_confidence
       FROM lesson_summaries_gpt5 ls
-      JOIN lessons l ON ls.lesson_id = l.id
       WHERE ls.grade IN (${placeholders})
+        AND (
+          ls.title LIKE 'LESSON %' 
+          OR ls.title LIKE 'Lesson %'
+          OR ls.title LIKE '%LESSON %'
+          OR (ls.lesson_number BETWEEN 1 AND 50 AND ls.title NOT LIKE '%page%' AND ls.title NOT LIKE '%session%')
+        )
+        AND LENGTH(ls.title) > 10
+        AND ls.extraction_confidence > 0.3
       ORDER BY ls.grade, ls.lesson_number
     `);
 
-    const lessons = (query.all(...grades) as any[]).map(row => this.processLessonRow(row));
+    const results = query.all(...grades.map(g => g.toString())) as any[];
+    console.log(`📚 Found ${results.length} filtered curriculum lessons for grades ${grades.join(', ')}`);
+    
+    const lessons = results.map((row: any) => this.processLessonRow(row));
     this.lessonsCache.set(cacheKey, lessons);
     
-    console.log(`📚 Loaded ${lessons.length} lessons for grades ${grades.join(', ')}`);
     return lessons;
+  }
+
+  /**
+   * Get lessons filtered by grades AND volumes (for precise curriculum selection)
+   */
+  getLessonsByGradeVolume(grades: number[], volumes: string[] = []): PrecisionLessonData[] {
+    if (!this.isPrecisionDb) {
+      console.warn('⚠️ Volume filtering only available with precision database');
+      return this.getLessonsByGrades(grades);
+    }
+
+    // Build grade and volume filters
+    const gradeList = grades.map(g => g.toString());
+    
+    let volumeFilter = '';
+    let params = [...gradeList];
+    if (volumes.length > 0) {
+      volumeFilter = ` AND d.volume IN (${volumes.map(() => '?').join(',')})`;
+      params.push(...volumes);
+    }
+    
+    // Query for actual curriculum lessons only
+    const query = this.db.prepare(`
+      SELECT 
+        ls.lesson_id,
+        ls.grade,
+        ls.lesson_number,
+        ls.title,
+        ls.standards_list,
+        ls.session_count,
+        ls.total_content_length,
+        ls.gpt5_context,
+        ls.unit_theme,
+        ls.estimated_days,
+        ls.is_major_work,
+        ls.extraction_confidence,
+        d.volume
+      FROM lesson_summaries_gpt5 ls
+      JOIN lessons l ON ls.lesson_id = l.id
+      JOIN documents d ON l.document_id = d.id
+      WHERE ls.grade IN (${gradeList.map(() => '?').join(',')})
+        ${volumeFilter}
+        AND (
+          ls.title LIKE 'LESSON %' 
+          OR ls.title LIKE 'Lesson %'
+          OR ls.title LIKE '%LESSON %'
+          OR (ls.lesson_number BETWEEN 1 AND 50 AND ls.title NOT LIKE '%page%' AND ls.title NOT LIKE '%session%')
+        )
+        AND LENGTH(ls.title) > 10
+        AND ls.extraction_confidence > 0.3
+      ORDER BY d.grade, d.volume, ls.lesson_number
+    `);
+
+    const results = query.all(...params) as any[];
+    const volumeText = volumes.length > 0 ? ` volumes ${volumes.join(',')}` : ' all volumes';
+    console.log(`📚 Found ${results.length} filtered curriculum lessons for grades ${grades.join(', ')}${volumeText}`);
+    
+    return results.map((row: any) => this.processLessonRow(row));
   }
 
   /**
@@ -492,10 +559,11 @@ export class PrecisionCurriculumService {
   }
 
   /**
-   * Generate custom pacing guide with precision lesson data
+   * Generate custom pacing guide with precision lesson data and volume selection
    */
   generateCustomPathway(parameters: {
     gradeRange: number[];
+    volumes?: string[];
     targetPopulation: string;
     totalDays: number;
     majorWorkFocus: number;
@@ -503,11 +571,17 @@ export class PrecisionCurriculumService {
   }): PrecisionLessonData[] {
     console.log('🎯 Generating precision pathway with parameters:', parameters);
     
-    let lessons = this.getLessonsByGrades(parameters.gradeRange);
-    console.log(`📚 Found ${lessons.length} precision lessons for grades ${parameters.gradeRange.join(', ')}`);
+    // Use volume-aware method if volumes specified
+    let lessons = parameters.volumes && parameters.volumes.length > 0 
+      ? this.getLessonsByGradeVolume(parameters.gradeRange, parameters.volumes)
+      : this.getLessonsByGrades(parameters.gradeRange);
+      
+    const volumeText = parameters.volumes && parameters.volumes.length > 0 
+      ? ` (volumes: ${parameters.volumes.join(', ')})` : '';
+    console.log(`📚 Found ${lessons.length} precision lessons for grades ${parameters.gradeRange.join(', ')}${volumeText}`);
     
     if (lessons.length === 0) {
-      console.warn('❌ No lessons found for specified grades');
+      console.warn('❌ No lessons found for specified grades and volumes');
       return [];
     }
 
