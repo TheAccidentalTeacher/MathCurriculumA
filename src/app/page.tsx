@@ -65,55 +65,168 @@ export default function Home() {
     const cards = document.querySelectorAll('[data-volume-card]');
     let completedAnimations = 0;
     
-    cards.forEach((card, i) => {
+    // Create EPIC particle explosion container
+    const explosionContainer = document.createElement('div');
+    explosionContainer.className = 'fixed inset-0 pointer-events-none z-50';
+    explosionContainer.style.background = 'radial-gradient(circle at center, rgba(147, 51, 234, 0.1) 0%, rgba(0, 0, 0, 0.3) 100%)';
+    document.body.appendChild(explosionContainer);
+    
+    // Generate multiple particle layers
+    const particleImages = [
+      '/animations/download-17.png', '/animations/download-18.png', '/animations/download-19.png',
+      '/animations/download-20.png', '/animations/download-21.png', '/animations/download-22.png',
+      '/animations/download-23.png', '/animations/download-24.png'
+    ];
+    
+    // Create 50 particle elements
+    for (let i = 0; i < 50; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'absolute animate-spin';
+      particle.style.cssText = `
+        width: ${Math.random() * 60 + 20}px;
+        height: ${Math.random() * 60 + 20}px;
+        background-image: url(${particleImages[Math.floor(Math.random() * particleImages.length)]});
+        background-size: cover;
+        background-position: center;
+        left: ${Math.random() * 100}%;
+        top: ${Math.random() * 100}%;
+        opacity: ${Math.random() * 0.8 + 0.3};
+        animation-duration: ${Math.random() * 3 + 1}s;
+        filter: hue-rotate(${Math.random() * 360}deg) brightness(1.5);
+      `;
+      explosionContainer.appendChild(particle);
+      
+      // Animate particles flying around
       setTimeout(() => {
-        // Phase 1: DRAMATIC spread and scale
-        (card as HTMLElement).style.transform = `
-          translateX(${(Math.random() - 0.5) * 400}px) 
-          translateY(${(Math.random() - 0.5) * 300}px) 
-          rotate(${(Math.random() - 0.5) * 90}deg) 
-          scale(${1.2 + Math.random() * 0.3})
+        particle.style.transition = 'all 4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        particle.style.transform = `
+          translateX(${(Math.random() - 0.5) * 800}px) 
+          translateY(${(Math.random() - 0.5) * 600}px) 
+          rotate(${Math.random() * 720}deg) 
+          scale(${Math.random() * 2 + 0.5})
         `;
-        (card as HTMLElement).style.transition = 'transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
-        (card as HTMLElement).style.zIndex = '10';
+      }, Math.random() * 500);
+    }
+    
+    // Add pulsing energy rings
+    for (let ring = 0; ring < 5; ring++) {
+      const energyRing = document.createElement('div');
+      energyRing.style.cssText = `
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: ${100 + ring * 100}px;
+        height: ${100 + ring * 100}px;
+        margin-left: ${-(50 + ring * 50)}px;
+        margin-top: ${-(50 + ring * 50)}px;
+        border: 3px solid rgba(147, 51, 234, ${0.8 - ring * 0.15});
+        border-radius: 50%;
+        animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+        animation-delay: ${ring * 0.2}s;
+      `;
+      explosionContainer.appendChild(energyRing);
+    }
+    
+    cards.forEach((card, i) => {
+      // Add magical glow to each card
+      const glow = document.createElement('div');
+      glow.className = 'absolute inset-0 rounded-xl animate-pulse';
+      glow.style.cssText = `
+        background: linear-gradient(45deg, 
+          rgba(147, 51, 234, 0.6), 
+          rgba(59, 130, 246, 0.6), 
+          rgba(16, 185, 129, 0.6), 
+          rgba(245, 101, 101, 0.6)
+        );
+        filter: blur(10px);
+        z-index: -1;
+      `;
+      (card as HTMLElement).style.position = 'relative';
+      (card as HTMLElement).appendChild(glow);
+      
+      setTimeout(() => {
+        // Phase 1: MASSIVE explosion spread
+        (card as HTMLElement).style.transform = `
+          translateX(${(Math.random() - 0.5) * 600}px) 
+          translateY(${(Math.random() - 0.5) * 500}px) 
+          rotate(${(Math.random() - 0.5) * 180}deg) 
+          scale(${1.5 + Math.random() * 0.8})
+        `;
+        (card as HTMLElement).style.transition = 'transform 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+        (card as HTMLElement).style.zIndex = '20';
+        (card as HTMLElement).style.filter = 'brightness(1.4) saturate(1.6) drop-shadow(0 0 30px rgba(147, 51, 234, 0.8))';
         
-        // Phase 2: Wild dance sequence
+        // Phase 2: Chaotic orbital dance
         setTimeout(() => {
           (card as HTMLElement).style.transform = `
-            translateX(${(Math.random() - 0.5) * 200}px) 
-            translateY(${(Math.random() - 0.5) * 200}px) 
-            rotate(${(Math.random() - 0.5) * 180}deg) 
-            scale(${0.8 + Math.random() * 0.6})
+            translateX(${(Math.random() - 0.5) * 400}px) 
+            translateY(${(Math.random() - 0.5) * 400}px) 
+            rotate(${(Math.random() - 0.5) * 270}deg) 
+            scale(${0.6 + Math.random() * 1.2})
           `;
-          (card as HTMLElement).style.transition = 'transform 0.6s ease-in-out';
+          (card as HTMLElement).style.transition = 'transform 0.8s ease-in-out';
+          (card as HTMLElement).style.filter = 'brightness(1.8) hue-rotate(90deg) drop-shadow(0 0 40px rgba(59, 130, 246, 1))';
           
-          // Phase 3: More wild movements
+          // Phase 3: Vortex spiral effect
           setTimeout(() => {
-            (card as HTMLElement).style.transform = `
-              translateX(${(Math.random() - 0.5) * 300}px) 
-              translateY(${(Math.random() - 0.5) * 250}px) 
-              rotate(${(Math.random() - 0.5) * 120}deg) 
-              scale(${1.1 + Math.random() * 0.4})
-            `;
-            (card as HTMLElement).style.transition = 'transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            const angle = (i * 60) + (Math.random() * 45);
+            const radius = 200 + Math.random() * 150;
+            const spiralX = Math.cos(angle * Math.PI / 180) * radius;
+            const spiralY = Math.sin(angle * Math.PI / 180) * radius;
             
-            // Phase 4: Final dramatic settle
+            (card as HTMLElement).style.transform = `
+              translateX(${spiralX}px) 
+              translateY(${spiralY}px) 
+              rotate(${angle * 3}deg) 
+              scale(${1.3 + Math.random() * 0.5})
+            `;
+            (card as HTMLElement).style.transition = 'transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            (card as HTMLElement).style.filter = 'brightness(2) hue-rotate(180deg) drop-shadow(0 0 50px rgba(16, 185, 129, 1))';
+            
+            // Phase 4: Matrix-style convergence
             setTimeout(() => {
-              (card as HTMLElement).style.transform = 'translateX(0) translateY(0) rotate(0deg) scale(1)';
-              (card as HTMLElement).style.transition = 'transform 1s cubic-bezier(0.34, 1.56, 0.64, 1)';
-              (card as HTMLElement).style.zIndex = '1';
-              completedAnimations++;
+              (card as HTMLElement).style.transform = `
+                translateX(${(Math.random() - 0.5) * 100}px) 
+                translateY(${(Math.random() - 0.5) * 100}px) 
+                rotate(${720 + (Math.random() * 180)}deg) 
+                scale(${0.8 + Math.random() * 0.6})
+              `;
+              (card as HTMLElement).style.transition = 'transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+              (card as HTMLElement).style.filter = 'brightness(1.2) hue-rotate(270deg) drop-shadow(0 0 60px rgba(245, 101, 101, 1))';
               
-              // Show accelerated viewer after all cards complete their EPIC animation
-              if (completedAnimations === cards.length) {
+              // Phase 5: EPIC final slam down
+              setTimeout(() => {
+                (card as HTMLElement).style.transform = 'translateX(0) translateY(0) rotate(0deg) scale(1)';
+                (card as HTMLElement).style.transition = 'transform 1.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                (card as HTMLElement).style.zIndex = '1';
+                (card as HTMLElement).style.filter = 'brightness(1) saturate(1) hue-rotate(0deg) drop-shadow(0 4px 20px rgba(0, 0, 0, 0.3))';
+                
+                // Remove glow after animation
                 setTimeout(() => {
-                  setShowAcceleratedViewer(true);
-                }, 500); // Delay after last card settles dramatically
-              }
-            }, 700);
-          }, 600);
-        }, 800);
-      }, i * 150); // Stagger the start times for dramatic effect
+                  if (glow.parentNode) {
+                    glow.remove();
+                  }
+                }, 1800);
+                
+                completedAnimations++;
+                
+                // GRAND FINALE - Show accelerated viewer with cinematic reveal
+                if (completedAnimations === cards.length) {
+                  setTimeout(() => {
+                    // Remove particle explosion
+                    explosionContainer.style.opacity = '0';
+                    explosionContainer.style.transition = 'opacity 1s ease-out';
+                    setTimeout(() => explosionContainer.remove(), 1000);
+                    
+                    // Show the accelerated viewer with dramatic entrance
+                    setShowAcceleratedViewer(true);
+                  }, 1000);
+                }
+              }, 1500);
+            }, 1000);
+          }, 800);
+        }, 1200);
+      }, i * 200); // Stagger each card's epic journey
     });
   };
 
