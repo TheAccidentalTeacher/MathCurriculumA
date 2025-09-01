@@ -41,7 +41,7 @@ export default function VirtualTutorPanel({
   }
 
   return (
-    <div className="h-full bg-white rounded-lg border border-gray-200 flex flex-col">
+    <div className="h-full bg-white rounded-lg border border-gray-200 flex flex-col relative z-10 shadow-sm">
       {/* Header with character selection */}
       <div className="border-b border-gray-200 p-4">
         <div className="flex items-center justify-between mb-3">
