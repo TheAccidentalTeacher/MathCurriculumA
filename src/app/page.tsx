@@ -1,11 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CurriculumService, SearchFilters } from "@/lib/curriculum-service";
 import { AcceleratedPathwayViewer } from "@/components/AcceleratedPathwayViewer";
 import Link from "next/link";
-
-const curriculumService = new CurriculumService();
 
 export default function Home() {
   const [data, setData] = useState<any>({ documents: [], stats: { documents: 0, sections: 0, topics: 0, keywords: 0 } });
@@ -21,13 +18,23 @@ export default function Home() {
 
   const loadInitialData = async () => {
     try {
+      const [documentsRes, statsRes] = await Promise.all([
+        fetch('/api/docs'),
+        fetch('/api/health')
+      ]);
+      
+      const documents = await documentsRes.json();
+      const health = await statsRes.json();
+      
       const initialData = {
-        documents: await curriculumService.getAllDocuments(),
-        stats: await curriculumService.getStats(),
+        documents: documents,
+        stats: health.stats || { documents: 0, sections: 0, topics: 0, keywords: 0 }
       };
       setData(initialData);
     } catch (error) {
       console.error('Error loading data:', error);
+      // Set fallback data
+      setData({ documents: [], stats: { documents: 0, sections: 0, topics: 0, keywords: 0 } });
     } finally {
       setLoading(false);
     }
@@ -39,13 +46,22 @@ export default function Home() {
 
     setLoading(true);
     try {
-      const filters: SearchFilters = {
+      const params = new URLSearchParams({
+        q: searchQuery,
         ...(gradeFilter && { grade: gradeFilter }),
-      };
-      const searchResults = await curriculumService.searchContent(searchQuery, filters);
-      setResults(searchResults);
+      });
+      
+      const response = await fetch(`/api/search/global?${params}`);
+      if (response.ok) {
+        const searchResults = await response.json();
+        setResults(searchResults);
+      } else {
+        console.error('Search failed:', response.statusText);
+        setResults([]);
+      }
     } catch (error) {
       console.error('Error searching:', error);
+      setResults([]);
     } finally {
       setLoading(false);
     }
