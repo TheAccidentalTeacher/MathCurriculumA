@@ -5,6 +5,8 @@ import Image from 'next/image';
 
 interface CharacterDisplayProps {
   character: 'somers' | 'gimli';
+  expression?: 'idle' | 'speaking' | 'thinking';
+  onExpressionChange?: (expression: 'idle' | 'speaking' | 'thinking') => void;
   lessonContext: {
     documentId: string;
     lessonNumber: number;
@@ -12,15 +14,29 @@ interface CharacterDisplayProps {
   };
 }
 
-export default function CharacterDisplay({ character, lessonContext }: CharacterDisplayProps) {
-  const [currentExpression, setCurrentExpression] = useState<'idle' | 'speaking' | 'thinking'>('idle');
+export default function CharacterDisplay({ 
+  character, 
+  expression: controlledExpression,
+  onExpressionChange,
+  lessonContext 
+}: CharacterDisplayProps) {
+  const [internalExpression, setInternalExpression] = useState<'idle' | 'speaking' | 'thinking'>('idle');
   const [imageError, setImageError] = useState(false);
+  const [currentFrame, setCurrentFrame] = useState(0);
 
-  // Character configuration
+  // Use controlled expression if provided, otherwise use internal state
+  const currentExpression = controlledExpression ?? internalExpression;
+
+  // Character configuration with animation frames
   const characterConfig = {
     somers: {
       name: 'Mr. Somers',
       primaryImage: '/animations/download-13.png',
+      animations: {
+        idle: ['/animations/download-13.png', '/animations/download-14.png'],
+        speaking: ['/animations/download-15.png', '/animations/download-16.png', '/animations/download-17.png'],
+        thinking: ['/animations/download-18.png', '/animations/download-19.png']
+      },
       altText: 'Mr. Somers, your math teacher',
       bgColor: 'bg-blue-50',
       borderColor: 'border-blue-200',
@@ -29,6 +45,11 @@ export default function CharacterDisplay({ character, lessonContext }: Character
     gimli: {
       name: 'Gimli',
       primaryImage: '/animations/Gimbers.png',
+      animations: {
+        idle: ['/animations/Gimbers.png'],
+        speaking: ['/animations/Gimbers.png'], // Can add more Gimli frames later
+        thinking: ['/animations/Gimbers.png']
+      },
       altText: 'Gimli, your friendly learning companion',
       bgColor: 'bg-green-50',
       borderColor: 'border-green-200',
@@ -38,14 +59,47 @@ export default function CharacterDisplay({ character, lessonContext }: Character
 
   const config = characterConfig[character];
 
+  // Animation cycling effect
+  useEffect(() => {
+    const animationFrames = config.animations[currentExpression];
+    if (animationFrames.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentFrame(prev => (prev + 1) % animationFrames.length);
+      }, currentExpression === 'speaking' ? 800 : 2000); // Faster for speaking
+
+      return () => clearInterval(interval);
+    } else {
+      setCurrentFrame(0);
+    }
+  }, [currentExpression, config.animations]);
+
   useEffect(() => {
     // Reset expression when character changes
-    setCurrentExpression('idle');
+    if (controlledExpression === undefined) {
+      setInternalExpression('idle');
+    }
     setImageError(false);
-  }, [character]);
+    setCurrentFrame(0);
+  }, [character, controlledExpression]);
+
+  // Function to change expression (will be called from chat interface)
+  const changeExpression = (expression: 'idle' | 'speaking' | 'thinking') => {
+    if (controlledExpression === undefined) {
+      setInternalExpression(expression);
+    }
+    onExpressionChange?.(expression);
+    setCurrentFrame(0);
+  };
+
+  // Get current animation frame
+  const getCurrentImage = () => {
+    const animationFrames = config.animations[currentExpression];
+    return animationFrames[currentFrame] || config.primaryImage;
+  };
 
   const handleImageError = () => {
-    console.warn(`Failed to load image for ${character}: ${config.primaryImage}`);
+    const currentImage = getCurrentImage();
+    console.warn(`Failed to load image for ${character}: ${currentImage}`);
     setImageError(true);
   };
 
@@ -56,10 +110,10 @@ export default function CharacterDisplay({ character, lessonContext }: Character
         <div className={`relative w-24 h-24 mb-3 rounded-full overflow-hidden ${config.borderColor} border-2 bg-white shadow-sm`}>
           {!imageError ? (
             <Image
-              src={config.primaryImage}
-              alt={config.altText}
+              src={getCurrentImage()}
+              alt={`${config.altText} - ${currentExpression}`}
               fill
-              className="object-cover"
+              className="object-cover transition-opacity duration-300"
               onError={handleImageError}
               priority
             />
@@ -70,11 +124,15 @@ export default function CharacterDisplay({ character, lessonContext }: Character
             </div>
           )}
           
-          {/* Expression indicator */}
+          {/* Expression indicator with animation */}
           <div className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-white border border-gray-300 flex items-center justify-center">
-            {currentExpression === 'idle' && '😊'}
-            {currentExpression === 'speaking' && '💬'}
-            {currentExpression === 'thinking' && '🤔'}
+            <span className={`text-sm transition-all duration-300 ${
+              currentExpression === 'speaking' ? 'animate-pulse' : ''
+            }`}>
+              {currentExpression === 'idle' && '😊'}
+              {currentExpression === 'speaking' && '💬'}
+              {currentExpression === 'thinking' && '🤔'}
+            </span>
           </div>
         </div>
 

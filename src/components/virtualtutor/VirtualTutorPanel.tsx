@@ -17,6 +17,7 @@ export default function VirtualTutorPanel({
 }: VirtualTutorPanelProps) {
   const [selectedCharacter, setSelectedCharacter] = useState<'somers' | 'gimli'>('somers');
   const [isInitialized, setIsInitialized] = useState(false);
+  const [characterExpression, setCharacterExpression] = useState<'idle' | 'speaking' | 'thinking'>('idle');
 
   useEffect(() => {
     // Initialize virtual tutor for this specific lesson
@@ -52,26 +53,32 @@ export default function VirtualTutorPanel({
         </div>
         
         {/* Character Selection Buttons */}
-        <div className="flex space-x-2">
+        <div className="flex space-x-2" role="group" aria-label="Choose your virtual tutor">
           <button
             onClick={() => handleCharacterSwitch('somers')}
-            className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 ${
               selectedCharacter === 'somers'
                 ? 'bg-blue-100 text-blue-800 border-2 border-blue-300'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-gray-200'
             }`}
             aria-label="Select Mr. Somers as your tutor"
+            aria-pressed={selectedCharacter === 'somers'}
+            role="button"
+            tabIndex={0}
           >
             👨‍🏫 Mr. Somers
           </button>
           <button
             onClick={() => handleCharacterSwitch('gimli')}
-            className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-green-300 ${
               selectedCharacter === 'gimli'
                 ? 'bg-green-100 text-green-800 border-2 border-green-300'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-gray-200'
             }`}
             aria-label="Select Gimli as your learning companion"
+            aria-pressed={selectedCharacter === 'gimli'}
+            role="button"
+            tabIndex={0}
           >
             🐕 Gimli
           </button>
@@ -82,6 +89,8 @@ export default function VirtualTutorPanel({
       <div className="flex-shrink-0">
         <CharacterDisplay 
           character={selectedCharacter}
+          expression={characterExpression}
+          onExpressionChange={setCharacterExpression}
           lessonContext={{
             documentId,
             lessonNumber,
@@ -94,6 +103,7 @@ export default function VirtualTutorPanel({
       <div className="flex-1 min-h-0">
         <ChatInterface 
           character={selectedCharacter}
+          onExpressionChange={setCharacterExpression}
           lessonContext={{
             documentId,
             lessonNumber,

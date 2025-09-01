@@ -12,6 +12,7 @@ interface ChatMessage {
 
 interface ChatInterfaceProps {
   character: 'somers' | 'gimli';
+  onExpressionChange?: (expression: 'idle' | 'speaking' | 'thinking') => void;
   lessonContext: {
     documentId: string;
     lessonNumber: number;
@@ -19,7 +20,11 @@ interface ChatInterfaceProps {
   };
 }
 
-export default function ChatInterface({ character, lessonContext }: ChatInterfaceProps) {
+export default function ChatInterface({ 
+  character, 
+  onExpressionChange, 
+  lessonContext 
+}: ChatInterfaceProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -79,9 +84,15 @@ export default function ChatInterface({ character, lessonContext }: ChatInterfac
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
     setIsTyping(true);
+    
+    // Set character to thinking while processing
+    onExpressionChange?.('thinking');
 
     // Simulate AI response (Phase 1 - we'll replace this with real AI in Phase 3)
     setTimeout(() => {
+      // Set character to speaking while responding
+      onExpressionChange?.('speaking');
+      
       const responses = {
         somers: [
           "That's an excellent question! Let me break this down step by step for you.",
@@ -109,6 +120,11 @@ export default function ChatInterface({ character, lessonContext }: ChatInterfac
 
       setMessages(prev => [...prev, assistantMessage]);
       setIsTyping(false);
+      
+      // Return character to idle after response
+      setTimeout(() => {
+        onExpressionChange?.('idle');
+      }, 1000);
     }, 1000 + Math.random() * 2000); // Random delay to simulate thinking
   };
 
@@ -120,13 +136,20 @@ export default function ChatInterface({ character, lessonContext }: ChatInterfac
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" role="region" aria-label={`Chat with ${config.name}`}>
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div 
+        className="flex-1 overflow-y-auto p-4 space-y-3" 
+        role="log" 
+        aria-live="polite" 
+        aria-label="Chat messages"
+      >
         {messages.map((message) => (
           <div
             key={message.id}
             className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+            role="article"
+            aria-label={`${message.type === 'user' ? 'Your' : config.name + "'s"} message`}
           >
             <div
               className={`max-w-[85%] rounded-lg px-3 py-2 ${
@@ -137,8 +160,8 @@ export default function ChatInterface({ character, lessonContext }: ChatInterfac
                   : 'bg-green-100 text-green-900'
               }`}
             >
-              <div className="text-sm">{message.content}</div>
-              <div className="text-xs opacity-70 mt-1">
+              <div className="text-sm" aria-label="Message content">{message.content}</div>
+              <div className="text-xs opacity-70 mt-1" aria-label="Message time">
                 {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </div>
             </div>
@@ -147,11 +170,11 @@ export default function ChatInterface({ character, lessonContext }: ChatInterfac
         
         {/* Typing Indicator */}
         {isTyping && (
-          <div className="flex justify-start">
+          <div className="flex justify-start" aria-live="polite" aria-label={`${config.name} is typing`}>
             <div className={`rounded-lg px-3 py-2 ${
               config.color === 'blue' ? 'bg-blue-50' : 'bg-green-50'
             }`}>
-              <div className="flex space-x-1">
+              <div className="flex space-x-1" aria-hidden="true">
                 <div className={`w-2 h-2 rounded-full animate-bounce ${
                   config.color === 'blue' ? 'bg-blue-400' : 'bg-green-400'
                 }`} style={{ animationDelay: '0ms' }}></div>
@@ -162,39 +185,70 @@ export default function ChatInterface({ character, lessonContext }: ChatInterfac
                   config.color === 'blue' ? 'bg-blue-400' : 'bg-green-400'
                 }`} style={{ animationDelay: '300ms' }}></div>
               </div>
+              <span className="sr-only">{config.name} is typing a response</span>
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area */}
-      <div className="border-t border-gray-200 p-4">
-        <div className="flex space-x-2">
-          <textarea
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder={config.placeholderText}
-            className="flex-1 resize-none border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            rows={2}
-            disabled={isTyping}
-          />
-          <button
-            onClick={handleSendMessage}
-            disabled={!inputValue.trim() || isTyping}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              inputValue.trim() && !isTyping
-                ? config.color === 'blue'
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'bg-green-600 text-white hover:bg-green-700'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
-            aria-label="Send message"
-          >
-            {isTyping ? '...' : 'Send'}
-          </button>
-        </div>
+      {/* Enhanced Input Area */}
+      <div className="border-t border-gray-200 p-4 bg-gray-50">
+        <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} role="form" aria-label="Send message to virtual tutor">
+          <div className="flex space-x-2 items-end">
+            <div className="flex-1">
+              <label htmlFor="chat-input" className="sr-only">
+                Type your message to {config.name}
+              </label>
+              <textarea
+                id="chat-input"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder={config.placeholderText}
+                className="w-full resize-none border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
+                rows={Math.min(4, Math.max(2, inputValue.split('\n').length))}
+                disabled={isTyping}
+                aria-describedby="input-help"
+                aria-invalid={false}
+                maxLength={2000}
+              />
+              <div id="input-help" className="flex items-center justify-between mt-2 px-1">
+                <span className="text-xs text-gray-500" aria-live="polite">
+                  {inputValue.length > 0 && `${inputValue.length}/2000 characters`}
+                </span>
+                <span className="text-xs text-gray-400">
+                  Press Enter to send, Shift+Enter for new line
+                </span>
+              </div>
+            </div>
+            <button
+              type="submit"
+              disabled={!inputValue.trim() || isTyping}
+              className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                inputValue.trim() && !isTyping
+                  ? config.color === 'blue'
+                    ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl focus:ring-blue-500'
+                    : 'bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-xl focus:ring-green-500'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed focus:ring-gray-300'
+              }`}
+              aria-label={isTyping ? `${config.name} is responding, please wait` : 'Send message'}
+              title={isTyping ? 'AI is responding...' : 'Send message'}
+            >
+              {isTyping ? (
+                <div className="flex items-center space-x-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" aria-hidden="true"></div>
+                  <span>...</span>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-1">
+                  <span>Send</span>
+                  <span aria-hidden="true">📤</span>
+                </div>
+              )}
+            </button>
+          </div>
+        </form>
         
         {/* Quick Actions */}
         <div className="mt-2 flex flex-wrap gap-2">
