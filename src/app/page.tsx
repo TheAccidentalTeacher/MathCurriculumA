@@ -626,6 +626,49 @@ export default function Home() {
             </div>
           </div>
         )}
+
+        {/* Admin Navigation */}
+        <div className="mt-8 p-6 bg-slate-800/50 border border-slate-700 rounded-lg">
+          <h3 className="text-xl font-semibold mb-4 text-slate-200">🔧 Admin Tools</h3>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Link 
+              href="/ocr" 
+              className="flex items-center gap-2 p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            >
+              <span>📄</span>
+              <div>
+                <div className="font-medium">OCR Admin</div>
+                <div className="text-sm opacity-80">Phase 2: Document Processing</div>
+              </div>
+            </Link>
+            
+            <Link 
+              href="/ai" 
+              className="flex items-center gap-2 p-4 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+            >
+              <span>🤖</span>
+              <div>
+                <div className="font-medium">AI Test Center</div>
+                <div className="text-sm opacity-80">Phase 3: OpenAI Integration</div>
+              </div>
+            </Link>
+            
+            <Link 
+              href="/virtualtutor" 
+              className="flex items-center gap-2 p-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
+            >
+              <span>🎓</span>
+              <div>
+                <div className="font-medium">Virtual Tutor</div>
+                <div className="text-sm opacity-80">Interactive Math Tutoring</div>
+              </div>
+            </Link>
+          </div>
+          
+          <div className="mt-4 text-sm text-slate-400 bg-slate-900/30 p-3 rounded border border-slate-700">
+            <strong>Phase Status:</strong> Phase 1 ✅ Complete | Phase 2 ✅ OCR Ready | Phase 3 🚧 AI Integration
+          </div>
+        </div>
       </div>
     </main>
   );

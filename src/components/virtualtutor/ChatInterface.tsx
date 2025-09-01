@@ -88,44 +88,129 @@ export default function ChatInterface({
     // Set character to thinking while processing
     onExpressionChange?.('thinking');
 
-    // Simulate AI response (Phase 1 - we'll replace this with real AI in Phase 3)
-    setTimeout(() => {
-      // Set character to speaking while responding
-      onExpressionChange?.('speaking');
+  const handleSendMessage = async () => {
+    if (!inputValue.trim() || isTyping) return;
+
+    const userMessage: ChatMessage = {
+      id: `user-${Date.now()}`,
+      type: 'user',
+      content: inputValue.trim(),
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInputValue('');
+    setIsTyping(true);
+    
+    // Set character to thinking while processing
+    onExpressionChange?.('thinking');
+
+    try {
+      console.log(`🤖 Sending AI request for ${character}`);
       
-      const responses = {
-        somers: [
-          "That's an excellent question! Let me break this down step by step for you.",
-          "I can see why that might be confusing. Let's work through this concept together.",
-          "Great thinking! Here's how we can approach this problem...",
-          "That's a common question in this lesson. The key thing to remember is..."
-        ],
-        gimli: [
-          "Woof! That's a great question! Let me help you fetch the answer! 🐕",
-          "Ooh ooh! I know this one! *wags tail excitedly*",
-          "Don't worry, we've got this! Let's tackle it together! 💪",
-          "That's exactly the kind of curiosity I love to see! Let me explain..."
-        ]
-      };
+      // Call our AI API
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: userMessage.content,
+          character: character,
+          lessonContext: {
+            lessonId: lessonContext.documentId + '-' + lessonContext.lessonNumber,
+            lessonTitle: lessonContext.lessonTitle || 'Math Lesson',
+            gradeLevel: 7, // Default grade level
+            unit: 'Mathematics', // Default unit
+            volume: 1, // Default volume
+            // TODO: Add OCR content when available
+            concepts: ['problem solving', 'mathematical reasoning']
+          },
+          conversationHistory: messages,
+          model: 'gpt-4o' // Default to GPT-4o
+        })
+      });
 
-      const randomResponse = responses[character][Math.floor(Math.random() * responses[character].length)];
+      const data = await response.json();
+      
+      if (data.success && data.response) {
+        // Set character to speaking while responding
+        onExpressionChange?.('speaking');
+        
+        const assistantMessage: ChatMessage = {
+          id: data.response.id,
+          type: 'assistant',
+          content: data.response.content,
+          timestamp: new Date(data.response.timestamp),
+          character: character
+        };
 
-      const assistantMessage: ChatMessage = {
-        id: `assistant-${Date.now()}`,
+        setMessages(prev => [...prev, assistantMessage]);
+
+        // Log AI response metrics
+        if (data.response.metadata) {
+          console.log(`✅ AI Response received:`);
+          console.log(`   📊 Tokens: ${data.response.metadata.tokens.total}`);
+          console.log(`   💰 Cost: $${data.response.metadata.cost.toFixed(6)}`);
+          console.log(`   🎯 Confidence: ${data.response.metadata.confidence}%`);
+          console.log(`   🧠 Model: ${data.response.model}`);
+        }
+        
+      } else {
+        // Handle API error with fallback
+        console.error('AI API error:', data.error || 'Unknown error');
+        
+        const fallbackMessage: ChatMessage = {
+          id: `assistant-fallback-${Date.now()}`,
+          type: 'assistant',
+          content: data.fallback?.content || getFallbackResponse(character, userMessage.content),
+          timestamp: new Date(),
+          character: character
+        };
+
+        setMessages(prev => [...prev, fallbackMessage]);
+      }
+      
+    } catch (error) {
+      console.error('❌ AI request failed:', error);
+      
+      // Fallback to placeholder response
+      const errorMessage: ChatMessage = {
+        id: `assistant-error-${Date.now()}`,
         type: 'assistant',
-        content: randomResponse + ` (Note: This is a placeholder response for Phase 1. In Phase 3, I'll analyze "${lessonContext.lessonTitle}" and give you specific help!)`,
+        content: getErrorFallbackResponse(character),
         timestamp: new Date(),
         character: character
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
       
       // Return character to idle after response
       setTimeout(() => {
         onExpressionChange?.('idle');
       }, 1000);
-    }, 1000 + Math.random() * 2000); // Random delay to simulate thinking
+    }
+  };
+
+  // Fallback response method
+  const getFallbackResponse = (char: string, userMsg: string): string => {
+    if (char === 'somers') {
+      return `I can see you're asking about "${userMsg.substring(0, 50)}...". While I'm having some technical difficulties connecting to my AI systems, I encourage you to review the lesson materials and try working through the practice problems. I'll be back to help soon!`;
+    } else {
+      return `Woof! I'm having a little trouble with my doggy brain connection! 🐕 But I can see you're curious about "${userMsg.substring(0, 50)}...". While my tech treats are loading, maybe try pawing through the lesson examples? I'll be back wagging and ready to help soon!`;
+    }
+  };
+
+  // Error fallback response
+  const getErrorFallbackResponse = (char: string): string => {
+    if (char === 'somers') {
+      return `I apologize, but I'm experiencing some technical difficulties right now. Please try asking your question again, or refer to your lesson materials for help. I'll be back online shortly!`;
+    } else {
+      return `Woof! My doggy brain is having a little technical hiccup! 🐕 Try asking me again in a moment, or check out those lesson examples while I get my digital treats sorted out!`;
+    }
+  };
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
