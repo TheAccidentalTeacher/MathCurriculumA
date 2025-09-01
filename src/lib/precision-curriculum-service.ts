@@ -460,7 +460,7 @@ export class PrecisionCurriculumService {
     if (grades && grades.length > 0) {
       const placeholders = grades.map(() => '?').join(',');
       sql += ` AND ls.grade IN (${placeholders})`;
-      params.push(...grades);
+      params.push(...grades.map(g => g.toString()));
     }
     
     sql += ` ORDER BY ls.grade, l.lesson_number`;
