@@ -417,6 +417,45 @@ export function CurriculumTransformer() {
                 ))}
               </div>
               
+              {/* Pacing Generator Link */}
+              <div className="mb-6">
+                <Link
+                  href="/pacing-generator"
+                  className="block bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 hover:from-purple-700 hover:via-pink-700 hover:to-orange-700 text-white rounded-xl p-6 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-3xl">🎯</span>
+                        <h3 className="text-xl font-bold">Create Custom Pacing Guide</h3>
+                      </div>
+                      <p className="text-purple-100 text-sm">
+                        Generate adaptive pacing guides tailored to your students' needs. 
+                        Perfect for accelerated, scaffolded, or standard instruction.
+                      </p>
+                    </div>
+                    <div className="text-4xl animate-bounce">
+                      ⚡
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4 flex items-center gap-4 text-sm text-purple-200">
+                    <div className="flex items-center gap-1">
+                      <span>📊</span>
+                      <span>Data-driven analysis</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span>📄</span>
+                      <span>PDF/CSV export</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span>🔧</span>
+                      <span>Fully customizable</span>
+                    </div>
+                  </div>
+                </Link>
+              </div>
+              
               <div className="flex items-center justify-between bg-slate-800/50 rounded-xl p-4">
                 <div className="text-sm text-slate-300">
                   <strong className="text-white">Enhanced Features:</strong> 
