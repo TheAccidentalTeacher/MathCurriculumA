@@ -57,20 +57,53 @@ export default function Home() {
     
     cards.forEach((card, i) => {
       setTimeout(() => {
-        (card as HTMLElement).style.transform = 'scale(0.95) rotate(' + (Math.random() * 10 - 5) + 'deg)';
-        (card as HTMLElement).style.transition = 'transform 0.2s ease';
+        // Phase 1: DRAMATIC spread and scale
+        (card as HTMLElement).style.transform = `
+          translateX(${(Math.random() - 0.5) * 400}px) 
+          translateY(${(Math.random() - 0.5) * 300}px) 
+          rotate(${(Math.random() - 0.5) * 90}deg) 
+          scale(${1.2 + Math.random() * 0.3})
+        `;
+        (card as HTMLElement).style.transition = 'transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+        (card as HTMLElement).style.zIndex = '10';
+        
+        // Phase 2: Wild dance sequence
         setTimeout(() => {
-          (card as HTMLElement).style.transform = 'scale(1) rotate(0deg)';
-          completedAnimations++;
+          (card as HTMLElement).style.transform = `
+            translateX(${(Math.random() - 0.5) * 200}px) 
+            translateY(${(Math.random() - 0.5) * 200}px) 
+            rotate(${(Math.random() - 0.5) * 180}deg) 
+            scale(${0.8 + Math.random() * 0.6})
+          `;
+          (card as HTMLElement).style.transition = 'transform 0.6s ease-in-out';
           
-          // Show accelerated viewer after all cards complete their animation
-          if (completedAnimations === cards.length) {
+          // Phase 3: More wild movements
+          setTimeout(() => {
+            (card as HTMLElement).style.transform = `
+              translateX(${(Math.random() - 0.5) * 300}px) 
+              translateY(${(Math.random() - 0.5) * 250}px) 
+              rotate(${(Math.random() - 0.5) * 120}deg) 
+              scale(${1.1 + Math.random() * 0.4})
+            `;
+            (card as HTMLElement).style.transition = 'transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            
+            // Phase 4: Final dramatic settle
             setTimeout(() => {
-              setShowAcceleratedViewer(true);
-            }, 300); // Small delay after last card settles
-          }
-        }, 200);
-      }, i * 100);
+              (card as HTMLElement).style.transform = 'translateX(0) translateY(0) rotate(0deg) scale(1)';
+              (card as HTMLElement).style.transition = 'transform 1s cubic-bezier(0.34, 1.56, 0.64, 1)';
+              (card as HTMLElement).style.zIndex = '1';
+              completedAnimations++;
+              
+              // Show accelerated viewer after all cards complete their EPIC animation
+              if (completedAnimations === cards.length) {
+                setTimeout(() => {
+                  setShowAcceleratedViewer(true);
+                }, 500); // Delay after last card settles dramatically
+              }
+            }, 700);
+          }, 600);
+        }, 800);
+      }, i * 150); // Stagger the start times for dramatic effect
     });
   };
 
