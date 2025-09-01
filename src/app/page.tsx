@@ -13,6 +13,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [gradeFilter, setGradeFilter] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showAcceleratedViewer, setShowAcceleratedViewer] = useState(false);
 
   useEffect(() => {
     loadInitialData();
@@ -52,12 +53,22 @@ export default function Home() {
 
   const handleShuffle = () => {
     const cards = document.querySelectorAll('[data-volume-card]');
+    let completedAnimations = 0;
+    
     cards.forEach((card, i) => {
       setTimeout(() => {
         (card as HTMLElement).style.transform = 'scale(0.95) rotate(' + (Math.random() * 10 - 5) + 'deg)';
         (card as HTMLElement).style.transition = 'transform 0.2s ease';
         setTimeout(() => {
           (card as HTMLElement).style.transform = 'scale(1) rotate(0deg)';
+          completedAnimations++;
+          
+          // Show accelerated viewer after all cards complete their animation
+          if (completedAnimations === cards.length) {
+            setTimeout(() => {
+              setShowAcceleratedViewer(true);
+            }, 300); // Small delay after last card settles
+          }
         }, 200);
       }, i * 100);
     });
@@ -230,11 +241,35 @@ export default function Home() {
                 onClick={handleShuffle}
                 className="px-6 py-3 bg-gradient-to-r from-slate-700 to-slate-600 hover:from-slate-600 hover:to-slate-500 text-white rounded-xl font-medium transition-all duration-300"
               >
-                🎲 Shuffle Cards
+                {showAcceleratedViewer ? '🎲 Shuffle Again' : '🎯 Generate Accelerated Pathway'}
               </button>
             </div>
           </div>
         </div>
+
+        {/* Accelerated Pathway Viewer - Appears after shuffle animation */}
+        {showAcceleratedViewer && (
+          <div className="mb-8 transform transition-all duration-1000 ease-out animate-fade-in-up">
+            <div className="bg-gradient-to-r from-purple-900/50 to-indigo-900/50 border border-purple-500/30 rounded-2xl p-6 backdrop-blur-sm">
+              <div className="flex justify-between items-center mb-4">
+                <div className="text-center flex-1">
+                  <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    🎯 Accelerated Grade 7/8 Pathway Generated!
+                  </h2>
+                  <p className="text-slate-300 mt-2">Your beautiful accelerated curriculum plan is ready</p>
+                </div>
+                <button
+                  onClick={() => setShowAcceleratedViewer(false)}
+                  className="ml-4 px-3 py-2 text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 rounded-lg transition-colors"
+                  title="Hide pathway viewer"
+                >
+                  ✕
+                </button>
+              </div>
+              <AcceleratedPathwayViewer />
+            </div>
+          </div>
+        )}
 
         {/* Search Form */}
         <form className="space-y-4 mb-8 bg-slate-800 p-6 rounded-lg border border-slate-700" onSubmit={handleSearch}>
