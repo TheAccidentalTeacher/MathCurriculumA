@@ -8,12 +8,14 @@ interface VirtualTutorPanelProps {
   documentId: string;
   lessonNumber: number;
   lessonTitle: string;
+  lessonAnalysis?: any; // Lesson content analysis from OCR
 }
 
 export default function VirtualTutorPanel({ 
   documentId, 
   lessonNumber, 
-  lessonTitle 
+  lessonTitle,
+  lessonAnalysis 
 }: VirtualTutorPanelProps) {
   const [selectedCharacter, setSelectedCharacter] = useState<'somers' | 'gimli'>('somers');
   const [isInitialized, setIsInitialized] = useState(false);
@@ -107,7 +109,8 @@ export default function VirtualTutorPanel({
           lessonContext={{
             documentId,
             lessonNumber,
-            lessonTitle
+            lessonTitle,
+            analysis: lessonAnalysis
           }}
         />
       </div>

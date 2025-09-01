@@ -19,10 +19,13 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [imageError, setImageError] = useState(false);
+  const [contentPreparationStatus, setContentPreparationStatus] = useState<string>('Initializing...');
+  const [lessonAnalysis, setLessonAnalysis] = useState<any>(null);
 
-  // Load lesson data on component mount
+  // Load lesson data and prepare content on component mount
   useEffect(() => {
     loadLessonData();
+    prepareLessonContent();
   }, [documentId, lessonNumber]);
 
   // Set initial session when lesson data loads
@@ -51,6 +54,48 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
       console.error('Lesson loading error:', err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const prepareLessonContent = async () => {
+    setContentPreparationStatus('🔍 Analyzing lesson content...');
+    
+    try {
+      // First check if content is already prepared
+      const checkResponse = await fetch(`/api/lessons/${documentId}/${lessonNumber}/prepare`);
+      const checkResult = await checkResponse.json();
+      
+      if (checkResult.success) {
+        setLessonAnalysis(checkResult.analysis);
+        setContentPreparationStatus('✅ Lesson analysis ready');
+        console.log('📚 Lesson content already prepared:', checkResult.analysis);
+        return;
+      }
+
+      // Prepare new content analysis
+      setContentPreparationStatus('📖 Extracting content from lesson pages...');
+      
+      const prepareResponse = await fetch(`/api/lessons/${documentId}/${lessonNumber}/prepare`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const prepareResult = await prepareResponse.json();
+      
+      if (prepareResult.success) {
+        setLessonAnalysis(prepareResult.analysis);
+        setContentPreparationStatus(`✅ Virtual Tutor ready with specialized knowledge (${prepareResult.processingTimeMs}ms)`);
+        console.log('🎯 Lesson content prepared for Virtual Tutor:', prepareResult.analysis);
+      } else {
+        throw new Error(prepareResult.error);
+      }
+      
+    } catch (error) {
+      console.error('Failed to prepare lesson content:', error);
+      setContentPreparationStatus('⚠️ Using general tutoring mode');
+      setLessonAnalysis(null);
     }
   };
 
@@ -308,6 +353,28 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
               Virtual Tutor Assistant
             </h2>
             <p className="text-sm sm:text-base text-gray-600 mt-1">Get personalized help with this lesson from Mr. Somers or Gimli</p>
+            
+            {/* Content Preparation Status */}
+            <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center space-x-2">
+                <div className="flex-shrink-0">
+                  {contentPreparationStatus.includes('✅') ? '🧠' : '⚡'}
+                </div>
+                <div className="text-sm text-blue-800">
+                  <span className="font-medium">AI Preparation: </span>
+                  {contentPreparationStatus}
+                </div>
+              </div>
+              
+              {lessonAnalysis && (
+                <div className="mt-2 text-xs text-blue-600">
+                  <span className="font-medium">Specialized in:</span> {lessonAnalysis.content?.mathematicalConcepts?.join(', ') || 'General Mathematics'}
+                  {lessonAnalysis.content?.confidence && (
+                    <span className="ml-2">• Confidence: {Math.round(lessonAnalysis.content.confidence * 100)}%</span>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="h-[500px] sm:h-[600px] lg:h-[650px]">
@@ -315,6 +382,7 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
                 documentId={documentId}
                 lessonNumber={lessonNumber}
                 lessonTitle={lessonData?.lessonTitle || `Lesson ${lessonNumber}`}
+                lessonAnalysis={lessonAnalysis}
               />
             </div>
           </div>

@@ -17,6 +17,7 @@ interface ChatInterfaceProps {
     documentId: string;
     lessonNumber: number;
     lessonTitle: string;
+    analysis?: any; // Optional lesson content analysis
   };
 }
 
@@ -35,13 +36,17 @@ export default function ChatInterface({
     somers: {
       name: 'Mr. Somers',
       color: 'blue',
-      initialMessage: `Hello! I'm Mr. Somers, your math teacher. I'm here to help you understand ${lessonContext.lessonTitle}. Feel free to ask me anything about this lesson - from basic concepts to challenging problems!`,
+      initialMessage: lessonContext.analysis 
+        ? `Hello! I'm Mr. Somers, your math teacher. I've analyzed ${lessonContext.lessonTitle} and I'm ready to help you with ${lessonContext.analysis.content?.mathematicalConcepts?.slice(0, 2).join(' and ') || 'the lesson concepts'}. I can explain formulas, help with practice problems, and guide you through any challenging topics!`
+        : `Hello! I'm Mr. Somers, your math teacher. I'm here to help you understand ${lessonContext.lessonTitle}. Feel free to ask me anything about this lesson - from basic concepts to challenging problems!`,
       placeholderText: 'Ask Mr. Somers about this lesson...'
     },
     gimli: {
       name: 'Gimli',
       color: 'green',
-      initialMessage: `Woof woof! Hi there! I'm Gimli, and I'm super excited to learn ${lessonContext.lessonTitle} with you! Don't worry if it seems tough - we'll figure it out together, and I'll cheer you on every step of the way! 🎾`,
+      initialMessage: lessonContext.analysis
+        ? `Woof woof! Hi there! I'm Gimli, and I've been studying ${lessonContext.lessonTitle} just for you! We'll be working on ${lessonContext.analysis.content?.mathematicalConcepts?.slice(0, 2).join(' and ') || 'cool math stuff'} together. Don't worry if it seems tricky - I'll be your learning buddy every step of the way! 🎾`
+        : `Woof woof! Hi there! I'm Gimli, and I'm super excited to learn ${lessonContext.lessonTitle} with you! Don't worry if it seems tough - we'll figure it out together, and I'll cheer you on every step of the way! 🎾`,
       placeholderText: 'Chat with Gimli about this lesson...'
     }
   };
@@ -123,8 +128,24 @@ export default function ChatInterface({
             gradeLevel: 7, // Default grade level
             unit: 'Mathematics', // Default unit
             volume: 1, // Default volume
-            // TODO: Add OCR content when available
-            concepts: ['problem solving', 'mathematical reasoning']
+            
+            // Enhanced lesson context from OCR analysis
+            ...(lessonContext.analysis && {
+              extractedContent: lessonContext.analysis.content?.extractedText,
+              mathematicalConcepts: lessonContext.analysis.content?.mathematicalConcepts || [],
+              keyFormulas: lessonContext.analysis.content?.keyFormulas || [],
+              vocabularyTerms: lessonContext.analysis.content?.vocabularyTerms || [],
+              practiceProblems: lessonContext.analysis.content?.practiceProblems || [],
+              difficultyLevel: lessonContext.analysis.content?.difficultyLevel,
+              prerequisites: lessonContext.analysis.content?.prerequisites || [],
+              tutorPrompt: lessonContext.analysis.tutorPrompt,
+              suggestedQuestions: lessonContext.analysis.suggestedQuestions || [],
+              teachingStrategies: lessonContext.analysis.teachingStrategies || [],
+              extractionConfidence: lessonContext.analysis.content?.confidence
+            }),
+            
+            // Fallback concepts if no analysis available
+            concepts: lessonContext.analysis?.content?.mathematicalConcepts || ['problem solving', 'mathematical reasoning']
           },
           conversationHistory: messages,
           model: 'gpt-4o' // Default to GPT-4o
