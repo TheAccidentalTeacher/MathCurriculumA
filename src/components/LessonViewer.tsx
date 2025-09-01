@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { LessonData, LessonSession } from '../lib/lesson-service';
 import KhanAcademyVideos from './KhanAcademyVideos';
+import VirtualTutorPanel from './virtualtutor/VirtualTutorPanel';
 
 interface LessonViewerProps {
   documentId: string;
@@ -289,13 +290,25 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
           )}
           </div>
           
-          {/* Khan Academy Videos Sidebar */}
-          <div className="xl:col-span-1">
-            <KhanAcademyVideos
-              documentId={documentId}
-              lessonNumber={lessonNumber}
-              lessonTitle={lessonData?.lessonTitle || `Lesson ${lessonNumber}`}
-            />
+          {/* Right Sidebar: Khan Academy Videos + Virtual Tutor */}
+          <div className="xl:col-span-1 space-y-6">
+            {/* Khan Academy Videos - Keep this at the top */}
+            <div>
+              <KhanAcademyVideos
+                documentId={documentId}
+                lessonNumber={lessonNumber}
+                lessonTitle={lessonData?.lessonTitle || `Lesson ${lessonNumber}`}
+              />
+            </div>
+            
+            {/* Virtual Tutor Panel - Below Khan Academy */}
+            <div className="h-96">
+              <VirtualTutorPanel
+                documentId={documentId}
+                lessonNumber={lessonNumber}
+                lessonTitle={lessonData?.lessonTitle || `Lesson ${lessonNumber}`}
+              />
+            </div>
           </div>
         </div>
       </div>
