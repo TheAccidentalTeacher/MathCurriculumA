@@ -1,39 +1,67 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import { CurriculumService, SearchFilters } from "@/lib/curriculum-service";
 import { AcceleratedPathwayViewer } from "@/components/AcceleratedPathwayViewer";
 import Link from "next/link";
 
 const curriculumService = new CurriculumService();
 
-// Force dynamic rendering to avoid build-time database calls
-export const dynamic = 'force-dynamic';
+export default function Home() {
+  const [data, setData] = useState<any>({ documents: [], stats: { documents: 0, sections: 0, topics: 0, keywords: 0 } });
+  const [results, setResults] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [gradeFilter, setGradeFilter] = useState('');
+  const [loading, setLoading] = useState(true);
 
-interface SearchParams {
-  q?: string;
-  grade?: string;
-}
+  useEffect(() => {
+    loadInitialData();
+  }, []);
 
-export default async function Home({ searchParams }: { searchParams?: Promise<SearchParams> }) {
-  const params = (await searchParams) || {};
-  const { q, grade } = params;
-  
-  let data: any = { documents: [], stats: { documents: 0, sections: 0, topics: 0, keywords: 0 } };
-  let results: any[] = [];
-
-  try {
-    if (q) {
-      const filters: SearchFilters = {
-        ...(grade && { grade: grade }),
-      };
-      results = await curriculumService.searchContent(q, filters);
-    } else {
-      data = {
+  const loadInitialData = async () => {
+    try {
+      const initialData = {
         documents: await curriculumService.getAllDocuments(),
         stats: await curriculumService.getStats(),
       };
+      setData(initialData);
+    } catch (error) {
+      console.error('Error loading data:', error);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error('Error loading data:', error);
-  }
+  };
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+
+    setLoading(true);
+    try {
+      const filters: SearchFilters = {
+        ...(gradeFilter && { grade: gradeFilter }),
+      };
+      const searchResults = await curriculumService.searchContent(searchQuery, filters);
+      setResults(searchResults);
+    } catch (error) {
+      console.error('Error searching:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleShuffle = () => {
+    const cards = document.querySelectorAll('[data-volume-card]');
+    cards.forEach((card, i) => {
+      setTimeout(() => {
+        (card as HTMLElement).style.transform = 'scale(0.95) rotate(' + (Math.random() * 10 - 5) + 'deg)';
+        (card as HTMLElement).style.transition = 'transform 0.2s ease';
+        setTimeout(() => {
+          (card as HTMLElement).style.transform = 'scale(1) rotate(0deg)';
+        }, 200);
+      }, i * 100);
+    });
+  };
 
   return (
         <main className="min-h-screen bg-slate-900 text-white p-8">
@@ -128,7 +156,6 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Se
         </div>
 
         {/* Interactive Curriculum Transformer */}
-        {/* <CurriculumTransformer /> */}
         <div className="bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 border border-blue-700 rounded-2xl p-8 mb-8">
           <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200 mb-4">
             🎴 Full Curriculum Viewer
@@ -136,29 +163,48 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Se
           <p className="text-slate-300 mb-6 text-lg">
             Transform six volumes into one powerful accelerated pathway
           </p>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Link href="/viewer/volume1" className="block p-4 bg-blue-600 text-white rounded-xl shadow-lg hover:bg-blue-700 transition-colors">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+            {/* Grade 6 Volumes */}
+            <Link href="/viewer/grade6-volume1" data-volume-card className="block p-4 bg-indigo-600 text-white rounded-xl shadow-lg hover:bg-indigo-700 transition-colors">
+              <div className="text-center">
+                <div className="text-3xl mb-2">📚</div>
+                <div className="font-bold text-lg">Grade 6 Volume 1</div>
+                <div className="text-sm opacity-90 mt-1">(512 pages)</div>
+              </div>
+            </Link>
+            <Link href="/viewer/grade6-volume2" data-volume-card className="block p-4 bg-teal-600 text-white rounded-xl shadow-lg hover:bg-teal-700 transition-colors">
+              <div className="text-center">
+                <div className="text-3xl mb-2">📖</div>
+                <div className="font-bold text-lg">Grade 6 Volume 2</div>
+                <div className="text-sm opacity-90 mt-1">(408 pages)</div>
+              </div>
+            </Link>
+            
+            {/* Grade 7 Volumes */}
+            <Link href="/viewer/volume1" data-volume-card className="block p-4 bg-blue-600 text-white rounded-xl shadow-lg hover:bg-blue-700 transition-colors">
               <div className="text-center">
                 <div className="text-3xl mb-2">📘</div>
                 <div className="font-bold text-lg">Grade 7 Volume 1</div>
                 <div className="text-sm opacity-90 mt-1">(504 pages)</div>
               </div>
             </Link>
-            <Link href="/viewer/volume2" className="block p-4 bg-green-600 text-white rounded-xl shadow-lg hover:bg-green-700 transition-colors">
+            <Link href="/viewer/volume2" data-volume-card className="block p-4 bg-green-600 text-white rounded-xl shadow-lg hover:bg-green-700 transition-colors">
               <div className="text-center">
                 <div className="text-3xl mb-2">📗</div>
                 <div className="font-bold text-lg">Grade 7 Volume 2</div>
                 <div className="text-sm opacity-90 mt-1">(440 pages)</div>
               </div>
             </Link>
-            <Link href="/viewer/grade8-volume1" className="block p-4 bg-purple-600 text-white rounded-xl shadow-lg hover:bg-purple-700 transition-colors">
+            
+            {/* Grade 8 Volumes */}
+            <Link href="/viewer/grade8-volume1" data-volume-card className="block p-4 bg-purple-600 text-white rounded-xl shadow-lg hover:bg-purple-700 transition-colors">
               <div className="text-center">
                 <div className="text-3xl mb-2">📙</div>
                 <div className="font-bold text-lg">Grade 8 Volume 1</div>
                 <div className="text-sm opacity-90 mt-1">(552 pages)</div>
               </div>
             </Link>
-            <Link href="/viewer/grade8-volume2" className="block p-4 bg-orange-600 text-white rounded-xl shadow-lg hover:bg-orange-700 transition-colors">
+            <Link href="/viewer/grade8-volume2" data-volume-card className="block p-4 bg-orange-600 text-white rounded-xl shadow-lg hover:bg-orange-700 transition-colors">
               <div className="text-center">
                 <div className="text-3xl mb-2">📕</div>
                 <div className="font-bold text-lg">Grade 8 Volume 2</div>
@@ -166,26 +212,56 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Se
               </div>
             </Link>
           </div>
+          
+          {/* Transform Button and Pacing Generator Link */}
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-blue-300">
+              <strong>Features:</strong> Navigate through all pages • High-resolution images • Quick page jumping
+            </div>
+            
+            <div className="flex gap-4">
+              <Link 
+                href="/pacing-generator"
+                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl font-medium transition-all duration-300 transform hover:scale-105 shadow-lg"
+              >
+                🚀 Advanced Pacing Generator
+              </Link>
+              <button
+                onClick={handleShuffle}
+                className="px-6 py-3 bg-gradient-to-r from-slate-700 to-slate-600 hover:from-slate-600 hover:to-slate-500 text-white rounded-xl font-medium transition-all duration-300"
+              >
+                🎲 Shuffle Cards
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Search Form */}
-        <form className="space-y-4 mb-8 bg-slate-800 p-6 rounded-lg border border-slate-700" action="/" method="get">
+        <form className="space-y-4 mb-8 bg-slate-800 p-6 rounded-lg border border-slate-700" onSubmit={handleSearch}>
           <div className="flex gap-4">
             <input
               type="text"
-              name="q"
-              defaultValue={q || ""}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search curriculum content..."
               className="flex-1 rounded-md bg-slate-700 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <button className="rounded-md bg-blue-600 hover:bg-blue-700 px-6 py-3 font-medium">
-              Search
+            <button 
+              type="submit"
+              disabled={loading}
+              className="rounded-md bg-blue-600 hover:bg-blue-700 disabled:opacity-50 px-6 py-3 font-medium"
+            >
+              {loading ? 'Searching...' : 'Search'}
             </button>
           </div>
           
           {/* Filters */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <select name="grade" defaultValue={grade || ""} className="rounded-md bg-slate-700 border border-slate-600 px-3 py-2">
+            <select 
+              value={gradeFilter} 
+              onChange={(e) => setGradeFilter(e.target.value)}
+              className="rounded-md bg-slate-700 border border-slate-600 px-3 py-2"
+            >
               <option value="">Any Grade</option>
               <option value="Grade 6">Grade 6</option>
               <option value="Grade 7">Grade 7</option>
@@ -200,10 +276,10 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Se
         </form>
 
         {/* Search Results */}
-        {q && (
+        {searchQuery && results.length > 0 && (
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-4">
-              Search Results for "{q}" ({results.length} found)
+              Search Results for "{searchQuery}" ({results.length} found)
             </h2>
             <div className="space-y-4">
               {results.map((result, idx) => (
@@ -257,7 +333,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Se
         )}
 
         {/* Documents Overview */}
-        {!q && data.documents && (
+        {!searchQuery && data.documents && (
           <div>
             <h2 className="text-2xl font-semibold mb-6">Available Documents</h2>
             <div className="grid md:grid-cols-2 gap-6">
