@@ -1,45 +1,106 @@
 'use client';
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface GeoGebraWidgetProps {
   // Basic configuration
-  appName?: 'graphing' | 'geometry' | 'calculator' | '3d' | 'cas' | 'suite';
+  appName?: 'graphing' | 'geometry' | '3d' | 'calculator' | 'suite' | 'cas' | 'classic';
   width?: number;
   height?: number;
   
-  // Content configuration
-  ggbBase64?: string; // Pre-built GeoGebra file
-  commands?: string[]; // GeoGebra commands to execute
-  material_id?: string; // Public GeoGebra material ID
+  // Content configuration  
+  ggbBase64?: string;
+  commands?: string[];
+  material_id?: string;
+  filename?: string;
   
-  // Interactive features
+  // Interactive features (following official GeoGebra parameters)
   enableRightClick?: boolean;
-  enableLabelDrags?: boolean;
+  enableLabelDrags?: boolean; 
   enableShiftDragZoom?: boolean;
   showToolBar?: boolean;
   showMenuBar?: boolean;
   showAlgebraInput?: boolean;
   showResetIcon?: boolean;
-  
-  // Callback functions
-  onReady?: () => void;
-  onUpdate?: (objName: string) => void;
+  showToolBarHelp?: boolean;
+  showZoomButtons?: boolean;
+  allowStyleBar?: boolean;
   
   // Styling
   className?: string;
+  
+  // Callbacks
+  onReady?: (api: any) => void;
+  onError?: (error: string) => void;
 }
 
+// Declare GeoGebra global types
 declare global {
   interface Window {
     GGBApplet: any;
-    ggbOnInit?: (name: string) => void;
   }
 }
 
-// Global registry to track applets and prevent conflicts
+// Global applet registry to prevent conflicts
 const appletRegistry = new Map<string, any>();
-let scriptLoadPromise: Promise<void> | null = null;
+let scriptPromise: Promise<void> | null = null;
+
+// Load the official GeoGebra deployggb.js script
+const loadGeoGebraScript = (): Promise<void> => {
+  // Return existing promise if already loading
+  if (scriptPromise) {
+    return scriptPromise;
+  }
+
+  // Check if already loaded
+  if (window.GGBApplet) {
+    return Promise.resolve();
+  }
+
+  // Create new loading promise
+  scriptPromise = new Promise((resolve, reject) => {
+    // Check if script already exists
+    const existingScript = document.querySelector('script[src*="deployggb.js"]');
+    if (existingScript) {
+      const checkGlobal = () => {
+        if (window.GGBApplet) {
+          resolve();
+        } else {
+          setTimeout(checkGlobal, 100);
+        }
+      };
+      checkGlobal();
+      return;
+    }
+
+    // Create and load script
+    const script = document.createElement('script');
+    script.src = 'https://www.geogebra.org/apps/deployggb.js';
+    script.async = true;
+    
+    script.onload = () => {
+      // Wait for GGBApplet to be available
+      const checkGGBApplet = () => {
+        if (window.GGBApplet) {
+          console.log('✅ GeoGebra script loaded successfully');
+          resolve();
+        } else {
+          setTimeout(checkGGBApplet, 50);
+        }
+      };
+      checkGGBApplet();
+    };
+    
+    script.onerror = () => {
+      scriptPromise = null; // Reset so we can try again
+      reject(new Error('Failed to load GeoGebra script'));
+    };
+    
+    document.head.appendChild(script);
+  });
+
+  return scriptPromise;
+};
 
 export default function GeoGebraWidget({
   appName = 'graphing',
@@ -48,255 +109,255 @@ export default function GeoGebraWidget({
   ggbBase64,
   commands = [],
   material_id,
+  filename,
   enableRightClick = true,
   enableLabelDrags = true,
   enableShiftDragZoom = true,
   showToolBar = false,
   showMenuBar = false,
-  showAlgebraInput = true,
-  showResetIcon = true,
+  showAlgebraInput = false,
+  showResetIcon = false,
+  showToolBarHelp = false,
+  showZoomButtons = false,
+  allowStyleBar = false,
+  className = '',
   onReady,
-  onUpdate,
-  className = ''
+  onError
 }: GeoGebraWidgetProps) {
-  const appletRef = useRef<HTMLDivElement>(null);
-  const appletId = useRef(`ggb_${Math.random().toString(36).substr(2, 9)}`);
-  const [isLoaded, setIsLoaded] = useState(false);
+
+  
+  const containerRef = useRef<HTMLDivElement>(null);
+  const appletIdRef = useRef(`ggb_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+  const appletRef = useRef<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const initTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const cleanupRef = useRef<(() => void) | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  
+  const appletId = appletIdRef.current;
 
-  const loadGeoGebraScript = useCallback((): Promise<void> => {
-    if (scriptLoadPromise) {
-      return scriptLoadPromise;
-    }
-
-    if (window.GGBApplet) {
-      return Promise.resolve();
-    }
-
-    scriptLoadPromise = new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = 'https://www.geogebra.org/apps/deployggb.js';
-      script.async = true;
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error('Failed to load GeoGebra API'));
-      document.head.appendChild(script);
-    });
-
-    return scriptLoadPromise;
-  }, []);
-
-  const initializeApplet = useCallback(async () => {
-    if (!appletRef.current || error) return;
-
+  // Cleanup function
+  const cleanup = () => {
     try {
+      if (appletRef.current) {
+        // Try to remove the applet properly
+        if (typeof appletRef.current.remove === 'function') {
+          appletRef.current.remove();
+        }
+        appletRef.current = null;
+      }
+      
+      // Remove from registry
+      if (appletRegistry.has(appletId)) {
+        appletRegistry.delete(appletId);
+      }
+      
+      // Clear container
+      if (containerRef.current) {
+        containerRef.current.innerHTML = '';
+      }
+      
+      console.log(`🧹 Cleaned up GeoGebra applet: ${appletId}`);
+    } catch (error) {
+      console.warn('Cleanup error:', error);
+    }
+  };
+
+  const initializeApplet = async () => {
+    try {
+      setError(null);
+      setIsLoading(true);
+      
+      // Load GeoGebra script first
       await loadGeoGebraScript();
       
       if (!window.GGBApplet) {
-        throw new Error('GeoGebra API not available after script load');
+        throw new Error('GGBApplet not available after script load');
       }
 
-      const containerId = appletId.current;
-      appletRef.current.id = containerId;
+      if (!containerRef.current) {
+        throw new Error('Container element not available');
+      }
 
-      // Clear any existing content
-      appletRef.current.innerHTML = '';
+      // Clean up any existing applet
+      cleanup();
 
-      const parameters = {
-        id: containerId,
+      // Create applet parameters following official GeoGebra documentation
+      const params: any = {
         appName: appName,
         width: width,
         height: height,
         showToolBar: showToolBar,
-        showMenuBar: showMenuBar,
+        showMenuBar: showMenuBar, 
         showAlgebraInput: showAlgebraInput,
         showResetIcon: showResetIcon,
+        showToolBarHelp: showToolBarHelp,
+        showZoomButtons: showZoomButtons,
+        allowStyleBar: allowStyleBar,
         enableRightClick: enableRightClick,
         enableLabelDrags: enableLabelDrags,
         enableShiftDragZoom: enableShiftDragZoom,
         useBrowserForJS: true,
-        allowStyleBar: false,
         preventFocus: false,
-        // Load content if provided
-        ...(ggbBase64 && { ggbBase64 }),
-        ...(material_id && { material_id })
-      };
+        // Official appletOnLoad callback
+        appletOnLoad: (api: any) => {
+          console.log(`✅ GeoGebra applet loaded: ${appletId}`);
+          
+          // Validate API
+          if (!api || typeof api.evalCommand !== 'function') {
+            const errorMsg = 'Invalid GeoGebra API object';
+            console.error(errorMsg);
+            setError(errorMsg);
+            onError?.(errorMsg);
+            return;
+          }
 
-      // Create unique callback function for this applet
-      const callbackName = `ggbInit_${containerId}`;
-      (window as any)[callbackName] = () => {
-        try {
-          const api = appletRegistry.get(containerId);
-          if (api) {
-            // Execute commands after initialization
-            commands.forEach(command => {
-              try {
+          // Store API reference
+          appletRef.current = api;
+          appletRegistry.set(appletId, api);
+          
+          // Execute any provided commands
+          if (commands && commands.length > 0) {
+            try {
+              commands.forEach(command => {
                 api.evalCommand(command);
-              } catch (cmdError) {
-                console.warn(`GeoGebra command failed: ${command}`, cmdError);
-              }
-            });
-
-            // Set up update listener
-            if (onUpdate) {
-              api.registerUpdateListener((objName: string) => {
-                onUpdate(objName);
               });
+            } catch (cmdError) {
+              console.warn('Error executing commands:', cmdError);
             }
-
-            setIsLoaded(true);
-            onReady?.();
-
-            // Cleanup the global callback
-            delete (window as any)[callbackName];
           }
-        } catch (err) {
-          console.error('GeoGebra callback error:', err);
-          setError('Failed to initialize GeoGebra applet');
+
+          setIsLoading(false);
+          onReady?.(api);
         }
       };
 
-      // Add callback to parameters
-      (parameters as any).appletOnLoad = callbackName;
+      // Add content parameters if provided
+      if (ggbBase64) {
+        params.ggbBase64 = ggbBase64;
+      } else if (material_id) {
+        params.material_id = material_id;
+      } else if (filename) {
+        params.filename = filename;
+      }
 
-      const ggbApp = new window.GGBApplet(parameters, true);
+      console.log(`🚀 Creating GeoGebra applet: ${appletId}`, params);
+
+      // Create applet using official pattern
+      const applet = new window.GGBApplet(params, true);
       
-      // Register the applet API for later use
-      const originalInject = ggbApp.inject;
-      ggbApp.inject = function(container: string | HTMLElement) {
-        const result = originalInject.call(this, container);
-        
-        // Store API reference after injection
-        setTimeout(() => {
-          try {
-            const api = ggbApp.getAPI();
-            if (api) {
-              appletRegistry.set(containerId, api);
-            }
-          } catch (err) {
-            console.warn('Failed to get GeoGebra API:', err);
-          }
-        }, 100);
-        
-        return result;
-      };
-
-      // Inject the applet
-      ggbApp.inject(containerId);
-
-      // Store cleanup function
-      cleanupRef.current = () => {
-        appletRegistry.delete(containerId);
-        if ((window as any)[callbackName]) {
-          delete (window as any)[callbackName];
+      // Create container element with unique ID
+      const appletDiv = document.createElement('div');
+      appletDiv.id = appletId;
+      appletDiv.style.width = `${width}px`;
+      appletDiv.style.height = `${height}px`;
+      
+      containerRef.current.appendChild(appletDiv);
+      
+      // Inject applet using official method
+      applet.inject(appletId);
+      
+      // Set timeout to handle loading failures
+      setTimeout(() => {
+        if (isLoading && !appletRef.current && !error) {
+          const timeoutError = 'GeoGebra applet loading timeout';
+          console.error(timeoutError);
+          setError(timeoutError);
+          onError?.(timeoutError);
+          setIsLoading(false);
         }
-      };
+      }, 10000);
 
-    } catch (err) {
-      console.error('GeoGebra initialization error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to initialize GeoGebra');
+    } catch (initError) {
+      const errorMessage = initError instanceof Error ? initError.message : 'Failed to initialize GeoGebra applet';
+      console.error('GeoGebra initialization error:', initError);
+      setError(errorMessage);
+      onError?.(errorMessage);
+      setIsLoading(false);
     }
-  }, [appName, width, height, ggbBase64, material_id, commands, onReady, onUpdate, loadGeoGebraScript, error]);
+  };
 
+  // Initialize applet on mount and when dependencies change
   useEffect(() => {
-    // Clear any previous error state
-    setError(null);
-    setIsLoaded(false);
-
-    // Set timeout for initialization
-    initTimeoutRef.current = setTimeout(() => {
-      if (!isLoaded && !error) {
-        setError('GeoGebra initialization timeout');
-      }
-    }, 15000);
-
-    // Initialize the applet
     initializeApplet();
+    
+    return cleanup; // Cleanup on unmount
+  }, [appName, width, height, ggbBase64, material_id, filename, retryCount]);
 
-    return () => {
-      // Cleanup timeout
-      if (initTimeoutRef.current) {
-        clearTimeout(initTimeoutRef.current);
+  // Retry handler
+  const handleRetry = () => {
+    if (retryCount < 3) {
+      setRetryCount(prev => prev + 1);
+    }
+  };
+
+  // Public API methods
+  const executeCommand = (command: string) => {
+    if (appletRef.current && !isLoading) {
+      try {
+        appletRef.current.evalCommand(command);
+      } catch (error) {
+        console.warn('Command execution error:', error);
       }
-      
-      // Cleanup applet
-      if (cleanupRef.current) {
-        cleanupRef.current();
-      }
-    };
-  }, [initializeApplet, isLoaded, error]);
-
-  // Public API for external control
-  const executeCommand = useCallback((command: string) => {
-    const api = appletRegistry.get(appletId.current);
-    if (api && isLoaded) {
-      api.evalCommand(command);
     }
-  }, [isLoaded]);
+  };
 
-  const setValue = useCallback((objName: string, value: any) => {
-    const api = appletRegistry.get(appletId.current);
-    if (api && isLoaded) {
-      api.setValue(objName, value);
-    }
-  }, [isLoaded]);
+  const getAppletAPI = () => {
+    return appletRef.current;
+  };
 
-  const getValue = useCallback((objName: string) => {
-    const api = appletRegistry.get(appletId.current);
-    if (api && isLoaded) {
-      return api.getValue(objName);
-    }
-    return null;
-  }, [isLoaded]);
+  // Expose methods for parent components
+  React.useImperativeHandle(undefined, () => ({
+    executeCommand,
+    getAPI: getAppletAPI,
+    retry: handleRetry
+  }));
 
+  // Error state rendering
   if (error) {
     return (
       <div className={`p-4 border border-red-300 rounded-lg bg-red-50 ${className}`}>
         <div className="flex items-center text-red-700 mb-2">
           <span className="mr-2">⚠️</span>
-          <span>GeoGebra Error: {error}</span>
+          <span className="font-medium">GeoGebra Error</span>
         </div>
+        <div className="text-sm text-red-600 mb-3">{error}</div>
         
-        {/* Fallback content */}
-        <div className="mt-3 p-3 bg-white border rounded text-sm text-gray-600">
-          <strong>Fallback Content:</strong> 
-          {commands.length > 0 && (
-            <div className="mt-2">
-              <strong>Mathematical Commands:</strong>
-              <ul className="list-disc list-inside mt-1">
-                {commands.map((command, idx) => (
-                  <li key={idx} className="font-mono text-xs">{command}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
+        {/* Show fallback content */}
+        {commands.length > 0 && (
+          <div className="mb-3 p-3 bg-white border rounded text-xs">
+            <div className="font-medium mb-1">Mathematical Content:</div>
+            {commands.map((command, idx) => (
+              <div key={idx} className="font-mono text-gray-700">{command}</div>
+            ))}
+          </div>
+        )}
         
-        <button 
-          onClick={() => {
-            setError(null);
-            setIsLoaded(false);
-          }} 
-          className="mt-2 px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
-        >
-          Try Again
-        </button>
+        {retryCount < 3 && (
+          <button 
+            onClick={handleRetry}
+            className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+          >
+            Retry ({retryCount + 1}/3)
+          </button>
+        )}
       </div>
     );
   }
 
+  // Main render
   return (
-    <div className={`geogebra-container ${className}`}>
+    <div className={`geogebra-widget relative ${className}`}>
       <div 
-        ref={appletRef} 
-        className="geogebra-applet"
-        style={{ width: width, height: height }}
+        ref={containerRef}
+        className="geogebra-container"
+        style={{ width: `${width}px`, height: `${height}px` }}
       />
-      {!isLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded">
+      
+      {/* Loading overlay */}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-90 rounded">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto mb-2"></div>
             <div className="text-sm text-gray-600">Loading GeoGebra...</div>
           </div>
         </div>
@@ -305,46 +366,14 @@ export default function GeoGebraWidget({
   );
 }
 
-// Pre-configured GeoGebra widgets for common use cases
+// Pre-configured widgets for common use cases
 
-export function PowersOf10GeoGebra(props: Partial<GeoGebraWidgetProps>) {
-  const commands = [
-    'A = (0, 0)',
-    'B = (1, 0)', 
-    'C = (10, 0)',
-    'D = (100, 0)',
-    'E = (1000, 0)',
-    'SetCaption(A, "10^0 = 1")',
-    'SetCaption(B, "10^1 = 10")',
-    'SetCaption(C, "10^2 = 100")',
-    'SetCaption(D, "10^3 = 1000")',
-    'ShowLabel(A, true)',
-    'ShowLabel(B, true)',
-    'ShowLabel(C, true)',
-    'ShowLabel(D, true)'
-  ];
-
+export function GraphingCalculator(props: Partial<GeoGebraWidgetProps>) {
   return (
     <GeoGebraWidget
       appName="graphing"
-      commands={commands}
-      showAlgebraInput={false}
-      showToolBar={false}
-      width={600}
-      height={300}
-      {...props}
-    />
-  );
-}
-
-export function GeometryExplorer(props: Partial<GeoGebraWidgetProps>) {
-  return (
-    <GeoGebraWidget
-      appName="geometry"
-      showToolBar={true}
       showAlgebraInput={true}
-      enableRightClick={true}
-      enableLabelDrags={true}
+      showToolBar={true}
       width={600}
       height={400}
       {...props}
@@ -352,13 +381,14 @@ export function GeometryExplorer(props: Partial<GeoGebraWidgetProps>) {
   );
 }
 
-export function FunctionGrapher(props: Partial<GeoGebraWidgetProps>) {
+export function GeometryTool(props: Partial<GeoGebraWidgetProps>) {
   return (
     <GeoGebraWidget
-      appName="graphing"
-      showAlgebraInput={true}
+      appName="geometry"
       showToolBar={true}
-      width={500}
+      enableRightClick={true}
+      enableLabelDrags={true}
+      width={600}
       height={400}
       {...props}
     />
@@ -378,32 +408,22 @@ export function Calculator3D(props: Partial<GeoGebraWidgetProps>) {
   );
 }
 
-// Utility function to create GeoGebra content from text descriptions
-export function createGeoGebraFromDescription(description: string): string[] {
+// Utility function to create commands from descriptions
+export function createCommandsFromDescription(description: string): string[] {
   const commands: string[] = [];
   
-  // Parse common mathematical descriptions
-  if (description.includes('linear function') || description.includes('y =')) {
-    const functionMatch = description.match(/y\s*=\s*([^,\n]+)/);
-    if (functionMatch) {
-      commands.push(`f(x) = ${functionMatch[1].trim()}`);
-    }
+  // Basic parsing for common mathematical content
+  if (description.includes('cube') || description.includes('3D')) {
+    commands.push('a = 2');
+    commands.push('Cube((-a/2,-a/2,-a/2), (a/2,a/2,a/2))');
   }
   
-  if (description.includes('point') && description.includes('(')) {
-    const pointMatches = description.match(/\((-?\d+\.?\d*),\s*(-?\d+\.?\d*)\)/g);
-    if (pointMatches) {
-      pointMatches.forEach((point, index) => {
-        commands.push(`P${index + 1} = ${point}`);
-      });
-    }
+  if (description.includes('sphere')) {
+    commands.push('Sphere((0,0,0), 2)');
   }
   
-  if (description.includes('circle')) {
-    const radiusMatch = description.match(/radius\s+(\d+)/);
-    if (radiusMatch) {
-      commands.push(`Circle((0,0), ${radiusMatch[1]})`);
-    }
+  if (description.includes('linear') && description.includes('function')) {
+    commands.push('f(x) = 2x + 1');
   }
   
   return commands;
