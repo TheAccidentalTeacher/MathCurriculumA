@@ -313,9 +313,9 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
 
       {/* Page Content */}
       <div className="flex-1 overflow-auto bg-gray-100">
-        <div className="max-w-7xl mx-auto p-6 grid grid-cols-1 xl:grid-cols-3 gap-6">
-          {/* Main Content Area */}
-          <div className="xl:col-span-2">
+        <div className="max-w-full mx-auto p-6 grid grid-cols-1 2xl:grid-cols-5 gap-6">
+          {/* Main Content Area - Now takes up 4 columns instead of 2 */}
+          <div className="2xl:col-span-4">
             {currentPage && (
               <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                 {imageError ? (
@@ -350,11 +350,11 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
                     Page {currentPage.pageNumber}
                   </div>
                   
-                  {/* Content Preview */}
+                  {/* Content Preview - Now much wider */}
                   {currentPage.textPreview && (
-                    <div className="absolute bottom-4 left-4 right-4 bg-white bg-opacity-90 p-3 rounded-md text-sm text-gray-700 max-h-20 overflow-hidden">
-                      <div className="font-medium mb-1">Content Preview:</div>
-                      <div className="text-xs text-gray-600 line-clamp-2">
+                    <div className="absolute bottom-4 left-4 right-4 bg-white bg-opacity-90 p-4 rounded-md text-base text-gray-700 max-h-32 overflow-y-auto">
+                      <div className="font-medium mb-2 text-lg">Content Preview:</div>
+                      <div className="text-sm text-gray-600 leading-relaxed">
                         {currentPage.textPreview}
                       </div>
                     </div>
@@ -365,8 +365,8 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
           )}
           </div>
           
-          {/* Right Sidebar: Khan Academy Videos Only */}
-          <div className="xl:col-span-1">
+          {/* Right Sidebar: Khan Academy Videos - Now takes up 1 column */}
+          <div className="2xl:col-span-1">
             <KhanAcademyVideos
               documentId={documentId}
               lessonNumber={lessonNumber}
