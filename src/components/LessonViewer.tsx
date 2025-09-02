@@ -22,11 +22,17 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
   const [contentPreparationStatus, setContentPreparationStatus] = useState<string>('Initializing...');
   const [lessonAnalysis, setLessonAnalysis] = useState<any>(null);
   const [contentWidth, setContentWidth] = useState<number>(80); // Default 80% width
+  const [tutorHeight, setTutorHeight] = useState<number>(800); // Default tutor height in pixels
 
   // Debug logging for width changes
   useEffect(() => {
     console.log(`📐 [LessonViewer] Content width changed to: ${contentWidth}%`);
   }, [contentWidth]);
+
+  // Debug logging for tutor height changes
+  useEffect(() => {
+    console.log(`📏 [LessonViewer] Tutor height changed to: ${tutorHeight}px`);
+  }, [tutorHeight]);
 
   // Load lesson data and prepare content on component mount
   useEffect(() => {
@@ -471,6 +477,94 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
         
         {/* Virtual Tutor Section - Below Main Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-6">
+          {/* Tutor Height Controls */}
+          <div className="mb-4 bg-gradient-to-r from-purple-200 via-indigo-200 to-blue-200 border-b-4 border-indigo-500 px-4 py-3 rounded-lg shadow-lg">
+            <div className="bg-white rounded-xl p-3 border-4 border-indigo-400 shadow-xl">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="text-xl font-black text-indigo-900 bg-indigo-300 px-4 py-3 rounded-lg shadow-md animate-pulse">
+                    📏 TUTOR BOX HEIGHT CONTROLS - RESIZE THE CHAT!
+                  </span>
+                  <div className="flex items-center space-x-3">
+                    <button
+                      onClick={() => setTutorHeight(Math.max(400, tutorHeight - 100))}
+                      className="px-4 py-3 bg-red-500 hover:bg-red-600 text-white border-2 border-red-700 rounded-lg text-lg font-bold shadow-lg transform hover:scale-105 transition-all"
+                      title="Make tutor box shorter"
+                    >
+                      ↕️ SHORTER
+                    </button>
+                    <input
+                      type="range"
+                      min="400"
+                      max="1200"
+                      value={tutorHeight}
+                      onChange={(e) => setTutorHeight(parseInt(e.target.value))}
+                      className="w-48 h-6 bg-indigo-300 rounded-lg appearance-none cursor-pointer shadow-lg"
+                      style={{
+                        background: `linear-gradient(to right, #6366f1 0%, #6366f1 ${((tutorHeight-400)/800)*100}%, #c7d2fe ${((tutorHeight-400)/800)*100}%, #c7d2fe 100%)`
+                      }}
+                    />
+                    <button
+                      onClick={() => setTutorHeight(Math.min(1200, tutorHeight + 100))}
+                      className="px-4 py-3 bg-green-500 hover:bg-green-600 text-white border-2 border-green-700 rounded-lg text-lg font-bold shadow-lg transform hover:scale-105 transition-all"
+                      title="Make tutor box taller"
+                    >
+                      TALLER ↕️
+                    </button>
+                    <span className="text-xl font-black text-indigo-900 bg-yellow-300 px-4 py-3 rounded-lg border-4 border-yellow-500 shadow-lg">
+                      {tutorHeight}px
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg font-bold text-indigo-900 bg-indigo-200 px-3 py-2 rounded-lg border-2 border-indigo-400">
+                    QUICK SIZES:
+                  </span>
+                  <button
+                    onClick={() => setTutorHeight(500)}
+                    className={`px-3 py-2 rounded-lg text-sm font-bold border-2 transition-all shadow-md transform hover:scale-105 ${
+                      tutorHeight === 500 
+                        ? 'bg-blue-600 text-white border-blue-800 shadow-lg' 
+                        : 'bg-blue-200 hover:bg-blue-300 border-blue-400 text-blue-900'
+                    }`}
+                  >
+                    📱 SMALL (500px)
+                  </button>
+                  <button
+                    onClick={() => setTutorHeight(750)}
+                    className={`px-3 py-2 rounded-lg text-sm font-bold border-2 transition-all shadow-md transform hover:scale-105 ${
+                      tutorHeight === 750 
+                        ? 'bg-green-600 text-white border-green-800 shadow-lg' 
+                        : 'bg-green-200 hover:bg-green-300 border-green-400 text-green-900'
+                    }`}
+                  >
+                    💻 MEDIUM (750px)
+                  </button>
+                  <button
+                    onClick={() => setTutorHeight(1000)}
+                    className={`px-3 py-2 rounded-lg text-sm font-bold border-2 transition-all shadow-md transform hover:scale-105 ${
+                      tutorHeight === 1000 
+                        ? 'bg-purple-600 text-white border-purple-800 shadow-lg' 
+                        : 'bg-purple-200 hover:bg-purple-300 border-purple-400 text-purple-900'
+                    }`}
+                  >
+                    🖥️ LARGE (1000px)
+                  </button>
+                  <button
+                    onClick={() => setTutorHeight(1200)}
+                    className={`px-3 py-2 rounded-lg text-sm font-bold border-2 transition-all shadow-md transform hover:scale-105 ${
+                      tutorHeight === 1200 
+                        ? 'bg-red-600 text-white border-red-800 shadow-lg' 
+                        : 'bg-red-200 hover:bg-red-300 border-red-400 text-red-900'
+                    }`}
+                  >
+                    🏟️ HUGE (1200px)
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="mb-4">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center">
               <span className="text-2xl sm:text-3xl mr-2 sm:mr-3">🎓</span>
@@ -501,7 +595,7 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
             </div>
           </div>
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <div className="h-[500px] sm:h-[600px] lg:h-[650px]">
+            <div style={{ height: `${tutorHeight}px` }}>
               <VirtualTutorPanel
                 documentId={documentId}
                 lessonNumber={lessonNumber}
