@@ -21,6 +21,7 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
   const [imageError, setImageError] = useState(false);
   const [contentPreparationStatus, setContentPreparationStatus] = useState<string>('Initializing...');
   const [lessonAnalysis, setLessonAnalysis] = useState<any>(null);
+  const [contentWidth, setContentWidth] = useState<number>(80); // Default 80% width
 
   // Load lesson data and prepare content on component mount
   useEffect(() => {
@@ -313,9 +314,65 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
 
       {/* Page Content */}
       <div className="flex-1 overflow-auto bg-gray-100">
-        <div className="max-w-full mx-auto p-6 grid grid-cols-1 2xl:grid-cols-5 gap-6">
-          {/* Main Content Area - Now takes up 4 columns instead of 2 */}
-          <div className="2xl:col-span-4">
+        {/* Width Control Panel */}
+        <div className="max-w-full mx-auto px-6 py-2 bg-white border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <span className="text-sm font-medium text-gray-700">Content Width:</span>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setContentWidth(Math.max(50, contentWidth - 10))}
+                  className="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-sm font-mono"
+                  title="Decrease width"
+                >
+                  −
+                </button>
+                <input
+                  type="range"
+                  min="50"
+                  max="95"
+                  value={contentWidth}
+                  onChange={(e) => setContentWidth(parseInt(e.target.value))}
+                  className="w-24 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                />
+                <button
+                  onClick={() => setContentWidth(Math.min(95, contentWidth + 10))}
+                  className="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-sm font-mono"
+                  title="Increase width"
+                >
+                  +
+                </button>
+                <span className="text-sm font-mono text-gray-600 min-w-[3rem]">
+                  {contentWidth}%
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setContentWidth(66)}
+                className="px-3 py-1 bg-blue-100 hover:bg-blue-200 rounded text-xs"
+              >
+                Compact
+              </button>
+              <button
+                onClick={() => setContentWidth(80)}
+                className="px-3 py-1 bg-green-100 hover:bg-green-200 rounded text-xs"
+              >
+                Balanced
+              </button>
+              <button
+                onClick={() => setContentWidth(90)}
+                className="px-3 py-1 bg-purple-100 hover:bg-purple-200 rounded text-xs"
+              >
+                Wide
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div className="max-w-full mx-auto p-6 flex gap-6">
+          {/* Main Content Area - Dynamically sized */}
+          <div style={{ width: `${contentWidth}%` }}>
             {currentPage && (
               <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                 {imageError ? (
@@ -365,8 +422,8 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
           )}
           </div>
           
-          {/* Right Sidebar: Khan Academy Videos - Now takes up 1 column */}
-          <div className="2xl:col-span-1">
+          {/* Right Sidebar: Khan Academy Videos - Dynamically sized */}
+          <div style={{ width: `${100 - contentWidth}%` }} className="min-w-[300px]">
             <KhanAcademyVideos
               documentId={documentId}
               lessonNumber={lessonNumber}
