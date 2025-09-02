@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import MathRenderer from '../MathRenderer';
 
 interface ChatMessage {
   id: string;
@@ -303,7 +304,9 @@ export default function ChatInterface({
                   : 'bg-green-50 text-green-900 border border-green-200'
               }`}
             >
-              <div className="text-sm" aria-label="Message content">{message.content}</div>
+              <div className="text-sm" aria-label="Message content">
+                <MathRenderer content={message.content} />
+              </div>
               <div className="text-xs opacity-70 mt-1" aria-label="Message time">
                 {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </div>
