@@ -29,6 +29,7 @@ export default function ChatInterface({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Character-specific configurations
@@ -53,7 +54,7 @@ export default function ChatInterface({
 
   const config = characterConfig[character];
 
-    // Initialize messages when character or lesson context changes
+    // Initialize messages when character changes or first time only
   useEffect(() => {
     console.log(`💬 [ChatInterface] Initializing chat for character: ${character}`);
     console.log(`📖 [ChatInterface] Lesson context:`, lessonContext);
@@ -83,7 +84,25 @@ export default function ChatInterface({
     console.log(`✅ [ChatInterface] Setting initial message for ${config.name}`);
     setMessages([initialMessage]);
     setInputValue('');
-  }, [character, lessonContext]);
+    setIsInitialized(true);
+  }, [character]); // Only depend on character, not lessonContext
+
+  // Update initial message when analysis becomes available (but don't reset conversation)
+  useEffect(() => {
+    if (isInitialized && lessonContext.analysis && messages.length === 1) {
+      console.log(`🔄 [ChatInterface] Updating initial message with analysis data`);
+      
+      const config = characterConfig[character];
+      const updatedMessage: ChatMessage = {
+        id: `${character}-welcome-updated-${Date.now()}`,
+        type: 'assistant',
+        content: config.initialMessage,
+        timestamp: new Date(),
+      };
+      
+      setMessages([updatedMessage]);
+    }
+  }, [lessonContext.analysis, isInitialized]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
