@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Debug: Resize Functionality</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f3f4f6;
+        }
+        .status-box {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .debug-info {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+        }
+        .fix-item {
+            background: #ecfccb;
+            border: 2px solid #84cc16;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        .test-steps {
+            background: #dbeafe;
+            border: 2px solid #3b82f6;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        .warning {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        .success {
+            color: #16a34a;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc2626;
+            font-weight: bold;
+        }
+        ul li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Resize Functionality Debug & Fix</h1>
+    
+    <div class="status-box">
+        <h2>✅ What I Just Fixed</h2>
+        
+        <div class="fix-item">
+            <h3>1. Event Handler Issues</h3>
+            <p><strong>Problem:</strong> Event handlers were being recreated on every render, causing listener issues.</p>
+            <p><strong>Solution:</strong> Used <code>useCallback</code> to stabilize event handlers.</p>
+        </div>
+        
+        <div class="fix-item">
+            <h3>2. Minimum Height</h3>
+            <p><strong>Problem:</strong> Minimum height was only 300px, making the box too small.</p>
+            <p><strong>Solution:</strong> Set minimum height to 500px as you requested.</p>
+        </div>
+        
+        <div class="fix-item">
+            <h3>3. Visibility Issues</h3>
+            <p><strong>Problem:</strong> Resize bar was too subtle and hard to see.</p>
+            <p><strong>Solution:</strong> Made resize bar much more visible with blue hover effects.</p>
+        </div>
+        
+        <div class="fix-item">
+            <h3>4. Debug Logging</h3>
+            <p><strong>Added:</strong> Console logging to help track resize events and height changes.</p>
+        </div>
+    </div>
+    
+    <div class="status-box">
+        <h2>🎯 Key Changes Made</h2>
+        <div class="debug-info">
+// Added useCallback import
+import { useState, useEffect, useCallback } from 'react';
+
+// Fixed minimum height to 500px
+const newHeight = Math.max(500, Math.min(1200, startHeight + deltaY));
+
+// Stabilized event handlers
+const handleMouseMove = useCallback((e: MouseEvent) => { ... }, [isResizing, startY, startHeight]);
+const handleMouseUp = useCallback(() => { ... }, []);
+
+// Enhanced resize bar visibility
+className="cursor-row-resize py-3 px-4 ... hover:bg-blue-100 ... border-2"
+        </div>
+    </div>
+    
+    <div class="test-steps">
+        <h2>🧪 How to Test the Fix</h2>
+        <ol>
+            <li><strong>Open your app:</strong> <a href="http://localhost:3003" target="_blank">http://localhost:3003</a></li>
+            <li><strong>Navigate to any lesson</strong> (click on a lesson card)</li>
+            <li><strong>Scroll down</strong> to the "Virtual Tutor Assistant" section</li>
+            <li><strong>Look for the blue-highlighted resize bar</strong> that says "↕ DRAG TO RESIZE" with current height</li>
+            <li><strong>Hover over the bar</strong> - it should turn blue and cursor should change to ↕</li>
+            <li><strong>Click and drag</strong> up/down to resize</li>
+            <li><strong>Check browser console</strong> (F12) for debug messages like:</li>
+            <div class="debug-info">
+🖱️ [LessonViewer] Mouse down - starting resize
+🖱️ [LessonViewer] Adding mouse event listeners
+🖱️ [LessonViewer] Dragging: new height 650px
+📏 [LessonViewer] Tutor height changed to: 650px
+            </div>
+        </ol>
+    </div>
+    
+    <div class="warning">
+        <h3>⚠️ If It's Still Not Working</h3>
+        <p>Check these potential issues:</p>
+        <ul>
+            <li><strong>Browser Cache:</strong> Hard refresh (Ctrl+F5 or Cmd+Shift+R)</li>
+            <li><strong>Console Errors:</strong> Open F12 Developer Tools → Console tab</li>
+            <li><strong>React State:</strong> Look for console messages starting with 🖱️ and 📏</li>
+            <li><strong>CSS Issues:</strong> Check if the resize bar is visible and has proper cursor</li>
+        </ul>
+    </div>
+    
+    <div class="status-box">
+        <h2>🔍 Debug Console Messages You Should See</h2>
+        <p>When the resize is working properly, you'll see these messages in the browser console:</p>
+        
+        <div class="debug-info">
+# When you start dragging:
+🖱️ [LessonViewer] Mouse down - starting resize
+🖱️ [LessonViewer] Adding mouse event listeners
+
+# While dragging:
+🖱️ [LessonViewer] Dragging: new height 580px
+📏 [LessonViewer] Tutor height changed to: 580px
+
+# When you stop dragging:
+🖱️ [LessonViewer] Mouse up - stopping resize
+🖱️ [LessonViewer] Removing mouse event listeners
+        </div>
+    </div>
+    
+    <div class="status-box">
+        <h2>📏 Current Specifications</h2>
+        <ul>
+            <li><strong>Default Height:</strong> 600px</li>
+            <li><strong>Minimum Height:</strong> 500px (as you requested)</li>
+            <li><strong>Maximum Height:</strong> 1200px</li>
+            <li><strong>Resize Bar:</strong> Blue-highlighted, clearly visible with "↕ DRAG TO RESIZE" text</li>
+            <li><strong>Current Height Display:</strong> Shows current height (e.g., "600px") on the resize bar</li>
+        </ul>
+    </div>
+    
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="http://localhost:3003" 
+           style="display: inline-block; background: #2563eb; color: white; padding: 15px 30px; 
+                  text-decoration: none; border-radius: 10px; font-weight: bold;">
+            🚀 Test the Fixed Resize Functionality
+        </a>
+        <br><br>
+        <p style="color: #666; font-size: 0.9em;">
+            Look for the blue resize bar above the Virtual Tutor panel.<br>
+            Check F12 console for debug messages if it's not working.
+        </p>
+    </div>
+</body>
+</html>

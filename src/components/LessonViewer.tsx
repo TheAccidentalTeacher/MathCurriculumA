@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { LessonData, LessonSession } from '../lib/lesson-service';
 import KhanAcademyVideos from './KhanAcademyVideos';
@@ -21,13 +21,30 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
   const [imageError, setImageError] = useState(false);
   const [contentPreparationStatus, setContentPreparationStatus] = useState<string>('Initializing...');
   const [lessonAnalysis, setLessonAnalysis] = useState<any>(null);
-  const [tutorHeight, setTutorHeight] = useState<number>(600); // Default tutor height
+  const [tutorHeight, setTutorHeight] = useState<number>(800); // Much larger default - minimum 500px
   const [isResizing, setIsResizing] = useState(false);
   const [startY, setStartY] = useState(0);
   const [startHeight, setStartHeight] = useState(0);
 
-  // Mouse drag resize handlers
+  // Mouse drag resize handlers with useCallback to prevent recreation
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isResizing) return;
+    
+    const deltaY = e.clientY - startY;
+    const newHeight = Math.max(500, Math.min(1200, startHeight + deltaY)); // Minimum 500px
+    setTutorHeight(newHeight);
+    console.log(`🖱️ [LessonViewer] Dragging: new height ${newHeight}px`);
+  }, [isResizing, startY, startHeight]);
+
+  const handleMouseUp = useCallback(() => {
+    console.log('🖱️ [LessonViewer] Mouse up - stopping resize');
+    setIsResizing(false);
+    document.body.style.cursor = 'default';
+    document.body.style.userSelect = 'auto';
+  }, []);
+
   const handleMouseDown = (e: React.MouseEvent) => {
+    console.log('🖱️ [LessonViewer] Mouse down - starting resize');
     e.preventDefault();
     setIsResizing(true);
     setStartY(e.clientY);
@@ -36,35 +53,28 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
     document.body.style.userSelect = 'none';
   };
 
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!isResizing) return;
-    
-    const deltaY = e.clientY - startY;
-    const newHeight = Math.max(300, Math.min(1200, startHeight + deltaY));
-    setTutorHeight(newHeight);
-  };
-
-  const handleMouseUp = () => {
-    setIsResizing(false);
-    document.body.style.cursor = 'default';
-    document.body.style.userSelect = 'auto';
-  };
-
   // Add/remove mouse event listeners for drag resize
   useEffect(() => {
     if (isResizing) {
+      console.log('🖱️ [LessonViewer] Adding mouse event listeners');
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
       return () => {
+        console.log('🖱️ [LessonViewer] Removing mouse event listeners');
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
       };
     }
-  }, [isResizing, startY, startHeight]);
+  }, [isResizing, handleMouseMove, handleMouseUp]);
 
-  // Debug logging for tutor height changes
+  // Debug logging for tutor height changes and ensure minimum
   useEffect(() => {
     console.log(`📏 [LessonViewer] Tutor height changed to: ${tutorHeight}px`);
+    // Ensure minimum height of 500px
+    if (tutorHeight < 500) {
+      console.log(`⚠️ [LessonViewer] Height too small (${tutorHeight}px), setting to 500px`);
+      setTutorHeight(500);
+    }
   }, [tutorHeight]);
 
   // Load lesson data and prepare content on component mount
@@ -452,21 +462,25 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
             </div>
           </div>
           
-          {/* Elegant Resize Bar */}
+          {/* Enhanced Resize Bar - More Visible */}
           <div 
-            className="group cursor-row-resize py-2 px-4 flex items-center justify-center hover:bg-gray-100 transition-colors duration-200 border-b"
+            className="group cursor-row-resize py-3 px-4 flex items-center justify-center hover:bg-blue-100 transition-colors duration-200 border-2 border-gray-200 hover:border-blue-300 bg-gray-50"
             onMouseDown={handleMouseDown}
-            title="Drag to resize tutor panel height"
+            title={`Drag to resize tutor panel height (currently ${tutorHeight}px)`}
+            style={{ 
+              minHeight: '40px',
+              userSelect: 'none'
+            }}
           >
-            <div className="flex items-center space-x-1">
-              <div className="w-8 h-0.5 bg-gray-300 group-hover:bg-gray-500 transition-colors duration-200 rounded"></div>
-              <div className="text-xs text-gray-400 group-hover:text-gray-600 font-medium transition-colors duration-200">
-                ↕
+            <div className="flex items-center space-x-2">
+              <div className="w-12 h-1 bg-gray-400 group-hover:bg-blue-500 transition-colors duration-200 rounded-full"></div>
+              <div className="text-sm text-gray-600 group-hover:text-blue-700 font-medium transition-colors duration-200">
+                ↕ DRAG TO RESIZE
               </div>
-              <div className="w-8 h-0.5 bg-gray-300 group-hover:bg-gray-500 transition-colors duration-200 rounded"></div>
+              <div className="w-12 h-1 bg-gray-400 group-hover:bg-blue-500 transition-colors duration-200 rounded-full"></div>
             </div>
-            <span className="ml-2 text-xs text-gray-400 group-hover:text-gray-600 transition-colors duration-200">
-              Drag to resize
+            <span className="ml-3 text-sm text-gray-500 group-hover:text-blue-600 transition-colors duration-200 font-medium">
+              {tutorHeight}px
             </span>
           </div>
           

@@ -104,10 +104,11 @@ export default function CharacterDisplay({
   };
 
   return (
-    <div className={`p-4 ${config.bgColor} ${config.borderColor} border-b`}>
-      {/* Character Image */}
-      <div className="flex flex-col items-center">
-        <div className={`relative w-24 h-24 mb-3 rounded-full overflow-hidden ${config.borderColor} border-2 bg-white shadow-sm`}>
+    <div className={`p-2 ${config.bgColor} ${config.borderColor} border-b`}>
+      {/* Compact horizontal layout */}
+      <div className="flex items-center space-x-3">
+        {/* Larger Character Image */}
+        <div className={`relative w-12 h-12 rounded-full overflow-hidden ${config.borderColor} border-2 bg-white shadow-sm flex-shrink-0`}>
           {!imageError ? (
             <Image
               src={getCurrentImage()}
@@ -119,14 +120,14 @@ export default function CharacterDisplay({
             />
           ) : (
             // Fallback emoji display
-            <div className="w-full h-full flex items-center justify-center text-4xl">
+            <div className="w-full h-full flex items-center justify-center text-2xl">
               {character === 'somers' ? '👨‍🏫' : '🐕'}
             </div>
           )}
           
-          {/* Expression indicator with animation */}
-          <div className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-white border border-gray-300 flex items-center justify-center">
-            <span className={`text-sm transition-all duration-300 ${
+          {/* Expression indicator */}
+          <div className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-white border border-gray-300 flex items-center justify-center">
+            <span className={`text-xs transition-all duration-300 ${
               currentExpression === 'speaking' ? 'animate-pulse' : ''
             }`}>
               {currentExpression === 'idle' && '😊'}
@@ -136,28 +137,24 @@ export default function CharacterDisplay({
           </div>
         </div>
 
-        {/* Character Name */}
-        <h4 className="font-semibold text-gray-900 mb-2">{config.name}</h4>
-        
-        {/* Status/Expression */}
-        <div className="text-center">
-          <div className="inline-flex items-center px-3 py-1 rounded-full text-xs bg-white border border-gray-200">
-            <div className={`w-2 h-2 rounded-full mr-2 ${
-              currentExpression === 'idle' ? 'bg-green-400' : 
-              currentExpression === 'speaking' ? 'bg-blue-400' : 'bg-yellow-400'
-            }`}></div>
-            <span className="text-gray-700">
-              {currentExpression === 'idle' && 'Ready to help'}
-              {currentExpression === 'speaking' && 'Explaining...'}
-              {currentExpression === 'thinking' && 'Thinking...'}
-            </span>
+        {/* Character Info - Compact */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center space-x-2">
+            <h4 className="font-semibold text-gray-900 text-sm truncate">{config.name}</h4>
+            <div className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-white border border-gray-200 flex-shrink-0">
+              <div className={`w-1.5 h-1.5 rounded-full mr-1 ${
+                currentExpression === 'idle' ? 'bg-green-400' : 
+                currentExpression === 'speaking' ? 'bg-blue-400' : 'bg-yellow-400'
+              }`}></div>
+              <span className="text-gray-700">
+                {currentExpression === 'idle' && 'Ready'}
+                {currentExpression === 'speaking' && 'Helping'}
+                {currentExpression === 'thinking' && 'Thinking'}
+              </span>
+            </div>
           </div>
-        </div>
-
-        {/* Lesson Context Display */}
-        <div className="mt-3 text-center">
-          <div className="text-xs text-gray-600 mb-1">Currently helping with:</div>
-          <div className="text-sm font-medium text-gray-800 line-clamp-2">
+          
+          <div className="text-xs text-gray-600 mt-0.5 truncate">
             Lesson {lessonContext.lessonNumber}: {lessonContext.lessonTitle}
           </div>
         </div>

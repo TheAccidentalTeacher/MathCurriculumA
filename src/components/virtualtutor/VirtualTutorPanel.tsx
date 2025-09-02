@@ -102,8 +102,8 @@ export default function VirtualTutorPanel({
         </div>
       </div>
 
-      {/* Character Display Area */}
-      <div className="flex-shrink-0">
+      {/* Compact Character Display Area */}
+      <div className="flex-shrink-0" style={{ maxHeight: '120px' }}>
         <CharacterDisplay 
           character={selectedCharacter}
           expression={characterExpression}
