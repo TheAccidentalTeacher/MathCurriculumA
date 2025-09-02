@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import MathRenderer from '../MathRenderer';
+import MathGrapher, { createLinearGraph, createPointGraph } from '../MathGrapher';
 
 interface ChatMessage {
   id: string;
@@ -109,6 +110,80 @@ export default function ChatInterface({
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Function to detect and render mathematical graphs in messages
+  const renderMessageWithGraphs = (content: string) => {
+    // Split content by graph markers
+    const parts = content.split(/(\[GRAPH:[^\]]+\])/g);
+    
+    return parts.map((part, index) => {
+      // Check if this part is a graph instruction
+      const graphMatch = part.match(/\[GRAPH:([^\]]+)\]/);
+      if (graphMatch) {
+        const graphInstruction = graphMatch[1];
+        
+        // Parse linear function: y = mx + b
+        const linearMatch = graphInstruction.match(/y\s*=\s*([+-]?\d*\.?\d*)\s*x\s*([+-]\s*\d+\.?\d*)?/);
+        if (linearMatch) {
+          const slope = parseFloat(linearMatch[1] || '1');
+          const yIntercept = parseFloat((linearMatch[2] || '0').replace(/\s/g, ''));
+          
+          return (
+            <div key={index} className="my-4">
+              <MathGrapher 
+                slope={slope}
+                yIntercept={yIntercept}
+                config={{ 
+                  type: 'linear', 
+                  title: `Graph of ${graphInstruction}`,
+                  gridlines: true 
+                }}
+                width={400}
+                height={300}
+              />
+            </div>
+          );
+        }
+        
+        // Parse coordinate points: points(x1,y1)(x2,y2)...
+        const pointsMatch = graphInstruction.match(/points\(([^)]+)\)/g);
+        if (pointsMatch) {
+          const points = pointsMatch.map(pointStr => {
+            const coords = pointStr.match(/\(([^,]+),([^)]+)\)/);
+            if (coords) {
+              return {
+                x: parseFloat(coords[1]),
+                y: parseFloat(coords[2]),
+                label: `(${coords[1]}, ${coords[2]})`
+              };
+            }
+            return null;
+          }).filter(Boolean) as { x: number; y: number; label: string }[];
+          
+          return (
+            <div key={index} className="my-4">
+              <MathGrapher 
+                points={points}
+                config={{ 
+                  type: 'coordinate', 
+                  title: 'Coordinate Points',
+                  gridlines: true 
+                }}
+                width={400}
+                height={300}
+              />
+            </div>
+          );
+        }
+        
+        // If no specific pattern matches, show the instruction as text
+        return <div key={index} className="text-gray-600 italic">{graphInstruction}</div>;
+      }
+      
+      // Regular content - render with math
+      return <MathRenderer key={index} content={part} />;
+    });
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -305,7 +380,11 @@ export default function ChatInterface({
               }`}
             >
               <div className="text-sm" aria-label="Message content">
-                <MathRenderer content={message.content} />
+                {message.type === 'user' ? (
+                  <MathRenderer content={message.content} />
+                ) : (
+                  renderMessageWithGraphs(message.content)
+                )}
               </div>
               <div className="text-xs opacity-70 mt-1" aria-label="Message time">
                 {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

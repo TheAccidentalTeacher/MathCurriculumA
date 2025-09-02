@@ -24,6 +24,7 @@
     "@prisma/client": "^6.15.0",
     "@types/better-sqlite3": "^7.6.13",
     "@types/katex": "^0.16.7",
+    "@types/plotly.js": "^3.0.3",
     "@vercel/postgres": "^0.10.0",
     "ai": "^5.0.29",
     "better-sqlite3": "^12.2.0",
@@ -33,9 +34,12 @@
     "openai": "^5.16.0",
     "pdf-parse": "^1.1.1",
     "pg": "^8.13.1",
+    "plotly.js": "^3.1.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
-    "react-katex": "^3.1.0"
+    "react-katex": "^3.1.0",
+    "react-plotly.js": "^2.6.0",
+    "recharts": "^3.1.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -44,6 +48,7 @@
     "@types/pg": "^8.11.10",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/react-plotly.js": "^2.6.3",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
     "prisma": "^6.15.0",
