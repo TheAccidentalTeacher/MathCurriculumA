@@ -246,14 +246,20 @@ export default function ChatInterface({
         
         return (
           <div key={index} className="my-4">
-            <GeoGebraWidget 
-              appName="graphing"
-              commands={commands}
-              width={600}
-              height={400}
-              showAlgebraInput={true}
-              showToolBar={false}
-            />
+            <div className="p-4 border border-blue-200 rounded-lg bg-blue-50">
+              <h4 className="font-semibold text-blue-800 mb-2">📐 Interactive Math Activity</h4>
+              <GeoGebraWidget 
+                appName="graphing"
+                commands={commands}
+                width={600}
+                height={400}
+                showAlgebraInput={true}
+                showToolBar={false}
+              />
+              <div className="mt-2 text-xs text-blue-600">
+                <strong>Commands:</strong> {commands.join(', ')}
+              </div>
+            </div>
           </div>
         );
       }
@@ -267,10 +273,16 @@ export default function ChatInterface({
         
         return (
           <div key={index} className="my-4">
-            <PowersOf10Activity 
-              activityType={activityType}
-              number={number}
-            />
+            <div className="p-4 border border-green-200 rounded-lg bg-green-50">
+              <h4 className="font-semibold text-green-800 mb-2">🔢 Powers of 10 Activity</h4>
+              <PowersOf10Activity 
+                activityType={activityType}
+                number={number}
+              />
+              <div className="mt-2 text-xs text-green-600">
+                <strong>Activity:</strong> {activityType} • <strong>Number:</strong> {number}
+              </div>
+            </div>
           </div>
         );
       }
