@@ -23,6 +23,11 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
   const [lessonAnalysis, setLessonAnalysis] = useState<any>(null);
   const [contentWidth, setContentWidth] = useState<number>(80); // Default 80% width
 
+  // Debug logging for width changes
+  useEffect(() => {
+    console.log(`📐 [LessonViewer] Content width changed to: ${contentWidth}%`);
+  }, [contentWidth]);
+
   // Load lesson data and prepare content on component mount
   useEffect(() => {
     console.log(`🚀 [LessonViewer] Component mounted for ${documentId} - Lesson ${lessonNumber}`);
@@ -314,15 +319,15 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
 
       {/* Page Content */}
       <div className="flex-1 overflow-auto bg-gray-100">
-        {/* Width Control Panel */}
-        <div className="max-w-full mx-auto px-6 py-2 bg-white border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <span className="text-sm font-medium text-gray-700">Content Width:</span>
-              <div className="flex items-center space-x-2">
+        {/* Width Control Panel - Make it more prominent */}
+        <div className="bg-blue-50 border-b-2 border-blue-200 px-6 py-3">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-4">
+              <span className="text-sm font-semibold text-blue-800">📐 Content Width:</span>
+              <div className="flex items-center space-x-3">
                 <button
                   onClick={() => setContentWidth(Math.max(50, contentWidth - 10))}
-                  className="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-sm font-mono"
+                  className="px-3 py-2 bg-white hover:bg-blue-100 border border-blue-300 rounded text-sm font-mono font-bold shadow-sm"
                   title="Decrease width"
                 >
                   −
@@ -333,38 +338,54 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
                   max="95"
                   value={contentWidth}
                   onChange={(e) => setContentWidth(parseInt(e.target.value))}
-                  className="w-24 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  className="w-32 h-3 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((contentWidth-50)/45)*100}%, #dbeafe ${((contentWidth-50)/45)*100}%, #dbeafe 100%)`
+                  }}
                 />
                 <button
                   onClick={() => setContentWidth(Math.min(95, contentWidth + 10))}
-                  className="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-sm font-mono"
+                  className="px-3 py-2 bg-white hover:bg-blue-100 border border-blue-300 rounded text-sm font-mono font-bold shadow-sm"
                   title="Increase width"
                 >
                   +
                 </button>
-                <span className="text-sm font-mono text-gray-600 min-w-[3rem]">
+                <span className="text-sm font-mono font-bold text-blue-800 min-w-[3.5rem] bg-white px-2 py-1 rounded border border-blue-300">
                   {contentWidth}%
                 </span>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-blue-700 mr-2">Quick presets:</span>
               <button
                 onClick={() => setContentWidth(66)}
-                className="px-3 py-1 bg-blue-100 hover:bg-blue-200 rounded text-xs"
+                className={`px-3 py-2 rounded text-xs font-semibold border transition-colors ${
+                  contentWidth === 66 
+                    ? 'bg-blue-600 text-white border-blue-600' 
+                    : 'bg-white hover:bg-blue-100 border-blue-300 text-blue-800'
+                }`}
               >
-                Compact
+                Compact (66%)
               </button>
               <button
                 onClick={() => setContentWidth(80)}
-                className="px-3 py-1 bg-green-100 hover:bg-green-200 rounded text-xs"
+                className={`px-3 py-2 rounded text-xs font-semibold border transition-colors ${
+                  contentWidth === 80 
+                    ? 'bg-green-600 text-white border-green-600' 
+                    : 'bg-white hover:bg-green-100 border-green-300 text-green-800'
+                }`}
               >
-                Balanced
+                Balanced (80%)
               </button>
               <button
                 onClick={() => setContentWidth(90)}
-                className="px-3 py-1 bg-purple-100 hover:bg-purple-200 rounded text-xs"
+                className={`px-3 py-2 rounded text-xs font-semibold border transition-colors ${
+                  contentWidth === 90 
+                    ? 'bg-purple-600 text-white border-purple-600' 
+                    : 'bg-white hover:bg-purple-100 border-purple-300 text-purple-800'
+                }`}
               >
-                Wide
+                Wide (90%)
               </button>
             </div>
           </div>
