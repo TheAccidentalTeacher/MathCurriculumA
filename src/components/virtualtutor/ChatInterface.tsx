@@ -3,6 +3,11 @@
 import { useState, useRef, useEffect } from 'react';
 import MathRenderer from '../MathRenderer';
 import MathGrapher, { createLinearGraph, createPointGraph } from '../MathGrapher';
+import PlaceValueChart, { createPowersOf10Chart } from '../PlaceValueChart';
+import ScientificNotationBuilder, { createScientificNotationExample } from '../ScientificNotationBuilder';
+import PowersOf10NumberLine, { createPowersOf10NumberLine } from '../PowersOf10NumberLine';
+import GeoGebraWidget, { PowersOf10GeoGebra, GeometryExplorer, FunctionGrapher } from '../GeoGebraWidget';
+import PowersOf10Activity from '../PowersOf10GeoGebra';
 
 interface ChatMessage {
   id: string;
@@ -113,10 +118,61 @@ export default function ChatInterface({
 
   // Function to detect and render mathematical graphs in messages
   const renderMessageWithGraphs = (content: string) => {
-    // Split content by graph markers
-    const parts = content.split(/(\[GRAPH:[^\]]+\])/g);
+    // Split content by graph markers including GeoGebra activities
+    const parts = content.split(/(\[GRAPH:[^\]]+\]|\[PLACEVALUE:[^\]]+\]|\[SCIENTIFIC:[^\]]+\]|\[POWERLINE:[^\]]+\]|\[GEOGEBRA:[^\]]+\]|\[GEOMETRY:[^\]]+\]|\[POWERS10:[^\]]+\])/g);
     
     return parts.map((part, index) => {
+      // Check for Place Value Chart instruction
+      const placeValueMatch = part.match(/\[PLACEVALUE:([^\]]+)\]/);
+      if (placeValueMatch) {
+        const number = parseFloat(placeValueMatch[1]) || 3500;
+        return (
+          <div key={index} className="my-4">
+            <PlaceValueChart 
+              number={number}
+              showPowersOf10={true}
+              interactive={true}
+              width={600}
+              height={300}
+            />
+          </div>
+        );
+      }
+
+      // Check for Scientific Notation Builder instruction
+      const scientificMatch = part.match(/\[SCIENTIFIC:([^\]]+)\]/);
+      if (scientificMatch) {
+        const number = parseFloat(scientificMatch[1]) || 3500;
+        return (
+          <div key={index} className="my-4">
+            <ScientificNotationBuilder 
+              initialNumber={number}
+              interactive={true}
+              showSteps={true}
+              width={700}
+              height={400}
+            />
+          </div>
+        );
+      }
+
+      // Check for Powers of 10 Number Line instruction
+      const powerLineMatch = part.match(/\[POWERLINE:([^\]]+)\]/);
+      if (powerLineMatch) {
+        const number = parseFloat(powerLineMatch[1]) || 3500;
+        return (
+          <div key={index} className="my-4">
+            <PowersOf10NumberLine 
+              currentNumber={number}
+              interactive={true}
+              showLabels={true}
+              width={800}
+              height={200}
+            />
+          </div>
+        );
+      }
+
       // Check if this part is a graph instruction
       const graphMatch = part.match(/\[GRAPH:([^\]]+)\]/);
       if (graphMatch) {
@@ -178,6 +234,55 @@ export default function ChatInterface({
         
         // If no specific pattern matches, show the instruction as text
         return <div key={index} className="text-gray-600 italic">{graphInstruction}</div>;
+      }
+
+      // Check for GeoGebra activities
+      const geogebraMatch = part.match(/\[GEOGEBRA:([^\]]+)\]/);
+      if (geogebraMatch) {
+        const activity = geogebraMatch[1];
+        const commands = activity.split(';').map(cmd => cmd.trim());
+        
+        return (
+          <div key={index} className="my-4">
+            <GeoGebraWidget 
+              appName="graphing"
+              commands={commands}
+              width={600}
+              height={400}
+              showAlgebraInput={true}
+              showToolBar={false}
+            />
+          </div>
+        );
+      }
+
+      // Check for Powers of 10 GeoGebra activity
+      const powers10Match = part.match(/\[POWERS10:([^\]]+)\]/);
+      if (powers10Match) {
+        const params = powers10Match[1].split(',');
+        const activityType = (params[0] || 'place-value') as 'place-value' | 'number-line' | 'scientific-notation' | 'decomposition';
+        const number = parseFloat(params[1]) || 3500;
+        
+        return (
+          <div key={index} className="my-4">
+            <PowersOf10Activity 
+              activityType={activityType}
+              number={number}
+            />
+          </div>
+        );
+      }
+
+      // Check for geometry activities
+      const geometryMatch = part.match(/\[GEOMETRY:([^\]]+)\]/);
+      if (geometryMatch) {
+        const geometryType = geometryMatch[1];
+        
+        return (
+          <div key={index} className="my-4">
+            <GeometryExplorer />
+          </div>
+        );
       }
       
       // Regular content - render with math
