@@ -8,6 +8,7 @@ import ScientificNotationBuilder, { createScientificNotationExample } from '../S
 import PowersOf10NumberLine, { createPowersOf10NumberLine } from '../PowersOf10NumberLine';
 import GeoGebraWidget, { PowersOf10GeoGebra, GeometryExplorer, FunctionGrapher } from '../GeoGebraWidget';
 import PowersOf10Activity from '../PowersOf10GeoGebra';
+import Cube3DVisualizer from '../Cube3DVisualizer';
 
 interface ChatMessage {
   id: string;
@@ -118,8 +119,8 @@ export default function ChatInterface({
 
   // Function to detect and render mathematical graphs in messages
   const renderMessageWithGraphs = (content: string) => {
-    // Split content by graph markers including GeoGebra activities
-    const parts = content.split(/(\[GRAPH:[^\]]+\]|\[PLACEVALUE:[^\]]+\]|\[SCIENTIFIC:[^\]]+\]|\[POWERLINE:[^\]]+\]|\[GEOGEBRA:[^\]]+\]|\[GEOMETRY:[^\]]+\]|\[POWERS10:[^\]]+\])/g);
+    // Split content by graph markers including GeoGebra activities and 3D visualizers
+    const parts = content.split(/(\[GRAPH:[^\]]+\]|\[PLACEVALUE:[^\]]+\]|\[SCIENTIFIC:[^\]]+\]|\[POWERLINE:[^\]]+\]|\[GEOGEBRA:[^\]]+\]|\[GEOMETRY:[^\]]+\]|\[POWERS10:[^\]]+\]|\[CUBE:[^\]]+\]|\[3D:[^\]]+\])/g);
     
     return parts.map((part, index) => {
       // Check for Place Value Chart instruction
@@ -284,14 +285,92 @@ export default function ChatInterface({
           </div>
         );
       }
+
+      // Check for 3D cube visualizations
+      const cubeMatch = part.match(/\[CUBE:([^\]]+)\]/);
+      if (cubeMatch) {
+        const sideLength = parseFloat(cubeMatch[1]) || 4;
+        
+        return (
+          <div key={index} className="my-4">
+            <Cube3DVisualizer 
+              sideLength={sideLength}
+              showVolume={true}
+              showFormula={true}
+              interactive={true}
+            />
+          </div>
+        );
+      }
+
+      // Check for general 3D visualizations
+      const threeDMatch = part.match(/\[3D:([^\]]+)\]/);
+      if (threeDMatch) {
+        const shape = threeDMatch[1].toLowerCase();
+        
+        if (shape.includes('cube')) {
+          return (
+            <div key={index} className="my-4">
+              <Cube3DVisualizer 
+                sideLength={4}
+                showVolume={true}
+                showFormula={true}
+                interactive={true}
+              />
+            </div>
+          );
+        }
+        
+        // For other 3D shapes, use GeoGebra 3D
+        return (
+          <div key={index} className="my-4">
+            <GeoGebraWidget 
+              appName="3d"
+              commands={[`${shape.charAt(0).toUpperCase() + shape.slice(1)}((0,0,0), 3)`]}
+              width={600}
+              height={500}
+              showToolBar={true}
+              showAlgebraInput={true}
+            />
+          </div>
+        );
+      }
       
-      // Regular content - render with math
-      return <MathRenderer key={index} content={part} />;
+      // Regular content - render with math and proper formatting
+      return (
+        <div key={index} className="whitespace-pre-wrap break-words">
+          <MathRenderer content={part} />
+        </div>
+      );
     });
   };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Function to format long AI responses
+  const formatAIResponse = (content: string) => {
+    // Split by sentences that end with periods followed by uppercase letters
+    const sentences = content.split(/(\. [A-Z])/g);
+    let formattedContent = '';
+    
+    for (let i = 0; i < sentences.length; i += 2) {
+      if (sentences[i]) {
+        // Add the sentence
+        formattedContent += sentences[i];
+        // Add back the period and space if there's a following part
+        if (sentences[i + 1]) {
+          formattedContent += sentences[i + 1];
+        }
+        // Add line break after every few sentences for readability
+        if (i > 0 && (i / 2) % 3 === 2) {
+          formattedContent += '\n\n';
+        }
+      }
+    }
+    
+    return formattedContent;
   };
 
   const handleSendMessage = async () => {
@@ -381,7 +460,7 @@ export default function ChatInterface({
         const assistantMessage: ChatMessage = {
           id: data.response.id || `assistant-${Date.now()}`,
           type: 'assistant',
-          content: data.response.content || data.response,
+          content: formatAIResponse(data.response.content || data.response),
           timestamp: new Date(),
           character: character
         };
