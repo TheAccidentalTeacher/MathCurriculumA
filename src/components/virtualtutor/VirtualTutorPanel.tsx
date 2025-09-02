@@ -23,9 +23,24 @@ export default function VirtualTutorPanel({
 
   useEffect(() => {
     // Initialize virtual tutor for this specific lesson
-    console.log(`Virtual Tutor initialized for Lesson ${lessonNumber}: ${lessonTitle}`);
+    console.log(`🎓 [VirtualTutorPanel] Initializing for Lesson ${lessonNumber}: ${lessonTitle}`);
+    console.log(`📊 [VirtualTutorPanel] Document ID: ${documentId}`);
+    console.log(`🧠 [VirtualTutorPanel] Lesson Analysis Available:`, !!lessonAnalysis);
+    
+    if (lessonAnalysis) {
+      console.log(`📚 [VirtualTutorPanel] Analysis details:`, {
+        concepts: lessonAnalysis.content?.mathematicalConcepts,
+        confidence: lessonAnalysis.content?.confidence,
+        difficulty: lessonAnalysis.content?.difficultyLevel,
+        formulas: lessonAnalysis.content?.keyFormulas?.length || 0,
+        vocabulary: lessonAnalysis.content?.vocabularyTerms?.length || 0
+      });
+    } else {
+      console.log(`⚠️ [VirtualTutorPanel] No lesson analysis provided - using fallback mode`);
+    }
+    
     setIsInitialized(true);
-  }, [documentId, lessonNumber, lessonTitle]);
+  }, [documentId, lessonNumber, lessonTitle, lessonAnalysis]);
 
   const handleCharacterSwitch = (character: 'somers' | 'gimli') => {
     setSelectedCharacter(character);

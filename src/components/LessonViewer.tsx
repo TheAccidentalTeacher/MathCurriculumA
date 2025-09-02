@@ -24,6 +24,7 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
 
   // Load lesson data and prepare content on component mount
   useEffect(() => {
+    console.log(`🚀 [LessonViewer] Component mounted for ${documentId} - Lesson ${lessonNumber}`);
     loadLessonData();
     prepareLessonContent();
   }, [documentId, lessonNumber]);
@@ -31,69 +32,98 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
   // Set initial session when lesson data loads
   useEffect(() => {
     if (lessonData && lessonData.sessions.length > 0 && !currentSession) {
+      console.log(`📋 [LessonViewer] Setting initial session, found ${lessonData.sessions.length} sessions`);
       setCurrentSession(lessonData.sessions[0]);
       setCurrentPageIndex(0);
     }
   }, [lessonData, currentSession]);
 
   const loadLessonData = async () => {
+    console.log(`📚 [LessonViewer] Starting to load lesson data for ${documentId}/${lessonNumber}`);
     setIsLoading(true);
     setError(null);
     
     try {
-      const response = await fetch(`/api/lessons/${documentId}/${lessonNumber}`);
+      const apiUrl = `/api/lessons/${documentId}/${lessonNumber}`;
+      console.log(`🌐 [LessonViewer] Fetching from: ${apiUrl}`);
+      
+      const response = await fetch(apiUrl);
+      console.log(`📡 [LessonViewer] API Response status: ${response.status}`);
+      
       const result = await response.json();
+      console.log(`📄 [LessonViewer] API Response data:`, result);
       
       if (result.success) {
+        console.log(`✅ [LessonViewer] Lesson data loaded successfully:`, result.lesson);
         setLessonData(result.lesson);
       } else {
+        console.error(`❌ [LessonViewer] API returned error:`, result.error);
         setError(result.error || 'Failed to load lesson data');
       }
     } catch (err) {
+      console.error(`💥 [LessonViewer] Network/parsing error:`, err);
       setError('Network error loading lesson data');
-      console.error('Lesson loading error:', err);
     } finally {
       setIsLoading(false);
+      console.log(`🏁 [LessonViewer] loadLessonData completed`);
     }
   };
 
   const prepareLessonContent = async () => {
+    console.log(`🔍 [LessonViewer] Starting content preparation for ${documentId}/${lessonNumber}`);
     setContentPreparationStatus('🔍 Analyzing lesson content...');
     
     try {
       // First check if content is already prepared
-      const checkResponse = await fetch(`/api/lessons/${documentId}/${lessonNumber}/prepare`);
+      const checkUrl = `/api/lessons/${documentId}/${lessonNumber}/prepare`;
+      console.log(`🔎 [LessonViewer] Checking for existing analysis: ${checkUrl}`);
+      
+      const checkResponse = await fetch(checkUrl);
+      console.log(`📊 [LessonViewer] Check response status: ${checkResponse.status}`);
+      
       const checkResult = await checkResponse.json();
+      console.log(`📈 [LessonViewer] Check response data:`, checkResult);
       
       if (checkResult.success) {
+        console.log(`✅ [LessonViewer] Found cached lesson analysis:`, checkResult.analysis);
         setLessonAnalysis(checkResult.analysis);
-        setContentPreparationStatus('✅ Lesson analysis ready');
-        console.log('📚 Lesson content already prepared:', checkResult.analysis);
+        setContentPreparationStatus('✅ Lesson analysis ready (cached)');
         return;
       }
 
       // Prepare new content analysis
+      console.log(`🆕 [LessonViewer] No cached analysis found, preparing new analysis...`);
       setContentPreparationStatus('📖 Extracting content from lesson pages...');
       
-      const prepareResponse = await fetch(`/api/lessons/${documentId}/${lessonNumber}/prepare`, {
+      const prepareResponse = await fetch(checkUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         }
       });
       
+      console.log(`🔧 [LessonViewer] Prepare response status: ${prepareResponse.status}`);
       const prepareResult = await prepareResponse.json();
+      console.log(`🎯 [LessonViewer] Prepare response data:`, prepareResult);
       
       if (prepareResult.success) {
+        console.log(`🎉 [LessonViewer] Content analysis completed successfully!`);
+        console.log(`📋 [LessonViewer] Analysis summary:`, {
+          concepts: prepareResult.analysis?.content?.mathematicalConcepts,
+          confidence: prepareResult.analysis?.content?.confidence,
+          processingTime: prepareResult.processingTimeMs
+        });
+        
         setLessonAnalysis(prepareResult.analysis);
         setContentPreparationStatus(`✅ Virtual Tutor ready with specialized knowledge (${prepareResult.processingTimeMs}ms)`);
-        console.log('🎯 Lesson content prepared for Virtual Tutor:', prepareResult.analysis);
       } else {
+        console.error(`❌ [LessonViewer] Content preparation failed:`, prepareResult.error);
         throw new Error(prepareResult.error);
       }
       
     } catch (error) {
-      console.error('Failed to prepare lesson content:', error);
+      console.error(`💥 [LessonViewer] Content preparation error:`, error);
+      console.log(`🔄 [LessonViewer] Falling back to general tutoring mode`);
       setContentPreparationStatus('⚠️ Using general tutoring mode');
       setLessonAnalysis(null);
     }

@@ -53,19 +53,37 @@ export default function ChatInterface({
 
   const config = characterConfig[character];
 
-  // Initialize conversation when character changes
+    // Initialize messages when character or lesson context changes
   useEffect(() => {
+    console.log(`💬 [ChatInterface] Initializing chat for character: ${character}`);
+    console.log(`📖 [ChatInterface] Lesson context:`, lessonContext);
+    console.log(`🧠 [ChatInterface] Analysis available:`, !!lessonContext.analysis);
+    
+    if (lessonContext.analysis) {
+      console.log(`🎯 [ChatInterface] Using specialized content for ${character}:`, {
+        concepts: lessonContext.analysis.content?.mathematicalConcepts,
+        tutorPrompt: lessonContext.analysis.tutorPrompt?.substring(0, 100) + '...',
+        confidence: lessonContext.analysis.content?.confidence
+      });
+    }
+    
+    const config = characterConfig[character];
+    console.log(`🎭 [ChatInterface] Character config:`, {
+      name: config.name,
+      initialMessage: config.initialMessage.substring(0, 100) + '...'
+    });
+    
     const initialMessage: ChatMessage = {
-      id: `init-${character}-${Date.now()}`,
+      id: `${character}-welcome-${Date.now()}`,
       type: 'assistant',
       content: config.initialMessage,
       timestamp: new Date(),
-      character: character
     };
 
+    console.log(`✅ [ChatInterface] Setting initial message for ${config.name}`);
     setMessages([initialMessage]);
     setInputValue('');
-  }, [character, config.initialMessage]);
+  }, [character, lessonContext]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -77,24 +95,14 @@ export default function ChatInterface({
   };
 
   const handleSendMessage = async () => {
-    if (!inputValue.trim()) return;
-
-    const userMessage: ChatMessage = {
-      id: `user-${Date.now()}`,
-      type: 'user',
-      content: inputValue.trim(),
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
-    setIsTyping(true);
-    
-    // Set character to thinking while processing
-    onExpressionChange?.('thinking');
-
-  const handleSendMessage = async () => {
     if (!inputValue.trim() || isTyping) return;
+
+    console.log(`💬 [ChatInterface] User sending message: "${inputValue.trim()}"`);
+    console.log(`🎭 [ChatInterface] Current character: ${character}`);
+    console.log(`📚 [ChatInterface] Lesson context:`, {
+      lessonId: lessonContext.documentId + '-' + lessonContext.lessonNumber,
+      hasAnalysis: !!lessonContext.analysis
+    });
 
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
@@ -111,7 +119,15 @@ export default function ChatInterface({
     onExpressionChange?.('thinking');
 
     try {
-      console.log(`🤖 Sending AI request for ${character}`);
+      console.log(`🤖 [ChatInterface] Sending AI request for ${character}`);
+      console.log(`📡 [ChatInterface] AI API payload preview:`, {
+        message: userMessage.content,
+        character,
+        lessonId: lessonContext.documentId + '-' + lessonContext.lessonNumber,
+        hasAnalysisData: !!lessonContext.analysis,
+        concepts: lessonContext.analysis?.content?.mathematicalConcepts || ['fallback'],
+        extractionConfidence: lessonContext.analysis?.content?.confidence || 'none'
+      });
       
       // Call our AI API
       const response = await fetch('/api/ai/chat', {
@@ -152,34 +168,37 @@ export default function ChatInterface({
         })
       });
 
+      console.log(`📡 [ChatInterface] AI API response status: ${response.status}`);
       const data = await response.json();
+      console.log(`📄 [ChatInterface] AI API response data:`, data);
       
       if (data.success && data.response) {
+        console.log(`✅ [ChatInterface] AI response received successfully`);
+        
         // Set character to speaking while responding
         onExpressionChange?.('speaking');
         
         const assistantMessage: ChatMessage = {
-          id: data.response.id,
+          id: data.response.id || `assistant-${Date.now()}`,
           type: 'assistant',
-          content: data.response.content,
-          timestamp: new Date(data.response.timestamp),
+          content: data.response.content || data.response,
+          timestamp: new Date(),
           character: character
         };
 
         setMessages(prev => [...prev, assistantMessage]);
 
         // Log AI response metrics
-        if (data.response.metadata) {
-          console.log(`✅ AI Response received:`);
-          console.log(`   📊 Tokens: ${data.response.metadata.tokens.total}`);
-          console.log(`   💰 Cost: $${data.response.metadata.cost.toFixed(6)}`);
-          console.log(`   🎯 Confidence: ${data.response.metadata.confidence}%`);
-          console.log(`   🧠 Model: ${data.response.model}`);
+        if (data.metrics) {
+          console.log(`📊 [ChatInterface] AI Response metrics:`);
+          console.log(`   � Tokens: ${data.metrics.tokens}`);
+          console.log(`   💰 Cost: ${data.metrics.costFormatted}`);
+          console.log(`   🧠 Model: ${data.model}`);
         }
         
       } else {
+        console.error(`❌ [ChatInterface] AI API returned error:`, data.error || 'Unknown error');
         // Handle API error with fallback
-        console.error('AI API error:', data.error || 'Unknown error');
         
         const fallbackMessage: ChatMessage = {
           id: `assistant-fallback-${Date.now()}`,
@@ -231,7 +250,6 @@ export default function ChatInterface({
     } else {
       return `Woof! My doggy brain is having a little technical hiccup! 🐕 Try asking me again in a moment, or check out those lesson examples while I get my digital treats sorted out!`;
     }
-  };
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {

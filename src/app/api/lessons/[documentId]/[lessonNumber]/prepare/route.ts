@@ -16,34 +16,24 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { documentId, lessonNumber } = await params;
     const lessonNum = parseInt(lessonNumber);
 
-    console.log(`📚 Preparing lesson content for ${documentId} - Lesson ${lessonNum}`);
+    console.log(`📚 [API] Starting lesson content preparation for ${documentId} - Lesson ${lessonNum}`);
 
     if (isNaN(lessonNum)) {
+      console.error(`❌ [API] Invalid lesson number: ${lessonNumber}`);
       return NextResponse.json({
         success: false,
         error: 'Invalid lesson number'
       }, { status: 400 });
     }
 
-    // Check if we already have cached analysis
-    const cachedAnalysis = await LessonContentService.getCachedLessonAnalysis(documentId, lessonNum);
-    
-    if (cachedAnalysis) {
-      console.log(`✅ Using cached analysis for ${documentId} - Lesson ${lessonNum}`);
-      return NextResponse.json({
-        success: true,
-        analysis: cachedAnalysis,
-        cached: true,
-        message: 'Lesson content ready from cache'
-      });
-    }
-
-    // Prepare fresh analysis
+    // Prepare lesson content (caching is handled internally)
     const startTime = Date.now();
+    console.log(`⏱️ [API] Starting content preparation at ${new Date().toISOString()}`);
+    
     const analysis = await LessonContentService.prepareLessonContent(documentId, lessonNum);
     const processingTime = Date.now() - startTime;
 
-    console.log(`✅ Lesson content prepared in ${processingTime}ms for ${documentId} - Lesson ${lessonNum}`);
+    console.log(`✅ [API] Lesson content prepared in ${processingTime}ms for ${documentId} - Lesson ${lessonNum}`);
 
     return NextResponse.json({
       success: true,
@@ -68,32 +58,44 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const { documentId, lessonNumber } = await params;
     const lessonNum = parseInt(lessonNumber);
 
+    console.log(`📖 [API] Getting lesson content status for ${documentId} - Lesson ${lessonNum}`);
+
     if (isNaN(lessonNum)) {
+      console.error(`❌ [API] Invalid lesson number: ${lessonNumber}`);
       return NextResponse.json({
         success: false,
         error: 'Invalid lesson number'
       }, { status: 400 });
     }
 
-    // Try to get cached analysis
-    const cachedAnalysis = await LessonContentService.getCachedLessonAnalysis(documentId, lessonNum);
+    // Get cache status
+    const cacheStatus = LessonContentService.getCacheStatus();
+    const cacheKey = `lesson_analysis_${documentId}_${lessonNum}`;
+    const isCached = cacheStatus.keys.includes(cacheKey);
     
-    if (cachedAnalysis) {
+    console.log(`📊 [API] Cache status for ${cacheKey}: ${isCached ? 'found' : 'not found'}`);
+    
+    if (isCached) {
       return NextResponse.json({
         success: true,
-        analysis: cachedAnalysis,
-        cached: true
+        cached: true,
+        message: 'Lesson content is ready',
+        cacheInfo: {
+          totalCached: cacheStatus.size,
+          cacheKey
+        }
       });
     }
 
     return NextResponse.json({
       success: false,
+      cached: false,
       error: 'Lesson content not prepared yet',
       message: 'Call POST /prepare to analyze lesson content'
     }, { status: 404 });
 
   } catch (error) {
-    console.error('❌ Error getting lesson content:', error);
+    console.error('❌ [API] Error getting lesson content:', error);
     
     return NextResponse.json({
       success: false,
