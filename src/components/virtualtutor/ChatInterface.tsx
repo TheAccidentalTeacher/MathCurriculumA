@@ -6,7 +6,7 @@ import MathGrapher, { createLinearGraph, createPointGraph } from '../MathGrapher
 import PlaceValueChart, { createPowersOf10Chart } from '../PlaceValueChart';
 import ScientificNotationBuilder, { createScientificNotationExample } from '../ScientificNotationBuilder';
 import PowersOf10NumberLine, { createPowersOf10NumberLine } from '../PowersOf10NumberLine';
-import GeoGebraWidget, { PowersOf10GeoGebra, GeometryExplorer, FunctionGrapher } from '../GeoGebraWidget';
+import ChatGeoGebra, { ChatCubeVisualizer, ChatGraphingActivity, ChatGeometryExplorer } from '../ChatGeoGebra';
 import PowersOf10Activity from '../PowersOf10GeoGebra';
 import GeometryVisualizer, { TriangleExplorer, CircleExplorer, CubeExplorer, SphereExplorer, CylinderExplorer } from '../GeometryVisualizer';
 import Cube3DVisualizer from '../Cube3DVisualizer';
@@ -176,9 +176,9 @@ export default function ChatInterface({
       }
 
       // Check if this part is a graph instruction
-      const graphMatch = part.match(/\[GRAPH:([^\]]+)\]/);
-      if (graphMatch) {
-        const graphInstruction = graphMatch[1];
+      const legacyGraphMatch = part.match(/\[GRAPH:([^\]]+)\]/);
+      if (legacyGraphMatch) {
+        const graphInstruction = legacyGraphMatch[1];
         
         // Parse linear function: y = mx + b
         const linearMatch = graphInstruction.match(/y\s*=\s*([+-]?\d*\.?\d*)\s*x\s*([+-]\s*\d+\.?\d*)?/);
@@ -246,20 +246,40 @@ export default function ChatInterface({
         
         return (
           <div key={index} className="my-4">
-            <div className="p-4 border border-blue-200 rounded-lg bg-blue-50">
-              <h4 className="font-semibold text-blue-800 mb-2">📐 Interactive Math Activity</h4>
-              <GeoGebraWidget 
-                appName="graphing"
-                commands={commands}
-                width={600}
-                height={400}
-                showAlgebraInput={true}
-                showToolBar={false}
-              />
-              <div className="mt-2 text-xs text-blue-600">
-                <strong>Commands:</strong> {commands.join(', ')}
-              </div>
-            </div>
+            <ChatGeoGebra 
+              commands={commands}
+              title="Interactive Math Activity"
+              description="Click to expand and interact with the mathematical visualization"
+            />
+          </div>
+        );
+      }
+
+      // Check for cube-specific activities
+      const chatCubeMatch = part.match(/\[CUBE:([^\]]+)\]/);
+      if (chatCubeMatch) {
+        const cubeParams = chatCubeMatch[1].split(',');
+        const cubeCount = parseInt(cubeParams[0]) || 8;
+        const showDecomposition = cubeParams[1] !== 'false';
+        
+        return (
+          <div key={index} className="my-4">
+            <ChatCubeVisualizer 
+              cubeCount={cubeCount}
+              showDecomposition={showDecomposition}
+            />
+          </div>
+        );
+      }
+
+      // Check for graphing activities
+      const chatGraphMatch = part.match(/\[GRAPH:([^\]]+)\]/);
+      if (chatGraphMatch) {
+        const functions = chatGraphMatch[1].split(';').map((f: string) => f.trim());
+        
+        return (
+          <div key={index} className="my-4">
+            <ChatGraphingActivity functions={functions} />
           </div>
         );
       }
@@ -290,11 +310,11 @@ export default function ChatInterface({
       // Check for geometry activities
       const geometryMatch = part.match(/\[GEOMETRY:([^\]]+)\]/);
       if (geometryMatch) {
-        const geometryType = geometryMatch[1];
+        const geometryCommands = geometryMatch[1].split(';').map(cmd => cmd.trim());
         
         return (
           <div key={index} className="my-4">
-            <GeometryExplorer />
+            <ChatGeometryExplorer shapes={geometryCommands} />
           </div>
         );
       }
@@ -389,9 +409,9 @@ export default function ChatInterface({
       }
 
       // Check for 3D cube visualizations
-      const cubeMatch = part.match(/\[CUBE:([^\]]+)\]/);
-      if (cubeMatch) {
-        const sideLength = parseFloat(cubeMatch[1]) || 4;
+      const legacyCubeMatch = part.match(/\[CUBE:([^\]]+)\]/);
+      if (legacyCubeMatch) {
+        const sideLength = parseFloat(legacyCubeMatch[1]) || 4;
         
         return (
           <div key={index} className="my-4">
@@ -423,16 +443,14 @@ export default function ChatInterface({
           );
         }
         
-        // For other 3D shapes, use GeoGebra 3D
+        // For other 3D shapes, use ChatGeoGebra 3D
         return (
           <div key={index} className="my-4">
-            <GeoGebraWidget 
+            <ChatGeoGebra 
               appName="3d"
               commands={[`${shape.charAt(0).toUpperCase() + shape.slice(1)}((0,0,0), 3)`]}
-              width={600}
-              height={500}
-              showToolBar={true}
-              showAlgebraInput={true}
+              title={`3D ${shape.charAt(0).toUpperCase() + shape.slice(1)} Explorer`}
+              description={`Interactive 3D visualization of a ${shape}`}
             />
           </div>
         );

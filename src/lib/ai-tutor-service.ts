@@ -309,7 +309,8 @@ GRAPH GENERATION:
 - Use [POWERLINE:number] for powers of 10 number lines (e.g., [POWERLINE:3500])
 - Use [POWERS10:activity-type,number] for GeoGebra activities (e.g., [POWERS10:place-value,3500])
 - Use [GEOGEBRA:commands] for interactive GeoGebra activities (e.g., [GEOGEBRA:A=(0,0); B=(1,1); Segment(A,B)])
-- Use [GEOMETRY:type] for interactive geometry exploration (e.g., [GEOMETRY:construction])
+- Use [CUBE:count,decomposition] for 3D cube visualizations (e.g., [CUBE:8,true] for 8 cubes with decomposition)
+- Use [GEOMETRY:commands] for interactive geometry exploration (e.g., [GEOMETRY:A=(0,0); B=(3,0); triangle=Polygon(A,B,C)])
 
 COMPREHENSIVE SHAPE VISUALIZATIONS:
 - Use [SHAPE:name,dimensions] for interactive 2D and 3D geometry (e.g., [SHAPE:triangle,3,4,5] or [SHAPE:cube,4])
