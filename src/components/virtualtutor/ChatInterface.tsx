@@ -8,6 +8,7 @@ import ScientificNotationBuilder, { createScientificNotationExample } from '../S
 import PowersOf10NumberLine, { createPowersOf10NumberLine } from '../PowersOf10NumberLine';
 import GeoGebraWidget, { PowersOf10GeoGebra, GeometryExplorer, FunctionGrapher } from '../GeoGebraWidget';
 import PowersOf10Activity from '../PowersOf10GeoGebra';
+import GeometryVisualizer, { TriangleExplorer, CircleExplorer, CubeExplorer, SphereExplorer, CylinderExplorer } from '../GeometryVisualizer';
 import Cube3DVisualizer from '../Cube3DVisualizer';
 
 interface ChatMessage {
@@ -120,7 +121,7 @@ export default function ChatInterface({
   // Function to detect and render mathematical graphs in messages
   const renderMessageWithGraphs = (content: string) => {
     // Split content by graph markers including GeoGebra activities and 3D visualizers
-    const parts = content.split(/(\[GRAPH:[^\]]+\]|\[PLACEVALUE:[^\]]+\]|\[SCIENTIFIC:[^\]]+\]|\[POWERLINE:[^\]]+\]|\[GEOGEBRA:[^\]]+\]|\[GEOMETRY:[^\]]+\]|\[POWERS10:[^\]]+\]|\[CUBE:[^\]]+\]|\[3D:[^\]]+\])/g);
+    const parts = content.split(/(\[GRAPH:[^\]]+\]|\[PLACEVALUE:[^\]]+\]|\[SCIENTIFIC:[^\]]+\]|\[POWERLINE:[^\]]+\]|\[GEOGEBRA:[^\]]+\]|\[GEOMETRY:[^\]]+\]|\[SHAPE:[^\]]+\]|\[POWERS10:[^\]]+\]|\[CUBE:[^\]]+\]|\[3D:[^\]]+\])/g);
     
     return parts.map((part, index) => {
       // Check for Place Value Chart instruction
@@ -282,6 +283,95 @@ export default function ChatInterface({
         return (
           <div key={index} className="my-4">
             <GeometryExplorer />
+          </div>
+        );
+      }
+
+      // Check for comprehensive shape visualizations
+      const shapeMatch = part.match(/\[SHAPE:([^,\]]+),?([^\]]*)\]/);
+      if (shapeMatch) {
+        const shapeName = shapeMatch[1].toLowerCase().trim();
+        const dimensionsStr = shapeMatch[2];
+        const dimensions = dimensionsStr ? dimensionsStr.split(',').map(d => parseFloat(d.trim())).filter(d => !isNaN(d)) : [];
+        
+        // 2D Shapes
+        if (shapeName === 'triangle') {
+          return (
+            <div key={index} className="my-4">
+              <TriangleExplorer sides={dimensions.length >= 3 ? dimensions : undefined} />
+            </div>
+          );
+        }
+        
+        if (shapeName === 'circle') {
+          return (
+            <div key={index} className="my-4">
+              <CircleExplorer radius={dimensions[0]} />
+            </div>
+          );
+        }
+        
+        if (shapeName === 'square') {
+          return (
+            <div key={index} className="my-4">
+              <GeometryVisualizer shape="square" dimensions={dimensions} />
+            </div>
+          );
+        }
+        
+        if (shapeName === 'rectangle') {
+          return (
+            <div key={index} className="my-4">
+              <GeometryVisualizer shape="rectangle" dimensions={dimensions} />
+            </div>
+          );
+        }
+        
+        if (['pentagon', 'hexagon', 'octagon', 'parallelogram', 'trapezoid', 'rhombus'].includes(shapeName)) {
+          return (
+            <div key={index} className="my-4">
+              <GeometryVisualizer shape={shapeName} dimensions={dimensions} />
+            </div>
+          );
+        }
+        
+        // 3D Shapes
+        if (shapeName === 'cube') {
+          return (
+            <div key={index} className="my-4">
+              <CubeExplorer side={dimensions[0]} />
+            </div>
+          );
+        }
+        
+        if (shapeName === 'sphere') {
+          return (
+            <div key={index} className="my-4">
+              <SphereExplorer radius={dimensions[0]} />
+            </div>
+          );
+        }
+        
+        if (shapeName === 'cylinder') {
+          return (
+            <div key={index} className="my-4">
+              <CylinderExplorer radius={dimensions[0]} height={dimensions[1]} />
+            </div>
+          );
+        }
+        
+        if (['rectangular_prism', 'box', 'cone', 'pyramid', 'triangular_prism'].includes(shapeName)) {
+          return (
+            <div key={index} className="my-4">
+              <GeometryVisualizer shape={shapeName} dimensions={dimensions} />
+            </div>
+          );
+        }
+        
+        // Fallback for any unrecognized shape
+        return (
+          <div key={index} className="my-4">
+            <GeometryVisualizer shape={shapeName} dimensions={dimensions} />
           </div>
         );
       }
