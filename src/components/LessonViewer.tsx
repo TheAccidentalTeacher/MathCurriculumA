@@ -327,7 +327,7 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
                 <span className="text-xl font-black text-orange-900 bg-orange-300 px-4 py-3 rounded-lg shadow-md animate-pulse">
                   🎛️ CONTENT WIDTH CONTROLS - CLICK HERE! 🎛️
                 </span>
-              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-4">
                 <button
                   onClick={() => setContentWidth(Math.max(50, contentWidth - 10))}
                   className="px-4 py-3 bg-red-500 hover:bg-red-600 text-white border-2 border-red-700 rounded-lg text-lg font-bold shadow-lg transform hover:scale-105 transition-all"
@@ -356,6 +356,7 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
                 <span className="text-xl font-black text-orange-900 bg-yellow-300 px-4 py-3 rounded-lg border-4 border-yellow-500 shadow-lg">
                   {contentWidth}%
                 </span>
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-3">
