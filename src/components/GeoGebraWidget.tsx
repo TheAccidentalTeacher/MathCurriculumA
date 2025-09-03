@@ -82,6 +82,36 @@ declare global {
   }
 }
 
+// Global context manager to limit concurrent GeoGebra instances
+class GeoGebraContextManager {
+  private static instance: GeoGebraContextManager;
+  private activeInstances = new Set<string>();
+  private readonly maxConcurrentInstances = 5; // Prevent WebGL context overflow
+  
+  static getInstance(): GeoGebraContextManager {
+    if (!GeoGebraContextManager.instance) {
+      GeoGebraContextManager.instance = new GeoGebraContextManager();
+    }
+    return GeoGebraContextManager.instance;
+  }
+  
+  canCreateInstance(): boolean {
+    return this.activeInstances.size < this.maxConcurrentInstances;
+  }
+  
+  registerInstance(id: string): void {
+    this.activeInstances.add(id);
+  }
+  
+  unregisterInstance(id: string): void {
+    this.activeInstances.delete(id);
+  }
+  
+  getActiveCount(): number {
+    return this.activeInstances.size;
+  }
+}
+
 const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
   appName = 'geometry',
   width = 600,
@@ -119,6 +149,8 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
   id
 }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const isMountedRef = useRef(true);
+  const contextManager = useRef(GeoGebraContextManager.getInstance());
   const [isLoaded, setIsLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [applet, setApplet] = useState<any>(null);
@@ -126,8 +158,10 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
   const [error, setError] = useState<string | null>(null);
   const [containerId] = useState(() => id || generateUniqueId());
 
-  // Cleanup function
+  // Cleanup function with improved lifecycle management
   const cleanup = useCallback(() => {
+    isMountedRef.current = false;
+    
     if (ggbApi && isLoaded) {
       try {
         // Unregister all listeners first
@@ -176,23 +210,42 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
       }
     }
     
+    // Unregister from context manager
+    contextManager.current.unregisterInstance(containerId);
+    
     // Reset all state
     setIsLoaded(false);
     setIsLoading(false);
     setGgbApi(null);
     setApplet(null);
     setError(null);
-  }, [ggbApi, isLoaded, onUpdate, onAdd, onRemove, onClick]);
+  }, [ggbApi, isLoaded, onUpdate, onAdd, onRemove, onClick, containerId]);
 
-  // Initialize GeoGebra applet
+  // Initialize GeoGebra applet with context management
   const initializeGeoGebra = useCallback(async () => {
-    if (!containerRef.current || !window.GGBApplet) {
+    if (!containerRef.current || !window.GGBApplet || !isMountedRef.current) {
+      return;
+    }
+
+    // Check if we can create a new instance
+    if (!contextManager.current.canCreateInstance()) {
+      console.warn(`GeoGebra context limit reached (${contextManager.current.getActiveCount()}). Waiting for cleanup...`);
+      setError('Too many GeoGebra instances active. Please wait...');
+      // Retry after some instances are cleaned up
+      setTimeout(() => {
+        if (isMountedRef.current) {
+          initializeGeoGebra();
+        }
+      }, 1000);
       return;
     }
 
     try {
       setIsLoading(true);
       setError(null);
+
+      // Register with context manager
+      contextManager.current.registerInstance(containerId);
 
       // Configure applet parameters according to GeoGebra API documentation
       const parameters = {
@@ -230,6 +283,17 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
 
         // Critical: appletOnLoad callback for proper initialization
         appletOnLoad: function(api: any) {
+          // Double-check component is still mounted
+          if (!isMountedRef.current) {
+            console.log('Component unmounted during applet load, aborting...');
+            try {
+              api?.remove();
+            } catch (e) {
+              // Ignore cleanup errors
+            }
+            return;
+          }
+
           console.log('GeoGebra applet loaded successfully');
           
           try {
@@ -249,6 +313,12 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
             if (commands && commands.length > 0) {
               // Wait longer to ensure the applet is fully ready and stable
               setTimeout(() => {
+                // Check if still mounted before executing commands
+                if (!isMountedRef.current) {
+                  console.log('Component unmounted before command execution, skipping...');
+                  return;
+                }
+
                 // Verify API is still valid before executing commands
                 if (!api || typeof api.evalCommand !== 'function') {
                   console.warn('API became invalid before command execution');
@@ -260,47 +330,49 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
                   setTimeout(() => {
                     try {
                       // Final check before each command execution
-                      if (api && typeof api.evalCommand === 'function') {
+                      if (isMountedRef.current && api && typeof api.evalCommand === 'function') {
                         console.log(`Executing command ${index + 1}/${commands.length}: ${command}`);
                         api.evalCommand(command);
                       } else {
-                        console.warn(`Skipping command ${index + 1}, API no longer valid`);
+                        console.warn(`Skipping command ${index + 1}, component unmounted or API invalid`);
                       }
                     } catch (error) {
                       console.error(`Error executing command "${command}":`, error);
                     }
-                  }, index * 150); // 150ms delay between commands
+                  }, index * 200); // Increased delay between commands to 200ms
                 });
-              }, 500); // Wait 500ms before starting command execution
+              }, 800); // Increased initial delay to 800ms
             }
 
-            // Register event listeners
-            if (onUpdate) {
-              api.registerUpdateListener((objName: string) => {
-                onUpdate(objName);
-              });
-            }
+            // Register event listeners only if still mounted
+            if (isMountedRef.current) {
+              if (onUpdate) {
+                api.registerUpdateListener((objName: string) => {
+                  if (isMountedRef.current) onUpdate(objName);
+                });
+              }
 
-            if (onAdd) {
-              api.registerAddListener((objName: string) => {
-                onAdd(objName);
-              });
-            }
+              if (onAdd) {
+                api.registerAddListener((objName: string) => {
+                  if (isMountedRef.current) onAdd(objName);
+                });
+              }
 
-            if (onRemove) {
-              api.registerRemoveListener((objName: string) => {
-                onRemove(objName);
-              });
-            }
+              if (onRemove) {
+                api.registerRemoveListener((objName: string) => {
+                  if (isMountedRef.current) onRemove(objName);
+                });
+              }
 
-            if (onClick) {
-              api.registerClickListener((objName: string) => {
-                onClick(objName);
-              });
-            }
+              if (onClick) {
+                api.registerClickListener((objName: string) => {
+                  if (isMountedRef.current) onClick(objName);
+                });
+              }
 
-            // Call the onReady callback
-            onReady?.(api);
+              // Call the onReady callback
+              onReady?.(api);
+            }
 
           } catch (callbackError) {
             console.error('Error in appletOnLoad callback:', callbackError);
@@ -314,7 +386,7 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
       const ggbApp = new window.GGBApplet(parameters, true);
       
       // Clear the container and inject the applet
-      if (containerRef.current) {
+      if (containerRef.current && isMountedRef.current) {
         containerRef.current.innerHTML = '';
         ggbApp.inject(containerId);
       }
@@ -323,6 +395,8 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
       console.error('GeoGebra initialization error:', initError);
       setError(`Failed to initialize GeoGebra: ${initError instanceof Error ? initError.message : 'Unknown error'}`);
       setIsLoading(false);
+      // Unregister on error
+      contextManager.current.unregisterInstance(containerId);
     }
   }, [
     containerId, appName, width, height, showToolBar, showMenuBar, showAlgebraInput,
@@ -333,21 +407,29 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
     commands, onReady, onUpdate, onAdd, onRemove, onClick
   ]);
 
+  // Set mount status
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   // Effect to load GeoGebra and initialize applet
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
 
     const loadAndInitialize = () => {
-      if (typeof window !== 'undefined') {
+      if (typeof window !== 'undefined' && isMountedRef.current) {
         if (window.GGBApplet) {
           // GeoGebra is already loaded
           initializeGeoGebra();
         } else {
           // Wait for GeoGebra to load from the script tag in layout.tsx
           const checkGeoGebra = () => {
-            if (window.GGBApplet) {
+            if (window.GGBApplet && isMountedRef.current) {
               initializeGeoGebra();
-            } else {
+            } else if (isMountedRef.current) {
               timeoutId = setTimeout(checkGeoGebra, 100);
             }
           };
@@ -367,10 +449,9 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
     };
   }, [initializeGeoGebra, cleanup]);
 
-  // Public API methods for external control
   // Programmatic API methods (exposed through ref)
   const executeCommand = useCallback((command: string) => {
-    if (ggbApi && isLoaded) {
+    if (ggbApi && isLoaded && isMountedRef.current) {
       try {
         // Double-check that the API is still valid
         if (typeof ggbApi.evalCommand === 'function') {
@@ -385,12 +466,16 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
         return false;
       }
     }
-    console.warn('GeoGebra not ready for command:', command);
+    if (!isMountedRef.current) {
+      console.warn('Component unmounted, skipping command:', command);
+    } else {
+      console.warn('GeoGebra not ready for command:', command);
+    }
     return false;
   }, [ggbApi, isLoaded]);
 
   const setValue = useCallback((objName: string, value: any) => {
-    if (ggbApi && isLoaded) {
+    if (ggbApi && isLoaded && isMountedRef.current) {
       try {
         ggbApi.setValue(objName, value);
         return true;
@@ -403,7 +488,7 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
   }, [ggbApi, isLoaded]);
 
   const getValue = useCallback((objName: string) => {
-    if (ggbApi && isLoaded) {
+    if (ggbApi && isLoaded && isMountedRef.current) {
       try {
         return ggbApi.getValue(objName);
       } catch (error) {
@@ -415,7 +500,7 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
   }, [ggbApi, isLoaded]);
 
   const getObjectNames = useCallback(() => {
-    if (ggbApi && isLoaded) {
+    if (ggbApi && isLoaded && isMountedRef.current) {
       try {
         return ggbApi.getAllObjectNames();
       } catch (error) {
@@ -428,7 +513,7 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
 
   // Enhanced API methods for educational use
   const getObjectType = useCallback((objName: string) => {
-    if (ggbApi && isLoaded) {
+    if (ggbApi && isLoaded && isMountedRef.current) {
       try {
         return ggbApi.getObjectType(objName);
       } catch (error) {
@@ -440,7 +525,7 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
   }, [ggbApi, isLoaded]);
 
   const setVisible = useCallback((objName: string, visible: boolean) => {
-    if (ggbApi && isLoaded) {
+    if (ggbApi && isLoaded && isMountedRef.current) {
       try {
         ggbApi.setVisible(objName, visible);
         return true;
@@ -453,7 +538,7 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
   }, [ggbApi, isLoaded]);
 
   const setColor = useCallback((objName: string, red: number, green: number, blue: number) => {
-    if (ggbApi && isLoaded) {
+    if (ggbApi && isLoaded && isMountedRef.current) {
       try {
         ggbApi.setColor(objName, red, green, blue);
         return true;
@@ -466,7 +551,7 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
   }, [ggbApi, isLoaded]);
 
   const undo = useCallback(() => {
-    if (ggbApi && isLoaded) {
+    if (ggbApi && isLoaded && isMountedRef.current) {
       try {
         ggbApi.undo();
         return true;
@@ -479,7 +564,7 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
   }, [ggbApi, isLoaded]);
 
   const redo = useCallback(() => {
-    if (ggbApi && isLoaded) {
+    if (ggbApi && isLoaded && isMountedRef.current) {
       try {
         ggbApi.redo();
         return true;
@@ -492,7 +577,7 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
   }, [ggbApi, isLoaded]);
 
   const reset = useCallback(() => {
-    if (ggbApi && isLoaded) {
+    if (ggbApi && isLoaded && isMountedRef.current) {
       try {
         ggbApi.reset();
         return true;
@@ -505,7 +590,7 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
   }, [ggbApi, isLoaded]);
 
   const getXML = useCallback(() => {
-    if (ggbApi && isLoaded) {
+    if (ggbApi && isLoaded && isMountedRef.current) {
       try {
         return ggbApi.getXML();
       } catch (error) {
@@ -517,7 +602,7 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
   }, [ggbApi, isLoaded]);
 
   const setXML = useCallback((xml: string) => {
-    if (ggbApi && isLoaded) {
+    if (ggbApi && isLoaded && isMountedRef.current) {
       try {
         ggbApi.setXML(xml);
         return true;
@@ -543,7 +628,7 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
     reset,
     getXML,
     setXML,
-    isReady: () => isLoaded && ggbApi !== null
+    isReady: () => isLoaded && ggbApi !== null && isMountedRef.current
   }), [executeCommand, setValue, getValue, getObjectNames, getObjectType, setVisible, setColor, undo, redo, reset, getXML, setXML, isLoaded, ggbApi]);
 
   // Error state
