@@ -160,9 +160,6 @@ export default function TestGeoGebraEnhanced() {
                     onReady={() => {
                       console.log(`${activeDemo} widget ready`);
                     }}
-                    onUpdate={(objName) => {
-                      console.log(`${activeDemo} object updated:`, objName);
-                    }}
                   />
                 </div>
               </div>

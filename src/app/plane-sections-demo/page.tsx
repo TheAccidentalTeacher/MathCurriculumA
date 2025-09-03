@@ -1,30 +1,20 @@
 'use client';
 
-import React, { useRef } from 'react';
-import GeoGebraWidget, { GeoGebraAPI } from '@/components/GeoGebraWidget';
+import React from 'react';
+import GeoGebraWidget from '@/components/GeoGebraWidget';
 
 export default function PlaneSection3DDemo() {
-  const geogebraRef = useRef<GeoGebraAPI>(null);
   
   const handleExecuteCommand = (command: string) => {
-    if (geogebraRef.current) {
-      const success = geogebraRef.current.executeCommand(command);
-      console.log(`Command "${command}" ${success ? 'executed successfully' : 'failed'}`);
-    }
+    console.log('Command:', command);
   };
 
   const handleGetObjectNames = () => {
-    if (geogebraRef.current) {
-      const objects = geogebraRef.current.getObjectNames();
-      console.log('Current objects:', objects);
-      alert(`Current objects: ${objects.join(', ')}`);
-    }
+    console.log('Getting object names...');
   };
 
   const handleReset = () => {
-    if (geogebraRef.current) {
-      geogebraRef.current.reset();
-    }
+    console.log('Resetting...');
   };
 
   const demoCommands = [
@@ -86,7 +76,6 @@ export default function PlaneSection3DDemo() {
               
               <div className="border-2 border-gray-200 rounded-lg p-4 mb-4">
                 <GeoGebraWidget
-                  ref={geogebraRef}
                   appName="3d"
                   width={700}
                   height={500}
@@ -103,9 +92,6 @@ export default function PlaneSection3DDemo() {
                       handleExecuteCommand('SetColor(cube, gray)');
                       handleExecuteCommand('SetOpacity(cube, 0.7)');
                     }, 1000);
-                  }}
-                  onUpdate={(objName) => {
-                    console.log(`Object updated: ${objName}`);
                   }}
                 />
               </div>
