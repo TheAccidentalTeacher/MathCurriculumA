@@ -128,21 +128,61 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
 
   // Cleanup function
   const cleanup = useCallback(() => {
-    if (ggbApi) {
+    if (ggbApi && isLoaded) {
       try {
-        // Unregister all listeners
-        if (onUpdate) ggbApi.unregisterUpdateListener();
-        if (onAdd) ggbApi.unregisterAddListener();
-        if (onRemove) ggbApi.unregisterRemoveListener();
-        if (onClick) ggbApi.unregisterClickListener();
+        // Unregister all listeners first
+        if (onUpdate) {
+          try {
+            ggbApi.unregisterUpdateListener();
+          } catch (err) {
+            console.warn('Error unregistering update listener:', err);
+          }
+        }
+        if (onAdd) {
+          try {
+            ggbApi.unregisterAddListener();
+          } catch (err) {
+            console.warn('Error unregistering add listener:', err);
+          }
+        }
+        if (onRemove) {
+          try {
+            ggbApi.unregisterRemoveListener();
+          } catch (err) {
+            console.warn('Error unregistering remove listener:', err);
+          }
+        }
+        if (onClick) {
+          try {
+            ggbApi.unregisterClickListener();
+          } catch (err) {
+            console.warn('Error unregistering click listener:', err);
+          }
+        }
+        
+        // Reset state before removing applet
+        setIsLoaded(false);
+        setGgbApi(null);
+        setApplet(null);
         
         // Remove the applet
-        ggbApi.remove?.();
+        try {
+          ggbApi.remove();
+        } catch (err) {
+          console.warn('Error removing GeoGebra applet:', err);
+        }
       } catch (err) {
         console.warn('Error during GeoGebra cleanup:', err);
       }
     }
-  }, [ggbApi, onUpdate, onAdd, onRemove, onClick]);
+    
+    // Reset all state
+    setIsLoaded(false);
+    setIsLoading(false);
+    setGgbApi(null);
+    setApplet(null);
+    setError(null);
+  }, [ggbApi, isLoaded, onUpdate, onAdd, onRemove, onClick]);
 
   // Initialize GeoGebra applet
   const initializeGeoGebra = useCallback(async () => {
@@ -200,15 +240,23 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
 
             // Execute any provided commands after initialization
             if (commands && commands.length > 0) {
-              commands.forEach((command, index) => {
-                setTimeout(() => {
-                  try {
-                    api.evalCommand(command);
-                  } catch (cmdError) {
-                    console.warn(`Error executing command "${command}":`, cmdError);
-                  }
-                }, index * 100); // Stagger commands to avoid conflicts
-              });
+              // Add a small delay to ensure the applet is fully ready
+              setTimeout(() => {
+                commands.forEach((command, index) => {
+                  setTimeout(() => {
+                    try {
+                      // Check if the API is still valid before executing
+                      if (api && typeof api.evalCommand === 'function') {
+                        api.evalCommand(command);
+                      } else {
+                        console.warn(`GeoGebra API not available for command: "${command}"`);
+                      }
+                    } catch (cmdError) {
+                      console.error(`Error executing command "${command}":`, cmdError);
+                    }
+                  }, index * 150); // Increased stagger time to avoid conflicts
+                });
+              }, 100); // Initial delay
             }
 
             // Register event listeners
@@ -309,13 +357,20 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
   const executeCommand = useCallback((command: string) => {
     if (ggbApi && isLoaded) {
       try {
-        ggbApi.evalCommand(command);
-        return true;
+        // Double-check that the API is still valid
+        if (typeof ggbApi.evalCommand === 'function') {
+          ggbApi.evalCommand(command);
+          return true;
+        } else {
+          console.warn('GeoGebra API is no longer valid for command:', command);
+          return false;
+        }
       } catch (error) {
         console.error('Failed to execute GeoGebra command:', command, error);
         return false;
       }
     }
+    console.warn('GeoGebra not ready for command:', command);
     return false;
   }, [ggbApi, isLoaded]);
 
