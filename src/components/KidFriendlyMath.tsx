@@ -1,17 +1,17 @@
 'use client';
 
 import React from 'react';
-import MathRenderer from '../MathRenderer';
+import MathRenderer from './MathRenderer';
 
 // Import the widget components (same as ChatInterface)
-import MathGrapher, { createLinearGraph, createPointGraph } from '../MathGrapher';
-import PlaceValueChart, { createPowersOf10Chart } from '../PlaceValueChart';
-import ScientificNotationBuilder, { createScientificNotationExample } from '../ScientificNotationBuilder';
-import PowersOf10NumberLine, { createPowersOf10NumberLine } from '../PowersOf10NumberLine';
-import ChatGeoGebra, { ChatCubeVisualizer, ChatGraphingActivity, ChatGeometryExplorer } from '../ChatGeoGebra';
-import PowersOf10Activity from '../PowersOf10GeoGebra';
-import GeometryVisualizer, { TriangleExplorer, CircleExplorer, CubeExplorer, SphereExplorer, CylinderExplorer } from '../GeometryVisualizer';
-import Cube3DVisualizer from '../Cube3DVisualizer';
+import MathGrapher, { createLinearGraph, createPointGraph } from './MathGrapher';
+import PlaceValueChart, { createPowersOf10Chart } from './PlaceValueChart';
+import ScientificNotationBuilder, { createScientificNotationExample } from './ScientificNotationBuilder';
+import PowersOf10NumberLine, { createPowersOf10NumberLine } from './PowersOf10NumberLine';
+import ChatGeoGebra, { ChatGeometryExplorer } from './ChatGeoGebra';
+import PowersOf10Activity from './PowersOf10GeoGebra';
+import GeometryVisualizer, { TriangleExplorer, CircleExplorer, CubeExplorer, SphereExplorer, CylinderExplorer } from './GeometryVisualizer';
+import Cube3DVisualizer from './Cube3DVisualizer';
 
 interface KidFriendlyMathProps {
   content: string;

@@ -2,12 +2,11 @@
 
 import { useState, useRef, useEffect } from 'react';
 import MathRenderer from '../MathRenderer';
-import KidFriendlyMath from '../KidFriendlyMath';
 import MathGrapher, { createLinearGraph, createPointGraph } from '../MathGrapher';
 import PlaceValueChart, { createPowersOf10Chart } from '../PlaceValueChart';
 import ScientificNotationBuilder, { createScientificNotationExample } from '../ScientificNotationBuilder';
 import PowersOf10NumberLine, { createPowersOf10NumberLine } from '../PowersOf10NumberLine';
-import ChatGeoGebra, { ChatCubeVisualizer, ChatGraphingActivity, ChatGeometryExplorer } from '../ChatGeoGebra';
+import GeoGebraWidget, { PowersOf10GeoGebra, GeometryExplorer, FunctionGrapher } from '../GeoGebraWidget';
 import PowersOf10Activity from '../PowersOf10GeoGebra';
 import GeometryVisualizer, { TriangleExplorer, CircleExplorer, CubeExplorer, SphereExplorer, CylinderExplorer } from '../GeometryVisualizer';
 import Cube3DVisualizer from '../Cube3DVisualizer';
@@ -177,9 +176,9 @@ export default function ChatInterface({
       }
 
       // Check if this part is a graph instruction
-      const legacyGraphMatch = part.match(/\[GRAPH:([^\]]+)\]/);
-      if (legacyGraphMatch) {
-        const graphInstruction = legacyGraphMatch[1];
+      const graphMatch = part.match(/\[GRAPH:([^\]]+)\]/);
+      if (graphMatch) {
+        const graphInstruction = graphMatch[1];
         
         // Parse linear function: y = mx + b
         const linearMatch = graphInstruction.match(/y\s*=\s*([+-]?\d*\.?\d*)\s*x\s*([+-]\s*\d+\.?\d*)?/);
@@ -247,40 +246,14 @@ export default function ChatInterface({
         
         return (
           <div key={index} className="my-4">
-            <ChatGeoGebra 
+            <GeoGebraWidget 
+              appName="graphing"
               commands={commands}
-              title="Interactive Math Activity"
-              description="Click to expand and interact with the mathematical visualization"
+              width={600}
+              height={400}
+              showAlgebraInput={true}
+              showToolBar={false}
             />
-          </div>
-        );
-      }
-
-      // Check for cube-specific activities
-      const chatCubeMatch = part.match(/\[CUBE:([^\]]+)\]/);
-      if (chatCubeMatch) {
-        const cubeParams = chatCubeMatch[1].split(',');
-        const cubeCount = parseInt(cubeParams[0]) || 8;
-        const showDecomposition = cubeParams[1] !== 'false';
-        
-        return (
-          <div key={index} className="my-4">
-            <ChatCubeVisualizer 
-              cubeCount={cubeCount}
-              showDecomposition={showDecomposition}
-            />
-          </div>
-        );
-      }
-
-      // Check for graphing activities
-      const chatGraphMatch = part.match(/\[GRAPH:([^\]]+)\]/);
-      if (chatGraphMatch) {
-        const functions = chatGraphMatch[1].split(';').map((f: string) => f.trim());
-        
-        return (
-          <div key={index} className="my-4">
-            <ChatGraphingActivity functions={functions} />
           </div>
         );
       }
@@ -294,16 +267,10 @@ export default function ChatInterface({
         
         return (
           <div key={index} className="my-4">
-            <div className="p-4 border border-green-200 rounded-lg bg-green-50">
-              <h4 className="font-semibold text-green-800 mb-2">🔢 Powers of 10 Activity</h4>
-              <PowersOf10Activity 
-                activityType={activityType}
-                number={number}
-              />
-              <div className="mt-2 text-xs text-green-600">
-                <strong>Activity:</strong> {activityType} • <strong>Number:</strong> {number}
-              </div>
-            </div>
+            <PowersOf10Activity 
+              activityType={activityType}
+              number={number}
+            />
           </div>
         );
       }
@@ -311,11 +278,11 @@ export default function ChatInterface({
       // Check for geometry activities
       const geometryMatch = part.match(/\[GEOMETRY:([^\]]+)\]/);
       if (geometryMatch) {
-        const geometryCommands = geometryMatch[1].split(';').map(cmd => cmd.trim());
+        const geometryType = geometryMatch[1];
         
         return (
           <div key={index} className="my-4">
-            <ChatGeometryExplorer shapes={geometryCommands} />
+            <GeometryExplorer />
           </div>
         );
       }
@@ -410,9 +377,9 @@ export default function ChatInterface({
       }
 
       // Check for 3D cube visualizations
-      const legacyCubeMatch = part.match(/\[CUBE:([^\]]+)\]/);
-      if (legacyCubeMatch) {
-        const sideLength = parseFloat(legacyCubeMatch[1]) || 4;
+      const cubeMatch = part.match(/\[CUBE:([^\]]+)\]/);
+      if (cubeMatch) {
+        const sideLength = parseFloat(cubeMatch[1]) || 4;
         
         return (
           <div key={index} className="my-4">
@@ -444,14 +411,16 @@ export default function ChatInterface({
           );
         }
         
-        // For other 3D shapes, use ChatGeoGebra 3D
+        // For other 3D shapes, use GeoGebra 3D
         return (
           <div key={index} className="my-4">
-            <ChatGeoGebra 
+            <GeoGebraWidget 
               appName="3d"
               commands={[`${shape.charAt(0).toUpperCase() + shape.slice(1)}((0,0,0), 3)`]}
-              title={`3D ${shape.charAt(0).toUpperCase() + shape.slice(1)} Explorer`}
-              description={`Interactive 3D visualization of a ${shape}`}
+              width={600}
+              height={500}
+              showToolBar={true}
+              showAlgebraInput={true}
             />
           </div>
         );
@@ -688,8 +657,7 @@ export default function ChatInterface({
                 {message.type === 'user' ? (
                   <MathRenderer content={message.content} />
                 ) : (
-                  // Use kid-friendly math rendering for assistant responses
-                  <KidFriendlyMath content={message.content} />
+                  renderMessageWithGraphs(message.content)
                 )}
               </div>
               <div className="text-xs opacity-70 mt-1" aria-label="Message time">
