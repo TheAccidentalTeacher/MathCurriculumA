@@ -159,39 +159,38 @@ export function ChatCubeVisualizer({
   cubeCount?: number; 
   showDecomposition?: boolean; 
 }) {
-  // Use proper GeoGebra 3D commands for cube visualization
+  // Use the correct GeoGebra 3D commands - simplified approach
   const commands = [
-    // Create a single unit cube using 3D coordinates
-    `SetActiveView(1)`, // Switch to 3D view
-    `cube = Cube((0,0,0), (1,1,1))`,
-    `SetColor(cube, blue)`,
-    `SetLineThickness(cube, 3)`,
+    // Create a simple 3D cube with proper syntax
+    'cube1 = Cube((0, 0, 0), 1)',
+    'SetColor(cube1, blue)',
+    'SetFilling(cube1, 0.5)',
     
-    // Add coordinate system for reference
-    `xAxis = Segment((0,0,0), (2,0,0))`,
-    `yAxis = Segment((0,0,0), (0,2,0))`,
-    `zAxis = Segment((0,0,0), (0,0,2))`,
-    `SetColor(xAxis, red)`,
-    `SetColor(yAxis, green)`, 
-    `SetColor(zAxis, blue)`,
+    // Add coordinate axes for reference
+    'xAxis = Line((0,0,0), (2,0,0))',
+    'yAxis = Line((0,0,0), (0,2,0))',
+    'zAxis = Line((0,0,0), (0,0,2))',
+    'SetColor(xAxis, red)',
+    'SetColor(yAxis, green)',
+    'SetColor(zAxis, blue)',
     
     // Add labels
-    `SetCaption(xAxis, "Length")`,
-    `SetCaption(yAxis, "Width")`,
-    `SetCaption(zAxis, "Height")`,
+    'SetCaption(xAxis, "x")',
+    'SetCaption(yAxis, "y")',
+    'SetCaption(zAxis, "z")',
     
-    // Add volume text
-    `volumeText = Text("Volume = 1×1×1 = 1 cubic unit", (1.5, 1.5, 1.5))`,
-    `SetColor(volumeText, black)`,
+    // Add text for volume
+    'volumeLabel = Text("Volume = 1 × 1 × 1 = 1 cubic unit", (1.2, 1.2))',
+    'SetColor(volumeLabel, black)',
   ];
 
   return (
     <ChatGeoGebra
       commands={commands}
       title="🧊 Cube Visualization"
-      description={`Exploring ${cubeCount} unit cubes and their volume`}
+      description="3D cube exploration - click to expand and rotate!"
       appName="3d"
-      height={320}
+      height={350}
     />
   );
 }
