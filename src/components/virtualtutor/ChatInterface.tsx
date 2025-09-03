@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import MathRenderer from '../MathRenderer';
+import KidFriendlyMath from '../KidFriendlyMath';
 import MathGrapher, { createLinearGraph, createPointGraph } from '../MathGrapher';
 import PlaceValueChart, { createPowersOf10Chart } from '../PlaceValueChart';
 import ScientificNotationBuilder, { createScientificNotationExample } from '../ScientificNotationBuilder';
@@ -687,7 +688,8 @@ export default function ChatInterface({
                 {message.type === 'user' ? (
                   <MathRenderer content={message.content} />
                 ) : (
-                  renderMessageWithGraphs(message.content)
+                  // Use kid-friendly math rendering for assistant responses
+                  <KidFriendlyMath content={message.content} />
                 )}
               </div>
               <div className="text-xs opacity-70 mt-1" aria-label="Message time">

@@ -22,6 +22,7 @@ export default function ChatGeoGebra({
 }: ChatGeoGebraProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isReady, setIsReady] = useState(false);
+  const [dimensions, setDimensions] = useState({ width: 480, height: height });
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleReady = useCallback(() => {
@@ -32,14 +33,28 @@ export default function ChatGeoGebra({
     setIsExpanded(!isExpanded);
   };
 
-  // Ensure the widget stays within chat bounds
-  const chatOptimizedWidth = Math.min(600, typeof window !== 'undefined' ? window.innerWidth - 100 : 500);
-  const chatOptimizedHeight = isExpanded ? Math.min(height + 100, 400) : height;
+  // Handle responsive sizing
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (typeof window === 'undefined') return;
+      
+      const containerWidth = containerRef.current?.parentElement?.offsetWidth || window.innerWidth;
+      const maxChatWidth = Math.min(containerWidth - 40, 600);
+      const width = Math.max(320, Math.min(maxChatWidth, 480));
+      const adjustedHeight = isExpanded ? Math.min(height + 100, 450) : Math.min(height, 300);
+      
+      setDimensions({ width, height: adjustedHeight });
+    };
+
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, [height, isExpanded]);
 
   return (
     <div 
       ref={containerRef}
-      className={`relative bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden ${className}`}
+      className={`relative bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden max-w-full ${className}`}
     >
       {/* Header with expand/collapse */}
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-3 border-b border-gray-200">
@@ -83,29 +98,36 @@ export default function ChatGeoGebra({
       </div>
 
       {/* GeoGebra Widget Container */}
-      <div className="relative">
+      <div className="relative bg-gray-50">
         <div 
-          className="transition-all duration-300 ease-in-out"
+          className="transition-all duration-300 ease-in-out overflow-hidden"
           style={{ 
-            maxHeight: isExpanded ? chatOptimizedHeight + 50 : chatOptimizedHeight,
-            overflow: 'hidden'
+            maxHeight: isExpanded ? dimensions.height + 50 : dimensions.height,
+            width: '100%'
           }}
         >
-          <GeoGebraWidget
-            appName={appName}
-            commands={commands}
-            width={chatOptimizedWidth}
-            height={chatOptimizedHeight}
-            showAlgebraInput={isExpanded}
-            showToolBar={isExpanded}
-            showMenuBar={false}
-            showResetIcon={true}
-            enableRightClick={isExpanded}
-            enableLabelDrags={true}
-            enableShiftDragZoom={isExpanded}
-            onReady={handleReady}
-            className="border-none"
-          />
+          <div 
+            className="flex justify-center items-center p-2"
+            style={{ minHeight: dimensions.height }}
+          >
+            <div style={{ width: dimensions.width, height: dimensions.height }}>
+              <GeoGebraWidget
+                appName={appName}
+                commands={commands}
+                width={dimensions.width}
+                height={dimensions.height}
+                showAlgebraInput={isExpanded}
+                showToolBar={isExpanded}
+                showMenuBar={false}
+                showResetIcon={true}
+                enableRightClick={isExpanded}
+                enableLabelDrags={true}
+                enableShiftDragZoom={isExpanded}
+                onReady={handleReady}
+                className="border-none"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Overlay when collapsed to prevent interaction issues */}
@@ -118,28 +140,6 @@ export default function ChatGeoGebra({
         )}
       </div>
 
-      {/* Commands Footer (only show when expanded) */}
-      {isExpanded && commands.length > 0 && (
-        <div className="bg-gray-50 px-4 py-2 border-t border-gray-200">
-          <details className="group">
-            <summary className="text-xs text-gray-600 cursor-pointer hover:text-gray-800">
-              <span className="font-medium">Mathematical Commands</span>
-              <span className="ml-2 group-open:hidden">({commands.length} commands)</span>
-            </summary>
-            <div className="mt-2 space-y-1">
-              {commands.map((command, idx) => (
-                <div 
-                  key={idx} 
-                  className="font-mono text-xs text-gray-700 bg-white px-2 py-1 rounded border"
-                >
-                  {command}
-                </div>
-              ))}
-            </div>
-          </details>
-        </div>
-      )}
-
       {/* Compact mode indicator */}
       {!isExpanded && (
         <div className="absolute bottom-2 right-2 bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium shadow-lg">
@@ -151,71 +151,6 @@ export default function ChatGeoGebra({
 }
 
 // Specialized components for common math activities
-
-export function ChatCubeVisualizer({ 
-  cubeCount = 8, 
-  showDecomposition = true 
-}: { 
-  cubeCount?: number; 
-  showDecomposition?: boolean; 
-}) {
-  const commands = [
-    // Create 3D cube representation
-    `cube = Cube((0,0,0), (1,1,1))`,
-    `SetColor(cube, "blue")`,
-    `SetCaption(cube, "Unit Cube")`,
-    
-    // Show cube breakdown if requested
-    ...(showDecomposition ? [
-      `point1 = (0,0,0)`,
-      `point2 = (1,0,0)`,
-      `point3 = (1,1,0)`,
-      `point4 = (0,1,0)`,
-      `base = Polygon(point1, point2, point3, point4)`,
-      `SetCaption(base, "Base: 1×1 = 1 square unit")`,
-    ] : []),
-    
-    // Add text showing cube count
-    `text1 = Text("Volume = ${cubeCount} cubic units", (2, 1))`,
-    `text2 = Text("Each cube = 1×1×1 = 1 cubic unit", (2, 0.5))`,
-  ];
-
-  return (
-    <ChatGeoGebra
-      commands={commands}
-      title="🧊 3D Cube Visualization"
-      description={`Exploring ${cubeCount} unit cubes and their volume`}
-      appName="3d"
-      height={320}
-    />
-  );
-}
-
-export function ChatGraphingActivity({ 
-  functions = ["f(x) = x^2"], 
-  points = [] 
-}: { 
-  functions?: string[]; 
-  points?: string[]; 
-}) {
-  const commands = [
-    ...functions,
-    ...points,
-    // Add grid and axis labels for better visibility in chat
-    `ShowGrid(true)`,
-    `ShowAxes(true)`,
-  ];
-
-  return (
-    <ChatGeoGebra
-      commands={commands}
-      title="📊 Function Graphing"
-      description="Interactive function visualization"
-      appName="graphing"
-      height={280}
-    />
-  );
-}
 
 export function ChatGeometryExplorer({ 
   shapes = [] 
