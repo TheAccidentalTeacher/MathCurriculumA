@@ -7,7 +7,7 @@ interface ChatGeoGebraProps {
   commands: string[];
   title?: string;
   description?: string;
-  appName?: 'graphing' | 'geometry' | '3d' | 'classic' | 'suite' | 'scientific' | 'evaluator';
+  appName?: 'graphing' | 'geometry' | 'calculator' | '3d' | 'cas';
   height?: number;
   className?: string;
 }
@@ -151,6 +151,76 @@ export default function ChatGeoGebra({
 }
 
 // Specialized components for common math activities
+
+export function ChatCubeVisualizer({ 
+  cubeCount = 8, 
+  showDecomposition = true 
+}: { 
+  cubeCount?: number; 
+  showDecomposition?: boolean; 
+}) {
+  // Use proper GeoGebra 3D commands for cube visualization
+  const commands = [
+    // Create a single unit cube using 3D coordinates
+    `SetActiveView(1)`, // Switch to 3D view
+    `cube = Cube((0,0,0), (1,1,1))`,
+    `SetColor(cube, blue)`,
+    `SetLineThickness(cube, 3)`,
+    
+    // Add coordinate system for reference
+    `xAxis = Segment((0,0,0), (2,0,0))`,
+    `yAxis = Segment((0,0,0), (0,2,0))`,
+    `zAxis = Segment((0,0,0), (0,0,2))`,
+    `SetColor(xAxis, red)`,
+    `SetColor(yAxis, green)`, 
+    `SetColor(zAxis, blue)`,
+    
+    // Add labels
+    `SetCaption(xAxis, "Length")`,
+    `SetCaption(yAxis, "Width")`,
+    `SetCaption(zAxis, "Height")`,
+    
+    // Add volume text
+    `volumeText = Text("Volume = 1×1×1 = 1 cubic unit", (1.5, 1.5, 1.5))`,
+    `SetColor(volumeText, black)`,
+  ];
+
+  return (
+    <ChatGeoGebra
+      commands={commands}
+      title="🧊 Cube Visualization"
+      description={`Exploring ${cubeCount} unit cubes and their volume`}
+      appName="3d"
+      height={320}
+    />
+  );
+}
+
+export function ChatGraphingActivity({ 
+  functions = ["f(x) = x^2"], 
+  points = [] 
+}: { 
+  functions?: string[]; 
+  points?: string[]; 
+}) {
+  const commands = [
+    ...functions,
+    ...points,
+    // Add grid and axis labels for better visibility in chat
+    `ShowGrid(true)`,
+    `ShowAxes(true)`,
+  ];
+
+  return (
+    <ChatGeoGebra
+      commands={commands}
+      title="📊 Function Graphing"
+      description="Interactive function visualization"
+      appName="graphing"
+      height={280}
+    />
+  );
+}
 
 export function ChatGeometryExplorer({ 
   shapes = [] 
