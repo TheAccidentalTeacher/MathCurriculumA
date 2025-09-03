@@ -132,8 +132,7 @@ export default function VirtualTutorPanel({
             documentId,
             lessonNumber,
             lessonTitle,
-            content: lessonContent, // Pass full content for intelligent analysis
-            analysis: lessonAnalysis // Keep legacy analysis for backward compatibility
+            analysis: lessonAnalysis
           }}
         />
       </div>
