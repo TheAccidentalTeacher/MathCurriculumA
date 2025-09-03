@@ -7,7 +7,7 @@ interface ChatGeoGebraProps {
   commands: string[];
   title?: string;
   description?: string;
-  appName?: 'graphing' | 'geometry' | 'calculator' | '3d' | 'cas';
+  appName?: 'graphing' | 'geometry' | '3d' | 'classic' | 'suite' | 'scientific' | 'evaluator';
   height?: number;
   className?: string;
 }
