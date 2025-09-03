@@ -8,14 +8,16 @@ interface VirtualTutorPanelProps {
   documentId: string;
   lessonNumber: number;
   lessonTitle: string;
-  lessonAnalysis?: any; // Lesson content analysis from OCR
+  lessonAnalysis?: any; // Legacy lesson content analysis from OCR
+  lessonContent?: any; // Full lesson content for intelligent analysis
 }
 
 export default function VirtualTutorPanel({ 
   documentId, 
   lessonNumber, 
   lessonTitle,
-  lessonAnalysis 
+  lessonAnalysis,
+  lessonContent 
 }: VirtualTutorPanelProps) {
   const [selectedCharacter, setSelectedCharacter] = useState<'somers' | 'gimli'>('somers');
   const [isInitialized, setIsInitialized] = useState(false);
@@ -125,7 +127,8 @@ export default function VirtualTutorPanel({
             documentId,
             lessonNumber,
             lessonTitle,
-            analysis: lessonAnalysis
+            content: lessonContent, // Pass full content for intelligent analysis
+            analysis: lessonAnalysis // Keep legacy analysis for backward compatibility
           }}
         />
       </div>

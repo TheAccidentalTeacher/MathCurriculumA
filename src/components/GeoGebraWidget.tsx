@@ -86,7 +86,9 @@ declare global {
 class GeoGebraContextManager {
   private static instance: GeoGebraContextManager;
   private activeInstances = new Set<string>();
-  private readonly maxConcurrentInstances = 5; // Prevent WebGL context overflow
+  private pendingQueue: Array<{ id: string; initFn: () => void; priority: number }> = [];
+  private readonly maxConcurrentInstances = 3; // Reduced from 5 to prevent overlap
+  private isProcessingQueue = false;
   
   static getInstance(): GeoGebraContextManager {
     if (!GeoGebraContextManager.instance) {
@@ -101,14 +103,59 @@ class GeoGebraContextManager {
   
   registerInstance(id: string): void {
     this.activeInstances.add(id);
+    console.log(`GeoGebra instances: ${this.activeInstances.size}/${this.maxConcurrentInstances} active, ${this.pendingQueue.length} queued`);
   }
   
   unregisterInstance(id: string): void {
     this.activeInstances.delete(id);
+    console.log(`GeoGebra instances: ${this.activeInstances.size}/${this.maxConcurrentInstances} active, ${this.pendingQueue.length} queued`);
+    
+    // Process next in queue
+    this.processQueue();
+  }
+  
+  queueForInitialization(id: string, initFn: () => void, priority: number = 0): void {
+    if (this.canCreateInstance()) {
+      // Can initialize immediately
+      initFn();
+    } else {
+      // Add to queue
+      this.pendingQueue.push({ id, initFn, priority });
+      // Sort by priority (higher priority first)
+      this.pendingQueue.sort((a, b) => b.priority - a.priority);
+      console.log(`Queued GeoGebra instance ${id} (priority: ${priority})`);
+    }
+  }
+  
+  private processQueue(): void {
+    if (this.isProcessingQueue || this.pendingQueue.length === 0 || !this.canCreateInstance()) {
+      return;
+    }
+    
+    this.isProcessingQueue = true;
+    
+    // Process next item in queue after a short delay to prevent rapid-fire creation
+    setTimeout(() => {
+      const next = this.pendingQueue.shift();
+      if (next && this.canCreateInstance()) {
+        console.log(`Processing queued GeoGebra instance ${next.id}`);
+        next.initFn();
+      }
+      this.isProcessingQueue = false;
+      
+      // Continue processing if there are more items
+      if (this.pendingQueue.length > 0 && this.canCreateInstance()) {
+        this.processQueue();
+      }
+    }, 500); // 500ms delay between queue processing
   }
   
   getActiveCount(): number {
     return this.activeInstances.size;
+  }
+  
+  getQueueLength(): number {
+    return this.pendingQueue.length;
   }
 }
 
@@ -221,183 +268,177 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
     setError(null);
   }, [ggbApi, isLoaded, onUpdate, onAdd, onRemove, onClick, containerId]);
 
-  // Initialize GeoGebra applet with context management
+  // Initialize GeoGebra applet with context management and queuing
   const initializeGeoGebra = useCallback(async () => {
     if (!containerRef.current || !window.GGBApplet || !isMountedRef.current) {
       return;
     }
 
-    // Check if we can create a new instance
-    if (!contextManager.current.canCreateInstance()) {
-      console.warn(`GeoGebra context limit reached (${contextManager.current.getActiveCount()}). Waiting for cleanup...`);
-      setError('Too many GeoGebra instances active. Please wait...');
-      // Retry after some instances are cleaned up
-      setTimeout(() => {
-        if (isMountedRef.current) {
-          initializeGeoGebra();
-        }
-      }, 1000);
-      return;
-    }
+    // Use the queue system to prevent simultaneous initialization
+    contextManager.current.queueForInitialization(containerId, () => {
+      if (!containerRef.current || !window.GGBApplet || !isMountedRef.current) {
+        return;
+      }
 
-    try {
-      setIsLoading(true);
-      setError(null);
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      // Register with context manager
-      contextManager.current.registerInstance(containerId);
+        // Register with context manager
+        contextManager.current.registerInstance(containerId);
 
-      // Configure applet parameters according to GeoGebra API documentation
-      const parameters = {
-        id: containerId,
-        appName: appName,
-        width: width,
-        height: height,
-        showToolBar: showToolBar,
-        showMenuBar: showMenuBar,
-        showAlgebraInput: showAlgebraInput,
-        showResetIcon: showResetIcon,
-        showZoomButtons: showZoomButtons,
-        showFullscreenButton: showFullscreenButton,
-        enableRightClick: enableRightClick,
-        enableLabelDrags: enableLabelDrags,
-        enableShiftDragZoom: enableShiftDragZoom,
-        enableFileFeatures: enableFileFeatures,
-        preventFocus: preventFocus,
-        borderColor: borderColor,
-        borderRadius: borderRadius,
-        scale: scale,
-        transparentGraphics: transparentGraphics,
-        language: language,
-        randomize: randomize,
-        useBrowserForJS: true,
-        showLogging: false,
-        
-        // Content loading
-        ...(ggbBase64 && { ggbBase64 }),
-        ...(material_id && { material_id }),
-        ...(filename && { filename }),
-        ...(customToolBar && { customToolBar }),
-        ...(perspective && { perspective }),
-        ...(rounding && { rounding }),
-
-        // Critical: appletOnLoad callback for proper initialization
-        appletOnLoad: function(api: any) {
-          // Double-check component is still mounted
-          if (!isMountedRef.current) {
-            console.log('Component unmounted during applet load, aborting...');
-            try {
-              api?.remove();
-            } catch (e) {
-              // Ignore cleanup errors
-            }
-            return;
-          }
-
-          console.log('GeoGebra applet loaded successfully');
+        // Configure applet parameters according to GeoGebra API documentation
+        const parameters = {
+          id: containerId,
+          appName: appName,
+          width: width,
+          height: height,
+          showToolBar: showToolBar,
+          showMenuBar: showMenuBar,
+          showAlgebraInput: showAlgebraInput,
+          showResetIcon: showResetIcon,
+          showZoomButtons: showZoomButtons,
+          showFullscreenButton: showFullscreenButton,
+          enableRightClick: enableRightClick,
+          enableLabelDrags: enableLabelDrags,
+          enableShiftDragZoom: enableShiftDragZoom,
+          enableFileFeatures: enableFileFeatures,
+          preventFocus: preventFocus,
+          borderColor: borderColor,
+          borderRadius: borderRadius,
+          scale: scale,
+          transparentGraphics: transparentGraphics,
+          language: language,
+          randomize: randomize,
+          useBrowserForJS: true,
+          showLogging: false,
           
-          try {
-            // Double-check that the API is valid and has required methods
-            if (!api || typeof api.evalCommand !== 'function') {
-              console.error('Invalid GeoGebra API received in appletOnLoad');
-              setError('Invalid GeoGebra API');
+          // Content loading
+          ...(ggbBase64 && { ggbBase64 }),
+          ...(material_id && { material_id }),
+          ...(filename && { filename }),
+          ...(customToolBar && { customToolBar }),
+          ...(perspective && { perspective }),
+          ...(rounding && { rounding }),
+
+          // Critical: appletOnLoad callback for proper initialization
+          appletOnLoad: function(api: any) {
+            // Double-check component is still mounted
+            if (!isMountedRef.current) {
+              console.log('Component unmounted during applet load, aborting...');
+              try {
+                api?.remove();
+              } catch (e) {
+                // Ignore cleanup errors
+              }
               return;
             }
 
-            setGgbApi(api);
-            setApplet(api);
-            setIsLoaded(true);
-            setIsLoading(false);
+            console.log('GeoGebra applet loaded successfully');
+            
+            try {
+              // Double-check that the API is valid and has required methods
+              if (!api || typeof api.evalCommand !== 'function') {
+                console.error('Invalid GeoGebra API received in appletOnLoad');
+                setError('Invalid GeoGebra API');
+                return;
+              }
 
-            // Execute any provided commands after initialization with proper timing
-            if (commands && commands.length > 0) {
-              // Wait longer to ensure the applet is fully ready and stable
-              setTimeout(() => {
-                // Check if still mounted before executing commands
-                if (!isMountedRef.current) {
-                  console.log('Component unmounted before command execution, skipping...');
-                  return;
-                }
+              setGgbApi(api);
+              setApplet(api);
+              setIsLoaded(true);
+              setIsLoading(false);
 
-                // Verify API is still valid before executing commands
-                if (!api || typeof api.evalCommand !== 'function') {
-                  console.warn('API became invalid before command execution');
-                  return;
-                }
+              // Execute any provided commands after initialization with proper timing
+              if (commands && commands.length > 0) {
+                // Wait longer to ensure the applet is fully ready and stable
+                setTimeout(() => {
+                  // Check if still mounted before executing commands
+                  if (!isMountedRef.current) {
+                    console.log('Component unmounted before command execution, skipping...');
+                    return;
+                  }
 
-                // Execute commands with delays between them to prevent conflicts
-                commands.forEach((command, index) => {
-                  setTimeout(() => {
-                    try {
-                      // Final check before each command execution
-                      if (isMountedRef.current && api && typeof api.evalCommand === 'function') {
-                        console.log(`Executing command ${index + 1}/${commands.length}: ${command}`);
-                        api.evalCommand(command);
-                      } else {
-                        console.warn(`Skipping command ${index + 1}, component unmounted or API invalid`);
+                  // Verify API is still valid before executing commands
+                  if (!api || typeof api.evalCommand !== 'function') {
+                    console.warn('API became invalid before command execution');
+                    return;
+                  }
+
+                  // Execute commands with delays between them to prevent conflicts
+                  commands.forEach((command, index) => {
+                    setTimeout(() => {
+                      try {
+                        // Final check before each command execution
+                        if (isMountedRef.current && api && typeof api.evalCommand === 'function') {
+                          console.log(`Executing command ${index + 1}/${commands.length}: ${command}`);
+                          api.evalCommand(command);
+                        } else {
+                          console.warn(`Skipping command ${index + 1}, component unmounted or API invalid`);
+                        }
+                      } catch (error) {
+                        console.error(`Error executing command "${command}":`, error);
                       }
-                    } catch (error) {
-                      console.error(`Error executing command "${command}":`, error);
-                    }
-                  }, index * 200); // Increased delay between commands to 200ms
-                });
-              }, 800); // Increased initial delay to 800ms
+                    }, index * 250); // Increased delay between commands to 250ms
+                  });
+                }, 1000); // Increased initial delay to 1000ms for better stability
+              }
+
+              // Register event listeners only if still mounted
+              if (isMountedRef.current) {
+                if (onUpdate) {
+                  api.registerUpdateListener((objName: string) => {
+                    if (isMountedRef.current) onUpdate(objName);
+                  });
+                }
+
+                if (onAdd) {
+                  api.registerAddListener((objName: string) => {
+                    if (isMountedRef.current) onAdd(objName);
+                  });
+                }
+
+                if (onRemove) {
+                  api.registerRemoveListener((objName: string) => {
+                    if (isMountedRef.current) onRemove(objName);
+                  });
+                }
+
+                if (onClick) {
+                  api.registerClickListener((objName: string) => {
+                    if (isMountedRef.current) onClick(objName);
+                  });
+                }
+
+                // Call the onReady callback
+                onReady?.(api);
+              }
+
+            } catch (callbackError) {
+              console.error('Error in appletOnLoad callback:', callbackError);
+              setError('Failed to initialize applet callbacks');
+              setIsLoading(false);
             }
-
-            // Register event listeners only if still mounted
-            if (isMountedRef.current) {
-              if (onUpdate) {
-                api.registerUpdateListener((objName: string) => {
-                  if (isMountedRef.current) onUpdate(objName);
-                });
-              }
-
-              if (onAdd) {
-                api.registerAddListener((objName: string) => {
-                  if (isMountedRef.current) onAdd(objName);
-                });
-              }
-
-              if (onRemove) {
-                api.registerRemoveListener((objName: string) => {
-                  if (isMountedRef.current) onRemove(objName);
-                });
-              }
-
-              if (onClick) {
-                api.registerClickListener((objName: string) => {
-                  if (isMountedRef.current) onClick(objName);
-                });
-              }
-
-              // Call the onReady callback
-              onReady?.(api);
-            }
-
-          } catch (callbackError) {
-            console.error('Error in appletOnLoad callback:', callbackError);
-            setError('Failed to initialize applet callbacks');
-            setIsLoading(false);
           }
+        };
+
+        // Create and inject the applet
+        const ggbApp = new window.GGBApplet(parameters, true);
+        
+        // Clear the container and inject the applet
+        if (containerRef.current && isMountedRef.current) {
+          containerRef.current.innerHTML = '';
+          ggbApp.inject(containerId);
         }
-      };
 
-      // Create and inject the applet
-      const ggbApp = new window.GGBApplet(parameters, true);
-      
-      // Clear the container and inject the applet
-      if (containerRef.current && isMountedRef.current) {
-        containerRef.current.innerHTML = '';
-        ggbApp.inject(containerId);
+      } catch (initError) {
+        console.error('GeoGebra initialization error:', initError);
+        setError(`Failed to initialize GeoGebra: ${initError instanceof Error ? initError.message : 'Unknown error'}`);
+        setIsLoading(false);
+        // Unregister on error
+        contextManager.current.unregisterInstance(containerId);
       }
-
-    } catch (initError) {
-      console.error('GeoGebra initialization error:', initError);
-      setError(`Failed to initialize GeoGebra: ${initError instanceof Error ? initError.message : 'Unknown error'}`);
-      setIsLoading(false);
-      // Unregister on error
-      contextManager.current.unregisterInstance(containerId);
-    }
+    }, 1); // Priority 1 (higher priority for earlier initialization)
   }, [
     containerId, appName, width, height, showToolBar, showMenuBar, showAlgebraInput,
     showResetIcon, showZoomButtons, showFullscreenButton, enableRightClick,
