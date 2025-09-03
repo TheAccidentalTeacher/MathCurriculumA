@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 
 interface GeoGebraWidgetProps {
   // Basic configuration
@@ -30,19 +30,38 @@ interface GeoGebraWidgetProps {
   className?: string;
   
   // Callbacks
-  onReady?: (api: any) => void;
+  onReady?: (api: GeoGebraAPI) => void;
   onError?: (error: string) => void;
+}
+
+// Define GeoGebra API interface
+interface GeoGebraAPI {
+  evalCommand: (command: string) => void;
+  getValue: (objName: string) => number;
+  setVisible: (objName: string, visible: boolean) => void;
+  setValue: (objName: string, value: number) => void;
+  getXML: () => string;
+  setXML: (xml: string) => void;
+  registerAddListener: (callback: (name: string) => void) => void;
+  registerUpdateListener: (callback: (name: string) => void) => void;
+  registerClickListener: (callback: (name: string) => void) => void;
+  getObjectNumber: () => number;
+  getObjectName: (i: number) => string;
+  remove?: () => void; // Optional method for cleanup
 }
 
 // Declare GeoGebra global types
 declare global {
   interface Window {
-    GGBApplet: any;
+    GGBApplet: new (parameters: Record<string, unknown>, version?: string) => {
+      inject: (id: string) => void;
+      setHTML5Codebase: (url: string) => void;
+    };
   }
 }
 
 // Global applet registry to prevent conflicts
-const appletRegistry = new Map<string, any>();
+const appletRegistry = new Map<string, GeoGebraAPI>();
 let scriptPromise: Promise<void> | null = null;
 
 // Load the official GeoGebra deployggb.js script
@@ -128,7 +147,7 @@ export default function GeoGebraWidget({
   
   const containerRef = useRef<HTMLDivElement>(null);
   const appletIdRef = useRef(`ggb_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
-  const appletRef = useRef<any>(null);
+  const appletRef = useRef<GeoGebraAPI | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
@@ -136,7 +155,7 @@ export default function GeoGebraWidget({
   const appletId = appletIdRef.current;
 
   // Cleanup function
-  const cleanup = () => {
+  const cleanup = useCallback(() => {
     try {
       if (appletRef.current) {
         // Try to remove the applet properly
@@ -160,9 +179,9 @@ export default function GeoGebraWidget({
     } catch (error) {
       console.warn('Cleanup error:', error);
     }
-  };
+  }, [appletId]);
 
-  const initializeApplet = async () => {
+  const initializeApplet = useCallback(async () => {
     try {
       setError(null);
       setIsLoading(true);
@@ -182,7 +201,7 @@ export default function GeoGebraWidget({
       cleanup();
 
       // Create applet parameters following official GeoGebra documentation
-      const params: any = {
+      const params: Record<string, unknown> = {
         appName: appName,
         width: width,
         height: height,
@@ -199,7 +218,7 @@ export default function GeoGebraWidget({
         useBrowserForJS: true,
         preventFocus: false,
         // Official appletOnLoad callback
-        appletOnLoad: (api: any) => {
+        appletOnLoad: (api: GeoGebraAPI) => {
           console.log(`✅ GeoGebra applet loaded: ${appletId}`);
           
           // Validate API
@@ -243,7 +262,7 @@ export default function GeoGebraWidget({
       console.log(`🚀 Creating GeoGebra applet: ${appletId}`, params);
 
       // Create applet using official pattern
-      const applet = new window.GGBApplet(params, true);
+      const applet = new window.GGBApplet(params, '5.0');
       
       // Create container element with unique ID
       const appletDiv = document.createElement('div');
@@ -274,14 +293,14 @@ export default function GeoGebraWidget({
       onError?.(errorMessage);
       setIsLoading(false);
     }
-  };
+  }, [appletId, appName, width, height, ggbBase64, material_id, filename, commands, showToolBar, showMenuBar, showAlgebraInput, showResetIcon, showToolBarHelp, showZoomButtons, allowStyleBar, enableRightClick, enableLabelDrags, enableShiftDragZoom, onReady, onError]);
 
   // Initialize applet on mount and when dependencies change
   useEffect(() => {
     initializeApplet();
     
     return cleanup; // Cleanup on unmount
-  }, [appName, width, height, ggbBase64, material_id, filename, retryCount]);
+  }, [initializeApplet, cleanup]);
 
   // Retry handler
   const handleRetry = () => {

@@ -99,7 +99,7 @@ export default function TestGeoGebraPage() {
           
           <GeoGebraWidget
             appName={currentConfig.appName}
-            initialCommands={currentConfig.commands}
+            commands={currentConfig.commands}
             width={700}
             height={500}
             showAlgebraInput={true}
