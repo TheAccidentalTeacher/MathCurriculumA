@@ -233,30 +233,45 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
           console.log('GeoGebra applet loaded successfully');
           
           try {
+            // Double-check that the API is valid and has required methods
+            if (!api || typeof api.evalCommand !== 'function') {
+              console.error('Invalid GeoGebra API received in appletOnLoad');
+              setError('Invalid GeoGebra API');
+              return;
+            }
+
             setGgbApi(api);
             setApplet(api);
             setIsLoaded(true);
             setIsLoading(false);
 
-            // Execute any provided commands after initialization
+            // Execute any provided commands after initialization with proper timing
             if (commands && commands.length > 0) {
-              // Add a small delay to ensure the applet is fully ready
+              // Wait longer to ensure the applet is fully ready and stable
               setTimeout(() => {
+                // Verify API is still valid before executing commands
+                if (!api || typeof api.evalCommand !== 'function') {
+                  console.warn('API became invalid before command execution');
+                  return;
+                }
+
+                // Execute commands with delays between them to prevent conflicts
                 commands.forEach((command, index) => {
                   setTimeout(() => {
                     try {
-                      // Check if the API is still valid before executing
+                      // Final check before each command execution
                       if (api && typeof api.evalCommand === 'function') {
+                        console.log(`Executing command ${index + 1}/${commands.length}: ${command}`);
                         api.evalCommand(command);
                       } else {
-                        console.warn(`GeoGebra API not available for command: "${command}"`);
+                        console.warn(`Skipping command ${index + 1}, API no longer valid`);
                       }
-                    } catch (cmdError) {
-                      console.error(`Error executing command "${command}":`, cmdError);
+                    } catch (error) {
+                      console.error(`Error executing command "${command}":`, error);
                     }
-                  }, index * 150); // Increased stagger time to avoid conflicts
+                  }, index * 150); // 150ms delay between commands
                 });
-              }, 100); // Initial delay
+              }, 500); // Wait 500ms before starting command execution
             }
 
             // Register event listeners
