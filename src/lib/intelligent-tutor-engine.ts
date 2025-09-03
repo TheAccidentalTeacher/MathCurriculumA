@@ -158,73 +158,43 @@ export class IntelligentTutorEngine {
   /**
    * Analyze user query to determine intent and required tools
    */
-  async analyzeUserQuery(query: string, lessonContext: LessonAnalysis): Promise<UserQuery> {
-    const prompt = `
-    You are an intelligent tutoring system analyzer. Analyze this student question in the context of the current lesson.
-
-    Student Question: "${query}"
-
-    Lesson Context:
-    - Topics: ${lessonContext.topics.join(', ')}
-    - Concepts: ${lessonContext.mathConcepts.join(', ')}
-    - Difficulty: ${lessonContext.difficulty}
-    - Key Terms: ${lessonContext.keyTerms.join(', ')}
-
-    Available Tools: ${this.availableTools.map(t => `${t.name} (${t.syntax})`).join(', ')}
-
-    Analyze the student's intent and determine:
-    1. What are they trying to understand/do? (explain/visualize/practice/calculate/explore)
-    2. What topics does their question relate to?
-    3. Which tools would best help answer their question?
-    4. How complex is their question? (1-5 scale)
-
-    Respond in JSON format:
-    {
-      "intent": "visualize",
-      "topics": ["topic1", "topic2"],
-      "recommendedTools": ["ToolName1", "ToolName2"],
-      "complexity": 3,
-      "reasoning": "Why these tools were selected"
-    }
-    `;
-
+  async analyzeUserQuery(query: string, lessonAnalysis: LessonAnalysis): Promise<UserQuery> {
+    console.log(`🔍 [IntelligentTutor] Analyzing user query: "${query}"`);
+    console.log(`📊 [IntelligentTutor] Using lesson analysis:`, lessonAnalysis);
+    
     try {
       const response = await fetch('/api/ai/analyze-query', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          prompt, 
-          model: 'o1-mini' // Use reasoning model for analysis
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query,
+          lessonAnalysis
         })
       });
 
+      console.log(`📡 [IntelligentTutor] Query analysis API response status:`, response.status);
+
       if (!response.ok) {
-        throw new Error('Failed to analyze user query');
+        console.error(`❌ [IntelligentTutor] Query analysis API failed:`, response.status);
+        throw new Error(`Query analysis failed: ${response.status}`);
       }
 
-      const analysis = await response.json();
+      const result = await response.json();
+      console.log(`✅ [IntelligentTutor] Query analysis result:`, result);
       
-      const toolNeeds = this.availableTools.filter(tool => 
-        analysis.recommendedTools?.includes(tool.name)
-      );
-
-      return {
-        text: query,
-        intent: analysis.intent || 'explain',
-        topics: analysis.topics || [],
-        toolNeeds,
-        complexity: analysis.complexity || 2
-      };
+      return result;
     } catch (error) {
-      console.error('Query analysis failed:', error);
+      console.error('Error analyzing user query:', error);
       
       // Fallback analysis
       return {
         text: query,
-        intent: 'explain',
-        topics: lessonContext.topics,
-        toolNeeds: lessonContext.suggestedTools.slice(0, 2),
-        complexity: 2
+        intent: 'explain' as const,
+        topics: lessonAnalysis.topics.slice(0, 2),
+        toolNeeds: lessonAnalysis.suggestedTools.slice(0, 1),
+        complexity: 3
       };
     }
   }

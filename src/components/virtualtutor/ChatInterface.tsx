@@ -48,11 +48,38 @@ export default function ChatInterface({
 
   // Analyze lesson content when it loads
   useEffect(() => {
+    console.log(`🔍 [ChatInterface] Analysis effect triggered`);
+    console.log(`📊 [ChatInterface] Current state:`, {
+      hasLessonAnalysis: !!lessonAnalysis,
+      hasLessonContent: !!lessonContext.content,
+      isAnalyzing: isAnalyzingLesson,
+      lessonTitle: lessonContext.lessonTitle
+    });
+    
     const analyzeLessonContent = async () => {
-      if (lessonAnalysis || !lessonContext.content || isAnalyzingLesson) return;
+      if (lessonAnalysis) {
+        console.log(`✅ [ChatInterface] Already have lesson analysis, skipping`);
+        return;
+      }
+      
+      if (!lessonContext.content) {
+        console.log(`⚠️ [ChatInterface] No lesson content available for analysis`);
+        console.log(`🔬 [ChatInterface] Full lessonContext:`, lessonContext);
+        return;
+      }
+      
+      if (isAnalyzingLesson) {
+        console.log(`⏳ [ChatInterface] Analysis already in progress`);
+        return;
+      }
       
       setIsAnalyzingLesson(true);
-      console.log(`🔍 [ChatInterface] Analyzing lesson content for: ${lessonContext.lessonTitle}`);
+      console.log(`🔍 [ChatInterface] Starting lesson content analysis for: ${lessonContext.lessonTitle}`);
+      console.log(`📄 [ChatInterface] Content to analyze:`, {
+        contentType: typeof lessonContext.content,
+        contentKeys: Object.keys(lessonContext.content || {}),
+        contentPreview: JSON.stringify(lessonContext.content).substring(0, 200) + '...'
+      });
       
       try {
         const analysis = await intelligentTutor.analyzeLessonContent(lessonContext.content);
@@ -61,6 +88,7 @@ export default function ChatInterface({
       } catch (error) {
         console.error('❌ [ChatInterface] Lesson analysis failed:', error);
         // Create fallback analysis
+        console.log(`🔧 [ChatInterface] Creating fallback analysis`);
         setLessonAnalysis({
           topics: ['general math'],
           mathConcepts: [lessonContext.lessonTitle],
@@ -527,6 +555,9 @@ export default function ChatInterface({
       lessonId: lessonContext.documentId + '-' + lessonContext.lessonNumber,
       hasAnalysis: !!lessonAnalysis
     });
+    console.log(`🔬 [ChatInterface] DEBUG - Full lesson context:`, lessonContext);
+    console.log(`🧠 [ChatInterface] DEBUG - lessonAnalysis state:`, lessonAnalysis);
+    console.log(`✅ [ChatInterface] DEBUG - Will use intelligent tutor?`, !!lessonAnalysis);
 
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
@@ -546,6 +577,8 @@ export default function ChatInterface({
       // Use intelligent tutor engine for smarter responses
       if (lessonAnalysis) {
         console.log(`🧠 [ChatInterface] Using intelligent tutor engine`);
+        console.log(`🎯 [ChatInterface] Analysis topics:`, lessonAnalysis.topics);
+        console.log(`🛠️ [ChatInterface] Suggested tools:`, lessonAnalysis.suggestedTools);
         
         // Analyze user query to determine intent and tools needed
         const queryAnalysis = await intelligentTutor.analyzeUserQuery(

@@ -28,15 +28,20 @@ export default function VirtualTutorPanel({
     console.log(`🎓 [VirtualTutorPanel] Initializing for Lesson ${lessonNumber}: ${lessonTitle}`);
     console.log(`📊 [VirtualTutorPanel] Document ID: ${documentId}`);
     console.log(`🧠 [VirtualTutorPanel] Lesson Analysis Available:`, !!lessonAnalysis);
+    console.log(`🔬 [VirtualTutorPanel] DEBUG - Full lessonAnalysis object:`, lessonAnalysis);
     
     if (lessonAnalysis) {
       console.log(`📚 [VirtualTutorPanel] Analysis details:`, {
+        rawAnalysis: lessonAnalysis,
         concepts: lessonAnalysis.content?.mathematicalConcepts,
         confidence: lessonAnalysis.content?.confidence,
         difficulty: lessonAnalysis.content?.difficultyLevel,
         formulas: lessonAnalysis.content?.keyFormulas?.length || 0,
         vocabulary: lessonAnalysis.content?.vocabularyTerms?.length || 0
       });
+      
+      // Convert legacy analysis to new format for intelligent tutor
+      console.log(`🔄 [VirtualTutorPanel] Converting legacy analysis to intelligent format`);
     } else {
       console.log(`⚠️ [VirtualTutorPanel] No lesson analysis provided - using fallback mode`);
     }
