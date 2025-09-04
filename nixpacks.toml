@@ -3,7 +3,8 @@
 providers = ['node']
 
 [phases.install]
-cmd = 'npm ci --omit=dev --prefer-offline --no-audit --no-fund'
+# Need dev dependencies for build - can't omit them
+cmd = 'npm ci --prefer-offline --no-audit --no-fund --progress=false'
 
 [phases.build]
 cmd = '''
@@ -20,3 +21,4 @@ NODE_ENV = 'production'
 NPM_CONFIG_UPDATE_NOTIFIER = 'false'
 NPM_CONFIG_FUND = 'false'
 NPM_CONFIG_AUDIT = 'false'
+NPM_CONFIG_PROGRESS = 'false'

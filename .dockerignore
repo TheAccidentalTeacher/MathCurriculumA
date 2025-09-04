@@ -77,3 +77,24 @@ __pycache__/
 # Backup files
 *.bak
 *.backup
+
+# Heavy sample files
+RCM07_NA_SW_V1_sample_10pages.json
+RCM07_NA_SW_V1_visual_extraction.json
+precision_lessons_export.json
+
+# Documentation markdown files
+ADVANCED_EXTRACTION_GUIDE.md
+COMPREHENSIVE_EXTRACTION_STRATEGY.md
+EXTRACTION_STRATEGY.md
+PHASE*.md
+PRODUCTION_DEPLOYMENT_COMPLETE.md
+RAILWAY_DEPLOYMENT.md
+PRECISION_DATABASE_INTEGRATION.md
+PRECISION_EXTRACTION_COMPLETE.md
+COST_ANALYSIS.md
+CODEBASE_VALUATION.md
+comprehensive_curriculum_understanding.md
+curriculum_analysis.md
+accelerated_pathway_analysis.md
+PUSH_SUMMARY.md
