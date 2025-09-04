@@ -1,13 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+// Disable static generation for this route since it requires runtime environment variables
+export const dynamic = 'force-dynamic';
+
+// Lazy initialization to prevent build-time errors
+const getOpenAIClient = () => {
+  return new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+  });
+};
 
 export async function POST(request: NextRequest) {
   try {
     const { prompt, model = 'o1-mini' } = await request.json();
+    
+    // Initialize OpenAI client only when needed
+    const openai = getOpenAIClient();
 
     if (!prompt) {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
@@ -87,7 +96,8 @@ export async function POST(request: NextRequest) {
     if (error instanceof Error && error.message.includes('model')) {
       // Fallback to gpt-4o-mini if o1 is not available
       try {
-        const fallbackCompletion = await openai.chat.completions.create({
+        const fallbackOpenai = getOpenAIClient();
+        const fallbackCompletion = await fallbackOpenai.chat.completions.create({
           model: 'gpt-4o-mini',
           messages: [
             {

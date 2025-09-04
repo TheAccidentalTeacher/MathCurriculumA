@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AITutorService, type AIModel, type LessonContext, type ChatMessage } from '@/lib/ai-tutor-service';
 
+// Disable static generation for this route since it requires runtime environment variables
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

@@ -1,13 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+// Disable static generation for this route since it requires runtime environment variables
+export const dynamic = 'force-dynamic';
+
+// Lazy initialization to prevent build-time errors
+const getOpenAIClient = () => {
+  return new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+  });
+};
 
 export async function POST(request: NextRequest) {
   try {
     const { prompt, model = 'gpt-4o-mini' } = await request.json();
+    
+    // Initialize OpenAI client only when needed
+    const openai = getOpenAIClient();
 
     if (!prompt) {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
