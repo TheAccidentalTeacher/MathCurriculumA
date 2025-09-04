@@ -176,7 +176,7 @@ export default function PacingGeneratorPage() {
   }, [pacingGuide]);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 text-gray-900 py-8">
       {/* Screen reader announcements */}
       <div 
         role="status" 

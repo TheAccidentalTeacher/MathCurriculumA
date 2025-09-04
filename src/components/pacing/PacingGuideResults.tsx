@@ -53,7 +53,7 @@ export function PacingGuideResults({
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-lg text-gray-900">
       {/* Screen reader announcements */}
       <div 
         role="status" 

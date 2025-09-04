@@ -150,7 +150,7 @@ export function AccessiblePacingForm({
   ];
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg text-gray-900">
       {/* Screen reader announcements */}
       <div 
         role="status" 
