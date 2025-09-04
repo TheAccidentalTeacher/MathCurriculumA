@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Geometry Visualization</title>
+</head>
+<body>
+    <h1>Testing GeometryVisualizer Components</h1>
+    
+    <h2>Test 1: Direct Cube</h2>
+    <div id="cube-test">
+        <p>This should show an interactive 3D cube:</p>
+        <!-- We'll manually insert a test cube here -->
+    </div>
+    
+    <h2>Test 2: Shape Markers</h2>
+    <div id="marker-test">
+        <p>Virtual tutor response with markers:</p>
+        <p>Let's explore a [CUBE:4] and a [SHAPE:cylinder,2,5]!</p>
+    </div>
+
+    <script>
+        // Simple test to verify if our components would work
+        console.log('Testing geometry visualization...');
+        
+        // Simulate what ChatInterface does
+        const text = "Let's explore a [CUBE:4] and a [SHAPE:cylinder,2,5]!";
+        const regex = /(\[CUBE:[^\]]+\]|\[SHAPE:[^\]]+\])/g;
+        const parts = text.split(regex);
+        
+        console.log('Split parts:', parts);
+        
+        parts.forEach((part, index) => {
+            if (part.startsWith('[CUBE:')) {
+                console.log('Found cube marker:', part);
+                const sizeMatch = part.match(/\[CUBE:(\d+)\]/);
+                if (sizeMatch) {
+                    const size = sizeMatch[1];
+                    console.log('Cube size:', size);
+                }
+            } else if (part.startsWith('[SHAPE:')) {
+                console.log('Found shape marker:', part);
+                const match = part.match(/\[SHAPE:([^,\]]+)(?:,([^,\]]+))*(?:,([^,\]]+))*(?:,([^,\]]+))?\]/);
+                if (match) {
+                    const shape = match[1];
+                    const param1 = match[2];
+                    const param2 = match[3];
+                    const param3 = match[4];
+                    console.log('Shape:', shape, 'Params:', param1, param2, param3);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

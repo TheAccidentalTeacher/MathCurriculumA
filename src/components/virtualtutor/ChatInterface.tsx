@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useGeometryMarkerDebug } from '../debug/geometryDebug';
 import MathRenderer from '../MathRenderer';
 import KidFriendlyMath from '../KidFriendlyMath';
 import MathGrapher, { createLinearGraph, createPointGraph } from '../MathGrapher';
@@ -121,6 +122,17 @@ export default function ChatInterface({
 
   // Function to detect and render mathematical graphs in messages
   const renderMessageWithGraphs = (content: string) => {
+    // Debug geometry markers in development
+    if (process.env.NODE_ENV === 'development') {
+      if (content.includes('[CUBE:') || content.includes('[SHAPE:')) {
+        console.group('🔍 ChatInterface Geometry Processing');
+        console.log('Processing content:', content);
+        console.log('CUBE markers found:', content.match(/\[CUBE:[^\]]+\]/g));
+        console.log('SHAPE markers found:', content.match(/\[SHAPE:[^\]]+\]/g));
+        console.groupEnd();
+      }
+    }
+    
     // Split content by graph markers including GeoGebra activities and 3D visualizers
     const parts = content.split(/(\[GRAPH:[^\]]+\]|\[PLACEVALUE:[^\]]+\]|\[SCIENTIFIC:[^\]]+\]|\[POWERLINE:[^\]]+\]|\[GEOGEBRA:[^\]]+\]|\[GEOMETRY:[^\]]+\]|\[SHAPE:[^\]]+\]|\[POWERS10:[^\]]+\]|\[CUBE:[^\]]+\]|\[3D:[^\]]+\])/g);
     
@@ -264,11 +276,18 @@ export default function ChatInterface({
         const showDecomposition = cubeParams[1] !== 'false';
         
         return (
-          <div key={index} className="my-4">
-            <ChatCubeVisualizer 
-              cubeCount={cubeCount}
-              showDecomposition={showDecomposition}
-            />
+          <div key={index} className="my-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="mb-3 flex items-center space-x-2">
+              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+              <span className="text-sm font-medium text-blue-700">Interactive 3D Cube Visualization</span>
+            </div>
+            <div className="bg-white rounded-lg overflow-hidden shadow-sm min-h-[350px]">
+              <ChatCubeVisualizer 
+                cubeCount={cubeCount}
+                showDecomposition={showDecomposition}
+              />
+            </div>
+            <p className="mt-2 text-xs text-blue-600">💡 Click and drag to rotate the 3D cube!</p>
           </div>
         );
       }
@@ -371,24 +390,45 @@ export default function ChatInterface({
         // 3D Shapes
         if (shapeName === 'cube') {
           return (
-            <div key={index} className="my-4">
-              <CubeExplorer side={dimensions[0]} />
+            <div key={index} className="my-6 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+              <div className="mb-3 flex items-center space-x-2">
+                <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                <span className="text-sm font-medium text-purple-700">Interactive 3D Cube Explorer</span>
+              </div>
+              <div className="bg-white rounded-lg overflow-hidden shadow-sm min-h-[400px]">
+                <CubeExplorer side={dimensions[0]} />
+              </div>
+              <p className="mt-2 text-xs text-purple-600">🎯 Explore the cube in 3D space!</p>
             </div>
           );
         }
         
         if (shapeName === 'sphere') {
           return (
-            <div key={index} className="my-4">
-              <SphereExplorer radius={dimensions[0]} />
+            <div key={index} className="my-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="mb-3 flex items-center space-x-2">
+                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                <span className="text-sm font-medium text-red-700">Interactive 3D Sphere Explorer</span>
+              </div>
+              <div className="bg-white rounded-lg overflow-hidden shadow-sm min-h-[400px]">
+                <SphereExplorer radius={dimensions[0]} />
+              </div>
+              <p className="mt-2 text-xs text-red-600">🌐 Rotate and explore the sphere!</p>
             </div>
           );
         }
         
         if (shapeName === 'cylinder') {
           return (
-            <div key={index} className="my-4">
-              <CylinderExplorer radius={dimensions[0]} height={dimensions[1]} />
+            <div key={index} className="my-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="mb-3 flex items-center space-x-2">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span className="text-sm font-medium text-green-700">Interactive 3D Cylinder Explorer</span>
+              </div>
+              <div className="bg-white rounded-lg overflow-hidden shadow-sm min-h-[400px]">
+                <CylinderExplorer radius={dimensions[0]} height={dimensions[1]} />
+              </div>
+              <p className="mt-2 text-xs text-green-600">🗜️ Examine the cylinder from all angles!</p>
             </div>
           );
         }
@@ -409,19 +449,26 @@ export default function ChatInterface({
         );
       }
 
-      // Check for 3D cube visualizations
+      // Check for 3D cube visualizations (legacy support)
       const legacyCubeMatch = part.match(/\[CUBE:([^\]]+)\]/);
       if (legacyCubeMatch) {
         const sideLength = parseFloat(legacyCubeMatch[1]) || 4;
         
         return (
-          <div key={index} className="my-4">
-            <Cube3DVisualizer 
-              sideLength={sideLength}
-              showVolume={true}
-              showFormula={true}
-              interactive={true}
-            />
+          <div key={index} className="my-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
+            <div className="mb-3 flex items-center space-x-2">
+              <div className="w-3 h-3 bg-indigo-500 rounded-full"></div>
+              <span className="text-sm font-medium text-indigo-700">3D Cube Visualization (Legacy)</span>
+            </div>
+            <div className="bg-white rounded-lg overflow-hidden shadow-sm min-h-[450px]">
+              <Cube3DVisualizer 
+                sideLength={sideLength}
+                showVolume={true}
+                showFormula={true}
+                interactive={true}
+              />
+            </div>
+            <p className="mt-2 text-xs text-indigo-600">📐 Interactive 3D cube with volume calculations!</p>
           </div>
         );
       }
