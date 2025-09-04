@@ -164,8 +164,16 @@ Let me show you something cool: [SHAPE:cube,4]`,
       timestamp: new Date(),
     };
 
-    console.log(`✅ [ChatInterface] Setting initial message for ${config.name}`);
-    setMessages([initialMessage]);
+    // Add a test GeoGebra message for debugging
+    const testGeoGebraMessage: ChatMessage = {
+      id: `${character}-test-geogebra-${Date.now()}`,
+      type: 'assistant',
+      content: "Here's an interactive 3D cube for plane sections: [SHAPE:cube,4] \n\nAnd here's a basic geometry exploration tool: [GEOMETRY:construction]",
+      timestamp: new Date(),
+    };
+
+    console.log(`✅ [ChatInterface] Setting initial messages for ${config.name}`);
+    setMessages([initialMessage, testGeoGebraMessage]);
     setInputValue('');
     setIsInitialized(true);
   }, [character]); // Only depend on character, not lessonContext
