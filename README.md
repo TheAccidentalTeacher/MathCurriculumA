@@ -143,6 +143,107 @@ MathCurriculumA/
 
 ---
 
+## 📐 GeoGebra Integration
+
+### **🎯 Interactive Math Visualization**
+This platform features comprehensive GeoGebra integration for dynamic mathematical visualizations and interactive learning experiences.
+
+### **🏗️ Architecture Overview**
+- **GeoGebraWidget.tsx** - Main React component for embedding GeoGebra applets
+- **ChatGeoGebra.tsx** - Specialized chat-integrated mathematical activities  
+- **Smart Error Handling** - Robust initialization and command execution
+- **Multiple App Types** - Support for graphing, geometry, 3D, scientific calculator modes
+
+### **🔧 Technical Implementation**
+```typescript
+// Basic GeoGebra Widget Usage
+<GeoGebraWidget 
+  appName="graphing" 
+  commands={['f(x) = x^2', 'SetColor(f, blue)']}
+  width={600} 
+  height={400} 
+  showToolBar={true}
+/>
+
+// 3D Visualization with proper axis handling
+<GeoGebraWidget 
+  appName="3d" 
+  commands={[
+    'cube1 = Cube((0, 0, 0), 1)',
+    'xAxisLine = Line((0,0,0), (2,0,0))',  // Note: Custom names
+    'yAxisLine = Line((0,0,0), (0,2,0))',  // to avoid system conflicts
+    'zAxisLine = Line((0,0,0), (0,0,2))'   
+  ]}
+/>
+```
+
+### **⚠️ Critical: System Object Naming Conflicts**
+
+**IMPORTANT**: GeoGebra has built-in system objects that are FIXED and cannot be reassigned:
+
+#### **🚫 Reserved Names (DO NOT USE)**
+- `xAxis`, `yAxis`, `zAxis` - Built-in coordinate axes (fixed objects)
+- `origin` - Coordinate system origin
+- Any system-generated axis or plane names
+
+#### **✅ Safe Alternatives**
+```javascript
+// ❌ WRONG - Will cause "Illegal assignment" error:
+'xAxis = Line((0,0,0), (2,0,0))'
+
+// ✅ CORRECT - Use descriptive custom names:
+'xAxisLine = Line((0,0,0), (2,0,0))'
+'customXAxis = Line((0,0,0), (2,0,0))'
+'referenceAxisX = Line((0,0,0), (2,0,0))'
+```
+
+### **🔍 Root Cause Analysis (Historical)**
+**Problem**: "Illegal assignment - Fixed objects may not be changed - Axis zAxis"
+
+**Research Findings**:
+- GeoGebra source code shows axes created with `setFixed(true)` in Construction classes
+- System axes (`xAxis`, `yAxis`, `zAxis`) are fixed objects that cannot be modified
+- Error occurs in `AlgebraProcessor` when attempting to assign to fixed object names
+- This affects 3D applets where all three system axes exist
+
+**Solution Applied**: 
+- Renamed all axis variables to avoid system object conflicts
+- Removed error suppression code since root cause was eliminated
+- Updated documentation to prevent future naming conflicts
+
+### **🛠️ Best Practices**
+
+#### **1. Command Execution**
+- Use delays between commands for complex constructions
+- Always check for component mount status before executing
+- Handle API validation properly
+
+#### **2. Error Prevention** 
+- Avoid reserved GeoGebra object names
+- Use descriptive custom variable names
+- Test 3D constructions thoroughly (where most system objects exist)
+
+#### **3. Performance Optimization**
+- Initialize applets only when needed
+- Clean up properly on component unmount  
+- Use appropriate app types (graphing vs geometry vs 3d)
+
+### **📚 Supported GeoGebra Apps**
+- **`graphing`** - Function plotting and analysis
+- **`geometry`** - 2D geometric constructions  
+- **`3d`** - Three-dimensional visualizations
+- **`classic`** - Full GeoGebra interface
+- **`scientific`** - Scientific calculator features
+- **`evaluator`** - Expression evaluation
+
+### **🔗 Integration Points**
+- **Intelligent Tutor Engine** - Dynamic GeoGebra generation based on lesson content
+- **Chat Interface** - Interactive math activities within conversations  
+- **Lesson Viewer** - Embedded visualizations for curriculum content
+- **Transformation Graphing** - Specialized notation support (`[TRANSFORM:]`)
+
+---
+
 ## 🎯 Data Architecture
 
 ### **Hierarchical Curriculum Structure**
@@ -469,6 +570,40 @@ This Math Curriculum Platform represents:
 - 🐛 **Issues** - GitHub Issues for bug reports
 - 💡 **Feature Requests** - GitHub Discussions
 - 📧 **Direct Contact** - For partnership and enterprise inquiries
+
+---
+
+## 📋 Developer Quick Reference
+
+### **GeoGebra Integration Checklist**
+```bash
+# ✅ DO: Use custom object names
+commands: ['myLine = Line((0,0), (1,1))']
+
+# ❌ DON'T: Use system object names  
+commands: ['xAxis = Line((0,0), (1,1))']  # Will cause "Illegal assignment" error
+
+# ✅ DO: Handle 3D properly
+commands: ['xAxisLine = Line((0,0,0), (2,0,0))']  # Custom name for reference line
+```
+
+### **Reserved GeoGebra Names to Avoid**
+- `xAxis`, `yAxis`, `zAxis` (coordinate axes)
+- `origin` (coordinate origin)  
+- `xOyPlane` (coordinate plane in 3D)
+- Any system-generated object names
+
+### **Common Error Solutions**
+- **"Illegal assignment"** → Check for system object name conflicts
+- **"Fixed objects may not be changed"** → Use different variable names
+- **Blank widgets** → Verify API loading and initialization timing
+- **Command failures** → Add delays between complex command sequences
+
+### **Testing Strategy**
+1. Test basic 2D functionality first
+2. Verify 3D applets load without errors
+3. Check command execution in browser console
+4. Validate all custom object names are unique
 
 ---
 
