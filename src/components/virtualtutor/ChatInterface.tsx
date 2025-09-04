@@ -6,12 +6,11 @@ import MathGrapher, { createLinearGraph, createPointGraph } from '../MathGrapher
 import PlaceValueChart, { createPowersOf10Chart } from '../PlaceValueChart';
 import ScientificNotationBuilder, { createScientificNotationExample } from '../ScientificNotationBuilder';
 import PowersOf10NumberLine, { createPowersOf10NumberLine } from '../PowersOf10NumberLine';
-import GeoGebraWidget, { GeometryExplorer, ShapeExplorer, PlaneSection3D } from '../GeoGebraWidget';
+import GeoGebraWidget, { PowersOf10GeoGebra, GeometryExplorer, FunctionGrapher } from '../GeoGebraWidget';
 import PowersOf10Activity from '../PowersOf10GeoGebra';
 import GeometryVisualizer, { TriangleExplorer, CircleExplorer, CubeExplorer, SphereExplorer, CylinderExplorer } from '../GeometryVisualizer';
 import Cube3DVisualizer from '../Cube3DVisualizer';
 import SmartGeoGebraFrame from '../SmartGeoGebraFrame';
-import ChatGeoGebra, { ChatCubeVisualizer, ChatGraphingActivity, ChatGeometryExplorer } from '../ChatGeoGebra';
 import { intelligentTutor, type LessonAnalysis } from '@/lib/intelligent-tutor-engine';
 
 interface ChatMessage {
@@ -49,38 +48,11 @@ export default function ChatInterface({
 
   // Analyze lesson content when it loads
   useEffect(() => {
-    console.log(`🔍 [ChatInterface] Analysis effect triggered`);
-    console.log(`📊 [ChatInterface] Current state:`, {
-      hasLessonAnalysis: !!lessonAnalysis,
-      hasLessonContent: !!lessonContext.content,
-      isAnalyzing: isAnalyzingLesson,
-      lessonTitle: lessonContext.lessonTitle
-    });
-    
     const analyzeLessonContent = async () => {
-      if (lessonAnalysis) {
-        console.log(`✅ [ChatInterface] Already have lesson analysis, skipping`);
-        return;
-      }
-      
-      if (!lessonContext.content) {
-        console.log(`⚠️ [ChatInterface] No lesson content available for analysis`);
-        console.log(`🔬 [ChatInterface] Full lessonContext:`, lessonContext);
-        return;
-      }
-      
-      if (isAnalyzingLesson) {
-        console.log(`⏳ [ChatInterface] Analysis already in progress`);
-        return;
-      }
+      if (lessonAnalysis || !lessonContext.content || isAnalyzingLesson) return;
       
       setIsAnalyzingLesson(true);
-      console.log(`🔍 [ChatInterface] Starting lesson content analysis for: ${lessonContext.lessonTitle}`);
-      console.log(`📄 [ChatInterface] Content to analyze:`, {
-        contentType: typeof lessonContext.content,
-        contentKeys: Object.keys(lessonContext.content || {}),
-        contentPreview: JSON.stringify(lessonContext.content).substring(0, 200) + '...'
-      });
+      console.log(`🔍 [ChatInterface] Analyzing lesson content for: ${lessonContext.lessonTitle}`);
       
       try {
         const analysis = await intelligentTutor.analyzeLessonContent(lessonContext.content);
@@ -89,7 +61,6 @@ export default function ChatInterface({
       } catch (error) {
         console.error('❌ [ChatInterface] Lesson analysis failed:', error);
         // Create fallback analysis
-        console.log(`🔧 [ChatInterface] Creating fallback analysis`);
         setLessonAnalysis({
           topics: ['general math'],
           mathConcepts: [lessonContext.lessonTitle],
@@ -113,24 +84,16 @@ export default function ChatInterface({
       name: 'Mr. Somers',
       color: 'blue',
       initialMessage: lessonAnalysis 
-        ? `Hello! I'm Mr. Somers, your math teacher. I've analyzed "${lessonContext.lessonTitle}" and I'm ready to help you with ${(lessonAnalysis.mathConcepts || []).slice(0, 2).join(' and ')}. Based on my analysis, we'll be working on ${(lessonAnalysis.topics || []).join(', ')} concepts. I have ${(lessonAnalysis.suggestedTools || []).length} interactive tools ready to help visualize and understand these topics!
-
-Let me show you an interactive visualization for plane sections: [SHAPE:cube,4]`
-        : `Hello! I'm Mr. Somers, your math teacher. I'm here to help you understand "${lessonContext.lessonTitle}". ${isAnalyzingLesson ? 'I\'m currently analyzing the lesson content to provide you with the best possible help...' : 'Feel free to ask me anything about this lesson!'}
-
-Let me demonstrate with an interactive cube visualization: [SHAPE:cube,4]`,
+        ? `Hello! I'm Mr. Somers, your math teacher. I've analyzed "${lessonContext.lessonTitle}" and I'm ready to help you with ${lessonAnalysis.mathConcepts.slice(0, 2).join(' and ')}. Based on my analysis, we'll be working on ${lessonAnalysis.topics.join(', ')} concepts. I have ${lessonAnalysis.suggestedTools.length} interactive tools ready to help visualize and understand these topics!`
+        : `Hello! I'm Mr. Somers, your math teacher. I'm here to help you understand "${lessonContext.lessonTitle}". ${isAnalyzingLesson ? 'I\'m currently analyzing the lesson content to provide you with the best possible help...' : 'Feel free to ask me anything about this lesson!'}`,
       placeholderText: 'Ask Mr. Somers about this lesson...'
     },
     gimli: {
       name: 'Gimli',
       color: 'green',
       initialMessage: lessonAnalysis
-        ? `Woof woof! Hi there! I'm Gimli, and I've been studying "${lessonContext.lessonTitle}" just for you! We're going to explore ${(lessonAnalysis.topics || []).slice(0, 2).join(' and ')}, and I've got ${(lessonAnalysis.suggestedTools || []).length} cool interactive tools to make learning fun! ${lessonAnalysis.difficulty === 'elementary' ? 'This looks like fun stuff!' : lessonAnalysis.difficulty === 'middle' ? 'This is perfect for us to tackle together!' : 'This might be challenging, but we\'ve got this!'} 🎾
-
-Watch this cool 3D cube! [SHAPE:cube,4]`
-        : `Woof woof! Hi there! I'm Gimli, and I'm super excited to learn "${lessonContext.lessonTitle}" with you! ${isAnalyzingLesson ? 'I\'m sniffing around the lesson content to understand it better...' : 'Don\'t worry if it seems tough - we\'ll figure it out together!'} 🎾
-
-Let me show you something cool: [SHAPE:cube,4]`,
+        ? `Woof woof! Hi there! I'm Gimli, and I've been studying "${lessonContext.lessonTitle}" just for you! We're going to explore ${lessonAnalysis.topics.slice(0, 2).join(' and ')}, and I've got ${lessonAnalysis.suggestedTools.length} cool interactive tools to make learning fun! ${lessonAnalysis.difficulty === 'elementary' ? 'This looks like fun stuff!' : lessonAnalysis.difficulty === 'middle' ? 'This is perfect for us to tackle together!' : 'This might be challenging, but we\'ve got this!'} 🎾`
+        : `Woof woof! Hi there! I'm Gimli, and I'm super excited to learn "${lessonContext.lessonTitle}" with you! ${isAnalyzingLesson ? 'I\'m sniffing around the lesson content to understand it better...' : 'Don\'t worry if it seems tough - we\'ll figure it out together!'} 🎾`,
       placeholderText: 'Chat with Gimli about this lesson...'
     }
   };
@@ -165,16 +128,8 @@ Let me show you something cool: [SHAPE:cube,4]`,
       timestamp: new Date(),
     };
 
-    // Add a test GeoGebra message for debugging
-    const testGeoGebraMessage: ChatMessage = {
-      id: `${character}-test-geogebra-${Date.now()}`,
-      type: 'assistant',
-      content: "Here's an interactive 3D cube for plane sections: [SHAPE:cube,4] \n\nAnd here's a basic geometry exploration tool: [GEOMETRY:construction]",
-      timestamp: new Date(),
-    };
-
-    console.log(`✅ [ChatInterface] Setting initial messages for ${config.name}`);
-    setMessages([initialMessage, testGeoGebraMessage]);
+    console.log(`✅ [ChatInterface] Setting initial message for ${config.name}`);
+    setMessages([initialMessage]);
     setInputValue('');
     setIsInitialized(true);
   }, [character]); // Only depend on character, not lessonContext
@@ -321,35 +276,6 @@ Let me show you something cool: [SHAPE:cube,4]`,
         return <div key={index} className="text-gray-600 italic">{graphInstruction}</div>;
       }
 
-      // Check for transformation activities (dilations, reflections, etc.)
-      const transformMatch = part.match(/\[TRANSFORM:([^\]]+)\]/);
-      if (transformMatch) {
-        const transformInstruction = transformMatch[1];
-        
-        // Parse transformation type and parameters
-        if (transformInstruction.toLowerCase().includes('dilation')) {
-          const scaleMatch = transformInstruction.match(/scale[:\s]*([\d.]+)/i);
-          const scale = scaleMatch ? parseFloat(scaleMatch[1]) : 2;
-          const centerMatch = transformInstruction.match(/center[:\s]*\(([^)]+)\)/i);
-          const center = centerMatch ? centerMatch[1].split(',').map(n => parseFloat(n.trim())) : [0, 0];
-          
-          // Create a dilation visualization using ChatGraphingActivity
-          return (
-            <div key={index} className="my-4">
-              <ChatGraphingActivity 
-                functions={[
-                  'original = Polygon((1,1), (3,1), (3,2), (1,2))',
-                  `dilated = Dilate(original, ${scale}, (${center[0]}, ${center[1]}))`
-                ]}
-                points={[`A = (${center[0]}, ${center[1]})`]}
-              />
-            </div>
-          );
-        }
-        
-        return <div key={index} className="text-gray-600 italic">Transformation: {transformInstruction}</div>;
-      }
-
       // Check for GeoGebra activities
       const geogebraMatch = part.match(/\[GEOGEBRA:([^\]]+)\]/);
       if (geogebraMatch) {
@@ -404,14 +330,14 @@ Let me show you something cool: [SHAPE:cube,4]`,
         );
       }
 
-      // Check for geometry activities - Using ChatGeoGebra for better integration
+      // Check for geometry activities
       const geometryMatch = part.match(/\[GEOMETRY:([^\]]+)\]/);
       if (geometryMatch) {
         const geometryType = geometryMatch[1];
         
         return (
           <div key={index} className="my-4">
-            <ChatGeometryExplorer shapes={[]} />
+            <GeometryExplorer />
           </div>
         );
       }
@@ -464,14 +390,11 @@ Let me show you something cool: [SHAPE:cube,4]`,
           );
         }
         
-        // 3D Shapes - Using ChatGeoGebra components for better integration
+        // 3D Shapes
         if (shapeName === 'cube') {
           return (
             <div key={index} className="my-4">
-              <ChatCubeVisualizer 
-                cubeCount={dimensions[0] || 1} 
-                showDecomposition={true} 
-              />
+              <CubeExplorer side={dimensions[0]} />
             </div>
           );
         }
@@ -604,9 +527,6 @@ Let me show you something cool: [SHAPE:cube,4]`,
       lessonId: lessonContext.documentId + '-' + lessonContext.lessonNumber,
       hasAnalysis: !!lessonAnalysis
     });
-    console.log(`🔬 [ChatInterface] DEBUG - Full lesson context:`, lessonContext);
-    console.log(`🧠 [ChatInterface] DEBUG - lessonAnalysis state:`, lessonAnalysis);
-    console.log(`✅ [ChatInterface] DEBUG - Will use intelligent tutor?`, !!lessonAnalysis);
 
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
@@ -626,8 +546,6 @@ Let me show you something cool: [SHAPE:cube,4]`,
       // Use intelligent tutor engine for smarter responses
       if (lessonAnalysis) {
         console.log(`🧠 [ChatInterface] Using intelligent tutor engine`);
-        console.log(`🎯 [ChatInterface] Analysis topics:`, lessonAnalysis.topics);
-        console.log(`🛠️ [ChatInterface] Suggested tools:`, lessonAnalysis.suggestedTools);
         
         // Analyze user query to determine intent and tools needed
         const queryAnalysis = await intelligentTutor.analyzeUserQuery(

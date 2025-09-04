@@ -47,13 +47,6 @@ export class IntelligentTutorEngine {
       syntax: '[GRAPH:function_or_shape]'
     },
     {
-      name: 'TransformationGrapher',
-      category: 'visualization',
-      applicableTopics: ['transformations', 'dilations', 'reflections', 'rotations', 'translations', 'coordinate geometry'],
-      complexity: 3,
-      syntax: '[TRANSFORM:type,parameters]'
-    },
-    {
       name: 'ShapeExplorer',
       category: 'visualization',
       applicableTopics: ['shapes', 'polygons', 'circles', 'basic geometry'],
@@ -165,43 +158,73 @@ export class IntelligentTutorEngine {
   /**
    * Analyze user query to determine intent and required tools
    */
-  async analyzeUserQuery(query: string, lessonAnalysis: LessonAnalysis): Promise<UserQuery> {
-    console.log(`🔍 [IntelligentTutor] Analyzing user query: "${query}"`);
-    console.log(`📊 [IntelligentTutor] Using lesson analysis:`, lessonAnalysis);
-    
+  async analyzeUserQuery(query: string, lessonContext: LessonAnalysis): Promise<UserQuery> {
+    const prompt = `
+    You are an intelligent tutoring system analyzer. Analyze this student question in the context of the current lesson.
+
+    Student Question: "${query}"
+
+    Lesson Context:
+    - Topics: ${lessonContext.topics.join(', ')}
+    - Concepts: ${lessonContext.mathConcepts.join(', ')}
+    - Difficulty: ${lessonContext.difficulty}
+    - Key Terms: ${lessonContext.keyTerms.join(', ')}
+
+    Available Tools: ${this.availableTools.map(t => `${t.name} (${t.syntax})`).join(', ')}
+
+    Analyze the student's intent and determine:
+    1. What are they trying to understand/do? (explain/visualize/practice/calculate/explore)
+    2. What topics does their question relate to?
+    3. Which tools would best help answer their question?
+    4. How complex is their question? (1-5 scale)
+
+    Respond in JSON format:
+    {
+      "intent": "visualize",
+      "topics": ["topic1", "topic2"],
+      "recommendedTools": ["ToolName1", "ToolName2"],
+      "complexity": 3,
+      "reasoning": "Why these tools were selected"
+    }
+    `;
+
     try {
       const response = await fetch('/api/ai/analyze-query', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          query,
-          lessonAnalysis
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          prompt, 
+          model: 'o1-mini' // Use reasoning model for analysis
         })
       });
 
-      console.log(`📡 [IntelligentTutor] Query analysis API response status:`, response.status);
-
       if (!response.ok) {
-        console.error(`❌ [IntelligentTutor] Query analysis API failed:`, response.status);
-        throw new Error(`Query analysis failed: ${response.status}`);
+        throw new Error('Failed to analyze user query');
       }
 
-      const result = await response.json();
-      console.log(`✅ [IntelligentTutor] Query analysis result:`, result);
+      const analysis = await response.json();
       
-      return result;
+      const toolNeeds = this.availableTools.filter(tool => 
+        analysis.recommendedTools?.includes(tool.name)
+      );
+
+      return {
+        text: query,
+        intent: analysis.intent || 'explain',
+        topics: analysis.topics || [],
+        toolNeeds,
+        complexity: analysis.complexity || 2
+      };
     } catch (error) {
-      console.error('Error analyzing user query:', error);
+      console.error('Query analysis failed:', error);
       
       // Fallback analysis
       return {
         text: query,
-        intent: 'explain' as const,
-        topics: (lessonAnalysis.topics || []).slice(0, 2),
-        toolNeeds: (lessonAnalysis.suggestedTools || []).slice(0, 1),
-        complexity: 3
+        intent: 'explain',
+        topics: lessonContext.topics,
+        toolNeeds: lessonContext.suggestedTools.slice(0, 2),
+        complexity: 2
       };
     }
   }
@@ -214,38 +237,26 @@ export class IntelligentTutorEngine {
     lessonContext: LessonAnalysis,
     character: string = 'somers'
   ): Promise<string> {
-    // Safely extract tool information
-    const toolSyntaxExamples = (userQuery.toolNeeds || []).map((toolName, index) => {
-      // If toolName is a string, find the corresponding tool
-      const toolNameStr = typeof toolName === 'string' ? toolName : toolName.name || 'Unknown';
-      const tool = this.availableTools.find(t => 
-        t.name.toLowerCase() === toolNameStr.toLowerCase()
-      );
-      
-      if (tool) {
-        return `${tool.name}: ${tool.syntax} - for ${(tool.applicableTopics || []).join(', ')}`;
-      } else {
-        // Fallback for unknown tools
-        return `${toolNameStr}: [SHAPE:${toolNameStr.toLowerCase()}] - interactive visualization`;
-      }
-    }).join('\n');
+    const toolSyntaxExamples = userQuery.toolNeeds.map(tool => 
+      `${tool.name}: ${tool.syntax} - for ${tool.applicableTopics.join(', ')}`
+    ).join('\n');
 
     const prompt = `
     You are ${character}, an engaging math tutor. The student asked: "${userQuery.text}"
 
     LESSON CONTEXT:
-    - Current topics: ${(lessonContext.topics || []).join(', ')}
-    - Key concepts: ${(lessonContext.mathConcepts || []).join(', ')}
-    - Learning objectives: ${(lessonContext.objectives || []).join(', ')}
+    - Current topics: ${lessonContext.topics.join(', ')}
+    - Key concepts: ${lessonContext.mathConcepts.join(', ')}
+    - Learning objectives: ${lessonContext.objectives.join(', ')}
     - Difficulty level: ${lessonContext.difficulty}
 
     ANALYSIS RESULTS:
     - Student intent: ${userQuery.intent}
-    - Query topics: ${(userQuery.topics || []).join(', ')}
+    - Query topics: ${userQuery.topics.join(', ')}
     - Complexity: ${userQuery.complexity}/5
 
     RECOMMENDED TOOLS FOR THIS QUESTION:
-    ${toolSyntaxExamples || 'No specific tools recommended'}
+    ${toolSyntaxExamples}
 
     INSTRUCTIONS:
     1. Provide a clear, ${lessonContext.difficulty}-school appropriate explanation
@@ -270,16 +281,13 @@ export class IntelligentTutorEngine {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: prompt,
+          messages: [{ role: 'user', content: prompt }],
           character,
           model: 'gpt-4o', // Use GPT-4o for response generation
           lessonContext: {
-            lessonTitle: `${(lessonContext.topics || []).join(', ')} - ${(lessonContext.difficulty || 'middle')} school`,
-            topics: lessonContext.topics || [],
-            concepts: lessonContext.mathConcepts || [],
-            objectives: lessonContext.objectives || []
-          },
-          conversationHistory: []
+            topics: lessonContext.topics,
+            concepts: lessonContext.mathConcepts
+          }
         })
       });
 
@@ -288,7 +296,7 @@ export class IntelligentTutorEngine {
       }
 
       const result = await response.json();
-      return result.response?.content || result.content || result.message || "I'd be happy to help! Could you rephrase your question?";
+      return result.content || result.message || "I'd be happy to help! Could you rephrase your question?";
 
     } catch (error) {
       console.error('Response generation failed:', error);
