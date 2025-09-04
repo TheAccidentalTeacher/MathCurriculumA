@@ -11,6 +11,7 @@ import PowersOf10Activity from '../PowersOf10GeoGebra';
 import GeometryVisualizer, { TriangleExplorer, CircleExplorer, CubeExplorer, SphereExplorer, CylinderExplorer } from '../GeometryVisualizer';
 import Cube3DVisualizer from '../Cube3DVisualizer';
 import SmartGeoGebraFrame from '../SmartGeoGebraFrame';
+import ChatGeoGebra, { ChatCubeVisualizer, ChatGraphingActivity, ChatGeometryExplorer } from '../ChatGeoGebra';
 import { intelligentTutor, type LessonAnalysis } from '@/lib/intelligent-tutor-engine';
 
 interface ChatMessage {
@@ -374,14 +375,14 @@ Let me show you something cool: [SHAPE:cube,4]`,
         );
       }
 
-      // Check for geometry activities
+      // Check for geometry activities - Using ChatGeoGebra for better integration
       const geometryMatch = part.match(/\[GEOMETRY:([^\]]+)\]/);
       if (geometryMatch) {
         const geometryType = geometryMatch[1];
         
         return (
           <div key={index} className="my-4">
-            <GeometryExplorer />
+            <ChatGeometryExplorer shapes={[]} />
           </div>
         );
       }
@@ -434,11 +435,14 @@ Let me show you something cool: [SHAPE:cube,4]`,
           );
         }
         
-        // 3D Shapes
+        // 3D Shapes - Using ChatGeoGebra components for better integration
         if (shapeName === 'cube') {
           return (
             <div key={index} className="my-4">
-              <CubeExplorer side={dimensions[0]} />
+              <ChatCubeVisualizer 
+                cubeCount={dimensions[0] || 1} 
+                showDecomposition={true} 
+              />
             </div>
           );
         }

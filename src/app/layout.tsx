@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { ReactNode } from "react";
+import Script from 'next/script';
 
 export const metadata = {
   title: "Math Curriculum",
@@ -12,9 +13,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <script src="https://www.geogebra.org/apps/deployggb.js" async></script>
       </head>
-      <body className="min-h-dvh bg-slate-900 text-slate-100">{children}</body>
+      <body className="min-h-dvh bg-slate-900 text-slate-100">
+        {children}
+        <Script
+          src="https://www.geogebra.org/apps/deployggb.js"
+          strategy="afterInteractive"
+        />
+      </body>
     </html>
   );
 }

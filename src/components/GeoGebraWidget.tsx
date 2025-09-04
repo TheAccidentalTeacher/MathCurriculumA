@@ -252,6 +252,16 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
         } catch (err) {
           console.warn('Error removing GeoGebra applet:', err);
         }
+
+        // Clean up window reference (based on research)
+        try {
+          if (typeof window !== 'undefined' && (window as any)[containerId]) {
+            delete (window as any)[containerId];
+            console.log(`Cleaned up window reference: ${containerId}`);
+          }
+        } catch (err) {
+          console.warn('Error cleaning up window reference:', err);
+        }
       } catch (err) {
         console.warn('Error during GeoGebra cleanup:', err);
       }
@@ -334,7 +344,7 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
               return;
             }
 
-            console.log('GeoGebra applet loaded successfully');
+            console.log(`GeoGebra applet loaded successfully with ID: ${containerId}`);
             
             try {
               // Double-check that the API is valid and has required methods
@@ -342,6 +352,11 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
                 console.error('Invalid GeoGebra API received in appletOnLoad');
                 setError('Invalid GeoGebra API');
                 return;
+              }
+
+              // Store API in window with unique ID to prevent conflicts (based on research)
+              if (typeof window !== 'undefined') {
+                (window as any)[containerId] = api;
               }
 
               setGgbApi(api);

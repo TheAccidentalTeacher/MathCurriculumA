@@ -3,6 +3,9 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import GeoGebraWidget from './GeoGebraWidget';
 
+// Generate unique ID for each ChatGeoGebra instance (based on research)
+const generateChatGeoGebraId = () => `chat-ggb-${Math.random().toString(36).substr(2, 9)}-${Date.now()}`;
+
 interface ChatGeoGebraProps {
   commands: string[];
   title?: string;
@@ -24,6 +27,7 @@ export default function ChatGeoGebra({
   const [isReady, setIsReady] = useState(false);
   const [dimensions, setDimensions] = useState({ width: 480, height: height });
   const containerRef = useRef<HTMLDivElement>(null);
+  const [widgetId] = useState(() => generateChatGeoGebraId()); // Unique ID for this instance
 
   const handleReady = useCallback(() => {
     setIsReady(true);
@@ -112,6 +116,7 @@ export default function ChatGeoGebra({
           >
             <div style={{ width: dimensions.width, height: dimensions.height }}>
               <GeoGebraWidget
+                id={widgetId}
                 appName={appName}
                 commands={commands}
                 width={dimensions.width}
