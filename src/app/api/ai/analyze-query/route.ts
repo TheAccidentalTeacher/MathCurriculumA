@@ -13,12 +13,16 @@ const getOpenAIClient = () => {
 
 export async function POST(request: NextRequest) {
   try {
-    const { prompt, model = 'o1-mini' } = await request.json();
+    const body = await request.json();
+    console.log('📥 [API] Received request body:', JSON.stringify(body, null, 2));
+    
+    const { prompt, model = 'o1-mini' } = body;
     
     // Initialize OpenAI client only when needed
     const openai = getOpenAIClient();
 
     if (!prompt) {
+      console.error('❌ [API] No prompt provided in request');
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
     }
 

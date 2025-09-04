@@ -321,6 +321,35 @@ Let me show you something cool: [SHAPE:cube,4]`,
         return <div key={index} className="text-gray-600 italic">{graphInstruction}</div>;
       }
 
+      // Check for transformation activities (dilations, reflections, etc.)
+      const transformMatch = part.match(/\[TRANSFORM:([^\]]+)\]/);
+      if (transformMatch) {
+        const transformInstruction = transformMatch[1];
+        
+        // Parse transformation type and parameters
+        if (transformInstruction.toLowerCase().includes('dilation')) {
+          const scaleMatch = transformInstruction.match(/scale[:\s]*([\d.]+)/i);
+          const scale = scaleMatch ? parseFloat(scaleMatch[1]) : 2;
+          const centerMatch = transformInstruction.match(/center[:\s]*\(([^)]+)\)/i);
+          const center = centerMatch ? centerMatch[1].split(',').map(n => parseFloat(n.trim())) : [0, 0];
+          
+          // Create a dilation visualization using ChatGraphingActivity
+          return (
+            <div key={index} className="my-4">
+              <ChatGraphingActivity 
+                functions={[
+                  'original = Polygon((1,1), (3,1), (3,2), (1,2))',
+                  `dilated = Dilate(original, ${scale}, (${center[0]}, ${center[1]}))`
+                ]}
+                points={[`A = (${center[0]}, ${center[1]})`]}
+              />
+            </div>
+          );
+        }
+        
+        return <div key={index} className="text-gray-600 italic">Transformation: {transformInstruction}</div>;
+      }
+
       // Check for GeoGebra activities
       const geogebraMatch = part.match(/\[GEOGEBRA:([^\]]+)\]/);
       if (geogebraMatch) {

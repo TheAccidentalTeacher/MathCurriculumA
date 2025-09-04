@@ -47,6 +47,13 @@ export class IntelligentTutorEngine {
       syntax: '[GRAPH:function_or_shape]'
     },
     {
+      name: 'TransformationGrapher',
+      category: 'visualization',
+      applicableTopics: ['transformations', 'dilations', 'reflections', 'rotations', 'translations', 'coordinate geometry'],
+      complexity: 3,
+      syntax: '[TRANSFORM:type,parameters]'
+    },
+    {
       name: 'ShapeExplorer',
       category: 'visualization',
       applicableTopics: ['shapes', 'polygons', 'circles', 'basic geometry'],
@@ -192,8 +199,8 @@ export class IntelligentTutorEngine {
       return {
         text: query,
         intent: 'explain' as const,
-        topics: lessonAnalysis.topics.slice(0, 2),
-        toolNeeds: lessonAnalysis.suggestedTools.slice(0, 1),
+        topics: (lessonAnalysis.topics || []).slice(0, 2),
+        toolNeeds: (lessonAnalysis.suggestedTools || []).slice(0, 1),
         complexity: 3
       };
     }
