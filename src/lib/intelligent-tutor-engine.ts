@@ -281,12 +281,13 @@ export class IntelligentTutorEngine {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [{ role: 'user', content: prompt }],
+          message: prompt,
           character,
           model: 'gpt-4o', // Use GPT-4o for response generation
           lessonContext: {
-            topics: lessonContext.topics,
-            concepts: lessonContext.mathConcepts
+            lessonTitle: lessonContext?.objectives?.[0] || 'Math Lesson',
+            topics: lessonContext?.topics || [],
+            concepts: lessonContext?.mathConcepts || []
           }
         })
       });
@@ -296,7 +297,7 @@ export class IntelligentTutorEngine {
       }
 
       const result = await response.json();
-      return result.content || result.message || "I'd be happy to help! Could you rephrase your question?";
+      return result.response?.content || result.content || result.message || "I'd be happy to help! Could you rephrase your question?";
 
     } catch (error) {
       console.error('Response generation failed:', error);
