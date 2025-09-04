@@ -1,5 +1,5 @@
-import GeometryVisualizer, { CubeExplorer } from '../components/GeometryVisualizer';
-import { ChatCubeVisualizer } from '../components/ChatGeoGebra';
+import GeometryVisualizer, { CubeExplorer } from '../../components/GeometryVisualizer';
+import { ChatCubeVisualizer } from '../../components/ChatGeoGebra';
 
 export default function TestGeometry() {
   return (
