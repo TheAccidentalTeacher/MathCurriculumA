@@ -203,7 +203,16 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
   const [applet, setApplet] = useState<any>(null);
   const [ggbApi, setGgbApi] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<string[]>([]);
   const [containerId] = useState(() => id || generateUniqueId());
+
+  // Add debug info helper
+  const addDebugInfo = useCallback((message: string) => {
+    const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+    const debugMessage = `[${timestamp}] ${message}`;
+    console.log(`🔍 [GeoGebra-${containerId}] ${debugMessage}`);
+    setDebugInfo(prev => [...prev.slice(-4), debugMessage]); // Keep last 5 messages
+  }, [containerId]);
 
   // Cleanup function with improved lifecycle management
   const cleanup = useCallback(() => {
@@ -344,15 +353,20 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
               return;
             }
 
+            addDebugInfo('AppletOnLoad callback triggered');
             console.log(`GeoGebra applet loaded successfully with ID: ${containerId}`);
             
             try {
               // Double-check that the API is valid and has required methods
               if (!api || typeof api.evalCommand !== 'function') {
-                console.error('Invalid GeoGebra API received in appletOnLoad');
+                const errorMsg = 'Invalid GeoGebra API received in appletOnLoad';
+                addDebugInfo(errorMsg);
+                console.error(errorMsg);
                 setError('Invalid GeoGebra API');
                 return;
               }
+
+              addDebugInfo('API validation successful');
 
               // Store API in window with unique ID to prevent conflicts (based on research)
               if (typeof window !== 'undefined') {
@@ -477,13 +491,17 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
 
     const loadAndInitialize = () => {
       if (typeof window !== 'undefined' && isMountedRef.current) {
+        addDebugInfo('Starting GeoGebra load process');
+        
         if (window.GGBApplet) {
-          // GeoGebra is already loaded
+          addDebugInfo('GeoGebra script already loaded, initializing');
           initializeGeoGebra();
         } else {
+          addDebugInfo('GeoGebra script not loaded, waiting...');
           // Wait for GeoGebra to load from the script tag in layout.tsx
           const checkGeoGebra = () => {
             if (window.GGBApplet && isMountedRef.current) {
+              addDebugInfo('GeoGebra script loaded, initializing');
               initializeGeoGebra();
             } else if (isMountedRef.current) {
               timeoutId = setTimeout(checkGeoGebra, 100);
@@ -724,6 +742,20 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
             <div className="text-sm text-gray-700 font-medium">Loading GeoGebra...</div>
             <div className="text-xs text-gray-500 mt-1">Initializing interactive geometry</div>
+          </div>
+        </div>
+      )}
+      
+      {/* Debug panel - shows in development or when there are issues */}
+      {(process.env.NODE_ENV === 'development' || debugInfo.length > 0) && (
+        <div className="absolute bottom-2 right-2 bg-black bg-opacity-75 text-white text-xs p-2 rounded max-w-sm">
+          <div className="font-bold mb-1">Debug Info ({containerId})</div>
+          <div>Loaded: {isLoaded ? '✅' : '❌'} | Loading: {isLoading ? '⏳' : '✅'}</div>
+          <div>API: {ggbApi ? '✅' : '❌'} | GGBApplet: {typeof window !== 'undefined' && window.GGBApplet ? '✅' : '❌'}</div>
+          <div className="max-h-20 overflow-y-auto mt-2">
+            {debugInfo.map((info, idx) => (
+              <div key={idx} className="text-xs opacity-80">{info}</div>
+            ))}
           </div>
         </div>
       )}
