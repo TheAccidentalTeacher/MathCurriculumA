@@ -165,10 +165,10 @@ export class IntelligentTutorEngine {
     Student Question: "${query}"
 
     Lesson Context:
-    - Topics: ${lessonContext.topics.join(', ')}
-    - Concepts: ${lessonContext.mathConcepts.join(', ')}
-    - Difficulty: ${lessonContext.difficulty}
-    - Key Terms: ${lessonContext.keyTerms.join(', ')}
+    - Topics: ${lessonContext.topics?.join(', ') || 'No topics available'}
+    - Concepts: ${lessonContext.mathConcepts?.join(', ') || 'No concepts available'}
+    - Difficulty: ${lessonContext.difficulty || 'medium'}
+    - Key Terms: ${lessonContext.keyTerms?.join(', ') || 'No key terms available'}
 
     Available Tools: ${this.availableTools.map(t => `${t.name} (${t.syntax})`).join(', ')}
 
@@ -238,21 +238,21 @@ export class IntelligentTutorEngine {
     character: string = 'somers'
   ): Promise<string> {
     const toolSyntaxExamples = userQuery.toolNeeds.map(tool => 
-      `${tool.name}: ${tool.syntax} - for ${tool.applicableTopics.join(', ')}`
+      `${tool.name}: ${tool.syntax} - for ${(tool.applicableTopics || []).join(', ')}`
     ).join('\n');
 
     const prompt = `
     You are ${character}, an engaging math tutor. The student asked: "${userQuery.text}"
 
     LESSON CONTEXT:
-    - Current topics: ${lessonContext.topics.join(', ')}
-    - Key concepts: ${lessonContext.mathConcepts.join(', ')}
-    - Learning objectives: ${lessonContext.objectives.join(', ')}
-    - Difficulty level: ${lessonContext.difficulty}
+    - Current topics: ${(lessonContext?.topics || []).join(', ')}
+    - Key concepts: ${(lessonContext?.mathConcepts || []).join(', ')}
+    - Learning objectives: ${(lessonContext?.objectives || []).join(', ')}
+    - Difficulty level: ${lessonContext?.difficulty || 'middle'}
 
     ANALYSIS RESULTS:
     - Student intent: ${userQuery.intent}
-    - Query topics: ${userQuery.topics.join(', ')}
+    - Query topics: ${(userQuery.topics || []).join(', ')}
     - Complexity: ${userQuery.complexity}/5
 
     RECOMMENDED TOOLS FOR THIS QUESTION:
@@ -281,16 +281,13 @@ export class IntelligentTutorEngine {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: prompt,
+          messages: [{ role: 'user', content: prompt }],
           character,
           model: 'gpt-4o', // Use GPT-4o for response generation
           lessonContext: {
-            lessonTitle: `${lessonContext.topics.join(', ')} - ${lessonContext.difficulty} school`,
             topics: lessonContext.topics,
-            concepts: lessonContext.mathConcepts,
-            objectives: lessonContext.objectives
-          },
-          conversationHistory: []
+            concepts: lessonContext.mathConcepts
+          }
         })
       });
 
@@ -299,7 +296,7 @@ export class IntelligentTutorEngine {
       }
 
       const result = await response.json();
-      return result.response?.content || result.content || result.message || "I'd be happy to help! Could you rephrase your question?";
+      return result.content || result.message || "I'd be happy to help! Could you rephrase your question?";
 
     } catch (error) {
       console.error('Response generation failed:', error);
