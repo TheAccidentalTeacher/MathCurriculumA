@@ -1,17 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-// Only create OpenAI client if API key is available (not during build)
-const openai = process.env.OPENAI_API_KEY ? new OpenAI({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
-}) : null;
+});
 
 export async function POST(request: NextRequest) {
   try {
-    if (!openai) {
-      return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
-    }
-
     const { prompt, model = 'o1-mini' } = await request.json();
 
     if (!prompt) {
@@ -92,9 +87,6 @@ export async function POST(request: NextRequest) {
     if (error instanceof Error && error.message.includes('model')) {
       // Fallback to gpt-4o-mini if o1 is not available
       try {
-        if (!openai) {
-          throw new Error('OpenAI client not available');
-        }
         const fallbackCompletion = await openai.chat.completions.create({
           model: 'gpt-4o-mini',
           messages: [

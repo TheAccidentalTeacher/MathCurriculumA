@@ -491,6 +491,7 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
                 lessonNumber={lessonNumber}
                 lessonTitle={lessonData?.lessonTitle || `Lesson ${lessonNumber}`}
                 lessonAnalysis={lessonAnalysis}
+                lessonContent={lessonData}
               />
             </div>
           </div>

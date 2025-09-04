@@ -76,8 +76,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     console.log(`📊 [API] Cache status for ${cacheKey}: ${isCached ? 'found' : 'not found'}`);
     
     if (isCached) {
+      // Actually retrieve the cached analysis
+      const cachedAnalysis = LessonContentService.getCachedAnalysis(documentId, lessonNum);
+      console.log(`🎯 [API] Retrieved cached analysis:`, !!cachedAnalysis);
+      
       return NextResponse.json({
         success: true,
+        analysis: cachedAnalysis,
         cached: true,
         message: 'Lesson content is ready',
         cacheInfo: {

@@ -309,16 +309,20 @@ GRAPH GENERATION:
 - Use [POWERLINE:number] for powers of 10 number lines (e.g., [POWERLINE:3500])
 - Use [POWERS10:activity-type,number] for GeoGebra activities (e.g., [POWERS10:place-value,3500])
 - Use [GEOGEBRA:commands] for interactive GeoGebra activities (e.g., [GEOGEBRA:A=(0,0); B=(1,1); Segment(A,B)])
-- Use [CUBE:count,decomposition] for 3D cube visualizations (e.g., [CUBE:8,true] for 8 cubes with decomposition)
-- Use [GEOMETRY:commands] for interactive geometry exploration (e.g., [GEOMETRY:A=(0,0); B=(3,0); triangle=Polygon(A,B,C)])
+- Use [GEOMETRY:type] for interactive geometry exploration (e.g., [GEOMETRY:construction])
 
 COMPREHENSIVE SHAPE VISUALIZATIONS:
 - Use [SHAPE:name,dimensions] for interactive 2D and 3D geometry (e.g., [SHAPE:triangle,3,4,5] or [SHAPE:cube,4])
+- Use [SMART_3D:shape,lesson_concept] for lesson-specific 3D visualizations (e.g., [SMART_3D:cube,plane_sections])
 - Supported 2D shapes: triangle, square, rectangle, circle, pentagon, hexagon, octagon, parallelogram, trapezoid, rhombus
 - Supported 3D shapes: cube, rectangular_prism, sphere, cylinder, cone, pyramid, triangular_prism
+- For plane sections lesson: Use [SMART_3D:cube,plane_sections], [SMART_3D:sphere,plane_sections], etc.
+- For volume lessons: Use [SMART_3D:cylinder,volume], [SMART_3D:cone,volume], etc.
 - Examples:
   * [SHAPE:triangle,3,4,5] - creates a triangle with sides 3, 4, 5
   * [SHAPE:square,5] - creates a square with side length 5
+  * [SMART_3D:cube,plane_sections] - creates an interactive cube with adjustable cutting plane
+  * [SMART_3D:sphere,volume] - creates a sphere with volume calculations
   * [SHAPE:rectangle,6,4] - creates a rectangle with length 6, width 4
   * [SHAPE:circle,3] - creates a circle with radius 3
   * [SHAPE:cube,4] - creates a 3D cube with side length 4

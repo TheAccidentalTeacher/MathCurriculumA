@@ -500,6 +500,16 @@ Be patient, encouraging, and adapt your explanations to the student's understand
   }
 
   /**
+   * Get cached lesson analysis if it exists
+   */
+  static getCachedAnalysis(documentId: string, lessonNumber: number): LessonAnalysis | null {
+    const cacheKey = `lesson_analysis_${documentId}_${lessonNumber}`;
+    const cached = this.cache.get(cacheKey);
+    console.log(`🔍 [LessonContentService] Getting cached analysis for ${cacheKey}: ${cached ? 'found' : 'not found'}`);
+    return cached || null;
+  }
+
+  /**
    * Clear cache (useful for development)
    */
   static clearCache() {
