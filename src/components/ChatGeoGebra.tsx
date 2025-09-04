@@ -171,18 +171,18 @@ export function ChatCubeVisualizer({
     'SetColor(cube1, blue)',
     'SetFilling(cube1, 0.5)',
     
-    // Add coordinate axes for reference
-    'xAxis = Line((0,0,0), (2,0,0))',
-    'yAxis = Line((0,0,0), (0,2,0))',
-    'zAxis = Line((0,0,0), (0,0,2))',
-    'SetColor(xAxis, red)',
-    'SetColor(yAxis, green)',
-    'SetColor(zAxis, blue)',
+    // Add coordinate axes for reference - FIXED: Use different names to avoid system axis conflicts
+    'xAxisLine = Line((0,0,0), (2,0,0))',
+    'yAxisLine = Line((0,0,0), (0,2,0))',
+    'zAxisLine = Line((0,0,0), (0,0,2))',
+    'SetColor(xAxisLine, red)',
+    'SetColor(yAxisLine, green)',
+    'SetColor(zAxisLine, blue)',
     
-    // Add labels
-    'SetCaption(xAxis, "x")',
-    'SetCaption(yAxis, "y")',
-    'SetCaption(zAxis, "z")',
+    // Add labels - FIXED: Use axis names instead of trying to modify system axes
+    'SetCaption(xAxisLine, "x")',
+    'SetCaption(yAxisLine, "y")',
+    'SetCaption(zAxisLine, "z")',
     
     // Add text for volume
     'volumeLabel = Text("Volume = 1 × 1 × 1 = 1 cubic unit", (1.2, 1.2))',

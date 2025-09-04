@@ -180,8 +180,6 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
         randomize: randomize,
         useBrowserForJS: true,
         showLogging: process.env.NODE_ENV === 'development',
-        errorDialogsActive: false, // Suppress error dialogs
-        allowSymbolTable: true,
         
         // Content loading
         ...(ggbBase64 && { ggbBase64 }),
@@ -236,14 +234,7 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
                         window[widgetId].evalCommand(command);
                         addDebug(`Executed command: ${command}`);
                       } catch (err) {
-                        // Handle common GeoGebra errors gracefully
-                        const errorMessage = err instanceof Error ? err.message : String(err);
-                        if (errorMessage.includes('Illegal assignment') || 
-                            errorMessage.includes('Fixed objects may not be changed')) {
-                          addDebug(`Skipping restricted command: ${command} (${errorMessage})`);
-                        } else {
-                          console.error(`Command execution failed: ${command}`, err);
-                        }
+                        console.error(`Command execution failed: ${command}`, err);
                       }
                     }
                   }, index * 100);
