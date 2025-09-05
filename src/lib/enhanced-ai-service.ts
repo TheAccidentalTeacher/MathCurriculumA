@@ -2,7 +2,13 @@ import OpenAI from 'openai';
 import { AICurriculumContextService, CurriculumContext, PacingRecommendation } from './ai-curriculum-context';
 
 export interface PacingGuideRequest {
-  gradeLevel: string;
+  gradeLevel: string; // Keep for backwards compatibility
+  gradeCombination?: {
+    selectedGrades: string[];
+    pathwayType: 'sequential' | 'accelerated' | 'combined' | 'custom';
+    skipGrades?: string[];
+    emphasis?: 'balanced' | 'foundational' | 'advanced';
+  };
   timeframe: string;
   studentPopulation: string;
   priorities: string[];
@@ -93,27 +99,32 @@ export class EnhancedAIService {
 
   async generatePacingGuide(request: PacingGuideRequest): Promise<PacingGuideResponse> {
     try {
-      // Build curriculum context
-      const context = await this.curriculumService.buildCurriculumContext(request.gradeLevel);
+      // Determine effective grade configuration
+      const gradeConfig = this.parseGradeConfiguration(request);
       
-      // Generate AI recommendations
-      const recommendations = await this.curriculumService.generatePacingRecommendations(
-        request.gradeLevel,
-        request.timeframe,
-        request.studentPopulation,
-        request.priorities
+      // Build comprehensive curriculum context for all selected grades
+      const contexts = await Promise.all(
+        gradeConfig.selectedGrades.map(grade => 
+          this.curriculumService.buildCurriculumContext(grade)
+        )
       );
+      
+      // Merge contexts and analyze cross-grade dependencies
+      const mergedContext = this.mergeCurriculumContexts(contexts, gradeConfig);
+      
+      // Generate AI recommendations with advanced pathway logic
+      const recommendations = await this.generateAdvancedRecommendations(gradeConfig, request);
 
-      // Create detailed prompt for GPT-4
-      const prompt = this.buildDetailedPrompt(context, request);
+      // Create sophisticated prompt for multi-grade analysis
+      const prompt = this.buildAdvancedPrompt(mergedContext, gradeConfig, request);
 
-      // Generate pacing guide with GPT-4
+      // Generate pacing guide with enhanced AI reasoning
       const completion = await this.openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
           {
             role: "system",
-            content: "You are an expert mathematics curriculum specialist with deep knowledge of grade 6-8 mathematics standards, pacing, and differentiation strategies. You create practical, research-based pacing guides that teachers can implement effectively."
+            content: "You are an expert mathematics curriculum specialist with deep knowledge of grade 6-8 mathematics standards, pacing, and differentiation strategies. You create practical, research-based pacing guides that teachers can implement effectively. You excel at analyzing multi-grade combinations and creating pedagogically sound accelerated pathways."
           },
           {
             role: "user",
@@ -130,7 +141,7 @@ export class EnhancedAIService {
         throw new Error('No response from AI service');
       }
 
-      const pacingGuide = await this.parseAIResponse(aiResponse, context, request);
+      const pacingGuide = await this.parseAIResponse(aiResponse, mergedContext, request);
 
       return {
         success: true,
@@ -346,6 +357,108 @@ Ensure the pacing guide is realistic, pedagogically sound, and addresses the spe
     
     const weekMatch = timeframe.match(/(\d+)\s*week/i);
     return weekMatch ? parseInt(weekMatch[1]) : 18;
+  }
+
+  // Helper methods for advanced grade combination support
+  private parseGradeConfiguration(request: PacingGuideRequest) {
+    if (request.gradeCombination && request.gradeCombination.selectedGrades.length > 0) {
+      return {
+        selectedGrades: request.gradeCombination.selectedGrades,
+        pathwayType: request.gradeCombination.pathwayType || 'sequential',
+        skipGrades: request.gradeCombination.skipGrades || [],
+        emphasis: request.gradeCombination.emphasis || 'balanced'
+      };
+    }
+    
+    // Fallback to single grade
+    return {
+      selectedGrades: [request.gradeLevel],
+      pathwayType: 'sequential' as const,
+      skipGrades: [],
+      emphasis: 'balanced' as const
+    };
+  }
+
+  private mergeCurriculumContexts(contexts: CurriculumContext[], gradeConfig: any): CurriculumContext {
+    if (contexts.length === 1) {
+      return contexts[0];
+    }
+
+    // Merge multiple grade contexts into a comprehensive view
+    const mergedStandards = contexts.flatMap(ctx => ctx.availableStandards);
+    const mergedMajorStandards = contexts.flatMap(ctx => ctx.majorStandards);
+    const mergedSupportingStandards = contexts.flatMap(ctx => ctx.supportingStandards);
+    const mergedAdditionalStandards = contexts.flatMap(ctx => ctx.additionalStandards);
+    const mergedUnitStructure = contexts.flatMap(ctx => ctx.unitStructure);
+
+    return {
+      gradeLevel: gradeConfig.selectedGrades.join('+'),
+      availableStandards: mergedStandards,
+      majorStandards: mergedMajorStandards,
+      supportingStandards: mergedSupportingStandards,
+      additionalStandards: mergedAdditionalStandards,
+      unitStructure: mergedUnitStructure,
+      totalLessons: contexts.reduce((sum, ctx) => sum + ctx.totalLessons, 0),
+      totalInstructionalDays: contexts.reduce((sum, ctx) => sum + ctx.totalInstructionalDays, 0)
+    };
+  }
+
+  private async generateAdvancedRecommendations(gradeConfig: any, request: PacingGuideRequest) {
+    // For now, use the first grade for basic recommendations
+    // TODO: Implement sophisticated multi-grade recommendation logic
+    const primaryGrade = gradeConfig.selectedGrades[0];
+    return await this.curriculumService.generatePacingRecommendations(
+      primaryGrade,
+      request.timeframe,
+      request.studentPopulation,
+      request.priorities
+    );
+  }
+
+  private buildAdvancedPrompt(context: CurriculumContext, gradeConfig: any, request: PacingGuideRequest): string {
+    const isMultiGrade = gradeConfig.selectedGrades.length > 1;
+    
+    if (isMultiGrade) {
+      return `
+Create a comprehensive ${gradeConfig.pathwayType} pacing guide for ${gradeConfig.selectedGrades.join(' + ')} mathematics curriculum.
+
+GRADE COMBINATION ANALYSIS:
+- Selected Grades: ${gradeConfig.selectedGrades.join(', ')}
+- Pathway Type: ${gradeConfig.pathwayType}
+- Emphasis: ${gradeConfig.emphasis}
+- Total Unit Structures: ${context.unitStructure.length}
+- Total Lessons: ${context.totalLessons}
+- Total Instructional Days: ${context.totalInstructionalDays}
+
+PEDAGOGICAL REQUIREMENTS:
+1. Analyze prerequisite relationships between grade levels
+2. Identify essential foundational concepts that cannot be skipped
+3. Create logical progression that builds mathematical understanding
+4. Balance content coverage with sufficient practice time
+5. Consider cognitive load and developmental appropriateness
+
+TIMEFRAME: ${request.timeframe}
+STUDENT POPULATION: ${request.studentPopulation}
+PRIORITIES: ${request.priorities.join(', ')}
+
+SCHEDULE CONSTRAINTS:
+- ${request.scheduleConstraints?.daysPerWeek || 5} days per week
+- ${request.scheduleConstraints?.minutesPerClass || 50} minutes per class
+
+Please create a detailed pacing guide that:
+- Maps prerequisite relationships across grades
+- Sequences topics for optimal learning progression
+- Provides realistic timeline estimates
+- Includes differentiation strategies
+- Identifies potential acceleration opportunities
+- Suggests assessment checkpoints
+
+Return the response in JSON format with the same structure as single-grade pacing guides.
+      `;
+    }
+
+    // Fallback to original prompt for single grades
+    return this.buildDetailedPrompt(context, request);
   }
 
   async disconnect() {
