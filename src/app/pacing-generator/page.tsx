@@ -60,7 +60,7 @@ export default function PacingGeneratorPage() {
       console.log('📡 API Response status:', response.status, response.statusText);
       
       const data: PacingGuideResponse = await response.json();
-      console.log('📊 API Response data:', data);
+      console.log('📊 API Response data:', JSON.stringify(data, null, 2));
 
       if (!response.ok) {
         console.error('❌ API Error:', data.error);
@@ -73,14 +73,23 @@ export default function PacingGeneratorPage() {
       }
 
       console.log('✅ Pacing guide generated successfully!');
-      console.log('📋 Generated guide structure:', {
-        overview: data.pacingGuide.overview,
-        weeklyScheduleLength: data.pacingGuide.weeklySchedule?.length || 0,
-        assessmentPlan: !!data.pacingGuide.assessmentPlan,
-        differentiationStrategiesCount: data.pacingGuide.differentiationStrategies?.length || 0,
-        flexibilityOptionsCount: data.pacingGuide.flexibilityOptions?.length || 0,
-        standardsAlignmentCount: data.pacingGuide.standardsAlignment?.length || 0
-      });
+      console.log('📋 Generated guide structure details:');
+      console.log('  📖 Overview:', JSON.stringify(data.pacingGuide.overview, null, 2));
+      console.log('  📅 Weekly Schedule Count:', data.pacingGuide.weeklySchedule?.length || 0);
+      console.log('  📅 Weekly Schedule Sample (first 2 weeks):', JSON.stringify(data.pacingGuide.weeklySchedule?.slice(0, 2), null, 2));
+      console.log('  📝 Assessment Plan:', JSON.stringify(data.pacingGuide.assessmentPlan, null, 2));
+      console.log('  🎯 Differentiation Strategies Count:', data.pacingGuide.differentiationStrategies?.length || 0);
+      console.log('  ⚡ Flexibility Options Count:', data.pacingGuide.flexibilityOptions?.length || 0);
+      console.log('  📊 Standards Alignment Count:', data.pacingGuide.standardsAlignment?.length || 0);
+      
+      // Check for empty content issues
+      if (!data.pacingGuide.weeklySchedule || data.pacingGuide.weeklySchedule.length === 0) {
+        console.error('🚨 CRITICAL PROBLEM: weeklySchedule is empty or undefined!');
+        console.error('🔍 This explains why 0 lessons are shown in the UI');
+        console.log('🔬 Full response for debugging:', JSON.stringify(data, null, 2));
+      } else {
+        console.log('✅ Weekly schedule contains', data.pacingGuide.weeklySchedule.length, 'weeks of content');
+      }
 
       setPacingGuide(data.pacingGuide);
       setCurrentStep('results');

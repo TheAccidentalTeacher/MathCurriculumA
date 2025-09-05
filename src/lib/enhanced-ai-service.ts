@@ -316,6 +316,40 @@ Ensure the pacing guide is realistic, pedagogically sound, and addresses the spe
       }
       
       console.log('📊 Parsed response structure:', Object.keys(parsedResponse || {}));
+      console.log('🔍 [AI Service] Detailed parsed response analysis:');
+      
+      if (parsedResponse.weeklySchedule) {
+        console.log('  📅 Weekly Schedule:', {
+          totalWeeks: parsedResponse.weeklySchedule.length,
+          firstWeek: parsedResponse.weeklySchedule[0] || 'undefined',
+          sampleWeekStructure: parsedResponse.weeklySchedule[0] ? Object.keys(parsedResponse.weeklySchedule[0]) : 'none'
+        });
+        
+        if (parsedResponse.weeklySchedule[0]) {
+          console.log('  📝 First week details:', {
+            lessons: parsedResponse.weeklySchedule[0].lessons || 'undefined',
+            lessonsCount: (parsedResponse.weeklySchedule[0].lessons || []).length,
+            focusStandards: parsedResponse.weeklySchedule[0].focusStandards || 'undefined',
+            learningObjectives: parsedResponse.weeklySchedule[0].learningObjectives || 'undefined'
+          });
+        }
+      } else {
+        console.error('❌ [AI Service] No weeklySchedule in parsed response!');
+      }
+      
+      if (parsedResponse.overview) {
+        console.log('  📋 Overview:', parsedResponse.overview);
+      } else {
+        console.error('❌ [AI Service] No overview in parsed response!');
+      }
+      console.log('🔍 [AI Service] Parsed response content analysis:');
+      console.log('  Overview present:', !!parsedResponse.overview);
+      console.log('  WeeklySchedule present:', !!parsedResponse.weeklySchedule);
+      console.log('  WeeklySchedule type:', typeof parsedResponse.weeklySchedule);
+      console.log('  WeeklySchedule length:', parsedResponse.weeklySchedule?.length || 'undefined');
+      console.log('  WeeklySchedule sample:', JSON.stringify(parsedResponse.weeklySchedule?.slice(0, 2), null, 2));
+      console.log('  AssessmentPlan present:', !!parsedResponse.assessmentPlan);
+      console.log('  DifferentiationStrategies present:', !!parsedResponse.differentiationStrategies);
       
       // Build the structured pacing guide
       console.log('🏗️ [AI Service] Building structured pacing guide...');
@@ -535,13 +569,12 @@ Return your response as a valid JSON object with this exact structure:
   "weeklySchedule": [
     {
       "week": 1,
-      "unit": "Unit Name",
-      "topics": ["Topic 1", "Topic 2"],
-      "gradeLevel": "6+7",
-      "focusStandards": ["Standard 1", "Standard 2"],
-      "prerequisites": ["Prerequisite concepts"],
-      "objectives": ["Learning objective 1", "Learning objective 2"],
-      "assessments": ["Assessment type"]
+      "unit": "Unit Name (e.g., 'Ratios and Proportional Relationships')",
+      "lessons": ["Unit 1, Lesson 1", "Unit 1, Lesson 2", "Unit 1, Lesson 3", "Unit 1, Lesson 4"],
+      "focusStandards": ["6.RP.A.1", "6.RP.A.2"],
+      "learningObjectives": ["Understand ratio concepts", "Use ratio language to describe relationships"],
+      "assessmentType": "formative",
+      "differentiationNotes": "Optional notes for differentiation"
     }
   ],
   "assessmentPlan": {
@@ -549,45 +582,60 @@ Return your response as a valid JSON object with this exact structure:
     "summativeSchedule": [
       {
         "week": 8,
-        "type": "Unit Test",
-        "scope": "Units 1-2",
-        "gradeLevel": "6+7"
+        "type": "Unit Assessment",
+        "standards": ["6.RP.A.1", "6.RP.A.2", "6.RP.A.3"],
+        "description": "Assessment covering ratio and proportion concepts"
       }
     ],
-    "diagnosticCheckpoints": ["Week 4", "Week 12", "Week 24"],
+    "diagnosticCheckpoints": [4, 12, 24],
     "portfolioComponents": ["Problem solving samples", "Reflection pieces"]
   },
   "differentiationStrategies": [
     {
-      "strategy": "Strategy name",
-      "implementation": "How to implement",
-      "targetStudents": "Who this helps"
+      "studentGroup": "Students with Disabilities",
+      "modifications": ["Extended time", "Visual supports"],
+      "resources": ["Manipulatives", "Graphic organizers"],
+      "assessmentAdjustments": ["Alternative formats", "Oral responses"]
     }
   ],
   "flexibilityOptions": [
     {
-      "scenario": "If students struggle with concept X",
-      "adjustment": "Add extra practice time",
-      "timeImpact": "1-2 days"
+      "scenario": "If students struggle with ratios",
+      "adjustments": ["Add concrete examples", "Use manipulatives"],
+      "impactAnalysis": "May need 1-2 extra days"
     }
   ],
   "standardsAlignment": [
     {
-      "standard": "Standard code and description",
-      "gradeLevel": "6" or "7",
-      "weeks": [1, 2, 3],
-      "emphasis": "major" or "supporting"
+      "standard": "6.RP.A.1 - Understand the concept of ratio",
+      "weeksCovered": [1, 2],
+      "connections": ["Links to fraction concepts", "Foundation for proportions"]
     }
   ]
 }
 \`\`\`
 
 Create at least 20 weeks of detailed weekly schedule covering the essential concepts from both grades with proper prerequisite sequencing.
-- Sequences topics for optimal learning progression
-- Provides realistic timeline estimates
-- Includes differentiation strategies
-- Identifies potential acceleration opportunities
-- Suggests assessment checkpoints
+
+CRITICAL REQUIREMENTS:
+- Focus on PACING and SEQUENCE, not detailed lesson content
+- Each week should reference existing curriculum units and lessons (e.g., "Unit 3, Lesson 2")
+- Lessons array should contain lesson REFERENCES, not detailed content
+- Each week MUST have 2-4 learning objectives that describe WHAT students will learn
+- Each week MUST have 2-3 focus standards using standard codes (e.g., "6.RP.A.1")
+- Use "assessmentType": "formative", "summative", or "diagnostic" 
+- Standards should use actual standard codes when possible
+- This is a PACING GUIDE - focus on timing, sequence, and organization
+
+PACING REQUIREMENTS:
+- Generate exactly ${this.calculateWeeks(request.timeframe)} weeks
+- Sequence topics for optimal learning progression
+- Provide realistic timeline estimates
+- Include differentiation strategies
+- Identify potential acceleration opportunities
+- Suggest assessment checkpoints
+
+ABSOLUTELY CRITICAL: Your JSON response must contain a "weeklySchedule" array with actual lesson content. Empty arrays will cause system failure.
 
 Return the response in JSON format with the same structure as single-grade pacing guides.
       `;
