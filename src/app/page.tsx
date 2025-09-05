@@ -447,6 +447,24 @@ export default function Home() {
                 <div className="text-sm opacity-90 mt-1 drop-shadow-sm">(456 pages)</div>
               </div>
             </Link>
+            
+            {/* Algebra 1 Volumes */}
+            <Link href="/viewer/algebra1-volume1" data-volume-card className="block p-4 bg-red-600 text-white rounded-xl shadow-lg hover:bg-red-700 transition-colors relative overflow-hidden group">
+              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/download-17.png)'}}></div>
+              <div className="text-center relative z-10">
+                <div className="text-3xl mb-2 drop-shadow-lg">📐</div>
+                <div className="font-bold text-lg drop-shadow-md">Algebra 1 Volume 1</div>
+                <div className="text-sm opacity-90 mt-1 drop-shadow-sm">(656 pages)</div>
+              </div>
+            </Link>
+            <Link href="/viewer/algebra1-volume2" data-volume-card className="block p-4 bg-pink-600 text-white rounded-xl shadow-lg hover:bg-pink-700 transition-colors relative overflow-hidden group">
+              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/download-18.png)'}}></div>
+              <div className="text-center relative z-10">
+                <div className="text-3xl mb-2 drop-shadow-lg">📏</div>
+                <div className="font-bold text-lg drop-shadow-md">Algebra 1 Volume 2</div>
+                <div className="text-sm opacity-90 mt-1 drop-shadow-sm">(698 pages)</div>
+              </div>
+            </Link>
           </div>
           
           {/* Transform Button and Pacing Generator Link */}

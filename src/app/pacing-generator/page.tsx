@@ -35,20 +35,11 @@ export default function PacingGeneratorPage() {
   }, []);
 
   const handleFormSubmit = useCallback(async (request: PacingGuideRequest) => {
-    console.group('🎯 Pacing Guide Generation Started');
-    console.log('📝 Request payload:', JSON.stringify(request, null, 2));
-    console.log('🔍 Grade configuration:', {
-      simple: request.gradeLevel,
-      advanced: request.gradeCombination,
-      isMultiGrade: (request.gradeCombination?.selectedGrades?.length || 0) > 1
-    });
-    
     setIsLoading(true);
     setError(null);
     setAnnouncements('Generating your pacing guide...');
 
     try {
-      console.log('🌐 Sending API request to /api/pacing/generate');
       const response = await fetch('/api/pacing/generate', {
         method: 'POST',
         headers: {
@@ -57,38 +48,14 @@ export default function PacingGeneratorPage() {
         body: JSON.stringify(request),
       });
 
-      console.log('📡 API Response status:', response.status, response.statusText);
-      
       const data: PacingGuideResponse = await response.json();
-      console.log('📊 API Response data:', JSON.stringify(data, null, 2));
 
       if (!response.ok) {
-        console.error('❌ API Error:', data.error);
         throw new Error(data.error || `HTTP error! status: ${response.status}`);
       }
 
       if (!data.success || !data.pacingGuide) {
-        console.error('❌ Generation failed:', data.error);
         throw new Error(data.error || 'Failed to generate pacing guide');
-      }
-
-      console.log('✅ Pacing guide generated successfully!');
-      console.log('📋 Generated guide structure details:');
-      console.log('  📖 Overview:', JSON.stringify(data.pacingGuide.overview, null, 2));
-      console.log('  📅 Weekly Schedule Count:', data.pacingGuide.weeklySchedule?.length || 0);
-      console.log('  📅 Weekly Schedule Sample (first 2 weeks):', JSON.stringify(data.pacingGuide.weeklySchedule?.slice(0, 2), null, 2));
-      console.log('  📝 Assessment Plan:', JSON.stringify(data.pacingGuide.assessmentPlan, null, 2));
-      console.log('  🎯 Differentiation Strategies Count:', data.pacingGuide.differentiationStrategies?.length || 0);
-      console.log('  ⚡ Flexibility Options Count:', data.pacingGuide.flexibilityOptions?.length || 0);
-      console.log('  📊 Standards Alignment Count:', data.pacingGuide.standardsAlignment?.length || 0);
-      
-      // Check for empty content issues
-      if (!data.pacingGuide.weeklySchedule || data.pacingGuide.weeklySchedule.length === 0) {
-        console.error('🚨 CRITICAL PROBLEM: weeklySchedule is empty or undefined!');
-        console.error('🔍 This explains why 0 lessons are shown in the UI');
-        console.log('🔬 Full response for debugging:', JSON.stringify(data, null, 2));
-      } else {
-        console.log('✅ Weekly schedule contains', data.pacingGuide.weeklySchedule.length, 'weeks of content');
       }
 
       setPacingGuide(data.pacingGuide);
@@ -96,13 +63,12 @@ export default function PacingGeneratorPage() {
       setAnnouncements('Pacing guide generated successfully');
       
     } catch (error) {
-      console.error('💥 Error generating pacing guide:', error);
+      console.error('Error generating pacing guide:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       setError(errorMessage);
       setAnnouncements(`Error: ${errorMessage}`);
     } finally {
       setIsLoading(false);
-      console.groupEnd();
     }
   }, []);
 
@@ -225,7 +191,7 @@ export default function PacingGeneratorPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900">
-            🤖 Dynamic Pacing Guide Generator
+            AI-Powered Pacing Guide Generator
           </h1>
           <p className="mt-4 text-xl text-gray-600">
             Create customized mathematics pacing guides with curriculum intelligence

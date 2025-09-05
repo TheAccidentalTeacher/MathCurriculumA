@@ -1,56 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-// Disable static generation for this route since it requires runtime environment variables
-export const dynamic = 'force-dynamic';
-
-// Lazy initialization to prevent build-time errors
-const getOpenAIClient = () => {
-  return new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-  });
-};
+// Only create OpenAI client if API key is available (not during build)
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+}) : null;
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    console.log('📥 [API] Received request body:', JSON.stringify(body, null, 2));
-    
-    // Handle both formats: direct prompt or query analysis request
-    let prompt;
-    let model = 'o1-mini';
-    
-    if (body.prompt) {
-      // Direct prompt format
-      prompt = body.prompt;
-      model = body.model || 'o1-mini';
-    } else if (body.query && body.lessonAnalysis) {
-      // Query analysis format  
-      const { query, lessonAnalysis } = body;
-      prompt = `Analyze this student query in the context of the lesson:
-
-Query: "${query}"
-Lesson Analysis: ${JSON.stringify(lessonAnalysis, null, 2)}
-
-Please return a JSON response with the following structure:
-{
-  "text": "${query}",
-  "intent": "explain|practice|clarify|visualize|calculate",
-  "topics": ["topic1", "topic2"],
-  "toolNeeds": ["tool1", "tool2"],
-  "complexity": 1-5
-}`;
-    } else {
-      console.error('❌ [API] Invalid request format - need either prompt or query+lessonAnalysis');
-      return NextResponse.json({ error: 'Either prompt or query+lessonAnalysis is required' }, { status: 400 });
+    if (!openai) {
+      return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
     }
-    
-    // Initialize OpenAI client only when needed
-    const openai = getOpenAIClient();
+
+    const { prompt, model = 'o1-mini' } = await request.json();
 
     if (!prompt) {
-      console.error('❌ [API] No valid prompt could be constructed');
-      return NextResponse.json({ error: 'Unable to construct prompt from request' }, { status: 400 });
+      return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
     }
 
     // For o1 models, we need to use a different approach
@@ -94,52 +59,29 @@ Please return a JSON response with the following structure:
     // Try to parse as JSON, fallback if needed
     try {
       const jsonResponse = JSON.parse(responseContent);
-      
-      // Ensure we have the expected structure for query analysis
-      if (jsonResponse.intent || jsonResponse.topics) {
-        console.log('✅ [API] Parsed JSON response:', jsonResponse);
-        return NextResponse.json(jsonResponse);
-      }
-      
-      // If it's not in the expected format, create a wrapper
-      console.log('⚠️ [API] Response not in expected format, wrapping:', jsonResponse);
-      return NextResponse.json({
-        text: jsonResponse.query || 'Unknown query',
-        intent: jsonResponse.intent || 'explain',
-        topics: jsonResponse.topics || ['general'],
-        toolNeeds: jsonResponse.toolNeeds || jsonResponse.recommendedTools || ['ShapeExplorer'],
-        complexity: jsonResponse.complexity || 2
-      });
-      
+      return NextResponse.json(jsonResponse);
     } catch (parseError) {
-      console.warn('⚠️ [API] Query analysis response was not valid JSON:', responseContent);
+      console.warn('Query analysis response was not valid JSON:', responseContent);
       
       // Attempt to extract JSON from the response
       const jsonMatch = responseContent.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         try {
           const extractedJson = JSON.parse(jsonMatch[0]);
-          console.log('✅ [API] Extracted JSON from response:', extractedJson);
-          return NextResponse.json({
-            text: extractedJson.query || 'Unknown query',
-            intent: extractedJson.intent || 'explain',
-            topics: extractedJson.topics || ['general'],
-            toolNeeds: extractedJson.toolNeeds || extractedJson.recommendedTools || ['ShapeExplorer'],
-            complexity: extractedJson.complexity || 2
-          });
+          return NextResponse.json(extractedJson);
         } catch (extractError) {
-          console.error('❌ [API] Failed to extract JSON:', extractError);
+          // Still not valid JSON
         }
       }
       
       // Return a default analysis structure
-      console.log('🔄 [API] Using fallback analysis structure');
       return NextResponse.json({
-        text: 'Fallback query',
-        intent: 'explain' as const,
+        intent: 'explain',
         topics: ['general'],
-        toolNeeds: ['ShapeExplorer'],
-        complexity: 2
+        recommendedTools: ['ShapeExplorer'],
+        complexity: 2,
+        reasoning: 'Fallback analysis due to parsing error',
+        rawResponse: responseContent
       });
     }
 
@@ -150,8 +92,10 @@ Please return a JSON response with the following structure:
     if (error instanceof Error && error.message.includes('model')) {
       // Fallback to gpt-4o-mini if o1 is not available
       try {
-        const fallbackOpenai = getOpenAIClient();
-        const fallbackCompletion = await fallbackOpenai.chat.completions.create({
+        if (!openai) {
+          throw new Error('OpenAI client not available');
+        }
+        const fallbackCompletion = await openai.chat.completions.create({
           model: 'gpt-4o-mini',
           messages: [
             {

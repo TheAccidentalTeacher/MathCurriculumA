@@ -3,14 +3,11 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import GeoGebraWidget from './GeoGebraWidget';
 
-// Generate unique ID for each ChatGeoGebra instance (based on research)
-const generateChatGeoGebraId = () => `chat-ggb-${Math.random().toString(36).substr(2, 9)}-${Date.now()}`;
-
 interface ChatGeoGebraProps {
   commands: string[];
   title?: string;
   description?: string;
-  appName?: 'graphing' | 'geometry' | '3d' | 'classic' | 'suite' | 'scientific' | 'evaluator';
+  appName?: 'graphing' | 'geometry' | 'calculator' | '3d' | 'cas';
   height?: number;
   className?: string;
 }
@@ -27,7 +24,6 @@ export default function ChatGeoGebra({
   const [isReady, setIsReady] = useState(false);
   const [dimensions, setDimensions] = useState({ width: 480, height: height });
   const containerRef = useRef<HTMLDivElement>(null);
-  const [widgetId] = useState(() => generateChatGeoGebraId()); // Unique ID for this instance
 
   const handleReady = useCallback(() => {
     setIsReady(true);
@@ -116,7 +112,6 @@ export default function ChatGeoGebra({
           >
             <div style={{ width: dimensions.width, height: dimensions.height }}>
               <GeoGebraWidget
-                id={widgetId}
                 appName={appName}
                 commands={commands}
                 width={dimensions.width}
@@ -171,18 +166,18 @@ export function ChatCubeVisualizer({
     'SetColor(cube1, blue)',
     'SetFilling(cube1, 0.5)',
     
-    // Add coordinate axes for reference - FIXED: Use different names to avoid system axis conflicts
-    'xAxisLine = Line((0,0,0), (2,0,0))',
-    'yAxisLine = Line((0,0,0), (0,2,0))',
-    'zAxisLine = Line((0,0,0), (0,0,2))',
-    'SetColor(xAxisLine, red)',
-    'SetColor(yAxisLine, green)',
-    'SetColor(zAxisLine, blue)',
+    // Add coordinate axes for reference
+    'xAxis = Line((0,0,0), (2,0,0))',
+    'yAxis = Line((0,0,0), (0,2,0))',
+    'zAxis = Line((0,0,0), (0,0,2))',
+    'SetColor(xAxis, red)',
+    'SetColor(yAxis, green)',
+    'SetColor(zAxis, blue)',
     
-    // Add labels - FIXED: Use axis names instead of trying to modify system axes
-    'SetCaption(xAxisLine, "x")',
-    'SetCaption(yAxisLine, "y")',
-    'SetCaption(zAxisLine, "z")',
+    // Add labels
+    'SetCaption(xAxis, "x")',
+    'SetCaption(yAxis, "y")',
+    'SetCaption(zAxis, "z")',
     
     // Add text for volume
     'volumeLabel = Text("Volume = 1 × 1 × 1 = 1 cubic unit", (1.2, 1.2))',

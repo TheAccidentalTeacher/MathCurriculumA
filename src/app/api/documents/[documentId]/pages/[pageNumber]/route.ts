@@ -33,6 +33,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       'RCM08_NA_SW_V1': 'RCM08_NA_SW_V1',
       'rcm08-na-sw-v2': 'RCM08_NA_SW_V2',
       'RCM08_NA_SW_V2': 'RCM08_NA_SW_V2',
+      'alg01-na-sw-v1': 'ALG01_NA_SW_V1',
+      'ALG01_NA_SW_V1': 'ALG01_NA_SW_V1',
+      'alg01-na-sw-v2': 'ALG01_NA_SW_V2',
+      'ALG01_NA_SW_V2': 'ALG01_NA_SW_V2',
       'test-sample': 'test_sample'
     };
 

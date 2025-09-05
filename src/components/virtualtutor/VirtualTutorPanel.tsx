@@ -29,14 +29,6 @@ export default function VirtualTutorPanel({
     console.log(`📊 [VirtualTutorPanel] Document ID: ${documentId}`);
     console.log(`🧠 [VirtualTutorPanel] Lesson Analysis Available:`, !!lessonAnalysis);
     console.log(`🔬 [VirtualTutorPanel] DEBUG - Full lessonAnalysis object:`, lessonAnalysis);
-    console.log(`📄 [VirtualTutorPanel] DEBUG - Full lessonContent object:`, lessonContent);
-    console.log(`📋 [VirtualTutorPanel] DEBUG - lessonContent type and keys:`, {
-      type: typeof lessonContent,
-      isNull: lessonContent === null,
-      isUndefined: lessonContent === undefined,
-      keys: lessonContent ? Object.keys(lessonContent) : 'N/A',
-      hasContent: !!(lessonContent?.sessions || lessonContent?.content || lessonContent?.pages)
-    });
     
     if (lessonAnalysis) {
       console.log(`📚 [VirtualTutorPanel] Analysis details:`, {
@@ -50,14 +42,12 @@ export default function VirtualTutorPanel({
       
       // Convert legacy analysis to new format for intelligent tutor
       console.log(`🔄 [VirtualTutorPanel] Converting legacy analysis to intelligent format`);
-    } else if (lessonContent) {
-      console.log(`🚀 [VirtualTutorPanel] No legacy analysis, but lesson content available - intelligent tutor will analyze`);
     } else {
-      console.log(`⚠️ [VirtualTutorPanel] No lesson analysis OR content provided - using fallback mode`);
+      console.log(`⚠️ [VirtualTutorPanel] No lesson analysis provided - using fallback mode`);
     }
     
     setIsInitialized(true);
-  }, [documentId, lessonNumber, lessonTitle, lessonAnalysis, lessonContent]);
+  }, [documentId, lessonNumber, lessonTitle, lessonAnalysis]);
 
   const handleCharacterSwitch = (character: 'somers' | 'gimli') => {
     setSelectedCharacter(character);
@@ -142,8 +132,7 @@ export default function VirtualTutorPanel({
             documentId,
             lessonNumber,
             lessonTitle,
-            content: lessonContent, // Pass full content for intelligent analysis
-            analysis: lessonAnalysis // Keep legacy analysis for backward compatibility
+            analysis: lessonAnalysis
           }}
         />
       </div>

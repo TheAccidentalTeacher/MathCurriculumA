@@ -263,7 +263,8 @@ class CurriculumDatabaseAnalyzer:
         expected_files = [
             "RCM06_NA_SW_V1.pdf", "RCM06_NA_SW_V2.pdf",
             "RCM07_NA_SW_V1.pdf", "RCM07_NA_SW_V2.pdf", 
-            "RCM08_NA_SW_V1.pdf", "RCM08_NA_SW_V2.pdf"
+            "RCM08_NA_SW_V1.pdf", "RCM08_NA_SW_V2.pdf",
+            "ALG01_NA_SW_V1.pdf", "ALG01_NA_SW_V2.pdf"
         ]
         
         cursor = self.conn.cursor()
