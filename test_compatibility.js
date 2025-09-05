@@ -32,19 +32,22 @@ function testDatabase(path, name) {
       console.log(`✅ Found ${grade7Lessons.length} Grade 7 lessons`);
       grade7Lessons.forEach(lesson => console.log(`   - ${lesson.title}`));
     } else {
-      // Test legacy database
-      const sectionCount = db.prepare("SELECT COUNT(*) as count FROM sections").get();
-      console.log(`✅ Legacy DB Stats: ${sectionCount.count} sections`);
+      // Test prisma database
+      const documentCount = db.prepare("SELECT COUNT(*) as count FROM documents").get();
+      const lessonCount = db.prepare("SELECT COUNT(*) as count FROM lessons").get();
+      const unitCount = db.prepare("SELECT COUNT(*) as count FROM units").get();
+      console.log(`✅ Prisma DB Stats: ${documentCount.count} documents, ${unitCount.count} units, ${lessonCount.count} lessons`);
       
-      const grade7Sections = db.prepare(`
-        SELECT s.title, d.grade 
-        FROM sections s 
-        JOIN documents d ON s.document_id = d.id 
-        WHERE d.grade = '7' AND s.title LIKE '%LESSON%' 
+      const grade7Lessons = db.prepare(`
+        SELECT l.title, d.grade_level 
+        FROM lessons l 
+        JOIN units u ON l.unit_id = u.id
+        JOIN documents d ON u.document_id = d.id 
+        WHERE d.grade_level = '7' 
         LIMIT 3
       `).all();
-      console.log(`✅ Found ${grade7Sections.length} Grade 7 lesson sections`);
-      grade7Sections.forEach(section => console.log(`   - ${section.title}`));
+      console.log(`✅ Found ${grade7Lessons.length} Grade 7 lessons`);
+      grade7Lessons.forEach(lesson => console.log(`   - ${lesson.title}`));
     }
     
     db.close();
