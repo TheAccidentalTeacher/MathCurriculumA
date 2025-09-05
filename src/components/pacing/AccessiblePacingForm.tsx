@@ -166,7 +166,7 @@ export function AccessiblePacingForm({
         onSubmit={handleSubmit}
         className="space-y-8"
         noValidate
-        aria-label="Pacing Guide Generator Form"
+        aria-label="Dynamic Pacing Guide Generator Form"
       >
         <div className="form-section">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
