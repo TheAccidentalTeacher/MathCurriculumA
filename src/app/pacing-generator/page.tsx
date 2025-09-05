@@ -35,11 +35,20 @@ export default function PacingGeneratorPage() {
   }, []);
 
   const handleFormSubmit = useCallback(async (request: PacingGuideRequest) => {
+    console.group('🎯 Pacing Guide Generation Started');
+    console.log('📝 Request payload:', JSON.stringify(request, null, 2));
+    console.log('🔍 Grade configuration:', {
+      simple: request.gradeLevel,
+      advanced: request.gradeCombination,
+      isMultiGrade: (request.gradeCombination?.selectedGrades?.length || 0) > 1
+    });
+    
     setIsLoading(true);
     setError(null);
     setAnnouncements('Generating your pacing guide...');
 
     try {
+      console.log('🌐 Sending API request to /api/pacing/generate');
       const response = await fetch('/api/pacing/generate', {
         method: 'POST',
         headers: {
@@ -48,27 +57,43 @@ export default function PacingGeneratorPage() {
         body: JSON.stringify(request),
       });
 
+      console.log('📡 API Response status:', response.status, response.statusText);
+      
       const data: PacingGuideResponse = await response.json();
+      console.log('📊 API Response data:', data);
 
       if (!response.ok) {
+        console.error('❌ API Error:', data.error);
         throw new Error(data.error || `HTTP error! status: ${response.status}`);
       }
 
       if (!data.success || !data.pacingGuide) {
+        console.error('❌ Generation failed:', data.error);
         throw new Error(data.error || 'Failed to generate pacing guide');
       }
+
+      console.log('✅ Pacing guide generated successfully!');
+      console.log('📋 Generated guide structure:', {
+        overview: data.pacingGuide.overview,
+        weeklyScheduleLength: data.pacingGuide.weeklySchedule?.length || 0,
+        assessmentPlan: !!data.pacingGuide.assessmentPlan,
+        differentiationStrategiesCount: data.pacingGuide.differentiationStrategies?.length || 0,
+        flexibilityOptionsCount: data.pacingGuide.flexibilityOptions?.length || 0,
+        standardsAlignmentCount: data.pacingGuide.standardsAlignment?.length || 0
+      });
 
       setPacingGuide(data.pacingGuide);
       setCurrentStep('results');
       setAnnouncements('Pacing guide generated successfully');
       
     } catch (error) {
-      console.error('Error generating pacing guide:', error);
+      console.error('💥 Error generating pacing guide:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       setError(errorMessage);
       setAnnouncements(`Error: ${errorMessage}`);
     } finally {
       setIsLoading(false);
+      console.groupEnd();
     }
   }, []);
 

@@ -2,11 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { EnhancedAIService, PacingGuideRequest } from '@/lib/enhanced-ai-service';
 
 export async function POST(request: NextRequest) {
+  console.group('🎯 [API] Pacing Guide Generation Request');
+  
   try {
     const body: PacingGuideRequest = await request.json();
+    console.log('📝 [API] Request body received:', JSON.stringify(body, null, 2));
     
     // Validate required fields
+    console.log('✅ [API] Validating required fields...');
     if (!body.gradeLevel || !body.timeframe || !body.studentPopulation) {
+      console.error('❌ [API] Missing required fields');
       return NextResponse.json(
         { 
           success: false, 
@@ -20,22 +25,33 @@ export async function POST(request: NextRequest) {
     const validGrades = ['6', '7', '8'];
     let gradesToValidate: string[] = [];
     
-    if (body.gradeCombination?.selectedGrades?.length > 0) {
+    console.log('🔍 [API] Validating grade combination...');
+    
+    if (body.gradeCombination?.selectedGrades && (body.gradeCombination.selectedGrades.length || 0) > 0) {
       // Advanced mode: validate each selected grade
+      console.log('📚 [API] Advanced mode - Multi-grade combination detected:', body.gradeCombination.selectedGrades);
       gradesToValidate = body.gradeCombination.selectedGrades;
     } else if (body.gradeLevel) {
       // Simple mode: validate single grade or parse combination
+      console.log('📖 [API] Simple mode - Grade level:', body.gradeLevel);
       if (body.gradeLevel.includes('+')) {
         // Handle legacy "6+7" format
+        console.log('🔗 [API] Legacy combination format detected');
         gradesToValidate = body.gradeLevel.split('+').map(g => g.trim());
       } else {
+        console.log('📝 [API] Single grade detected');
         gradesToValidate = [body.gradeLevel];
       }
     }
     
+    console.log('✅ [API] Final grades to validate:', gradesToValidate);
+    
     // Validate all grades in the combination
     const invalidGrades = gradesToValidate.filter(grade => !validGrades.includes(grade));
+    console.log('🔍 [API] Invalid grades found:', invalidGrades);
+    
     if (invalidGrades.length > 0) {
+      console.error('❌ [API] Grade validation failed');
       return NextResponse.json(
         { 
           success: false, 
@@ -108,12 +124,33 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate pacing guide
+    console.log('🤖 [API] Initializing AI service...');
     const aiService = new EnhancedAIService();
     
     try {
+      console.log('🚀 [API] Calling AI service with request:', JSON.stringify(body, null, 2));
       const result = await aiService.generatePacingGuide(body);
       
+      console.log('📊 [API] AI service response received:');
+      console.log('  Success:', result.success);
+      console.log('  Has pacing guide:', !!result.pacingGuide);
+      
+      if (result.pacingGuide) {
+        console.log('  Pacing guide structure:');
+        console.log('    Overview:', result.pacingGuide.overview);
+        console.log('    Weekly schedule count:', result.pacingGuide.weeklySchedule?.length || 0);
+        console.log('    Assessment plan:', !!result.pacingGuide.assessmentPlan);
+        console.log('    Differentiation strategies count:', result.pacingGuide.differentiationStrategies?.length || 0);
+        console.log('    Standards alignment count:', result.pacingGuide.standardsAlignment?.length || 0);
+        
+        if (result.pacingGuide.weeklySchedule?.length > 0) {
+          console.log('    First week:', result.pacingGuide.weeklySchedule[0].unit);
+          console.log('    First week lessons count:', result.pacingGuide.weeklySchedule[0].lessons?.length || 0);
+        }
+      }
+      
       if (!result.success) {
+        console.error('❌ [API] AI service returned failure:', result.error);
         return NextResponse.json(
           { 
             success: false, 
@@ -123,18 +160,23 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      console.log('✅ [API] Returning successful response');
       return NextResponse.json(result);
       
     } finally {
+      console.log('🧹 [API] Cleaning up AI service...');
       // Clean up AI service
       await aiService.disconnect();
+      console.groupEnd();
     }
 
   } catch (error) {
-    console.error('Error in pacing guide API:', error);
+    console.error('💥 [API] Error in pacing guide generation:', error);
+    console.groupEnd();
     
     // Handle specific error types
     if (error instanceof SyntaxError) {
+      console.error('❌ [API] JSON syntax error');
       return NextResponse.json(
         { 
           success: false, 
@@ -147,6 +189,11 @@ export async function POST(request: NextRequest) {
     if (error instanceof Error) {
       // Don't expose internal error details to client
       const isDevelopment = process.env.NODE_ENV === 'development';
+      console.error('❌ [API] Error details:', {
+        message: error.message,
+        stack: isDevelopment ? error.stack : 'Hidden in production'
+      });
+      
       return NextResponse.json(
         { 
           success: false, 
