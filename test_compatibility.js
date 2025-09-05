@@ -56,7 +56,7 @@ function testDatabase(path, name) {
 }
 
 // Test both databases
-testDatabase('/workspaces/MathCurriculumA/curriculum_precise.db', 'Precision');
-testDatabase('/workspaces/MathCurriculumA/prisma/curriculum.db', 'Legacy');
+testDatabase('./curriculum_precise.db', 'Precision');
+testDatabase('./prisma/curriculum.db', 'Legacy');
 
 console.log('\n🎯 Database compatibility testing complete!');
