@@ -16,13 +16,40 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate grade level
+    // Validate grade level - support both single grades and combinations
     const validGrades = ['6', '7', '8'];
-    if (!validGrades.includes(body.gradeLevel)) {
+    let gradesToValidate: string[] = [];
+    
+    if (body.gradeCombination?.selectedGrades?.length > 0) {
+      // Advanced mode: validate each selected grade
+      gradesToValidate = body.gradeCombination.selectedGrades;
+    } else if (body.gradeLevel) {
+      // Simple mode: validate single grade or parse combination
+      if (body.gradeLevel.includes('+')) {
+        // Handle legacy "6+7" format
+        gradesToValidate = body.gradeLevel.split('+').map(g => g.trim());
+      } else {
+        gradesToValidate = [body.gradeLevel];
+      }
+    }
+    
+    // Validate all grades in the combination
+    const invalidGrades = gradesToValidate.filter(grade => !validGrades.includes(grade));
+    if (invalidGrades.length > 0) {
       return NextResponse.json(
         { 
           success: false, 
-          error: 'Invalid grade level. Must be 6, 7, or 8' 
+          error: `Invalid grade level(s): ${invalidGrades.join(', ')}. Must be 6, 7, or 8` 
+        },
+        { status: 400 }
+      );
+    }
+    
+    if (gradesToValidate.length === 0) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'No valid grade levels specified. Must select at least one grade (6, 7, or 8)' 
         },
         { status: 400 }
       );
