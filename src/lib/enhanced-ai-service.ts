@@ -117,10 +117,29 @@ export class EnhancedAIService {
       
       console.log('📖 [AI Service] Contexts built, count:', contexts.length);
       
+      // Debug each context to see what curriculum data we have
+      contexts.forEach((context, index) => {
+        console.log(`📋 [AI Service] Context ${index + 1} (Grade ${gradeConfig.selectedGrades[index]}):`, {
+          gradeLevel: context.gradeLevel,
+          totalLessons: context.totalLessons,
+          totalInstructionalDays: context.totalInstructionalDays,
+          unitStructureCount: context.unitStructure.length,
+          unitTitles: context.unitStructure.map(unit => unit.unitTitle),
+          majorStandardsCount: context.majorStandards.length,
+          availableStandardsCount: context.availableStandards.length
+        });
+      });
+      
       // Merge contexts and analyze cross-grade dependencies
       console.log('🔗 [AI Service] Merging curriculum contexts...');
       const mergedContext = this.mergeCurriculumContexts(contexts, gradeConfig);
-      console.log('📋 [AI Service] Merged context prepared');
+      console.log('📋 [AI Service] Merged context:', {
+        totalLessons: mergedContext.totalLessons,
+        totalInstructionalDays: mergedContext.totalInstructionalDays,
+        unitStructureCount: mergedContext.unitStructure.length,
+        majorStandardsCount: mergedContext.majorStandards.length,
+        allUnitTitles: mergedContext.unitStructure.map(unit => unit.unitTitle)
+      });
       
       // Generate AI recommendations with advanced pathway logic
       console.log('💡 [AI Service] Generating advanced recommendations...');
@@ -316,6 +335,15 @@ Ensure the pacing guide is realistic, pedagogically sound, and addresses the spe
       }
       
       console.log('📊 Parsed response structure:', Object.keys(parsedResponse || {}));
+      console.log('🔍 [AI Service] Parsed response content:', {
+        hasOverview: !!parsedResponse.overview,
+        hasWeeklySchedule: !!parsedResponse.weeklySchedule,
+        weeklyScheduleLength: parsedResponse.weeklySchedule?.length || 0,
+        weeklyScheduleSample: parsedResponse.weeklySchedule?.slice(0, 2) || [],
+        hasAssessmentPlan: !!parsedResponse.assessmentPlan,
+        hasDifferentiationStrategies: !!parsedResponse.differentiationStrategies,
+        differentiationCount: parsedResponse.differentiationStrategies?.length || 0
+      });
       console.log('🔍 [AI Service] Detailed parsed response analysis:');
       
       if (parsedResponse.weeklySchedule) {
