@@ -99,12 +99,16 @@ MathCurriculumA/
 │   │   ├── RCM08_NA_SW_V1.pdf  (47.4MB)
 │   │   └── RCM08_NA_SW_V2.pdf  (38.3MB)
 │
-├── 🖼️ Processed Assets
-│   ├── webapp_pages/       # High-res page images
-│   │   ├── RCM07_NA_SW_V1/ # 504 pages extracted
-│   │   └── RCM07_NA_SW_V2/ # 440 pages extracted
-│   ├── visual_extractions/ # Extracted visual elements
-│   └── rendered_*/         # Processed diagrams
+├── 🖼️ Processed PNG Assets (4,226 Total Pages)
+│   └── webapp_pages/       # Complete high-resolution page images
+│       ├── RCM06_NA_SW_V1/ # Grade 6 Volume 1 (512 PNG files)
+│       ├── RCM06_NA_SW_V2/ # Grade 6 Volume 2 (408 PNG files)
+│       ├── RCM07_NA_SW_V1/ # Grade 7 Volume 1 (504 PNG files)
+│       ├── RCM07_NA_SW_V2/ # Grade 7 Volume 2 (440 PNG files)
+│       ├── RCM08_NA_SW_V1/ # Grade 8 Volume 1 (552 PNG files)
+│       ├── RCM08_NA_SW_V2/ # Grade 8 Volume 2 (456 PNG files)
+│       ├── ALG01_NA_SW_V1/ # Algebra 1 Volume 1 (656 PNG files)
+│       └── ALG01_NA_SW_V2/ # Algebra 1 Volume 2 (698 PNG files)
 │
 └── 📚 Documentation
     ├── README.md           # This comprehensive guide
@@ -439,27 +443,204 @@ The platform is production-ready and deployed on Railway:
 ## 📊 Project Metrics & Statistics
 
 ### **Content Processed**
-- **📖 4 PDF documents** (142MB total)
-- **📄 944 pages** extracted and processed
-- **🖼️ 944 high-resolution images** generated and stored
-- **📝 Thousands of problems** categorized and indexed
-- **🏷️ Comprehensive keyword database** built
-- **🎯 Educational standards** mapped and linked
+- **📖 8 PDF documents** (Complete Grade 6, 7, 8, and Algebra 1)
+- **📄 4,226 pages** extracted and processed
+- **🖼️ 4,226 high-resolution PNG files** (2550x3263 pixels each)
+- **📝 Thousands of lessons and problems** categorized and indexed
+- **🏷️ Comprehensive curriculum database** with lesson boundaries
 
-### **Code Quality**
-- **📁 100+ files** in organized structure
-- **🔧 TypeScript** throughout for type safety
-- **✅ Production-ready** deployment
-- **🚀 Performance optimized** for scale
-- **📱 Mobile responsive** design
-- **♿ Accessibility compliant** interface
+---
 
-### **Development Velocity**
-- **⚡ 24-hour development cycle** from concept to production
-- **🔄 20+ git commits** with detailed history
-- **🛠️ Multiple extraction approaches** developed and refined
-- **🎯 Enterprise-level architecture** implemented
-- **📈 Scalable foundation** for future expansion
+## 🖼️ Complete PNG Asset Library
+
+### **📂 Asset Organization Structure**
+All curriculum content has been extracted as high-resolution PNG files organized by volume:
+
+```
+webapp_pages/
+├── RCM06_NA_SW_V1/         # Grade 6 Mathematics Volume 1
+│   ├── pages/              # 512 PNG files (page_001.png - page_512.png)
+│   ├── data/               # Lesson boundaries and metadata
+│   └── manifest.json       # Complete page inventory
+├── RCM06_NA_SW_V2/         # Grade 6 Mathematics Volume 2  
+│   ├── pages/              # 408 PNG files (page_001.png - page_408.png)
+│   ├── data/               # Lesson boundaries and metadata
+│   └── manifest.json       # Complete page inventory
+├── RCM07_NA_SW_V1/         # Grade 7 Mathematics Volume 1
+│   ├── pages/              # 504 PNG files (page_001.png - page_504.png)
+│   ├── data/               # Lesson boundaries and metadata
+│   └── manifest.json       # Complete page inventory
+├── RCM07_NA_SW_V2/         # Grade 7 Mathematics Volume 2
+│   ├── pages/              # 440 PNG files (page_001.png - page_440.png)
+│   ├── data/               # Lesson boundaries and metadata
+│   └── manifest.json       # Complete page inventory
+├── RCM08_NA_SW_V1/         # Grade 8 Mathematics Volume 1
+│   ├── pages/              # 552 PNG files (page_001.png - page_552.png)
+│   ├── data/               # Lesson boundaries and metadata
+│   └── manifest.json       # Complete page inventory
+├── RCM08_NA_SW_V2/         # Grade 8 Mathematics Volume 2
+│   ├── pages/              # 456 PNG files (page_001.png - page_456.png)
+│   ├── data/               # Lesson boundaries and metadata
+│   └── manifest.json       # Complete page inventory
+├── ALG01_NA_SW_V1/         # Algebra 1 Mathematics Volume 1
+│   ├── pages/              # 656 PNG files (page_001.png - page_656.png)
+│   ├── data/               # Lesson boundaries and metadata
+│   └── manifest.json       # Complete page inventory
+└── ALG01_NA_SW_V2/         # Algebra 1 Mathematics Volume 2
+    ├── pages/              # 698 PNG files (page_001.png - page_698.png)
+    ├── data/               # Lesson boundaries and metadata
+    └── manifest.json       # Complete page inventory
+```
+
+### **📊 PNG File Specifications**
+- **Resolution**: 2550×3263 pixels (high-resolution for clear text and diagrams)
+- **Format**: PNG with full color support
+- **Quality**: Original PDF fidelity preserved
+- **Naming**: Sequential `page_XXX.png` format (page_001.png, page_002.png, etc.)
+- **Total Size**: 4,226 individual page images
+
+### **🔍 Access Patterns**
+These PNG files serve as the **primary content source** for:
+- **PDF Viewer Component** - Displays curriculum pages in the browser
+- **Lesson Navigation** - Direct page jumping to specific lessons
+- **Search Results** - Visual context for search matches  
+- **Content Analysis** - Raw material for precision database regeneration
+- **Visual Processing** - Source for diagram and element extraction
+
+### **📋 Manifest Files**
+Each volume includes a `manifest.json` with complete metadata:
+```json
+{
+  "document_id": "RCM06_NA_SW_V1",
+  "source_pdf": "/workspaces/MathCurriculumA/PDF files/RCM06_NA_SW_V1.pdf",
+  "total_pages": 512,
+  "extraction_date": "2025-08-31T12:00:00Z",
+  "pages": [
+    {
+      "page_number": 1,
+      "filename": "page_001.png",
+      "path": "webapp_pages/RCM06_NA_SW_V1/pages/page_001.png",
+      "size": { "width": 2550, "height": 3263 }
+    }
+    // ... complete page inventory
+  ]
+}
+```
+---
+
+## 🎯 Complete User Workflow: Accelerated Pathway Generation
+
+### **🚀 Interactive User Journey**
+
+The platform provides a sophisticated **multi-step user experience** for generating and exploring accelerated curriculum pathways:
+
+#### **Step 1: Main Dashboard** (`/`)
+- **Curriculum Cards Display**: 8 volume cards (Grades 6-8 + Algebra 1)
+- **Generate Accelerated Pathway Button**: Triggers the complete animation sequence
+- **Database Toggle**: Switch between legacy and precision databases
+
+#### **Step 2: Epic 8-Second Animation**
+```typescript
+handleShuffle() {
+  // Phase 1: Massive explosion spread (1.2s)
+  // Phase 2: Chaotic orbital dance (0.8s) 
+  // Phase 3: Vortex spiral effect (1s)
+  // Phase 4: Matrix-style convergence (1.5s)
+  // Phase 5: Epic final slam down (1.8s)
+  // Total: ~8 seconds of particle animation
+}
+```
+- **50 Animated Particles**: Mathematical symbols flying across screen
+- **5 Energy Rings**: Pulsing concentric circles from center
+- **Card Transformations**: All 8 curriculum cards perform complex movements
+- **Visual Effects**: Brightness, rotation, scale, and filter transformations
+
+#### **Step 3: AcceleratedPathwayViewer Reveals** 
+```typescript
+{showAcceleratedViewer && (
+  <AcceleratedPathwayViewer />
+)}
+```
+**Features**:
+- **Units A-J Display**: Organized by mathematical themes
+- **Lesson Breakdown**: Grade 7/8 combined sequence (109 total lessons)
+- **Interactive Controls**: Expand/collapse units, filter by Major Work
+- **Progress Tracking**: Real-time lesson counts and estimated days
+
+#### **Step 4: Unit Exploration**
+```typescript
+// Unit Structure Example
+{
+  id: "unit-a",
+  title: "Unit A: Proportional Relationships: Ratios, Rates, and Circles",
+  description: "Foundation concepts for proportional reasoning",
+  lessons: [/* 17 lessons with detailed metadata */],
+  estimatedDays: 17
+}
+```
+**User Actions**:
+- **Click Unit Headers**: Expand to show individual lessons
+- **View Lesson Details**: Grade level, session count, Major Work status
+- **Filter Options**: Show only Major Work lessons
+
+#### **Step 5: Individual Lesson Access**
+```typescript
+// "View →" Button Navigation
+getViewerUrl(lesson): `/lesson/${documentId}/${lessonNumber}`
+```
+**Lesson Card Data**:
+- **Lesson Identifier**: G7 U1 L1, G8 U2 L3, etc.
+- **Search Pattern**: "LESSON 1 | SOLVE PROBLEMS INVOLVING SCALE"
+- **Navigation Metadata**: Document ID, page estimates, session counts
+- **Academic Classification**: Major Work vs Supporting Work
+
+#### **Step 6: LessonViewer Component** (`/lesson/[documentId]/[lessonNumber]`)
+```typescript
+<LessonViewer 
+  documentId={documentId}    // e.g., "RCM07_NA_SW_V1"
+  lessonNumber={lessonNum}   // e.g., 3
+/>
+```
+
+**Complete Lesson Experience**:
+- **Lesson Overview**: Standards, objectives, session breakdown
+- **Session Navigation**: Explore → Develop → Refine structure
+- **Page Display**: High-resolution PNG rendering of curriculum pages
+- **Virtual Tutor Panel**: AI-powered lesson analysis and assistance
+- **Khan Academy Integration**: Related video content
+- **Resizable Interface**: Draggable panels for optimal viewing
+
+#### **Step 7: Deep Content Analysis**
+```typescript
+// Auto-triggered content preparation
+prepareLessonContent() {
+  // 1. Check for cached lesson analysis
+  // 2. Generate new AI analysis if needed
+  // 3. Provide lesson insights and standards mapping
+}
+```
+
+### **🔄 Data Flow Architecture**
+
+```
+User Click → Animation Trigger → Database Query → Lesson Organization → 
+Individual Selection → PDF Page Loading → AI Analysis → Interactive Display
+```
+
+**Component Interactions**:
+1. **Main Page** (`page.tsx`) → Handles shuffle animation
+2. **AcceleratedPathwayViewer** → Displays organized lesson list  
+3. **LessonViewer** → Renders individual lesson content
+4. **Virtual Tutor** → Provides AI-powered assistance
+5. **PageViewer** → Displays high-resolution curriculum images
+
+### **🎮 Interactive Features**
+
+- **Real-time Animations**: Particle systems with mathematical themes
+- **Responsive Navigation**: Instant lesson jumping with page accuracy
+- **AI Enhancement**: Automated lesson analysis and content preparation
+- **Educational Standards**: Comprehensive standards mapping and alignment
+- **Progress Tracking**: Visual indicators for lesson completion and pacing
 
 ---
 

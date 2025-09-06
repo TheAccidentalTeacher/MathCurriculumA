@@ -214,7 +214,7 @@ function WeeklyScheduleView({
                   Week {week.week}: {week.unit}
                 </h4>
                 <p className="text-sm text-gray-600 mt-1">
-                  {week.lessons.length} lesson{week.lessons.length !== 1 ? 's' : ''} • {week.focusStandards.length} standard{week.focusStandards.length !== 1 ? 's' : ''}
+                  {(week.lessons || []).length} lesson{(week.lessons || []).length !== 1 ? 's' : ''} • {(week.focusStandards || []).length} standard{(week.focusStandards || []).length !== 1 ? 's' : ''}
                   {week.assessmentType && (
                     <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       week.assessmentType === 'summative' 
@@ -248,7 +248,7 @@ function WeeklyScheduleView({
                 <div>
                   <h5 className="font-medium text-gray-900 mb-2">Lessons</h5>
                   <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-                    {week.lessons.map((lesson, index) => (
+                    {(week.lessons || []).map((lesson, index) => (
                       <li key={index}>{lesson}</li>
                     ))}
                   </ul>
@@ -256,18 +256,18 @@ function WeeklyScheduleView({
                 <div>
                   <h5 className="font-medium text-gray-900 mb-2">Learning Objectives</h5>
                   <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-                    {week.learningObjectives.map((objective, index) => (
+                    {(week.learningObjectives || []).map((objective, index) => (
                       <li key={index}>{objective}</li>
                     ))}
                   </ul>
                 </div>
               </div>
               
-              {week.focusStandards.length > 0 && (
+              {(week.focusStandards || []).length > 0 && (
                 <div className="mt-4">
                   <h5 className="font-medium text-gray-900 mb-2">Focus Standards</h5>
                   <div className="flex flex-wrap gap-2">
-                    {week.focusStandards.map((standard, index) => (
+                    {(week.focusStandards || []).map((standard, index) => (
                       <span
                         key={index}
                         className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
@@ -310,7 +310,7 @@ function AssessmentPlanView({ assessmentPlan }: { assessmentPlan: any }) {
         <div>
           <h4 className="text-lg font-semibold text-gray-900 mb-4">Summative Assessments</h4>
           <div className="space-y-4">
-            {assessmentPlan.summativeSchedule.map((assessment: any, index: number) => (
+            {(assessmentPlan.summativeSchedule || []).map((assessment: any, index: number) => (
               <div key={index} className="border border-gray-200 rounded-lg p-6">
                 <div className="flex items-center justify-between mb-2">
                   <h5 className="text-lg font-medium text-gray-900">{assessment.type}</h5>
@@ -322,7 +322,7 @@ function AssessmentPlanView({ assessmentPlan }: { assessmentPlan: any }) {
                 <div>
                   <h6 className="text-sm font-medium text-gray-900 mb-2">Standards Assessed:</h6>
                   <div className="flex flex-wrap gap-2">
-                    {assessment.standards.map((standard: string, idx: number) => (
+                    {(assessment.standards || []).map((standard: string, idx: number) => (
                       <span
                         key={idx}
                         className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
@@ -342,7 +342,7 @@ function AssessmentPlanView({ assessmentPlan }: { assessmentPlan: any }) {
         <div>
           <h4 className="text-lg font-semibold text-gray-900 mb-4">Diagnostic Checkpoints</h4>
           <div className="flex flex-wrap gap-2">
-            {assessmentPlan.diagnosticCheckpoints.map((week: number, index: number) => (
+            {(assessmentPlan.diagnosticCheckpoints || []).map((week: number, index: number) => (
               <span
                 key={index}
                 className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800"
@@ -370,7 +370,7 @@ function DifferentiationView({
       <div>
         <h3 className="text-xl font-semibold text-gray-900 mb-6">Differentiation Strategies</h3>
         <div className="space-y-6">
-          {strategies.map((strategy, index) => (
+          {(strategies || []).map((strategy, index) => (
             <div key={index} className="border border-gray-200 rounded-lg p-6">
               <h4 className="text-lg font-medium text-gray-900 mb-4">{strategy.studentGroup}</h4>
               
@@ -378,7 +378,7 @@ function DifferentiationView({
                 <div>
                   <h5 className="text-sm font-medium text-gray-900 mb-2">Modifications</h5>
                   <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-                    {strategy.modifications.map((mod, idx) => (
+                    {(strategy.modifications || []).map((mod, idx) => (
                       <li key={idx}>{mod}</li>
                     ))}
                   </ul>
@@ -387,7 +387,7 @@ function DifferentiationView({
                 <div>
                   <h5 className="text-sm font-medium text-gray-900 mb-2">Resources</h5>
                   <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-                    {strategy.resources.map((resource, idx) => (
+                    {(strategy.resources || []).map((resource, idx) => (
                       <li key={idx}>{resource}</li>
                     ))}
                   </ul>
@@ -396,7 +396,7 @@ function DifferentiationView({
                 <div>
                   <h5 className="text-sm font-medium text-gray-900 mb-2">Assessment Adjustments</h5>
                   <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-                    {strategy.assessmentAdjustments.map((adjustment, idx) => (
+                    {(strategy.assessmentAdjustments || []).map((adjustment, idx) => (
                       <li key={idx}>{adjustment}</li>
                     ))}
                   </ul>
@@ -411,14 +411,14 @@ function DifferentiationView({
         <div>
           <h3 className="text-xl font-semibold text-gray-900 mb-6">Flexibility Options</h3>
           <div className="space-y-4">
-            {flexibilityOptions.map((option, index) => (
+            {(flexibilityOptions || []).map((option, index) => (
               <div key={index} className="border border-gray-200 rounded-lg p-6">
                 <h4 className="text-lg font-medium text-gray-900 mb-2">{option.scenario}</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <h5 className="text-sm font-medium text-gray-900 mb-2">Adjustments</h5>
                     <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-                      {option.adjustments.map((adjustment, idx) => (
+                      {(option.adjustments || []).map((adjustment, idx) => (
                         <li key={idx}>{adjustment}</li>
                       ))}
                     </ul>
@@ -443,7 +443,7 @@ function StandardsAlignmentView({ alignment }: { alignment: StandardsAlignment[]
     <div className="space-y-6">
       <h3 className="text-xl font-semibold text-gray-900 mb-6">Standards Alignment</h3>
       <div className="space-y-4">
-        {alignment.map((item, index) => (
+        {(alignment || []).map((item, index) => (
           <div key={index} className="border border-gray-200 rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <h4 className="text-lg font-medium text-gray-900">{item.standard}</h4>
@@ -462,7 +462,7 @@ function StandardsAlignmentView({ alignment }: { alignment: StandardsAlignment[]
               <div>
                 <h5 className="text-sm font-medium text-gray-900 mb-2">Weeks Covered</h5>
                 <div className="flex flex-wrap gap-1">
-                  {item.weeksCovered.map((week, idx) => (
+                  {(item.weeksCovered || []).map((week, idx) => (
                     <span
                       key={idx}
                       className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800"
@@ -476,7 +476,7 @@ function StandardsAlignmentView({ alignment }: { alignment: StandardsAlignment[]
               <div>
                 <h5 className="text-sm font-medium text-gray-900 mb-2">Connections</h5>
                 <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-                  {item.connections.map((connection, idx) => (
+                  {(item.connections || []).map((connection, idx) => (
                     <li key={idx}>{connection}</li>
                   ))}
                 </ul>

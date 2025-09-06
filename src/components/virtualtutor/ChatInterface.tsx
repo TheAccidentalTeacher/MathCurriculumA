@@ -1,17 +1,17 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useGeometryMarkerDebug } from '../debug/geometryDebug';
 import MathRenderer from '../MathRenderer';
-import KidFriendlyMath from '../KidFriendlyMath';
 import MathGrapher, { createLinearGraph, createPointGraph } from '../MathGrapher';
 import PlaceValueChart, { createPowersOf10Chart } from '../PlaceValueChart';
 import ScientificNotationBuilder, { createScientificNotationExample } from '../ScientificNotationBuilder';
 import PowersOf10NumberLine, { createPowersOf10NumberLine } from '../PowersOf10NumberLine';
-import ChatGeoGebra, { ChatCubeVisualizer, ChatGraphingActivity, ChatGeometryExplorer } from '../ChatGeoGebra';
+import GeoGebraWidget, { PowersOf10GeoGebra, GeometryExplorer, FunctionGrapher } from '../GeoGebraWidget';
 import PowersOf10Activity from '../PowersOf10GeoGebra';
 import GeometryVisualizer, { TriangleExplorer, CircleExplorer, CubeExplorer, SphereExplorer, CylinderExplorer } from '../GeometryVisualizer';
 import Cube3DVisualizer from '../Cube3DVisualizer';
+import SmartGeoGebraFrame from '../SmartGeoGebraFrame';
+import { intelligentTutor, type LessonAnalysis } from '@/lib/intelligent-tutor-engine';
 
 interface ChatMessage {
   id: string;
@@ -28,7 +28,8 @@ interface ChatInterfaceProps {
     documentId: string;
     lessonNumber: number;
     lessonTitle: string;
-    analysis?: any; // Optional lesson content analysis
+    content?: any; // Full lesson content for analysis
+    analysis?: LessonAnalysis; // Optional pre-analyzed lesson content
   };
 }
 
@@ -41,24 +42,58 @@ export default function ChatInterface({
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [lessonAnalysis, setLessonAnalysis] = useState<LessonAnalysis | null>(lessonContext.analysis || null);
+  const [isAnalyzingLesson, setIsAnalyzingLesson] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Character-specific configurations
+  // Analyze lesson content when it loads
+  useEffect(() => {
+    const analyzeLessonContent = async () => {
+      if (lessonAnalysis || !lessonContext.content || isAnalyzingLesson) return;
+      
+      setIsAnalyzingLesson(true);
+      console.log(`🔍 [ChatInterface] Analyzing lesson content for: ${lessonContext.lessonTitle}`);
+      
+      try {
+        const analysis = await intelligentTutor.analyzeLessonContent(lessonContext.content);
+        setLessonAnalysis(analysis);
+        console.log(`✅ [ChatInterface] Lesson analysis complete:`, analysis);
+      } catch (error) {
+        console.error('❌ [ChatInterface] Lesson analysis failed:', error);
+        // Create fallback analysis
+        setLessonAnalysis({
+          topics: ['general math'],
+          mathConcepts: [lessonContext.lessonTitle],
+          visualizationNeeds: ['basic diagrams'],
+          difficulty: 'middle',
+          suggestedTools: intelligentTutor.getAvailableTools().slice(0, 3),
+          keyTerms: [],
+          objectives: [`Understand ${lessonContext.lessonTitle}`]
+        });
+      } finally {
+        setIsAnalyzingLesson(false);
+      }
+    };
+
+    analyzeLessonContent();
+  }, [lessonContext.content, lessonAnalysis, isAnalyzingLesson]);
+
+  // Character-specific configurations (updated with intelligent analysis)
   const characterConfig = {
     somers: {
       name: 'Mr. Somers',
       color: 'blue',
-      initialMessage: lessonContext.analysis 
-        ? `Hello! I'm Mr. Somers, your math teacher. I've analyzed ${lessonContext.lessonTitle} and I'm ready to help you with ${lessonContext.analysis.content?.mathematicalConcepts?.slice(0, 2).join(' and ') || 'the lesson concepts'}. I can explain formulas, help with practice problems, and guide you through any challenging topics!`
-        : `Hello! I'm Mr. Somers, your math teacher. I'm here to help you understand ${lessonContext.lessonTitle}. Feel free to ask me anything about this lesson - from basic concepts to challenging problems!`,
+      initialMessage: lessonAnalysis 
+        ? `Hello! I'm Mr. Somers, your math teacher. I've analyzed "${lessonContext.lessonTitle}" and I'm ready to help you with ${(lessonAnalysis.mathConcepts || []).slice(0, 2).join(' and ')}. Based on my analysis, we'll be working on ${(lessonAnalysis.topics || []).join(', ')} concepts. I have ${(lessonAnalysis.suggestedTools || []).length} interactive tools ready to help visualize and understand these topics!`
+        : `Hello! I'm Mr. Somers, your math teacher. I'm here to help you understand "${lessonContext.lessonTitle}". ${isAnalyzingLesson ? 'I\'m currently analyzing the lesson content to provide you with the best possible help...' : 'Feel free to ask me anything about this lesson!'}`,
       placeholderText: 'Ask Mr. Somers about this lesson...'
     },
     gimli: {
       name: 'Gimli',
       color: 'green',
-      initialMessage: lessonContext.analysis
-        ? `Woof woof! Hi there! I'm Gimli, and I've been studying ${lessonContext.lessonTitle} just for you! We'll be working on ${lessonContext.analysis.content?.mathematicalConcepts?.slice(0, 2).join(' and ') || 'cool math stuff'} together. Don't worry if it seems tricky - I'll be your learning buddy every step of the way! 🎾`
-        : `Woof woof! Hi there! I'm Gimli, and I'm super excited to learn ${lessonContext.lessonTitle} with you! Don't worry if it seems tough - we'll figure it out together, and I'll cheer you on every step of the way! 🎾`,
+      initialMessage: lessonAnalysis
+        ? `Woof woof! Hi there! I'm Gimli, and I've been studying "${lessonContext.lessonTitle}" just for you! We're going to explore ${(lessonAnalysis.topics || []).slice(0, 2).join(' and ')}, and I've got ${(lessonAnalysis.suggestedTools || []).length} cool interactive tools to make learning fun! ${lessonAnalysis.difficulty === 'elementary' ? 'This looks like fun stuff!' : lessonAnalysis.difficulty === 'middle' ? 'This is perfect for us to tackle together!' : 'This might be challenging, but we\'ve got this!'} 🎾`
+        : `Woof woof! Hi there! I'm Gimli, and I'm super excited to learn "${lessonContext.lessonTitle}" with you! ${isAnalyzingLesson ? 'I\'m sniffing around the lesson content to understand it better...' : 'Don\'t worry if it seems tough - we\'ll figure it out together!'} 🎾`,
       placeholderText: 'Chat with Gimli about this lesson...'
     }
   };
@@ -73,9 +108,10 @@ export default function ChatInterface({
     
     if (lessonContext.analysis) {
       console.log(`🎯 [ChatInterface] Using specialized content for ${character}:`, {
-        concepts: lessonContext.analysis.content?.mathematicalConcepts,
-        tutorPrompt: lessonContext.analysis.tutorPrompt?.substring(0, 100) + '...',
-        confidence: lessonContext.analysis.content?.confidence
+        concepts: lessonContext.analysis.mathConcepts,
+        topics: lessonContext.analysis.topics,
+        tools: lessonContext.analysis.suggestedTools,
+        difficulty: lessonContext.analysis.difficulty
       });
     }
     
@@ -122,17 +158,6 @@ export default function ChatInterface({
 
   // Function to detect and render mathematical graphs in messages
   const renderMessageWithGraphs = (content: string) => {
-    // Debug geometry markers in development
-    if (process.env.NODE_ENV === 'development') {
-      if (content.includes('[CUBE:') || content.includes('[SHAPE:')) {
-        console.group('🔍 ChatInterface Geometry Processing');
-        console.log('Processing content:', content);
-        console.log('CUBE markers found:', content.match(/\[CUBE:[^\]]+\]/g));
-        console.log('SHAPE markers found:', content.match(/\[SHAPE:[^\]]+\]/g));
-        console.groupEnd();
-      }
-    }
-    
     // Split content by graph markers including GeoGebra activities and 3D visualizers
     const parts = content.split(/(\[GRAPH:[^\]]+\]|\[PLACEVALUE:[^\]]+\]|\[SCIENTIFIC:[^\]]+\]|\[POWERLINE:[^\]]+\]|\[GEOGEBRA:[^\]]+\]|\[GEOMETRY:[^\]]+\]|\[SHAPE:[^\]]+\]|\[POWERS10:[^\]]+\]|\[CUBE:[^\]]+\]|\[3D:[^\]]+\])/g);
     
@@ -189,9 +214,9 @@ export default function ChatInterface({
       }
 
       // Check if this part is a graph instruction
-      const legacyGraphMatch = part.match(/\[GRAPH:([^\]]+)\]/);
-      if (legacyGraphMatch) {
-        const graphInstruction = legacyGraphMatch[1];
+      const graphMatch = part.match(/\[GRAPH:([^\]]+)\]/);
+      if (graphMatch) {
+        const graphInstruction = graphMatch[1];
         
         // Parse linear function: y = mx + b
         const linearMatch = graphInstruction.match(/y\s*=\s*([+-]?\d*\.?\d*)\s*x\s*([+-]\s*\d+\.?\d*)?/);
@@ -259,55 +284,14 @@ export default function ChatInterface({
         
         return (
           <div key={index} className="my-4">
-            <ChatGeoGebra 
+            <GeoGebraWidget 
+              appName="graphing"
               commands={commands}
-              title="Interactive Math Activity"
-              description="Click to expand and interact with the mathematical visualization"
+              width={600}
+              height={400}
+              showAlgebraInput={true}
+              showToolBar={false}
             />
-          </div>
-        );
-      }
-
-      // Check for cube-specific activities
-      const chatCubeMatch = part.match(/\[CUBE:([^\]]+)\]/);
-      if (chatCubeMatch) {
-        const cubeParams = chatCubeMatch[1].split(',');
-        const cubeCount = parseInt(cubeParams[0]) || 8;
-        const showDecomposition = cubeParams[1] !== 'false';
-        
-        return (
-          <div key={index} className="my-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <div className="mb-3 flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                <span className="text-sm font-medium text-blue-700">Interactive 3D Cube Visualization</span>
-              </div>
-              <button
-                onClick={() => window.open(`/cube-demo?size=${cubeCount}`, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes')}
-                className="px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
-              >
-                🔗 Open in New Window
-              </button>
-            </div>
-            <div className="bg-white rounded-lg overflow-hidden shadow-sm min-h-[350px]">
-              <ChatCubeVisualizer 
-                cubeCount={cubeCount}
-                showDecomposition={showDecomposition}
-              />
-            </div>
-            <p className="mt-2 text-xs text-blue-600">💡 Click and drag to rotate the 3D cube!</p>
-          </div>
-        );
-      }
-
-      // Check for graphing activities
-      const chatGraphMatch = part.match(/\[GRAPH:([^\]]+)\]/);
-      if (chatGraphMatch) {
-        const functions = chatGraphMatch[1].split(';').map((f: string) => f.trim());
-        
-        return (
-          <div key={index} className="my-4">
-            <ChatGraphingActivity functions={functions} />
           </div>
         );
       }
@@ -321,16 +305,27 @@ export default function ChatInterface({
         
         return (
           <div key={index} className="my-4">
-            <div className="p-4 border border-green-200 rounded-lg bg-green-50">
-              <h4 className="font-semibold text-green-800 mb-2">🔢 Powers of 10 Activity</h4>
-              <PowersOf10Activity 
-                activityType={activityType}
-                number={number}
-              />
-              <div className="mt-2 text-xs text-green-600">
-                <strong>Activity:</strong> {activityType} • <strong>Number:</strong> {number}
-              </div>
-            </div>
+            <PowersOf10Activity 
+              activityType={activityType}
+              number={number}
+            />
+          </div>
+        );
+      }
+
+      // Check for smart 3D visualizations
+      const smart3DMatch = part.match(/\[SMART_3D:([^,]+),([^\]]+)\]/);
+      if (smart3DMatch) {
+        const shape = smart3DMatch[1].toLowerCase().trim();
+        const concept = smart3DMatch[2].toLowerCase().trim();
+        
+        return (
+          <div key={index} className="my-4">
+            <SmartGeoGebraFrame 
+              shape={shape}
+              lesson={lessonContext?.lessonTitle || ''}
+              concept={concept}
+            />
           </div>
         );
       }
@@ -338,11 +333,11 @@ export default function ChatInterface({
       // Check for geometry activities
       const geometryMatch = part.match(/\[GEOMETRY:([^\]]+)\]/);
       if (geometryMatch) {
-        const geometryCommands = geometryMatch[1].split(';').map(cmd => cmd.trim());
+        const geometryType = geometryMatch[1];
         
         return (
           <div key={index} className="my-4">
-            <ChatGeometryExplorer shapes={geometryCommands} />
+            <GeometryExplorer />
           </div>
         );
       }
@@ -398,61 +393,24 @@ export default function ChatInterface({
         // 3D Shapes
         if (shapeName === 'cube') {
           return (
-            <div key={index} className="my-6 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-              <div className="mb-3 flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                  <span className="text-sm font-medium text-purple-700">Interactive 3D Cube Explorer</span>
-                </div>
-                <button
-                  onClick={() => window.open(`/test-3d?shape=cube&size=${dimensions[0]}`, '_blank', 'width=900,height=700,scrollbars=yes,resizable=yes')}
-                  className="px-3 py-1 bg-purple-500 text-white text-xs rounded hover:bg-purple-600 transition-colors"
-                >
-                  🔗 Open in New Window
-                </button>
-              </div>
-              <div className="bg-white rounded-lg overflow-hidden shadow-sm min-h-[400px]">
-                <CubeExplorer side={dimensions[0]} />
-              </div>
-              <p className="mt-2 text-xs text-purple-600">🎯 Explore the cube in 3D space!</p>
+            <div key={index} className="my-4">
+              <CubeExplorer side={dimensions[0]} />
             </div>
           );
         }
         
         if (shapeName === 'sphere') {
           return (
-            <div key={index} className="my-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <div className="mb-3 flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                  <span className="text-sm font-medium text-red-700">Interactive 3D Sphere Explorer</span>
-                </div>
-                <button
-                  onClick={() => window.open(`/test-3d?shape=sphere&radius=${dimensions[0]}`, '_blank', 'width=900,height=700,scrollbars=yes,resizable=yes')}
-                  className="px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition-colors"
-                >
-                  🔗 Open in New Window
-                </button>
-              </div>
-              <div className="bg-white rounded-lg overflow-hidden shadow-sm min-h-[400px]">
-                <SphereExplorer radius={dimensions[0]} />
-              </div>
-              <p className="mt-2 text-xs text-red-600">🌐 Rotate and explore the sphere!</p>
+            <div key={index} className="my-4">
+              <SphereExplorer radius={dimensions[0]} />
             </div>
           );
         }
         
         if (shapeName === 'cylinder') {
           return (
-            <div key={index} className="my-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-              <div className="mb-3 flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-sm font-medium text-green-700">Interactive 3D Cylinder Explorer</span>
-              </div>
-              <div className="bg-white rounded-lg overflow-hidden shadow-sm min-h-[400px]">
-                <CylinderExplorer radius={dimensions[0]} height={dimensions[1]} />
-              </div>
-              <p className="mt-2 text-xs text-green-600">🗜️ Examine the cylinder from all angles!</p>
+            <div key={index} className="my-4">
+              <CylinderExplorer radius={dimensions[0]} height={dimensions[1]} />
             </div>
           );
         }
@@ -473,26 +431,19 @@ export default function ChatInterface({
         );
       }
 
-      // Check for 3D cube visualizations (legacy support)
-      const legacyCubeMatch = part.match(/\[CUBE:([^\]]+)\]/);
-      if (legacyCubeMatch) {
-        const sideLength = parseFloat(legacyCubeMatch[1]) || 4;
+      // Check for 3D cube visualizations
+      const cubeMatch = part.match(/\[CUBE:([^\]]+)\]/);
+      if (cubeMatch) {
+        const sideLength = parseFloat(cubeMatch[1]) || 4;
         
         return (
-          <div key={index} className="my-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
-            <div className="mb-3 flex items-center space-x-2">
-              <div className="w-3 h-3 bg-indigo-500 rounded-full"></div>
-              <span className="text-sm font-medium text-indigo-700">3D Cube Visualization (Legacy)</span>
-            </div>
-            <div className="bg-white rounded-lg overflow-hidden shadow-sm min-h-[450px]">
-              <Cube3DVisualizer 
-                sideLength={sideLength}
-                showVolume={true}
-                showFormula={true}
-                interactive={true}
-              />
-            </div>
-            <p className="mt-2 text-xs text-indigo-600">📐 Interactive 3D cube with volume calculations!</p>
+          <div key={index} className="my-4">
+            <Cube3DVisualizer 
+              sideLength={sideLength}
+              showVolume={true}
+              showFormula={true}
+              interactive={true}
+            />
           </div>
         );
       }
@@ -515,14 +466,16 @@ export default function ChatInterface({
           );
         }
         
-        // For other 3D shapes, use ChatGeoGebra 3D
+        // For other 3D shapes, use GeoGebra 3D
         return (
           <div key={index} className="my-4">
-            <ChatGeoGebra 
+            <GeoGebraWidget 
               appName="3d"
               commands={[`${shape.charAt(0).toUpperCase() + shape.slice(1)}((0,0,0), 3)`]}
-              title={`3D ${shape.charAt(0).toUpperCase() + shape.slice(1)} Explorer`}
-              description={`Interactive 3D visualization of a ${shape}`}
+              width={600}
+              height={500}
+              showToolBar={true}
+              showAlgebraInput={true}
             />
           </div>
         );
@@ -572,7 +525,7 @@ export default function ChatInterface({
     console.log(`🎭 [ChatInterface] Current character: ${character}`);
     console.log(`📚 [ChatInterface] Lesson context:`, {
       lessonId: lessonContext.documentId + '-' + lessonContext.lessonNumber,
-      hasAnalysis: !!lessonContext.analysis
+      hasAnalysis: !!lessonAnalysis
     });
 
     const userMessage: ChatMessage = {
@@ -590,96 +543,71 @@ export default function ChatInterface({
     onExpressionChange?.('thinking');
 
     try {
-      console.log(`🤖 [ChatInterface] Sending AI request for ${character}`);
-      console.log(`📡 [ChatInterface] AI API payload preview:`, {
-        message: userMessage.content,
-        character,
-        lessonId: lessonContext.documentId + '-' + lessonContext.lessonNumber,
-        hasAnalysisData: !!lessonContext.analysis,
-        concepts: lessonContext.analysis?.content?.mathematicalConcepts || ['fallback'],
-        extractionConfidence: lessonContext.analysis?.content?.confidence || 'none'
-      });
-      
-      // Call our AI API
-      const response = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: userMessage.content,
-          character: character,
-          lessonContext: {
-            lessonId: lessonContext.documentId + '-' + lessonContext.lessonNumber,
-            lessonTitle: lessonContext.lessonTitle || 'Math Lesson',
-            gradeLevel: 7, // Default grade level
-            unit: 'Mathematics', // Default unit
-            volume: 1, // Default volume
-            
-            // Enhanced lesson context from OCR analysis
-            ...(lessonContext.analysis && {
-              extractedContent: lessonContext.analysis.content?.extractedText,
-              mathematicalConcepts: lessonContext.analysis.content?.mathematicalConcepts || [],
-              keyFormulas: lessonContext.analysis.content?.keyFormulas || [],
-              vocabularyTerms: lessonContext.analysis.content?.vocabularyTerms || [],
-              practiceProblems: lessonContext.analysis.content?.practiceProblems || [],
-              difficultyLevel: lessonContext.analysis.content?.difficultyLevel,
-              prerequisites: lessonContext.analysis.content?.prerequisites || [],
-              tutorPrompt: lessonContext.analysis.tutorPrompt,
-              suggestedQuestions: lessonContext.analysis.suggestedQuestions || [],
-              teachingStrategies: lessonContext.analysis.teachingStrategies || [],
-              extractionConfidence: lessonContext.analysis.content?.confidence
-            }),
-            
-            // Fallback concepts if no analysis available
-            concepts: lessonContext.analysis?.content?.mathematicalConcepts || ['problem solving', 'mathematical reasoning']
-          },
-          conversationHistory: messages,
-          model: 'gpt-4o' // Default to GPT-4o
-        })
-      });
-
-      console.log(`📡 [ChatInterface] AI API response status: ${response.status}`);
-      const data = await response.json();
-      console.log(`📄 [ChatInterface] AI API response data:`, data);
-      
-      if (data.success && data.response) {
-        console.log(`✅ [ChatInterface] AI response received successfully`);
+      // Use intelligent tutor engine for smarter responses
+      if (lessonAnalysis) {
+        console.log(`🧠 [ChatInterface] Using intelligent tutor engine`);
         
-        // Set character to speaking while responding
-        onExpressionChange?.('speaking');
+        // Analyze user query to determine intent and tools needed
+        const queryAnalysis = await intelligentTutor.analyzeUserQuery(
+          userMessage.content, 
+          lessonAnalysis
+        );
+        
+        console.log(`🔍 [ChatInterface] Query analysis:`, queryAnalysis);
+        
+        // Generate smart response using GPT-4o
+        const aiResponse = await intelligentTutor.generateResponse(
+          queryAnalysis,
+          lessonAnalysis,
+          character
+        );
         
         const assistantMessage: ChatMessage = {
-          id: data.response.id || `assistant-${Date.now()}`,
+          id: `assistant-${Date.now()}`,
           type: 'assistant',
-          content: formatAIResponse(data.response.content || data.response),
+          content: aiResponse,
           timestamp: new Date(),
           character: character
         };
 
         setMessages(prev => [...prev, assistantMessage]);
-
-        // Log AI response metrics
-        if (data.metrics) {
-          console.log(`📊 [ChatInterface] AI Response metrics:`);
-          console.log(`   � Tokens: ${data.metrics.tokens}`);
-          console.log(`   💰 Cost: ${data.metrics.costFormatted}`);
-          console.log(`   🧠 Model: ${data.model}`);
-        }
-        
+        console.log(`✅ [ChatInterface] Intelligent response generated`);
       } else {
-        console.error(`❌ [ChatInterface] AI API returned error:`, data.error || 'Unknown error');
-        // Handle API error with fallback
+        // Fallback to original API if no analysis available
+        console.log(`🤖 [ChatInterface] Using fallback API (no lesson analysis)`);
         
-        const fallbackMessage: ChatMessage = {
-          id: `assistant-fallback-${Date.now()}`,
+        const response = await fetch('/api/ai/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            message: userMessage.content,
+            character: character,
+            lessonContext: {
+              lessonId: lessonContext.documentId + '-' + lessonContext.lessonNumber,
+              lessonTitle: lessonContext.lessonTitle || 'Math Lesson',
+              gradeLevel: 7,
+              unit: 'Mathematics',
+              volume: 1
+            }
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`AI API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const assistantMessage: ChatMessage = {
+          id: data.response?.id || `assistant-${Date.now()}`,
           type: 'assistant',
-          content: data.fallback?.content || getFallbackResponse(character, userMessage.content),
+          content: data.response?.content || data.message || "I'm having trouble right now. Could you try rephrasing your question?",
           timestamp: new Date(),
           character: character
         };
 
-        setMessages(prev => [...prev, fallbackMessage]);
+        setMessages(prev => [...prev, assistantMessage]);
       }
       
     } catch (error) {
@@ -759,8 +687,7 @@ export default function ChatInterface({
                 {message.type === 'user' ? (
                   <MathRenderer content={message.content} />
                 ) : (
-                  // Use kid-friendly math rendering for assistant responses
-                  <KidFriendlyMath content={message.content} />
+                  renderMessageWithGraphs(message.content)
                 )}
               </div>
               <div className="text-xs opacity-70 mt-1" aria-label="Message time">

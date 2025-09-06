@@ -16,6 +16,12 @@ export function AccessiblePacingForm({
 }: AccessiblePacingFormProps) {
   const [formData, setFormData] = useState<PacingGuideRequest>({
     gradeLevel: '',
+    gradeCombination: {
+      selectedGrades: [],
+      pathwayType: 'sequential',
+      skipGrades: [],
+      emphasis: 'balanced'
+    },
     timeframe: '',
     studentPopulation: '',
     priorities: [],
@@ -27,6 +33,8 @@ export function AccessiblePacingForm({
     differentiationNeeds: []
   });
 
+  const [isAdvancedMode, setIsAdvancedMode] = useState(false);
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [announcements, setAnnouncements] = useState<string>('');
   const formRef = useRef<HTMLFormElement>(null);
@@ -34,8 +42,28 @@ export function AccessiblePacingForm({
   const validateForm = useCallback((): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.gradeLevel) {
-      newErrors.gradeLevel = 'Please select a grade level';
+    // Validate grade selection (either simple or advanced mode)
+    if (!formData.gradeLevel && (!formData.gradeCombination?.selectedGrades || formData.gradeCombination.selectedGrades.length === 0)) {
+      newErrors.gradeLevel = 'Please select at least one grade level';
+    }
+
+    // Advanced validation for multi-grade combinations
+    if (isAdvancedMode && formData.gradeCombination?.selectedGrades) {
+      const selectedGrades = formData.gradeCombination.selectedGrades;
+      
+      if (selectedGrades.length > 4) {
+        newErrors.gradeLevel = 'Please select no more than 4 grade levels for optimal pacing';
+      }
+      
+      if (selectedGrades.length > 1) {
+        // Check for pedagogically challenging combinations
+        const gradeNumbers = selectedGrades.map(g => parseInt(g)).sort();
+        const maxGap = Math.max(...gradeNumbers) - Math.min(...gradeNumbers);
+        
+        if (maxGap > 3) {
+          newErrors.gradeLevel = 'Grade combinations with gaps larger than 3 years may require additional considerations';
+        }
+      }
     }
 
     if (!formData.timeframe) {
@@ -166,7 +194,7 @@ export function AccessiblePacingForm({
         onSubmit={handleSubmit}
         className="space-y-8"
         noValidate
-        aria-label="Pacing Guide Generator Form"
+        aria-label="Dynamic Pacing Guide Generator Form"
       >
         <div className="form-section">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
@@ -183,30 +211,143 @@ export function AccessiblePacingForm({
             Basic Information
           </legend>
 
+          {/* Grade Selection - Enhanced with Multi-Grade Support */}
           <div className="form-group">
-            <label 
-              htmlFor="gradeLevel" 
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Grade Level *
-            </label>
-            <select
-              id="gradeLevel"
-              name="gradeLevel"
-              value={formData.gradeLevel}
-              onChange={(e) => handleFieldChange('gradeLevel', e.target.value)}
-              className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                errors.gradeLevel ? 'border-red-500' : 'border-gray-300'
-              }`}
-              aria-required="true"
-              aria-invalid={!!errors.gradeLevel}
-              aria-describedby={errors.gradeLevel ? 'gradeLevel-error' : undefined}
-            >
-              <option value="">Select a grade level</option>
-              {availableGrades.map(grade => (
-                <option key={grade} value={grade}>Grade {grade}</option>
-              ))}
-            </select>
+            <div className="flex items-center justify-between mb-4">
+              <label className="text-sm font-medium text-gray-700">
+                Grade Level Configuration *
+              </label>
+              <button
+                type="button"
+                onClick={() => setIsAdvancedMode(!isAdvancedMode)}
+                className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-pressed={isAdvancedMode}
+              >
+                {isAdvancedMode ? 'Simple Mode' : 'Advanced Combinations'}
+              </button>
+            </div>
+
+            {!isAdvancedMode ? (
+              // Simple single grade selection
+              <div>
+                <label htmlFor="gradeLevel" className="block text-sm text-gray-600 mb-2">
+                  Single Grade Level
+                </label>
+                <select
+                  id="gradeLevel"
+                  name="gradeLevel"
+                  value={formData.gradeLevel}
+                  onChange={(e) => {
+                    handleFieldChange('gradeLevel', e.target.value);
+                    // Clear advanced settings when using simple mode
+                    handleFieldChange('gradeCombination', {
+                      selectedGrades: [e.target.value],
+                      pathwayType: 'sequential',
+                      skipGrades: [],
+                      emphasis: 'balanced'
+                    });
+                  }}
+                  className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                    errors.gradeLevel ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  aria-required="true"
+                  aria-invalid={!!errors.gradeLevel}
+                  aria-describedby={errors.gradeLevel ? 'gradeLevel-error' : undefined}
+                >
+                  <option value="">Select a grade level</option>
+                  {availableGrades.map(grade => (
+                    <option key={grade} value={grade}>Grade {grade}</option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              // Advanced multi-grade combination interface
+              <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <label className="block text-sm text-gray-600 mb-2">
+                    Select Grade Levels to Combine
+                  </label>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    {availableGrades.map(grade => (
+                      <label key={grade} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={formData.gradeCombination?.selectedGrades?.includes(grade) || false}
+                          onChange={(e) => {
+                            const currentGrades = formData.gradeCombination?.selectedGrades || [];
+                            const newGrades = e.target.checked
+                              ? [...currentGrades, grade]
+                              : currentGrades.filter(g => g !== grade);
+                            
+                            handleFieldChange('gradeCombination', {
+                              ...formData.gradeCombination,
+                              selectedGrades: newGrades
+                            });
+                            
+                            // Update the legacy gradeLevel field for backwards compatibility
+                            handleFieldChange('gradeLevel', newGrades.join('+'));
+                          }}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">Grade {grade}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="pathwayType" className="block text-sm text-gray-600 mb-2">
+                    Pathway Type
+                  </label>
+                  <select
+                    id="pathwayType"
+                    value={formData.gradeCombination?.pathwayType || 'sequential'}
+                    onChange={(e) => handleFieldChange('gradeCombination', {
+                      ...formData.gradeCombination,
+                      pathwayType: e.target.value as 'sequential' | 'accelerated' | 'combined' | 'custom'
+                    })}
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="sequential">Sequential (Normal Progression)</option>
+                    <option value="accelerated">Accelerated (Compressed Timeline)</option>
+                    <option value="combined">Combined (Merged Scope & Sequence)</option>
+                    <option value="custom">Custom (AI-Optimized Pathway)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="emphasis" className="block text-sm text-gray-600 mb-2">
+                    Curriculum Emphasis
+                  </label>
+                  <select
+                    id="emphasis"
+                    value={formData.gradeCombination?.emphasis || 'balanced'}
+                    onChange={(e) => handleFieldChange('gradeCombination', {
+                      ...formData.gradeCombination,
+                      emphasis: e.target.value as 'balanced' | 'foundational' | 'advanced'
+                    })}
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="balanced">Balanced Coverage</option>
+                    <option value="foundational">Foundational Focus (Ensure Prerequisites)</option>
+                    <option value="advanced">Advanced Focus (Challenge & Acceleration)</option>
+                  </select>
+                </div>
+
+                {formData.gradeCombination?.selectedGrades && formData.gradeCombination.selectedGrades.length > 0 && (
+                  <div className="p-3 bg-blue-50 rounded-md">
+                    <p className="text-sm text-blue-700">
+                      🎯 <strong>Selected Pathway:</strong> {formData.gradeCombination.selectedGrades.join(' + ')} | 
+                      {formData.gradeCombination.pathwayType} | {formData.gradeCombination.emphasis}
+                    </p>
+                    <p className="text-xs text-blue-600 mt-1">
+                      AI will analyze prerequisites and create an optimal sequence for this grade combination.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
             {errors.gradeLevel && (
               <p id="gradeLevel-error" className="mt-1 text-sm text-red-600" role="alert">
                 {errors.gradeLevel}

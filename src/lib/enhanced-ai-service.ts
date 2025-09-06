@@ -2,7 +2,13 @@ import OpenAI from 'openai';
 import { AICurriculumContextService, CurriculumContext, PacingRecommendation } from './ai-curriculum-context';
 
 export interface PacingGuideRequest {
-  gradeLevel: string;
+  gradeLevel: string; // Keep for backwards compatibility
+  gradeCombination?: {
+    selectedGrades: string[];
+    pathwayType: 'sequential' | 'accelerated' | 'combined' | 'custom';
+    skipGrades?: string[];
+    emphasis?: 'balanced' | 'foundational' | 'advanced';
+  };
   timeframe: string;
   studentPopulation: string;
   priorities: string[];
@@ -92,28 +98,67 @@ export class EnhancedAIService {
   }
 
   async generatePacingGuide(request: PacingGuideRequest): Promise<PacingGuideResponse> {
+    console.group('🧠 [AI Service] Generating Pacing Guide');
+    console.log('📝 [AI Service] Request received:', JSON.stringify(request, null, 2));
+    
     try {
-      // Build curriculum context
-      const context = await this.curriculumService.buildCurriculumContext(request.gradeLevel);
+      // Determine effective grade configuration
+      console.log('🔍 [AI Service] Parsing grade configuration...');
+      const gradeConfig = this.parseGradeConfiguration(request);
+      console.log('📊 [AI Service] Grade config:', gradeConfig);
       
-      // Generate AI recommendations
-      const recommendations = await this.curriculumService.generatePacingRecommendations(
-        request.gradeLevel,
-        request.timeframe,
-        request.studentPopulation,
-        request.priorities
+      // Build comprehensive curriculum context for all selected grades
+      console.log('📚 [AI Service] Building curriculum contexts for grades:', gradeConfig.selectedGrades);
+      const contexts = await Promise.all(
+        gradeConfig.selectedGrades.map(grade => 
+          this.curriculumService.buildCurriculumContext(grade)
+        )
       );
+      
+      console.log('📖 [AI Service] Contexts built, count:', contexts.length);
+      
+      // Debug each context to see what curriculum data we have
+      contexts.forEach((context, index) => {
+        console.log(`📋 [AI Service] Context ${index + 1} (Grade ${gradeConfig.selectedGrades[index]}):`, {
+          gradeLevel: context.gradeLevel,
+          totalLessons: context.totalLessons,
+          totalInstructionalDays: context.totalInstructionalDays,
+          unitStructureCount: context.unitStructure.length,
+          unitTitles: context.unitStructure.map(unit => unit.unitTitle),
+          majorStandardsCount: context.majorStandards.length,
+          availableStandardsCount: context.availableStandards.length
+        });
+      });
+      
+      // Merge contexts and analyze cross-grade dependencies
+      console.log('🔗 [AI Service] Merging curriculum contexts...');
+      const mergedContext = this.mergeCurriculumContexts(contexts, gradeConfig);
+      console.log('📋 [AI Service] Merged context:', {
+        totalLessons: mergedContext.totalLessons,
+        totalInstructionalDays: mergedContext.totalInstructionalDays,
+        unitStructureCount: mergedContext.unitStructure.length,
+        majorStandardsCount: mergedContext.majorStandards.length,
+        allUnitTitles: mergedContext.unitStructure.map(unit => unit.unitTitle)
+      });
+      
+      // Generate AI recommendations with advanced pathway logic
+      console.log('💡 [AI Service] Generating advanced recommendations...');
+      const recommendations = await this.generateAdvancedRecommendations(gradeConfig, request);
+      console.log('✨ [AI Service] Recommendations generated, count:', recommendations?.length || 0);
 
-      // Create detailed prompt for GPT-4
-      const prompt = this.buildDetailedPrompt(context, request);
+      // Create sophisticated prompt for multi-grade analysis
+      console.log('📝 [AI Service] Building advanced prompt...');
+      const prompt = this.buildAdvancedPrompt(mergedContext, gradeConfig, request);
+      console.log('🎯 [AI Service] Prompt built, length:', prompt.length, 'characters');
 
-      // Generate pacing guide with GPT-4
+      // Generate pacing guide with enhanced AI reasoning
+      console.log('🤖 [AI Service] Calling OpenAI API...');
       const completion = await this.openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
           {
             role: "system",
-            content: "You are an expert mathematics curriculum specialist with deep knowledge of grade 6-8 mathematics standards, pacing, and differentiation strategies. You create practical, research-based pacing guides that teachers can implement effectively."
+            content: "You are an expert mathematics curriculum specialist with deep knowledge of grade 6-8 mathematics standards, pacing, and differentiation strategies. You create practical, research-based pacing guides that teachers can implement effectively. You excel at analyzing multi-grade combinations and creating pedagogically sound accelerated pathways."
           },
           {
             role: "user",
@@ -125,21 +170,42 @@ export class EnhancedAIService {
       });
 
       // Parse the AI response into structured data
+      console.log('📨 [AI Service] OpenAI response received');
       const aiResponse = completion.choices[0]?.message?.content;
+      
       if (!aiResponse) {
+        console.error('❌ [AI Service] No response content from OpenAI');
         throw new Error('No response from AI service');
       }
+      
+      console.log('📝 [AI Service] AI response length:', aiResponse.length, 'characters');
+      console.log('🔍 [AI Service] AI response preview:', aiResponse.substring(0, 200) + '...');
 
-      const pacingGuide = await this.parseAIResponse(aiResponse, context, request);
+      console.log('🔧 [AI Service] Parsing AI response...');
+      const pacingGuide = await this.parseAIResponse(aiResponse, mergedContext, request);
+      
+      console.log('✅ [AI Service] Pacing guide parsed successfully');
+      console.log('📊 [AI Service] Final guide structure:', {
+        hasOverview: !!pacingGuide.overview,
+        weeklyScheduleCount: pacingGuide.weeklySchedule?.length || 0,
+        hasAssessmentPlan: !!pacingGuide.assessmentPlan,
+        differentiationCount: pacingGuide.differentiationStrategies?.length || 0
+      });
 
-      return {
+      const result = {
         success: true,
         pacingGuide,
         recommendations
       };
+      
+      console.log('🎉 [AI Service] Returning successful result');
+      console.groupEnd();
+      return result;
 
     } catch (error) {
-      console.error('Error generating pacing guide:', error);
+      console.error('💥 [AI Service] Error generating pacing guide:', error);
+      console.groupEnd();
+      
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error occurred'
@@ -234,20 +300,87 @@ Ensure the pacing guide is realistic, pedagogically sound, and addresses the spe
   }
 
   private async parseAIResponse(
-    aiResponse: string, 
-    context: CurriculumContext, 
+    aiResponse: string,
+    context: CurriculumContext,
     request: PacingGuideRequest
   ): Promise<GeneratedPacingGuide> {
     try {
-      // Extract JSON from the AI response
-      const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        throw new Error('No valid JSON found in AI response');
+      console.log('🔍 AI Response length:', aiResponse.length);
+      console.log('📝 AI Response preview:', aiResponse.substring(0, 500) + '...');
+      
+      // Try multiple JSON extraction methods
+      let parsedResponse: any = null;
+      
+      // Method 1: Look for JSON blocks wrapped in ```json
+      const jsonBlockMatch = aiResponse.match(/```json\s*([\s\S]*?)\s*```/);
+      if (jsonBlockMatch) {
+        console.log('✅ Found JSON block format');
+        parsedResponse = JSON.parse(jsonBlockMatch[1]);
+      } else {
+        // Method 2: Look for any JSON object
+        const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          console.log('✅ Found JSON object format');
+          parsedResponse = JSON.parse(jsonMatch[0]);
+        } else {
+          // Method 3: Try parsing the entire response
+          try {
+            console.log('🔄 Attempting to parse entire response as JSON');
+            parsedResponse = JSON.parse(aiResponse);
+          } catch (e) {
+            console.error('❌ Failed to parse AI response as JSON:', e);
+            throw new Error('No valid JSON found in AI response. Response: ' + aiResponse.substring(0, 200));
+          }
+        }
       }
-
-      const parsedResponse = JSON.parse(jsonMatch[0]);
+      
+      console.log('📊 Parsed response structure:', Object.keys(parsedResponse || {}));
+      console.log('🔍 [AI Service] Parsed response content:', {
+        hasOverview: !!parsedResponse.overview,
+        hasWeeklySchedule: !!parsedResponse.weeklySchedule,
+        weeklyScheduleLength: parsedResponse.weeklySchedule?.length || 0,
+        weeklyScheduleSample: parsedResponse.weeklySchedule?.slice(0, 2) || [],
+        hasAssessmentPlan: !!parsedResponse.assessmentPlan,
+        hasDifferentiationStrategies: !!parsedResponse.differentiationStrategies,
+        differentiationCount: parsedResponse.differentiationStrategies?.length || 0
+      });
+      console.log('🔍 [AI Service] Detailed parsed response analysis:');
+      
+      if (parsedResponse.weeklySchedule) {
+        console.log('  📅 Weekly Schedule:', {
+          totalWeeks: parsedResponse.weeklySchedule.length,
+          firstWeek: parsedResponse.weeklySchedule[0] || 'undefined',
+          sampleWeekStructure: parsedResponse.weeklySchedule[0] ? Object.keys(parsedResponse.weeklySchedule[0]) : 'none'
+        });
+        
+        if (parsedResponse.weeklySchedule[0]) {
+          console.log('  📝 First week details:', {
+            lessons: parsedResponse.weeklySchedule[0].lessons || 'undefined',
+            lessonsCount: (parsedResponse.weeklySchedule[0].lessons || []).length,
+            focusStandards: parsedResponse.weeklySchedule[0].focusStandards || 'undefined',
+            learningObjectives: parsedResponse.weeklySchedule[0].learningObjectives || 'undefined'
+          });
+        }
+      } else {
+        console.error('❌ [AI Service] No weeklySchedule in parsed response!');
+      }
+      
+      if (parsedResponse.overview) {
+        console.log('  📋 Overview:', parsedResponse.overview);
+      } else {
+        console.error('❌ [AI Service] No overview in parsed response!');
+      }
+      console.log('🔍 [AI Service] Parsed response content analysis:');
+      console.log('  Overview present:', !!parsedResponse.overview);
+      console.log('  WeeklySchedule present:', !!parsedResponse.weeklySchedule);
+      console.log('  WeeklySchedule type:', typeof parsedResponse.weeklySchedule);
+      console.log('  WeeklySchedule length:', parsedResponse.weeklySchedule?.length || 'undefined');
+      console.log('  WeeklySchedule sample:', JSON.stringify(parsedResponse.weeklySchedule?.slice(0, 2), null, 2));
+      console.log('  AssessmentPlan present:', !!parsedResponse.assessmentPlan);
+      console.log('  DifferentiationStrategies present:', !!parsedResponse.differentiationStrategies);
       
       // Build the structured pacing guide
+      console.log('🏗️ [AI Service] Building structured pacing guide...');
       const pacingGuide: GeneratedPacingGuide = {
         overview: {
           gradeLevel: request.gradeLevel,
@@ -267,10 +400,19 @@ Ensure the pacing guide is realistic, pedagogically sound, and addresses the spe
         flexibilityOptions: parsedResponse.flexibilityOptions || [],
         standardsAlignment: parsedResponse.standardsAlignment || []
       };
-
+      
+      console.log('📋 [AI Service] Built pacing guide structure:');
+      console.log('  Overview:', pacingGuide.overview);
+      console.log('  Weekly schedule entries:', pacingGuide.weeklySchedule.length);
+      console.log('  Assessment plan:', !!pacingGuide.assessmentPlan);
+      console.log('  Differentiation strategies:', pacingGuide.differentiationStrategies.length);
+      console.log('  Flexibility options:', pacingGuide.flexibilityOptions.length);
+      console.log('  Standards alignment:', pacingGuide.standardsAlignment.length);
+      
       return pacingGuide;
     } catch (error) {
-      console.error('Error parsing AI response:', error);
+      console.error('💥 [AI Service] Error parsing AI response:', error);
+      console.log('🛟 [AI Service] Generating fallback pacing guide...');
       // Return a fallback pacing guide
       return this.generateFallbackPacingGuide(context, request);
     }
@@ -280,8 +422,16 @@ Ensure the pacing guide is realistic, pedagogically sound, and addresses the spe
     context: CurriculumContext, 
     request: PacingGuideRequest
   ): GeneratedPacingGuide {
+    console.log('🔧 [AI Service] Generating fallback pacing guide...');
     const totalWeeks = this.calculateWeeks(request.timeframe);
     const lessonsPerWeek = Math.ceil(context.totalLessons / totalWeeks);
+    
+    console.log('📊 [AI Service] Fallback calculations:', {
+      totalWeeks,
+      lessonsPerWeek,
+      totalLessons: context.totalLessons,
+      unitCount: context.unitStructure.length
+    });
 
     return {
       overview: {
@@ -346,6 +496,181 @@ Ensure the pacing guide is realistic, pedagogically sound, and addresses the spe
     
     const weekMatch = timeframe.match(/(\d+)\s*week/i);
     return weekMatch ? parseInt(weekMatch[1]) : 18;
+  }
+
+  // Helper methods for advanced grade combination support
+  private parseGradeConfiguration(request: PacingGuideRequest) {
+    if (request.gradeCombination && request.gradeCombination.selectedGrades.length > 0) {
+      return {
+        selectedGrades: request.gradeCombination.selectedGrades,
+        pathwayType: request.gradeCombination.pathwayType || 'sequential',
+        skipGrades: request.gradeCombination.skipGrades || [],
+        emphasis: request.gradeCombination.emphasis || 'balanced'
+      };
+    }
+    
+    // Fallback to single grade
+    return {
+      selectedGrades: [request.gradeLevel],
+      pathwayType: 'sequential' as const,
+      skipGrades: [],
+      emphasis: 'balanced' as const
+    };
+  }
+
+  private mergeCurriculumContexts(contexts: CurriculumContext[], gradeConfig: any): CurriculumContext {
+    if (contexts.length === 1) {
+      return contexts[0];
+    }
+
+    // Merge multiple grade contexts into a comprehensive view
+    const mergedStandards = contexts.flatMap(ctx => ctx.availableStandards);
+    const mergedMajorStandards = contexts.flatMap(ctx => ctx.majorStandards);
+    const mergedSupportingStandards = contexts.flatMap(ctx => ctx.supportingStandards);
+    const mergedAdditionalStandards = contexts.flatMap(ctx => ctx.additionalStandards);
+    const mergedUnitStructure = contexts.flatMap(ctx => ctx.unitStructure);
+
+    return {
+      gradeLevel: gradeConfig.selectedGrades.join('+'),
+      availableStandards: mergedStandards,
+      majorStandards: mergedMajorStandards,
+      supportingStandards: mergedSupportingStandards,
+      additionalStandards: mergedAdditionalStandards,
+      unitStructure: mergedUnitStructure,
+      totalLessons: contexts.reduce((sum, ctx) => sum + ctx.totalLessons, 0),
+      totalInstructionalDays: contexts.reduce((sum, ctx) => sum + ctx.totalInstructionalDays, 0)
+    };
+  }
+
+  private async generateAdvancedRecommendations(gradeConfig: any, request: PacingGuideRequest) {
+    // For now, use the first grade for basic recommendations
+    // TODO: Implement sophisticated multi-grade recommendation logic
+    const primaryGrade = gradeConfig.selectedGrades[0];
+    return await this.curriculumService.generatePacingRecommendations(
+      primaryGrade,
+      request.timeframe,
+      request.studentPopulation,
+      request.priorities
+    );
+  }
+
+  private buildAdvancedPrompt(context: CurriculumContext, gradeConfig: any, request: PacingGuideRequest): string {
+    const isMultiGrade = gradeConfig.selectedGrades.length > 1;
+    
+    if (isMultiGrade) {
+      return `
+Create a comprehensive ${gradeConfig.pathwayType} pacing guide for ${gradeConfig.selectedGrades.join(' + ')} mathematics curriculum.
+
+GRADE COMBINATION ANALYSIS:
+- Selected Grades: ${gradeConfig.selectedGrades.join(', ')}
+- Pathway Type: ${gradeConfig.pathwayType}
+- Emphasis: ${gradeConfig.emphasis}
+- Total Unit Structures: ${context.unitStructure.length}
+- Total Lessons: ${context.totalLessons}
+- Total Instructional Days: ${context.totalInstructionalDays}
+
+PEDAGOGICAL REQUIREMENTS:
+1. Analyze prerequisite relationships between grade levels
+2. Identify essential foundational concepts that cannot be skipped
+3. Create logical progression that builds mathematical understanding
+4. Balance content coverage with sufficient practice time
+5. Consider cognitive load and developmental appropriateness
+
+TIMEFRAME: ${request.timeframe}
+STUDENT POPULATION: ${request.studentPopulation}
+PRIORITIES: ${request.priorities.join(', ')}
+
+SCHEDULE CONSTRAINTS:
+- ${request.scheduleConstraints?.daysPerWeek || 5} days per week
+- ${request.scheduleConstraints?.minutesPerClass || 50} minutes per class
+
+REQUIRED OUTPUT FORMAT:
+Return your response as a valid JSON object with this exact structure:
+
+\`\`\`json
+{
+  "overview": {
+    "totalWeeks": 36,
+    "lessonsPerWeek": 4,
+    "description": "Brief description of the combined pathway approach"
+  },
+  "weeklySchedule": [
+    {
+      "week": 1,
+      "unit": "Unit Name (e.g., 'Ratios and Proportional Relationships')",
+      "lessons": ["Unit 1, Lesson 1", "Unit 1, Lesson 2", "Unit 1, Lesson 3", "Unit 1, Lesson 4"],
+      "focusStandards": ["6.RP.A.1", "6.RP.A.2"],
+      "learningObjectives": ["Understand ratio concepts", "Use ratio language to describe relationships"],
+      "assessmentType": "formative",
+      "differentiationNotes": "Optional notes for differentiation"
+    }
+  ],
+  "assessmentPlan": {
+    "formativeFrequency": "Weekly",
+    "summativeSchedule": [
+      {
+        "week": 8,
+        "type": "Unit Assessment",
+        "standards": ["6.RP.A.1", "6.RP.A.2", "6.RP.A.3"],
+        "description": "Assessment covering ratio and proportion concepts"
+      }
+    ],
+    "diagnosticCheckpoints": [4, 12, 24],
+    "portfolioComponents": ["Problem solving samples", "Reflection pieces"]
+  },
+  "differentiationStrategies": [
+    {
+      "studentGroup": "Students with Disabilities",
+      "modifications": ["Extended time", "Visual supports"],
+      "resources": ["Manipulatives", "Graphic organizers"],
+      "assessmentAdjustments": ["Alternative formats", "Oral responses"]
+    }
+  ],
+  "flexibilityOptions": [
+    {
+      "scenario": "If students struggle with ratios",
+      "adjustments": ["Add concrete examples", "Use manipulatives"],
+      "impactAnalysis": "May need 1-2 extra days"
+    }
+  ],
+  "standardsAlignment": [
+    {
+      "standard": "6.RP.A.1 - Understand the concept of ratio",
+      "weeksCovered": [1, 2],
+      "connections": ["Links to fraction concepts", "Foundation for proportions"]
+    }
+  ]
+}
+\`\`\`
+
+Create at least 20 weeks of detailed weekly schedule covering the essential concepts from both grades with proper prerequisite sequencing.
+
+CRITICAL REQUIREMENTS:
+- Focus on PACING and SEQUENCE, not detailed lesson content
+- Each week should reference existing curriculum units and lessons (e.g., "Unit 3, Lesson 2")
+- Lessons array should contain lesson REFERENCES, not detailed content
+- Each week MUST have 2-4 learning objectives that describe WHAT students will learn
+- Each week MUST have 2-3 focus standards using standard codes (e.g., "6.RP.A.1")
+- Use "assessmentType": "formative", "summative", or "diagnostic" 
+- Standards should use actual standard codes when possible
+- This is a PACING GUIDE - focus on timing, sequence, and organization
+
+PACING REQUIREMENTS:
+- Generate exactly ${this.calculateWeeks(request.timeframe)} weeks
+- Sequence topics for optimal learning progression
+- Provide realistic timeline estimates
+- Include differentiation strategies
+- Identify potential acceleration opportunities
+- Suggest assessment checkpoints
+
+ABSOLUTELY CRITICAL: Your JSON response must contain a "weeklySchedule" array with actual lesson content. Empty arrays will cause system failure.
+
+Return the response in JSON format with the same structure as single-grade pacing guides.
+      `;
+    }
+
+    // Fallback to original prompt for single grades
+    return this.buildDetailedPrompt(context, request);
   }
 
   async disconnect() {

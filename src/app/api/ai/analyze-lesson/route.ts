@@ -1,25 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-// Only create OpenAI client if API key is available (not during build)
-const openai = process.env.OPENAI_API_KEY ? new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-}) : null;
+// Disable static generation for this route since it requires runtime environment variables
+export const dynamic = 'force-dynamic';
+
+// Lazy initialization to prevent build-time errors
+const getOpenAIClient = () => {
+  return new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+  });
+};
 
 export async function POST(request: NextRequest) {
   try {
-    if (!openai) {
-      return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
-    }
+    const { prompt, model = 'gpt-4o-mini' } = await request.json();
+    
+    // Initialize OpenAI client only when needed
+    const openai = getOpenAIClient();
 
-    const { lessonContent, documentId, lessonNumber } = await request.json();
-
-    if (!lessonContent) {
-      return NextResponse.json({ error: 'Lesson content is required' }, { status: 400 });
+    if (!prompt) {
+      return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
     }
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: model,
       messages: [
         {
           role: 'system',
@@ -27,7 +31,7 @@ export async function POST(request: NextRequest) {
         },
         {
           role: 'user',
-          content: `Analyze this lesson content from document ${documentId}, lesson ${lessonNumber}:\n\n${lessonContent}\n\nProvide a detailed educational analysis including key concepts, learning objectives, prerequisites, and assessment suggestions.`
+          content: prompt
         }
       ],
       temperature: 0.3,
