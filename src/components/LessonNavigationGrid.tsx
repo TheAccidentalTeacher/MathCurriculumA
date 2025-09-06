@@ -508,14 +508,21 @@ export function LessonNavigationGrid() {
   };
 
   const getLessonViewerUrl = (grade: number, volume: number, lessonNumber: number, startPage: number) => {
-    const gradeMap: Record<number, string> = {
-      6: `grade6-volume${volume}`,
-      7: `grade7-volume${volume}`,
-      8: `grade8-volume${volume}`,
-      9: `algebra1-volume${volume}`
+    // Map to document IDs for the lesson viewer route
+    const documentMap: Record<number, Record<number, string>> = {
+      6: { 1: 'RCM06_NA_SW_V1', 2: 'RCM06_NA_SW_V2' },
+      7: { 1: 'RCM07_NA_SW_V1', 2: 'RCM07_NA_SW_V2' },
+      8: { 1: 'RCM08_NA_SW_V1', 2: 'RCM08_NA_SW_V2' },
+      9: { 1: 'ALG01_NA_SW_V1', 2: 'ALG01_NA_SW_V2' }
     };
     
-    return `/viewer/${gradeMap[grade]}?lessonNumber=${lessonNumber}&page=${startPage}`;
+    const documentId = documentMap[grade]?.[volume];
+    if (!documentId) {
+      console.error(`No document mapping for Grade ${grade}, Volume ${volume}`);
+      return '#';
+    }
+    
+    return `/lesson/${documentId}/${lessonNumber}`;
   };
 
   return (
