@@ -3,28 +3,65 @@
 import React, { useState, useCallback } from 'react';
 import { 
   GeneratedPacingGuide, 
+  DetailedLessonGuide,
   WeeklySchedule, 
   DifferentiationStrategy,
   FlexibilityOption,
-  StandardsAlignment 
+  StandardsAlignment,
+  DetailedLesson,
+  ProgressionStage
 } from '@/lib/enhanced-ai-service';
 
 interface PacingGuideResultsProps {
-  pacingGuide: GeneratedPacingGuide;
+  pacingGuide?: GeneratedPacingGuide;
+  detailedLessonGuide?: DetailedLessonGuide;
   onExport?: (format: 'pdf' | 'csv' | 'json') => void;
   onModify?: () => void;
 }
 
-type ViewMode = 'overview' | 'weekly' | 'assessments' | 'differentiation' | 'standards';
+type ViewMode = 'overview' | 'weekly' | 'assessments' | 'differentiation' | 'standards' | 'detailed-lessons' | 'progression' | 'lesson-plans';
 
 export function PacingGuideResults({ 
   pacingGuide, 
+  detailedLessonGuide,
   onExport, 
   onModify 
 }: PacingGuideResultsProps) {
   const [activeView, setActiveView] = useState<ViewMode>('overview');
   const [selectedWeek, setSelectedWeek] = useState<number | null>(null);
+  const [selectedLesson, setSelectedLesson] = useState<number | null>(null);
   const [announcements, setAnnouncements] = useState<string>('');
+
+  // Determine if this is a detailed lesson guide
+  const isDetailedGuide = !!detailedLessonGuide;
+  const currentGuide = pacingGuide || (detailedLessonGuide ? {
+    overview: {
+      gradeLevel: "7-8 Accelerated",
+      timeframe: detailedLessonGuide.pathway.duration,
+      totalWeeks: Math.ceil(detailedLessonGuide.lessonByLessonBreakdown.length / 4),
+      lessonsPerWeek: 4,
+      totalLessons: detailedLessonGuide.lessonByLessonBreakdown.length
+    },
+    weeklySchedule: [],
+    assessmentPlan: {
+      formativeFrequency: detailedLessonGuide.assessmentStrategy.overallApproach,
+      summativeSchedule: detailedLessonGuide.assessmentStrategy.summativeAssessments.map(assessment => ({
+        week: parseInt(assessment.timing.replace(/\D/g, '')) || 1,
+        type: assessment.name,
+        standards: assessment.standards,
+        description: assessment.purpose
+      })),
+      diagnosticCheckpoints: detailedLessonGuide.assessmentStrategy.diagnosticCheckpoints.map((_, idx) => idx + 1),
+      portfolioComponents: detailedLessonGuide.assessmentStrategy.portfolioElements
+    },
+    differentiationStrategies: [],
+    flexibilityOptions: [],
+    standardsAlignment: []
+  } : null);
+
+  if (!currentGuide) {
+    return <div className="text-center p-8">No pacing guide data available</div>;
+  }
 
   const handleViewChange = useCallback((view: ViewMode) => {
     setActiveView(view);
@@ -42,12 +79,15 @@ export function PacingGuideResults({
   }, [onExport]);
 
   const getViewLabel = (view: ViewMode): string => {
-    const labels = {
+    const labels: Record<ViewMode, string> = {
       overview: 'Overview',
       weekly: 'Weekly Schedule',
       assessments: 'Assessment Plan',
       differentiation: 'Differentiation',
-      standards: 'Standards Alignment'
+      standards: 'Standards Alignment',
+      'detailed-lessons': 'Detailed Lessons',
+      'progression': 'Progression Map',
+      'lesson-plans': 'Lesson Plans'
     };
     return labels[view];
   };
@@ -69,11 +109,16 @@ export function PacingGuideResults({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              Grade {pacingGuide.overview.gradeLevel} Pacing Guide
+              {isDetailedGuide ? detailedLessonGuide!.pathway.name : `Grade ${currentGuide.overview.gradeLevel} Pacing Guide`}
             </h1>
             <p className="mt-2 text-lg text-gray-600">
-              {pacingGuide.overview.timeframe} • {pacingGuide.overview.totalWeeks} weeks • {pacingGuide.overview.lessonsPerWeek} lessons/week
+              {currentGuide.overview.timeframe} • {currentGuide.overview.totalWeeks} weeks • {currentGuide.overview.lessonsPerWeek} lessons/week
             </p>
+            {isDetailedGuide && (
+              <p className="mt-1 text-sm text-blue-600">
+                {detailedLessonGuide!.pathway.description}
+              </p>
+            )}
           </div>
           <div className="mt-4 sm:mt-0 flex space-x-3">
             <button
@@ -102,10 +147,13 @@ export function PacingGuideResults({
       {/* Navigation Tabs */}
       <div className="border-b border-gray-200 mb-8">
         <nav className="-mb-px flex space-x-8" aria-label="Pacing guide navigation">
-          {(['overview', 'weekly', 'assessments', 'differentiation', 'standards'] as ViewMode[]).map((view) => (
+          {(isDetailedGuide 
+            ? ['overview', 'detailed-lessons', 'progression', 'assessments', 'lesson-plans'] 
+            : ['overview', 'weekly', 'assessments', 'differentiation', 'standards']
+          ).map((view) => (
             <button
               key={view}
-              onClick={() => handleViewChange(view)}
+              onClick={() => handleViewChange(view as ViewMode)}
               className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                 activeView === view
                   ? 'border-blue-500 text-blue-600'
@@ -114,7 +162,7 @@ export function PacingGuideResults({
               aria-selected={activeView === view}
               role="tab"
             >
-              {getViewLabel(view)}
+              {getViewLabel(view as ViewMode)}
             </button>
           ))}
         </nav>
@@ -123,10 +171,33 @@ export function PacingGuideResults({
       {/* Content Views */}
       <div role="tabpanel" aria-labelledby={`${activeView}-tab`}>
         {activeView === 'overview' && (
-          <OverviewView pacingGuide={pacingGuide} />
+          <OverviewView 
+            pacingGuide={currentGuide} 
+            detailedLessonGuide={detailedLessonGuide}
+          />
         )}
 
-        {activeView === 'weekly' && (
+        {activeView === 'detailed-lessons' && isDetailedGuide && (
+          <DetailedLessonsView 
+            lessonGuide={detailedLessonGuide!}
+            selectedLesson={selectedLesson}
+            onLessonSelect={(lesson) => setSelectedLesson(lesson)}
+          />
+        )}
+
+        {activeView === 'progression' && isDetailedGuide && (
+          <ProgressionMapView progressionMap={detailedLessonGuide!.progressionMap} />
+        )}
+
+        {activeView === 'lesson-plans' && isDetailedGuide && (
+          <LessonPlansView 
+            lessons={detailedLessonGuide!.lessonByLessonBreakdown}
+            selectedLesson={selectedLesson}
+            onLessonSelect={(lesson) => setSelectedLesson(lesson)}
+          />
+        )}
+
+        {activeView === 'weekly' && !isDetailedGuide && pacingGuide && (
           <WeeklyScheduleView 
             schedule={pacingGuide.weeklySchedule}
             selectedWeek={selectedWeek}
@@ -135,17 +206,20 @@ export function PacingGuideResults({
         )}
 
         {activeView === 'assessments' && (
-          <AssessmentPlanView assessmentPlan={pacingGuide.assessmentPlan} />
+          <AssessmentPlanView 
+            assessmentPlan={currentGuide.assessmentPlan}
+            detailedStrategy={isDetailedGuide ? detailedLessonGuide!.assessmentStrategy : undefined}
+          />
         )}
 
-        {activeView === 'differentiation' && (
+        {activeView === 'differentiation' && !isDetailedGuide && pacingGuide && (
           <DifferentiationView 
             strategies={pacingGuide.differentiationStrategies}
             flexibilityOptions={pacingGuide.flexibilityOptions}
           />
         )}
 
-        {activeView === 'standards' && (
+        {activeView === 'standards' && !isDetailedGuide && pacingGuide && (
           <StandardsAlignmentView alignment={pacingGuide.standardsAlignment} />
         )}
       </div>
@@ -154,7 +228,15 @@ export function PacingGuideResults({
 }
 
 // Overview Component
-function OverviewView({ pacingGuide }: { pacingGuide: GeneratedPacingGuide }) {
+function OverviewView({ 
+  pacingGuide, 
+  detailedLessonGuide 
+}: { 
+  pacingGuide: GeneratedPacingGuide;
+  detailedLessonGuide?: DetailedLessonGuide;
+}) {
+  const isDetailedGuide = !!detailedLessonGuide;
+  
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -172,15 +254,57 @@ function OverviewView({ pacingGuide }: { pacingGuide: GeneratedPacingGuide }) {
         </div>
       </div>
 
+      {isDetailedGuide && detailedLessonGuide && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-orange-50 p-6 rounded-lg">
+            <h3 className="text-lg font-semibold text-orange-900 mb-2">Target Outcome</h3>
+            <p className="text-sm text-orange-800">{detailedLessonGuide.pathway.targetOutcome}</p>
+          </div>
+          <div className="bg-teal-50 p-6 rounded-lg">
+            <h3 className="text-lg font-semibold text-teal-900 mb-2">Algebra Readiness</h3>
+            <p className="text-sm text-teal-800">
+              {detailedLessonGuide.analysisResults.standardsCoverage.algebralReadinessIndicators.length} indicators
+            </p>
+          </div>
+        </div>
+      )}
+
       <div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">Quick Summary</h3>
+        <h3 className="text-xl font-semibold text-gray-900 mb-4">
+          {isDetailedGuide ? 'Pathway Summary' : 'Quick Summary'}
+        </h3>
         <div className="bg-gray-50 p-6 rounded-lg">
-          <p className="text-gray-700 leading-relaxed">
-            This pacing guide covers <strong>{pacingGuide.overview.totalLessons} lessons</strong> over{' '}
-            <strong>{pacingGuide.overview.totalWeeks} weeks</strong> for Grade {pacingGuide.overview.gradeLevel} mathematics.
-            The schedule includes <strong>{pacingGuide.assessmentPlan.summativeSchedule.length} major assessments</strong> and{' '}
-            <strong>{pacingGuide.differentiationStrategies.length} differentiation strategies</strong> to support diverse learners.
-          </p>
+          {isDetailedGuide && detailedLessonGuide ? (
+            <div className="space-y-4">
+              <p className="text-gray-700 leading-relaxed">
+                <strong>{detailedLessonGuide.pathway.name}</strong>: {detailedLessonGuide.pathway.description}
+              </p>
+              <p className="text-gray-700">
+                <strong>Analysis Results:</strong> {detailedLessonGuide.analysisResults.scopeAndSequenceMatch}
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="font-medium text-gray-900">Major Work Standards:</p>
+                  <p className="text-sm text-gray-600">
+                    {detailedLessonGuide.analysisResults.standardsCoverage.majorWork.length} standards
+                  </p>
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900">Cross-Grade Connections:</p>
+                  <p className="text-sm text-gray-600">
+                    {detailedLessonGuide.analysisResults.standardsCoverage.crossGradeConnections.length} connections
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p className="text-gray-700 leading-relaxed">
+              This pacing guide covers <strong>{pacingGuide.overview.totalLessons} lessons</strong> over{' '}
+              <strong>{pacingGuide.overview.totalWeeks} weeks</strong> for Grade {pacingGuide.overview.gradeLevel} mathematics.
+              The schedule includes <strong>{pacingGuide.assessmentPlan.summativeSchedule?.length || 0} major assessments</strong> and{' '}
+              <strong>{pacingGuide.differentiationStrategies?.length || 0} differentiation strategies</strong> to support diverse learners.
+            </p>
+          )}
         </div>
       </div>
     </div>
@@ -293,70 +417,6 @@ function WeeklyScheduleView({
   );
 }
 
-// Assessment Plan Component
-function AssessmentPlanView({ assessmentPlan }: { assessmentPlan: any }) {
-  return (
-    <div className="space-y-8">
-      <div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">Assessment Overview</h3>
-        <div className="bg-blue-50 p-6 rounded-lg">
-          <p className="text-blue-900">
-            <strong>Formative Assessment Frequency:</strong> {assessmentPlan.formativeFrequency}
-          </p>
-        </div>
-      </div>
-
-      {assessmentPlan.summativeSchedule.length > 0 && (
-        <div>
-          <h4 className="text-lg font-semibold text-gray-900 mb-4">Summative Assessments</h4>
-          <div className="space-y-4">
-            {(assessmentPlan.summativeSchedule || []).map((assessment: any, index: number) => (
-              <div key={index} className="border border-gray-200 rounded-lg p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <h5 className="text-lg font-medium text-gray-900">{assessment.type}</h5>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Week {assessment.week}
-                  </span>
-                </div>
-                <p className="text-gray-700 mb-3">{assessment.description}</p>
-                <div>
-                  <h6 className="text-sm font-medium text-gray-900 mb-2">Standards Assessed:</h6>
-                  <div className="flex flex-wrap gap-2">
-                    {(assessment.standards || []).map((standard: string, idx: number) => (
-                      <span
-                        key={idx}
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
-                      >
-                        {standard}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {assessmentPlan.diagnosticCheckpoints.length > 0 && (
-        <div>
-          <h4 className="text-lg font-semibold text-gray-900 mb-4">Diagnostic Checkpoints</h4>
-          <div className="flex flex-wrap gap-2">
-            {(assessmentPlan.diagnosticCheckpoints || []).map((week: number, index: number) => (
-              <span
-                key={index}
-                className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800"
-              >
-                Week {week}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 // Differentiation Component
 function DifferentiationView({ 
   strategies, 
@@ -432,6 +492,464 @@ function DifferentiationView({
             ))}
           </div>
         </div>
+      )}
+    </div>
+  );
+}
+
+// Detailed Lessons Component
+function DetailedLessonsView({ 
+  lessonGuide, 
+  selectedLesson, 
+  onLessonSelect 
+}: { 
+  lessonGuide: DetailedLessonGuide;
+  selectedLesson: number | null;
+  onLessonSelect: (lesson: number) => void;
+}) {
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h3 className="text-xl font-semibold text-gray-900">Detailed Lesson Analysis</h3>
+        <span className="text-sm text-gray-500">
+          {lessonGuide.lessonByLessonBreakdown.length} lessons total
+        </span>
+      </div>
+
+      {/* Analysis Results Summary */}
+      <div className="bg-blue-50 p-6 rounded-lg">
+        <h4 className="text-lg font-medium text-blue-900 mb-3">Analysis Results</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm font-medium text-blue-800">Scope & Sequence Match:</p>
+            <p className="text-sm text-blue-700">{lessonGuide.analysisResults.scopeAndSequenceMatch}</p>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-blue-800">Prerequisite Check:</p>
+            <p className="text-sm text-blue-700">
+              {lessonGuide.analysisResults.prerequisiteCheck.prerequisitesMet.length} prerequisites met
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Standards Coverage */}
+      <div className="bg-green-50 p-6 rounded-lg">
+        <h4 className="text-lg font-medium text-green-900 mb-3">Standards Coverage</h4>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+          <div>
+            <p className="text-2xl font-bold text-green-600">
+              {lessonGuide.analysisResults.standardsCoverage.majorWork.length}
+            </p>
+            <p className="text-sm text-green-800">Major Work</p>
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-green-600">
+              {lessonGuide.analysisResults.standardsCoverage.supportingWork.length}
+            </p>
+            <p className="text-sm text-green-800">Supporting</p>
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-green-600">
+              {lessonGuide.analysisResults.standardsCoverage.additionalWork.length}
+            </p>
+            <p className="text-sm text-green-800">Additional</p>
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-green-600">
+              {lessonGuide.analysisResults.standardsCoverage.algebralReadinessIndicators.length}
+            </p>
+            <p className="text-sm text-green-800">Algebra Ready</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Lessons Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {lessonGuide.lessonByLessonBreakdown.map((lesson) => (
+          <div 
+            key={lesson.lessonNumber}
+            className={`border rounded-lg p-4 cursor-pointer transition-all ${
+              selectedLesson === lesson.lessonNumber 
+                ? 'border-blue-500 bg-blue-50' 
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
+            onClick={() => onLessonSelect(lesson.lessonNumber)}
+          >
+            <div className="flex justify-between items-start mb-2">
+              <h4 className="font-medium text-gray-900">Lesson {lesson.lessonNumber}</h4>
+              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                Grade {lesson.grade}
+              </span>
+            </div>
+            <h5 className="text-sm font-medium text-gray-800 mb-2">{lesson.title}</h5>
+            <p className="text-xs text-gray-600 mb-2">{lesson.unit}</p>
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>{lesson.duration.sessions} sessions</span>
+              <span>{lesson.duration.totalMinutes} min</span>
+            </div>
+            <div className="mt-2">
+              <div className="flex flex-wrap gap-1">
+                {lesson.standards.primary.slice(0, 2).map((standard, idx) => (
+                  <span 
+                    key={idx} 
+                    className="text-xs bg-blue-100 text-blue-700 px-1 py-0.5 rounded"
+                  >
+                    {standard}
+                  </span>
+                ))}
+                {lesson.standards.primary.length > 2 && (
+                  <span className="text-xs text-gray-500">+{lesson.standards.primary.length - 2}</span>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Progression Map Component
+function ProgressionMapView({ progressionMap }: { progressionMap: ProgressionStage[] }) {
+  return (
+    <div className="space-y-6">
+      <h3 className="text-xl font-semibold text-gray-900">Learning Progression Map</h3>
+      
+      <div className="space-y-6">
+        {progressionMap.map((stage, index) => (
+          <div key={index} className="border border-gray-200 rounded-lg p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-lg font-medium text-gray-900">{stage.stage}</h4>
+              <span className="text-sm text-gray-500">
+                Weeks {Math.min(...stage.weeks)} - {Math.max(...stage.weeks)}
+              </span>
+            </div>
+            
+            <p className="text-gray-700 mb-4">{stage.focus}</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h5 className="text-sm font-medium text-gray-900 mb-2">Key Milestones</h5>
+                <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                  {stage.milestones.map((milestone, idx) => (
+                    <li key={idx}>{milestone}</li>
+                  ))}
+                </ul>
+              </div>
+              
+              <div>
+                <h5 className="text-sm font-medium text-gray-900 mb-2">Assessment Points</h5>
+                <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                  {stage.assessmentPoints.map((point, idx) => (
+                    <li key={idx}>{point}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Lesson Plans Component
+function LessonPlansView({ 
+  lessons, 
+  selectedLesson, 
+  onLessonSelect 
+}: { 
+  lessons: DetailedLesson[];
+  selectedLesson: number | null;
+  onLessonSelect: (lesson: number) => void;
+}) {
+  const currentLesson = selectedLesson ? lessons.find(l => l.lessonNumber === selectedLesson) : lessons[0];
+  
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h3 className="text-xl font-semibold text-gray-900">Detailed Lesson Plans</h3>
+        <select 
+          value={currentLesson?.lessonNumber || ''} 
+          onChange={(e) => onLessonSelect(Number(e.target.value))}
+          className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+        >
+          {lessons.map((lesson) => (
+            <option key={lesson.lessonNumber} value={lesson.lessonNumber}>
+              Lesson {lesson.lessonNumber}: {lesson.title}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {currentLesson && (
+        <div className="bg-white border border-gray-200 rounded-lg">
+          {/* Lesson Header */}
+          <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
+            <div className="flex justify-between items-start">
+              <div>
+                <h4 className="text-lg font-medium text-gray-900">
+                  Lesson {currentLesson.lessonNumber}: {currentLesson.title}
+                </h4>
+                <p className="text-sm text-gray-600">{currentLesson.unit} • Grade {currentLesson.grade}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-medium text-gray-900">
+                  {currentLesson.duration.sessions} sessions
+                </p>
+                <p className="text-sm text-gray-600">
+                  {currentLesson.duration.totalMinutes} minutes total
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 space-y-6">
+            {/* Standards */}
+            <div>
+              <h5 className="text-lg font-medium text-gray-900 mb-3">Standards Alignment</h5>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-700 mb-2">Primary Standards</p>
+                  <div className="space-y-1">
+                    {currentLesson.standards.primary.map((standard, idx) => (
+                      <span key={idx} className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-1">
+                        {standard}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-700 mb-2">Supporting Standards</p>
+                  <div className="space-y-1">
+                    {currentLesson.standards.supporting.map((standard, idx) => (
+                      <span key={idx} className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded mr-1">
+                        {standard}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-700 mb-2">Mathematical Practices</p>
+                  <div className="space-y-1">
+                    {currentLesson.standards.mathematical_practices.map((practice, idx) => (
+                      <span key={idx} className="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded mr-1">
+                        {practice}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Learning Objectives */}
+            <div>
+              <h5 className="text-lg font-medium text-gray-900 mb-3">Learning Objectives</h5>
+              <ul className="list-disc list-inside text-gray-700 space-y-1">
+                {currentLesson.learningObjectives.map((objective, idx) => (
+                  <li key={idx}>{objective}</li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Lesson Structure */}
+            <div>
+              <h5 className="text-lg font-medium text-gray-900 mb-3">Lesson Structure</h5>
+              <div className="space-y-4">
+                {currentLesson.lessonStructure.map((phase, idx) => (
+                  <div key={idx} className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <h6 className="font-medium text-gray-900">{phase.phase}</h6>
+                      <span className="text-sm text-gray-500">{phase.timeMinutes} minutes</span>
+                    </div>
+                    <p className="text-sm text-gray-700 mb-3">{phase.description}</p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                      <div>
+                        <p className="font-medium text-gray-900 mb-1">Teacher Actions</p>
+                        <ul className="list-disc list-inside text-gray-600 space-y-0.5">
+                          {phase.teacherActions.map((action, actionIdx) => (
+                            <li key={actionIdx}>{action}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900 mb-1">Student Actions</p>
+                        <ul className="list-disc list-inside text-gray-600 space-y-0.5">
+                          {phase.studentActions.map((action, actionIdx) => (
+                            <li key={actionIdx}>{action}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900 mb-1">Key Questions</p>
+                        <ul className="list-disc list-inside text-gray-600 space-y-0.5">
+                          {phase.keyQuestions.map((question, questionIdx) => (
+                            <li key={questionIdx}>{question}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Assessment and Homework */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h5 className="text-lg font-medium text-gray-900 mb-3">Assessment</h5>
+                <div className="space-y-2">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Formative Strategies</p>
+                    <ul className="list-disc list-inside text-sm text-gray-600">
+                      {currentLesson.assessment.formative.map((strategy, idx) => (
+                        <li key={idx}>{strategy}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Exit Ticket</p>
+                    <p className="text-sm text-gray-600">{currentLesson.assessment.exitTicket}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h5 className="text-lg font-medium text-gray-900 mb-3">Homework & Connection</h5>
+                <div className="space-y-2">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Homework</p>
+                    <p className="text-sm text-gray-600">{currentLesson.homework}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Connection to Next</p>
+                    <p className="text-sm text-gray-600">{currentLesson.connectionToNext}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Real-World Application */}
+            <div>
+              <h5 className="text-lg font-medium text-gray-900 mb-3">Real-World Application</h5>
+              <p className="text-gray-700">{currentLesson.realWorldApplication}</p>
+            </div>
+
+            {/* Differentiation */}
+            <div>
+              <h5 className="text-lg font-medium text-gray-900 mb-3">Differentiation</h5>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-700 mb-2">Supports</p>
+                  <ul className="list-disc list-inside text-sm text-gray-600 space-y-0.5">
+                    {currentLesson.differentiation.supports.map((support, idx) => (
+                      <li key={idx}>{support}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-700 mb-2">Extensions</p>
+                  <ul className="list-disc list-inside text-sm text-gray-600 space-y-0.5">
+                    {currentLesson.differentiation.extensions.map((extension, idx) => (
+                      <li key={idx}>{extension}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-700 mb-2">Accommodations</p>
+                  <ul className="list-disc list-inside text-sm text-gray-600 space-y-0.5">
+                    {currentLesson.differentiation.accommodations.map((accommodation, idx) => (
+                      <li key={idx}>{accommodation}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Update AssessmentPlanView to handle detailed strategy
+function AssessmentPlanView({ 
+  assessmentPlan, 
+  detailedStrategy 
+}: { 
+  assessmentPlan: any;
+  detailedStrategy?: any;
+}) {
+  const strategy = detailedStrategy || assessmentPlan;
+  
+  return (
+    <div className="space-y-6">
+      <h3 className="text-xl font-semibold text-gray-900 mb-6">Assessment Strategy</h3>
+      
+      {detailedStrategy && (
+        <div className="bg-blue-50 p-6 rounded-lg">
+          <h4 className="text-lg font-medium text-blue-900 mb-3">Overall Approach</h4>
+          <p className="text-blue-800">{strategy.overallApproach}</p>
+        </div>
+      )}
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h4 className="text-lg font-medium text-gray-900 mb-4">Formative Assessment</h4>
+          <p className="text-sm text-gray-600 mb-3">
+            Frequency: {strategy.formativeFrequency || 'Weekly'}
+          </p>
+          {detailedStrategy && (
+            <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+              {strategy.formativeStrategies?.map((strategy: string, idx: number) => (
+                <li key={idx}>{strategy}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+        
+        <div>
+          <h4 className="text-lg font-medium text-gray-900 mb-4">Summative Assessment</h4>
+          <div className="space-y-3">
+            {(strategy.summativeSchedule || strategy.summativeAssessments || []).map((assessment: any, idx: number) => (
+              <div key={idx} className="border border-gray-200 rounded p-3">
+                <h5 className="font-medium text-gray-900">{assessment.name || assessment.type}</h5>
+                <p className="text-sm text-gray-600">{assessment.timing || `Week ${assessment.week}`}</p>
+                {assessment.description && (
+                  <p className="text-sm text-gray-700 mt-1">{assessment.description}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      
+      {detailedStrategy && (
+        <>
+          <div>
+            <h4 className="text-lg font-medium text-gray-900 mb-4">Diagnostic Checkpoints</h4>
+            <div className="space-y-3">
+              {strategy.diagnosticCheckpoints?.map((checkpoint: any, idx: number) => (
+                <div key={idx} className="border border-gray-200 rounded p-3">
+                  <h5 className="font-medium text-gray-900">{checkpoint.timing}</h5>
+                  <p className="text-sm text-gray-600">{checkpoint.focus}</p>
+                  <p className="text-sm text-gray-700">{checkpoint.assessmentMethod}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div>
+            <h4 className="text-lg font-medium text-gray-900 mb-4">Mastery Indicators</h4>
+            <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+              {strategy.masteryIndicators?.map((indicator: string, idx: number) => (
+                <li key={idx}>{indicator}</li>
+              ))}
+            </ul>
+          </div>
+        </>
       )}
     </div>
   );

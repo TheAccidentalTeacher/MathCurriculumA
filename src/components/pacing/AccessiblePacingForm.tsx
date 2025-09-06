@@ -165,7 +165,9 @@ export function AccessiblePacingForm({
     'Mathematical practices',
     'Real-world applications',
     'Technology integration',
-    'Collaborative learning'
+    'Collaborative learning',
+    'Detailed lesson-by-lesson guide (AI-generated)',
+    'Accelerated pathway analysis'
   ];
 
   const differentiationOptions = [
@@ -502,6 +504,28 @@ export function AccessiblePacingForm({
               </label>
             ))}
           </div>
+          
+          {/* Help text for detailed lesson guide */}
+          {formData.priorities.includes('Detailed lesson-by-lesson guide (AI-generated)') && (
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h4 className="text-sm font-medium text-blue-900 mb-2">📚 Detailed Lesson-by-Lesson Guide</h4>
+              <p className="text-sm text-blue-800 mb-2">
+                When you select this option, the AI will generate comprehensive lesson plans that include:
+              </p>
+              <ul className="text-sm text-blue-800 list-disc list-inside space-y-1">
+                <li>Analysis of your choices against scope and sequence</li>
+                <li>Standards coverage mapping and prerequisite checking</li>
+                <li>Detailed lesson structure with Warm-Up, Explore, Develop, Refine phases</li>
+                <li>Learning objectives, key vocabulary, and materials for each lesson</li>
+                <li>Differentiation strategies and assessment methods</li>
+                <li>Real-world applications and connections between lessons</li>
+              </ul>
+              <p className="text-sm text-blue-800 mt-2">
+                <strong>Perfect for:</strong> Accelerated pathways, combined grade sequences (like 8th grade-Algebra I), 
+                and when you need implementable lesson plans with all pertinent information.
+              </p>
+            </div>
+          )}
         </fieldset>
 
         {/* Differentiation Needs */}

@@ -6,7 +6,8 @@ import { PacingGuideResults } from '@/components/pacing/PacingGuideResults';
 import { 
   PacingGuideRequest, 
   PacingGuideResponse, 
-  GeneratedPacingGuide 
+  GeneratedPacingGuide,
+  DetailedLessonGuide
 } from '@/lib/enhanced-ai-service';
 
 export default function PacingGeneratorPage() {
@@ -14,6 +15,7 @@ export default function PacingGeneratorPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [availableGrades, setAvailableGrades] = useState<string[]>(['6', '7', '8']);
   const [pacingGuide, setPacingGuide] = useState<GeneratedPacingGuide | null>(null);
+  const [detailedLessonGuide, setDetailedLessonGuide] = useState<DetailedLessonGuide | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [announcements, setAnnouncements] = useState<string>('');
 
@@ -67,31 +69,38 @@ export default function PacingGeneratorPage() {
         throw new Error(data.error || `HTTP error! status: ${response.status}`);
       }
 
-      if (!data.success || !data.pacingGuide) {
+      if (!data.success || (!data.pacingGuide && !data.detailedLessonGuide)) {
         console.error('❌ Generation failed:', data.error);
         throw new Error(data.error || 'Failed to generate pacing guide');
       }
 
       console.log('✅ Pacing guide generated successfully!');
-      console.log('📋 Generated guide structure details:');
-      console.log('  📖 Overview:', JSON.stringify(data.pacingGuide.overview, null, 2));
-      console.log('  📅 Weekly Schedule Count:', data.pacingGuide.weeklySchedule?.length || 0);
-      console.log('  📅 Weekly Schedule Sample (first 2 weeks):', JSON.stringify(data.pacingGuide.weeklySchedule?.slice(0, 2), null, 2));
-      console.log('  📝 Assessment Plan:', JSON.stringify(data.pacingGuide.assessmentPlan, null, 2));
-      console.log('  🎯 Differentiation Strategies Count:', data.pacingGuide.differentiationStrategies?.length || 0);
-      console.log('  ⚡ Flexibility Options Count:', data.pacingGuide.flexibilityOptions?.length || 0);
-      console.log('  📊 Standards Alignment Count:', data.pacingGuide.standardsAlignment?.length || 0);
       
-      // Check for empty content issues
-      if (!data.pacingGuide.weeklySchedule || data.pacingGuide.weeklySchedule.length === 0) {
-        console.error('🚨 CRITICAL PROBLEM: weeklySchedule is empty or undefined!');
-        console.error('🔍 This explains why 0 lessons are shown in the UI');
-        console.log('🔬 Full response for debugging:', JSON.stringify(data, null, 2));
-      } else {
-        console.log('✅ Weekly schedule contains', data.pacingGuide.weeklySchedule.length, 'weeks of content');
+      if (data.detailedLessonGuide) {
+        console.log('� Detailed lesson guide generated:');
+        console.log('  🎯 Pathway:', data.detailedLessonGuide.pathway.name);
+        console.log('  � Analysis:', Object.keys(data.detailedLessonGuide.analysisResults));
+        console.log('  � Lessons:', data.detailedLessonGuide.lessonByLessonBreakdown.length);
+        console.log('  � Progression stages:', data.detailedLessonGuide.progressionMap.length);
+        
+        setDetailedLessonGuide(data.detailedLessonGuide);
+        setPacingGuide(null);
+      } else if (data.pacingGuide) {
+        console.log('� Standard pacing guide generated:');
+        console.log('  📖 Overview:', JSON.stringify(data.pacingGuide.overview, null, 2));
+        console.log('  📅 Weekly Schedule Count:', data.pacingGuide.weeklySchedule?.length || 0);
+        console.log('  � Assessment Plan:', JSON.stringify(data.pacingGuide.assessmentPlan, null, 2));
+        
+        // Check for empty content issues
+        if (!data.pacingGuide.weeklySchedule || data.pacingGuide.weeklySchedule.length === 0) {
+          console.error('🚨 CRITICAL PROBLEM: weeklySchedule is empty or undefined!');
+        } else {
+          console.log('✅ Weekly schedule contains', data.pacingGuide.weeklySchedule.length, 'weeks of content');
+        }
+        
+        setPacingGuide(data.pacingGuide);
+        setDetailedLessonGuide(null);
       }
-
-      setPacingGuide(data.pacingGuide);
       setCurrentStep('results');
       setAnnouncements('Pacing guide generated successfully');
       
@@ -109,6 +118,7 @@ export default function PacingGeneratorPage() {
   const handleModifyRequest = useCallback(() => {
     setCurrentStep('form');
     setPacingGuide(null);
+    setDetailedLessonGuide(null);
     setError(null);
     setAnnouncements('Returned to form to modify parameters');
   }, []);
@@ -207,7 +217,7 @@ export default function PacingGeneratorPage() {
       console.error('Export error:', error);
       setAnnouncements('Export failed. Please try again.');
     }
-  }, [pacingGuide]);
+  }, [pacingGuide, detailedLessonGuide]);
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 py-8">
@@ -312,9 +322,10 @@ export default function PacingGeneratorPage() {
           />
         )}
 
-        {currentStep === 'results' && pacingGuide && (
+        {currentStep === 'results' && (pacingGuide || detailedLessonGuide) && (
           <PacingGuideResults
-            pacingGuide={pacingGuide}
+            pacingGuide={pacingGuide || undefined}
+            detailedLessonGuide={detailedLessonGuide || undefined}
             onExport={handleExport}
             onModify={handleModifyRequest}
           />

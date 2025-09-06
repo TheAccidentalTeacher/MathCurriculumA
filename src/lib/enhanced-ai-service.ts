@@ -23,8 +23,131 @@ export interface PacingGuideRequest {
 export interface PacingGuideResponse {
   success: boolean;
   pacingGuide?: GeneratedPacingGuide;
+  detailedLessonGuide?: DetailedLessonGuide;
   recommendations?: PacingRecommendation[];
   error?: string;
+}
+
+export interface DetailedLessonGuide {
+  pathway: {
+    name: string;
+    description: string;
+    targetOutcome: string;
+    duration: string;
+  };
+  analysisResults: {
+    choicesAnalyzed: any;
+    scopeAndSequenceMatch: string;
+    standardsCoverage: StandardsCoverageAnalysis;
+    prerequisiteCheck: PrerequisiteAnalysis;
+  };
+  lessonByLessonBreakdown: DetailedLesson[];
+  progressionMap: ProgressionStage[];
+  assessmentStrategy: DetailedAssessmentStrategy;
+  teachingSupport: TeachingSupport;
+}
+
+export interface DetailedLesson {
+  lessonNumber: number;
+  title: string;
+  unit: string;
+  grade: string;
+  duration: {
+    sessions: number;
+    totalMinutes: number;
+  };
+  standards: {
+    primary: string[];
+    supporting: string[];
+    mathematical_practices: string[];
+  };
+  learningObjectives: string[];
+  keyVocabulary: string[];
+  materials: string[];
+  lessonStructure: LessonPhase[];
+  differentiation: {
+    supports: string[];
+    extensions: string[];
+    accommodations: string[];
+  };
+  assessment: {
+    formative: string[];
+    summative?: string;
+    exitTicket: string;
+  };
+  homework: string;
+  connectionToNext: string;
+  realWorldApplication: string;
+}
+
+export interface LessonPhase {
+  phase: 'Warm-Up' | 'Explore' | 'Develop' | 'Refine' | 'Practice' | 'Apply';
+  timeMinutes: number;
+  description: string;
+  teacherActions: string[];
+  studentActions: string[];
+  keyQuestions: string[];
+}
+
+export interface StandardsCoverageAnalysis {
+  majorWork: string[];
+  supportingWork: string[];
+  additionalWork: string[];
+  crossGradeConnections: string[];
+  algebralReadinessIndicators: string[];
+}
+
+export interface PrerequisiteAnalysis {
+  prerequisitesRequired: string[];
+  prerequisitesMet: string[];
+  potentialGaps: string[];
+  interventionSuggestions: string[];
+}
+
+export interface ProgressionStage {
+  stage: string;
+  weeks: number[];
+  focus: string;
+  milestones: string[];
+  assessmentPoints: string[];
+}
+
+export interface DetailedAssessmentStrategy {
+  overallApproach: string;
+  formativeStrategies: string[];
+  summativeAssessments: DetailedSummativeAssessment[];
+  diagnosticCheckpoints: DiagnosticCheckpoint[];
+  portfolioElements: string[];
+  masteryIndicators: string[];
+}
+
+export interface DetailedSummativeAssessment {
+  name: string;
+  timing: string;
+  standards: string[];
+  format: string;
+  duration: string;
+  purpose: string;
+  gradingCriteria: string[];
+}
+
+export interface DiagnosticCheckpoint {
+  timing: string;
+  focus: string;
+  assessmentMethod: string;
+  interventionTriggers: string[];
+}
+
+export interface TeachingSupport {
+  pedagogicalApproach: string;
+  classroomManagement: string[];
+  parentCommunication: string[];
+  professionalDevelopment: string[];
+  resources: {
+    required: string[];
+    recommended: string[];
+    digital: string[];
+  };
 }
 
 export interface GeneratedPacingGuide {
@@ -98,6 +221,106 @@ export class EnhancedAIService {
   }
 
   async generatePacingGuide(request: PacingGuideRequest): Promise<PacingGuideResponse> {
+    console.group('🧠 [AI Service] Generating Pacing Guide');
+    console.log('📝 [AI Service] Request received:', JSON.stringify(request, null, 2));
+    
+    try {
+      // Check if this is a request for detailed lesson-by-lesson generation
+      const isDetailedRequest = request.priorities?.includes('detailed-lesson-guide') || 
+                               request.studentPopulation?.toLowerCase().includes('accelerated') ||
+                               request.gradeCombination?.pathwayType === 'accelerated';
+      
+      if (isDetailedRequest) {
+        console.log('🎯 [AI Service] Detected detailed lesson guide request');
+        return await this.generateDetailedLessonGuide(request);
+      }
+      
+      // Standard pacing guide generation (existing logic)
+      return await this.generateStandardPacingGuide(request);
+    } catch (error) {
+      console.error('💥 [AI Service] Error generating pacing guide:', error);
+      console.groupEnd();
+      
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error occurred'
+      };
+    }
+  }
+
+  async generateDetailedLessonGuide(request: PacingGuideRequest): Promise<PacingGuideResponse> {
+    console.group('📚 [AI Service] Generating Detailed Lesson Guide');
+    console.log('🎯 [AI Service] Accelerated pathway detected');
+    
+    try {
+      // Import the accelerated pathway data
+      const { ACCELERATED_PATHWAY } = await import('./accelerated-pathway');
+      console.log('📖 [AI Service] Loaded accelerated pathway data, lesson count:', ACCELERATED_PATHWAY.length);
+      
+      // Determine effective grade configuration
+      const gradeConfig = this.parseGradeConfiguration(request);
+      console.log('📊 [AI Service] Grade config:', gradeConfig);
+      
+      // Build comprehensive curriculum context
+      const contexts = await Promise.all(
+        gradeConfig.selectedGrades.map(grade => 
+          this.curriculumService.buildCurriculumContext(grade)
+        )
+      );
+      const mergedContext = this.mergeCurriculumContexts(contexts, gradeConfig);
+      
+      // Create enhanced prompt for detailed analysis
+      const detailedPrompt = this.buildDetailedLessonPrompt(request, ACCELERATED_PATHWAY, mergedContext);
+      console.log('📝 [AI Service] Built detailed prompt, length:', detailedPrompt.length);
+      
+      // Call OpenAI with GPT-4 Turbo for comprehensive analysis
+      console.log('🤖 [AI Service] Calling OpenAI API for detailed analysis...');
+      const completion = await this.openai.chat.completions.create({
+        model: "gpt-4-turbo",
+        messages: [
+          {
+            role: "system",
+            content: "You are an expert mathematics curriculum specialist and instructional designer with deep expertise in accelerated pathways, Grade 7-8 combined sequences, and Algebra I preparation. You excel at creating detailed lesson-by-lesson guides that analyze curriculum choices against scope and sequence, standards alignment, and pedagogical progression. You provide comprehensive, actionable lesson plans with all pertinent information for implementation."
+          },
+          {
+            role: "user", 
+            content: detailedPrompt
+          }
+        ],
+        temperature: 0.3, // Lower temperature for more precise analysis
+        max_tokens: 6000   // More tokens for detailed response
+      });
+      
+      const aiResponse = completion.choices[0]?.message?.content;
+      if (!aiResponse) {
+        throw new Error('No response from AI service');
+      }
+      
+      console.log('📨 [AI Service] Received detailed response, length:', aiResponse.length);
+      
+      // Parse the detailed response
+      const detailedGuide = await this.parseDetailedLessonResponse(aiResponse, request, ACCELERATED_PATHWAY);
+      
+      console.log('✅ [AI Service] Detailed lesson guide generated successfully');
+      console.groupEnd();
+      
+      return {
+        success: true,
+        detailedLessonGuide: detailedGuide
+      };
+      
+    } catch (error) {
+      console.error('💥 [AI Service] Error generating detailed lesson guide:', error);
+      console.groupEnd();
+      
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error occurred'
+      };
+    }
+  }
+
+  async generateStandardPacingGuide(request: PacingGuideRequest): Promise<PacingGuideResponse> {
     console.group('🧠 [AI Service] Generating Pacing Guide');
     console.log('📝 [AI Service] Request received:', JSON.stringify(request, null, 2));
     
@@ -671,6 +894,388 @@ Return the response in JSON format with the same structure as single-grade pacin
 
     // Fallback to original prompt for single grades
     return this.buildDetailedPrompt(context, request);
+  }
+
+  private buildDetailedLessonPrompt(request: PacingGuideRequest, acceleratedPathway: any[], context: CurriculumContext): string {
+    const choicesAnalysis = {
+      gradeLevel: request.gradeLevel,
+      gradeCombination: request.gradeCombination,
+      timeframe: request.timeframe,
+      studentPopulation: request.studentPopulation,
+      priorities: request.priorities,
+      scheduleConstraints: request.scheduleConstraints,
+      differentiationNeeds: request.differentiationNeeds
+    };
+
+    return `You are tasked with creating a comprehensive lesson-by-lesson guide for an accelerated 8th grade-Algebra I pathway. This is a sophisticated analysis that requires you to examine all user choices, compare them to the appropriate scope and sequence, analyze standards coverage, and generate detailed lesson plans.
+
+## USER CHOICES ANALYSIS
+${JSON.stringify(choicesAnalysis, null, 2)}
+
+## ACCELERATED PATHWAY CURRICULUM DATA
+The following is the complete accelerated pathway curriculum with ${acceleratedPathway.length} lessons:
+
+${acceleratedPathway.map(lesson => `
+**Lesson ${lesson.lessonNumber}: ${lesson.title}**
+- Grade: ${lesson.grade}
+- Unit: ${lesson.unit}
+- Sessions: ${lesson.sessions}
+- Standards: ${lesson.standards.join(', ')}
+- Major Work: ${lesson.isMajorWork ? 'Yes' : 'No'}
+- Description: ${lesson.description || 'Core lesson content'}
+`).join('\n')}
+
+## CURRICULUM CONTEXT
+Total Lessons Available: ${context.totalLessons}
+Major Standards Focus: ${context.majorStandards.join(', ')}
+Available Standards: ${context.availableStandards.join(', ')}
+
+Unit Structure:
+${context.unitStructure.map(unit => `
+- ${unit.unitTitle}: ${unit.lessonCount} lessons
+  Standards: ${unit.standards.join(', ')}
+  Focus Distribution: Major(${unit.focusDistribution.major}%), Supporting(${unit.focusDistribution.supporting}%), Additional(${unit.focusDistribution.additional}%)
+`).join('')}
+
+## ANALYSIS REQUIREMENTS
+
+1. **Analyze User Choices**: Examine the grade combination, timeframe, student population, and priorities to understand the specific pathway needs.
+
+2. **Scope and Sequence Validation**: Compare the user's choices against the accelerated pathway structure to ensure pedagogical soundness and appropriate progression.
+
+3. **Standards Coverage Analysis**: Map all lessons to standards and identify:
+   - Major work vs. supporting/additional work
+   - Cross-grade connections  
+   - Algebra I readiness indicators
+   - Prerequisite checking
+
+4. **Generate Detailed Lesson Plans**: For each lesson in the accelerated pathway, create comprehensive lesson plans including:
+   - Learning objectives
+   - Key vocabulary
+   - Lesson structure (Warm-Up, Explore, Develop, Refine phases)
+   - Differentiation strategies
+   - Assessment methods
+   - Real-world applications
+
+## OUTPUT FORMAT
+
+Please provide a detailed JSON response with the following structure:
+
+{
+  "pathway": {
+    "name": "Accelerated 8th Grade to Algebra I Pathway",
+    "description": "Description of the pathway approach",
+    "targetOutcome": "Students prepared for Algebra II or Geometry",
+    "duration": "Academic year timeframe"
+  },
+  "analysisResults": {
+    "choicesAnalyzed": ${JSON.stringify(choicesAnalysis)},
+    "scopeAndSequenceMatch": "Detailed analysis of how choices align with accelerated pathway",
+    "standardsCoverage": {
+      "majorWork": ["List of major work standards"],
+      "supportingWork": ["List of supporting standards"],
+      "additionalWork": ["List of additional standards"],
+      "crossGradeConnections": ["Connections between grades"],
+      "algebraReadinessIndicators": ["Key indicators for Algebra readiness"]
+    },
+    "prerequisiteCheck": {
+      "prerequisitesRequired": ["Required prerequisite skills"],
+      "prerequisitesMet": ["Prerequisites met by this pathway"],
+      "potentialGaps": ["Potential learning gaps"],
+      "interventionSuggestions": ["Suggested interventions"]
+    }
+  },
+  "lessonByLessonBreakdown": [
+    {
+      "lessonNumber": 1,
+      "title": "Lesson title from accelerated pathway",
+      "unit": "Unit name",
+      "grade": "7 or 8",
+      "duration": {
+        "sessions": 2,
+        "totalMinutes": 90
+      },
+      "standards": {
+        "primary": ["Primary standards"],
+        "supporting": ["Supporting standards"],
+        "mathematical_practices": ["Relevant mathematical practices"]
+      },
+      "learningObjectives": ["Specific, measurable objectives"],
+      "keyVocabulary": ["Essential vocabulary terms"],
+      "materials": ["Required materials and resources"],
+      "lessonStructure": [
+        {
+          "phase": "Warm-Up",
+          "timeMinutes": 10,
+          "description": "Detailed phase description",
+          "teacherActions": ["Specific teacher actions"],
+          "studentActions": ["Expected student actions"],
+          "keyQuestions": ["Essential questions for this phase"]
+        }
+      ],
+      "differentiation": {
+        "supports": ["Support strategies for struggling learners"],
+        "extensions": ["Extension activities for advanced learners"],
+        "accommodations": ["Specific accommodations"]
+      },
+      "assessment": {
+        "formative": ["Formative assessment strategies"],
+        "summative": "Summative assessment if applicable",
+        "exitTicket": "Exit ticket question"
+      },
+      "homework": "Homework assignment description",
+      "connectionToNext": "How this lesson connects to the next",
+      "realWorldApplication": "Real-world application or context"
+    }
+  ],
+  "progressionMap": [
+    {
+      "stage": "Foundation Building",
+      "weeks": [1, 2, 3],
+      "focus": "Core concepts establishment",
+      "milestones": ["Key milestones"],
+      "assessmentPoints": ["Assessment timing"]
+    }
+  ],
+  "assessmentStrategy": {
+    "overallApproach": "Comprehensive assessment philosophy",
+    "formativeStrategies": ["Daily formative strategies"],
+    "summativeAssessments": [
+      {
+        "name": "Assessment name",
+        "timing": "When administered",
+        "standards": ["Standards assessed"],
+        "format": "Assessment format",
+        "duration": "Time required",
+        "purpose": "Assessment purpose",
+        "gradingCriteria": ["Grading criteria"]
+      }
+    ],
+    "diagnosticCheckpoints": [
+      {
+        "timing": "When administered",
+        "focus": "Focus area",
+        "assessmentMethod": "Method used",
+        "interventionTriggers": ["When to intervene"]
+      }
+    ],
+    "portfolioElements": ["Portfolio components"],
+    "masteryIndicators": ["How to measure mastery"]
+  },
+  "teachingSupport": {
+    "pedagogicalApproach": "Overall teaching philosophy",
+    "classroomManagement": ["Management strategies"],
+    "parentCommunication": ["Communication strategies"],
+    "professionalDevelopment": ["PD recommendations"],
+    "resources": {
+      "required": ["Essential resources"],
+      "recommended": ["Recommended resources"],
+      "digital": ["Digital tools and platforms"]
+    }
+  }
+}
+
+## SPECIAL FOCUS AREAS
+
+Since this is specifically for accelerated 8th grade students preparing for Algebra II or Geometry:
+
+1. Emphasize algebraic thinking and linear relationships
+2. Ensure strong foundation in coordinate geometry
+3. Build robust understanding of functions
+4. Develop facility with systems of equations
+5. Strengthen proportional reasoning
+6. Prepare for polynomial operations through exponent work
+
+Generate a comprehensive, implementable guide that teachers can use immediately to deliver this accelerated pathway effectively.`;
+  }
+
+  private async parseDetailedLessonResponse(aiResponse: string, request: PacingGuideRequest, acceleratedPathway: any[]): Promise<DetailedLessonGuide> {
+    try {
+      console.log('🔍 [AI Service] Parsing detailed lesson response...');
+      
+      // Extract JSON from AI response
+      let parsedResponse: any = null;
+      
+      const jsonBlockMatch = aiResponse.match(/```json\s*([\s\S]*?)\s*```/);
+      if (jsonBlockMatch) {
+        parsedResponse = JSON.parse(jsonBlockMatch[1]);
+      } else {
+        const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          parsedResponse = JSON.parse(jsonMatch[0]);
+        } else {
+          parsedResponse = JSON.parse(aiResponse);
+        }
+      }
+      
+      console.log('📊 [AI Service] Parsed detailed response structure:', Object.keys(parsedResponse || {}));
+      
+      // Structure the detailed lesson guide
+      const detailedGuide: DetailedLessonGuide = {
+        pathway: parsedResponse.pathway || {
+          name: "Accelerated 8th Grade to Algebra I Pathway",
+          description: "Comprehensive accelerated pathway combining Grade 7-8 content to prepare students for advanced mathematics",
+          targetOutcome: "Students prepared for Algebra II or Geometry",
+          duration: request.timeframe
+        },
+        analysisResults: parsedResponse.analysisResults || {
+          choicesAnalyzed: {
+            gradeLevel: request.gradeLevel,
+            gradeCombination: request.gradeCombination,
+            timeframe: request.timeframe,
+            studentPopulation: request.studentPopulation,
+            priorities: request.priorities
+          },
+          scopeAndSequenceMatch: "Analysis pending",
+          standardsCoverage: {
+            majorWork: [],
+            supportingWork: [],
+            additionalWork: [],
+            crossGradeConnections: [],
+            algebraReadinessIndicators: []
+          },
+          prerequisiteCheck: {
+            prerequisitesRequired: [],
+            prerequisitesMet: [],
+            potentialGaps: [],
+            interventionSuggestions: []
+          }
+        },
+        lessonByLessonBreakdown: parsedResponse.lessonByLessonBreakdown || acceleratedPathway.map((lesson, index) => ({
+          lessonNumber: lesson.lessonNumber || index + 1,
+          title: lesson.title,
+          unit: lesson.unit,
+          grade: lesson.grade,
+          duration: {
+            sessions: lesson.sessions || 2,
+            totalMinutes: (lesson.sessions || 2) * 45
+          },
+          standards: {
+            primary: lesson.standards || [],
+            supporting: [],
+            mathematical_practices: []
+          },
+          learningObjectives: [
+            `Students will understand ${lesson.title.toLowerCase()}`,
+            `Students will apply concepts in real-world contexts`
+          ],
+          keyVocabulary: [],
+          materials: ["Student textbook", "Interactive whiteboard", "Manipulatives"],
+          lessonStructure: [
+            {
+              phase: "Warm-Up",
+              timeMinutes: 10,
+              description: "Review prior knowledge and prepare for new learning",
+              teacherActions: ["Present warm-up problem", "Facilitate discussion"],
+              studentActions: ["Complete warm-up", "Share thinking"],
+              keyQuestions: ["What do you remember about...?"]
+            },
+            {
+              phase: "Explore",
+              timeMinutes: 15,
+              description: "Initial exploration of new concept",
+              teacherActions: ["Present exploration task", "Observe student work"],
+              studentActions: ["Work on exploration", "Discuss findings"],
+              keyQuestions: ["What patterns do you notice?"]
+            },
+            {
+              phase: "Develop",
+              timeMinutes: 15,
+              description: "Formalize the mathematical concept",
+              teacherActions: ["Facilitate concept development", "Connect to prior learning"],
+              studentActions: ["Participate in discussion", "Take notes"],
+              keyQuestions: ["How does this connect to what we know?"]
+            },
+            {
+              phase: "Refine",
+              timeMinutes: 5,
+              description: "Clarify and consolidate understanding",
+              teacherActions: ["Address misconceptions", "Summarize key points"],
+              studentActions: ["Ask questions", "Reflect on learning"],
+              keyQuestions: ["What is the most important thing to remember?"]
+            }
+          ],
+          differentiation: {
+            supports: ["Visual aids", "Peer support", "Modified problems"],
+            extensions: ["Challenge problems", "Mathematical connections"],
+            accommodations: ["Extended time", "Alternative formats"]
+          },
+          assessment: {
+            formative: ["Exit ticket", "Observation", "Quick check"],
+            exitTicket: "Write one thing you learned and one question you have"
+          },
+          homework: "Practice problems from textbook",
+          connectionToNext: `This lesson prepares students for the next lesson on ${acceleratedPathway[index + 1]?.title || 'advanced concepts'}`,
+          realWorldApplication: "Real-world application will be determined based on lesson content"
+        })),
+        progressionMap: parsedResponse.progressionMap || [
+          {
+            stage: "Foundation Building",
+            weeks: [1, 2, 3, 4, 5, 6],
+            focus: "Core concepts and number sense",
+            milestones: ["Master rational number operations", "Understand proportional relationships"],
+            assessmentPoints: ["Week 3: Formative check", "Week 6: Unit assessment"]
+          },
+          {
+            stage: "Algebraic Thinking",
+            weeks: [7, 8, 9, 10, 11, 12],
+            focus: "Expressions, equations, and linear relationships",
+            milestones: ["Solve linear equations", "Graph linear functions"],
+            assessmentPoints: ["Week 9: Mid-unit check", "Week 12: Unit assessment"]
+          },
+          {
+            stage: "Advanced Applications",
+            weeks: [13, 14, 15, 16, 17, 18],
+            focus: "Systems, functions, and coordinate geometry",
+            milestones: ["Solve systems of equations", "Analyze functions"],
+            assessmentPoints: ["Week 15: Progress check", "Week 18: Comprehensive assessment"]
+          }
+        ],
+        assessmentStrategy: parsedResponse.assessmentStrategy || {
+          overallApproach: "Balanced formative and summative assessment with emphasis on mathematical practices",
+          formativeStrategies: ["Daily exit tickets", "Think-pair-share", "Observation protocols"],
+          summativeAssessments: [
+            {
+              name: "Unit 1 Assessment: Number Sense and Proportional Relationships",
+              timing: "Week 6",
+              standards: ["7.RP", "7.NS"],
+              format: "Mixed format with multiple choice and constructed response",
+              duration: "50 minutes",
+              purpose: "Measure understanding of foundational concepts",
+              gradingCriteria: ["Accuracy", "Mathematical reasoning", "Communication"]
+            }
+          ],
+          diagnosticCheckpoints: [
+            {
+              timing: "Week 1",
+              focus: "Prerequisite skills",
+              assessmentMethod: "Diagnostic pre-assessment",
+              interventionTriggers: ["Score below 70%", "Gaps in foundational skills"]
+            }
+          ],
+          portfolioElements: ["Problem-solving reflections", "Mathematical connections", "Growth documentation"],
+          masteryIndicators: ["Consistent accuracy", "Flexible thinking", "Clear communication"]
+        },
+        teachingSupport: parsedResponse.teachingSupport || {
+          pedagogicalApproach: "Constructivist approach with emphasis on mathematical discourse and real-world connections",
+          classroomManagement: ["Clear expectations", "Collaborative grouping", "Mathematical talk protocols"],
+          parentCommunication: ["Weekly progress updates", "Home support suggestions", "Conference opportunities"],
+          professionalDevelopment: ["Mathematical practices workshop", "Differentiation strategies", "Assessment design"],
+          resources: {
+            required: ["Student textbooks", "Teacher edition", "Manipulatives", "Graphing technology"],
+            recommended: ["Online practice platform", "Mathematical modeling tasks", "Assessment bank"],
+            digital: ["Desmos graphing calculator", "Khan Academy", "IXL Math"]
+          }
+        }
+      };
+      
+      console.log('✅ [AI Service] Detailed lesson guide structured successfully');
+      return detailedGuide;
+      
+    } catch (error) {
+      console.error('❌ [AI Service] Error parsing detailed response:', error);
+      throw new Error(`Failed to parse detailed lesson response: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   async disconnect() {
