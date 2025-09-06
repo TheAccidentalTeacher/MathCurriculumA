@@ -105,16 +105,29 @@ const GRADE_DATA: Grade[] = [
         number: 1,
         title: "Ratio and Proportional Relationships",
         description: "Scale, unit rates, and proportional reasoning",
-        totalLessons: 6,
-        estimatedDays: 18,
-        majorWorkCount: 6,
+        totalLessons: 19,
+        estimatedDays: 38,
+        majorWorkCount: 19,
         lessons: [
-          { number: 1, title: "Solve Problems Involving Scale", sessions: 4, startPage: 15, endPage: 42, isMajorWork: true },
-          { number: 2, title: "Find Unit Rates Involving Ratios of Fractions", sessions: 2, startPage: 43, endPage: 58, isMajorWork: true },
-          { number: 3, title: "Understand Proportional Relationships", sessions: 2, startPage: 59, endPage: 70, isMajorWork: true },
-          { number: 4, title: "Represent Proportional Relationships", sessions: 3, startPage: 71, endPage: 92, isMajorWork: true },
-          { number: 5, title: "Solve Proportional Relationship Problems", sessions: 2, startPage: 93, endPage: 108, isMajorWork: true },
-          { number: 6, title: "Solve Area and Circumference Problems Involving Circles", sessions: 3, startPage: 109, endPage: 148, isMajorWork: true }
+          { number: 1, title: "Solve Problems Involving Scale", sessions: 1, startPage: 17, endPage: 20, isMajorWork: true },
+          { number: 2, title: "Solve Problems Involving Scale - Using Scale to Find Distances", sessions: 1, startPage: 21, endPage: 21, isMajorWork: true },
+          { number: 3, title: "Solve Problems Involving Scale - Explore different ways", sessions: 1, startPage: 22, endPage: 26, isMajorWork: true },
+          { number: 4, title: "Solve Problems Involving Scale - Blueprint problem", sessions: 1, startPage: 27, endPage: 32, isMajorWork: true },
+          { number: 5, title: "Solve Problems Involving Scale - Architect drawing", sessions: 1, startPage: 33, endPage: 33, isMajorWork: true },
+          { number: 6, title: "Solve Problems Involving Scale - Different scale drawing", sessions: 1, startPage: 34, endPage: 44, isMajorWork: true },
+          { number: 7, title: "Find Unit Rates Involving Ratios of Fractions", sessions: 1, startPage: 45, endPage: 48, isMajorWork: true },
+          { number: 8, title: "Find Unit Rates - Solving Problems with Two Fractions", sessions: 1, startPage: 49, endPage: 49, isMajorWork: true },
+          { number: 9, title: "Find Unit Rates Involving Ratios of Fractions", sessions: 3, startPage: 50, endPage: 60, isMajorWork: true },
+          { number: 10, title: "Understand Proportional Relationships", sessions: 1, startPage: 61, endPage: 64, isMajorWork: true },
+          { number: 11, title: "Understand Proportional Relationships - Develop Understanding", sessions: 3, startPage: 65, endPage: 72, isMajorWork: true },
+          { number: 12, title: "Represent Proportional Relationships", sessions: 1, startPage: 73, endPage: 76, isMajorWork: true },
+          { number: 13, title: "Represent Proportional Relationships - Interpreting Graphs", sessions: 1, startPage: 77, endPage: 77, isMajorWork: true },
+          { number: 14, title: "Represent Proportional Relationships", sessions: 2, startPage: 78, endPage: 82, isMajorWork: true },
+          { number: 15, title: "Represent Proportional Relationships - Recognizing Graphs", sessions: 1, startPage: 83, endPage: 83, isMajorWork: true },
+          { number: 16, title: "Represent Proportional Relationships", sessions: 4, startPage: 84, endPage: 94, isMajorWork: true },
+          { number: 17, title: "Solve Proportional Relationship Problems", sessions: 1, startPage: 95, endPage: 98, isMajorWork: true },
+          { number: 18, title: "Solve Proportional Relationship Problems - Francisca and Elizabeth", sessions: 1, startPage: 99, endPage: 99, isMajorWork: true },
+          { number: 19, title: "Solve Proportional Relationship Problems - Explore different ways", sessions: 3, startPage: 100, endPage: 110, isMajorWork: true }
         ]
       }
     ],
@@ -145,18 +158,27 @@ const GRADE_DATA: Grade[] = [
     volume1: [
       {
         number: 1,
-        title: "Rigid Transformations and Congruence",
+        title: "Rigid Transformations and Congruence", 
         description: "Transformations, rotations, reflections, and translations",
-        totalLessons: 6,
-        estimatedDays: 18,
-        majorWorkCount: 4,
+        totalLessons: 15,
+        estimatedDays: 30,
+        majorWorkCount: 12,
         lessons: [
-          { number: 1, title: "Understand Translations", sessions: 3, startPage: 15, endPage: 32, isMajorWork: false },
-          { number: 2, title: "Understand Reflections", sessions: 3, startPage: 33, endPage: 50, isMajorWork: false },
-          { number: 3, title: "Understand Rotations", sessions: 3, startPage: 51, endPage: 68, isMajorWork: false },
-          { number: 4, title: "Understand Congruent Figures", sessions: 3, startPage: 69, endPage: 86, isMajorWork: false },
-          { number: 5, title: "Describe Sequences of Transformations", sessions: 3, startPage: 87, endPage: 104, isMajorWork: false },
-          { number: 6, title: "Understand Similarity", sessions: 3, startPage: 105, endPage: 148, isMajorWork: false }
+          { number: 1, title: "Understand Rigid Transformations and Their Properties", sessions: 1, startPage: 17, endPage: 20, isMajorWork: true },
+          { number: 2, title: "Understand Rigid Transformations - Develop Understanding", sessions: 3, startPage: 21, endPage: 28, isMajorWork: true },
+          { number: 3, title: "Work with Single Rigid Transformations in the Coordinate Plane", sessions: 1, startPage: 29, endPage: 32, isMajorWork: true },
+          { number: 4, title: "Single Rigid Transformations - Performing a Reflection", sessions: 1, startPage: 33, endPage: 33, isMajorWork: true },
+          { number: 5, title: "Work with Single Rigid Transformations", sessions: 2, startPage: 34, endPage: 38, isMajorWork: true },
+          { number: 6, title: "Work with Single Rigid Transformations", sessions: 3, startPage: 39, endPage: 39, isMajorWork: true },
+          { number: 7, title: "Work with Single Rigid Transformations", sessions: 3, startPage: 40, endPage: 44, isMajorWork: true },
+          { number: 8, title: "Work with Single Rigid Transformations", sessions: 4, startPage: 45, endPage: 45, isMajorWork: true },
+          { number: 9, title: "Work with Single Rigid Transformations", sessions: 5, startPage: 46, endPage: 56, isMajorWork: true },
+          { number: 10, title: "Work with Sequences of Transformations and Congruence", sessions: 1, startPage: 57, endPage: 60, isMajorWork: true },
+          { number: 11, title: "Sequences of Transformations and Congruence", sessions: 2, startPage: 61, endPage: 61, isMajorWork: true },
+          { number: 12, title: "Sequences of Transformations and Congruence", sessions: 2, startPage: 62, endPage: 66, isMajorWork: true },
+          { number: 13, title: "Sequences of Transformations - Edita and her brother game", sessions: 1, startPage: 67, endPage: 67, isMajorWork: false },
+          { number: 14, title: "Work with Sequences of Transformations and Congruence", sessions: 4, startPage: 68, endPage: 96, isMajorWork: true },
+          { number: 15, title: "Understand Dilations and Similarity", sessions: 1, startPage: 97, endPage: 100, isMajorWork: false }
         ]
       }
     ],
@@ -240,9 +262,9 @@ const GRADE_DATA: Grade[] = [
 ];
 
 export function LessonNavigationGrid() {
-  const [expandedGrades, setExpandedGrades] = useState<Set<number>>(new Set([6]));
-  const [expandedVolumes, setExpandedVolumes] = useState<Set<string>>(new Set());
-  const [expandedUnits, setExpandedUnits] = useState<Set<string>>(new Set());
+  const [expandedGrades, setExpandedGrades] = useState<Set<number>>(new Set([6, 7, 8]));
+  const [expandedVolumes, setExpandedVolumes] = useState<Set<string>>(new Set(['grade6-v1', 'grade7-v1', 'grade8-v1']));
+  const [expandedUnits, setExpandedUnits] = useState<Set<string>>(new Set(['grade6-v1-unit1', 'grade7-v1-unit1', 'grade8-v1-unit1']));
 
   const toggleGrade = (grade: number) => {
     const newExpanded = new Set(expandedGrades);
@@ -288,7 +310,7 @@ export function LessonNavigationGrid() {
   return (
     <div className="space-y-6">
       {GRADE_DATA.map((grade) => (
-        <div key={grade.level} className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+        <div key={grade.level} className="bg-gradient-to-r from-purple-900 to-indigo-900 rounded-xl p-6 border border-purple-300/30 shadow-lg">
           {/* Grade Header */}
           <button
             onClick={() => toggleGrade(grade.level)}
@@ -296,15 +318,15 @@ export function LessonNavigationGrid() {
           >
             <div className="flex items-center space-x-4">
               {expandedGrades.has(grade.level) ? (
-                <span className="text-white text-xl">▼</span>
+                <span className="text-yellow-300 text-xl font-bold">▼</span>
               ) : (
-                <span className="text-white text-xl">▶</span>
+                <span className="text-yellow-300 text-xl font-bold">▶</span>
               )}
               <div>
-                <h2 className="text-2xl font-bold text-white group-hover:text-purple-200 transition-colors">
+                <h2 className="text-2xl font-bold text-white group-hover:text-yellow-200 transition-colors">
                   {grade.title}
                 </h2>
-                <p className="text-purple-200">
+                <p className="text-gray-200 font-medium">
                   {grade.volume1.reduce((sum, unit) => sum + unit.totalLessons, 0) + 
                    grade.volume2.reduce((sum, unit) => sum + unit.totalLessons, 0)} lessons total
                 </p>
@@ -319,14 +341,14 @@ export function LessonNavigationGrid() {
               <div className="ml-4">
                 <button
                   onClick={() => toggleVolume(`grade${grade.level}-v1`)}
-                  className="flex items-center space-x-3 text-left group mb-3"
+                  className="flex items-center space-x-3 text-left group mb-3 p-2 rounded-lg hover:bg-white/10 transition-colors"
                 >
                   {expandedVolumes.has(`grade${grade.level}-v1`) ? (
-                    <span className="text-purple-200">▼</span>
+                    <span className="text-blue-300 font-bold">▼</span>
                   ) : (
-                    <span className="text-purple-200">▶</span>
+                    <span className="text-blue-300 font-bold">▶</span>
                   )}
-                  <h3 className="text-xl font-semibold text-white group-hover:text-purple-200">
+                  <h3 className="text-xl font-semibold text-white group-hover:text-blue-200">
                     Volume 1
                   </h3>
                 </button>
@@ -334,23 +356,23 @@ export function LessonNavigationGrid() {
                 {expandedVolumes.has(`grade${grade.level}-v1`) && (
                   <div className="ml-8 space-y-3">
                     {grade.volume1.map((unit) => (
-                      <div key={unit.number} className="border border-white/10 rounded-lg p-4 bg-white/5">
+                      <div key={unit.number} className="border border-purple-400/30 rounded-lg p-4 bg-gradient-to-r from-purple-800/50 to-indigo-800/50">
                         <button
                           onClick={() => toggleUnit(`grade${grade.level}-v1-unit${unit.number}`)}
-                          className="w-full flex items-center justify-between text-left group"
+                          className="w-full flex items-center justify-between text-left group p-2 rounded hover:bg-white/10 transition-colors"
                         >
                           <div className="flex items-center space-x-3">
                             {expandedUnits.has(`grade${grade.level}-v1-unit${unit.number}`) ? (
-                              <span className="text-purple-300">▼</span>
+                              <span className="text-green-300 font-bold">▼</span>
                             ) : (
-                              <span className="text-purple-300">▶</span>
+                              <span className="text-green-300 font-bold">▶</span>
                             )}
                             <div>
-                              <h4 className="font-semibold text-white group-hover:text-purple-200">
+                              <h4 className="font-semibold text-white group-hover:text-green-200">
                                 Unit {unit.number}: {unit.title}
                               </h4>
-                              <p className="text-sm text-purple-300">{unit.description}</p>
-                              <p className="text-xs text-purple-400">
+                              <p className="text-sm text-gray-200">{unit.description}</p>
+                              <p className="text-xs text-gray-300 font-medium">
                                 {unit.totalLessons} lessons • {unit.estimatedDays} days estimated • {unit.majorWorkCount} major work
                               </p>
                             </div>
@@ -360,40 +382,40 @@ export function LessonNavigationGrid() {
                         {expandedUnits.has(`grade${grade.level}-v1-unit${unit.number}`) && (
                           <div className="mt-4 space-y-2">
                             {unit.lessons.map((lesson) => (
-                              <div key={lesson.number} className="flex items-center justify-between bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors group">
+                              <div key={lesson.number} className="flex items-center justify-between bg-gradient-to-r from-gray-800/80 to-gray-700/80 rounded-lg p-3 hover:from-gray-700/80 hover:to-gray-600/80 transition-all duration-200 group border border-gray-600/40">
                                 <div className="flex items-center space-x-4">
                                   <div className="flex-shrink-0">
-                                    <span className="inline-flex items-center justify-center w-8 h-8 bg-purple-600 text-white text-sm font-bold rounded-full">
+                                    <span className="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-bold rounded-full">
                                       {lesson.number}
                                     </span>
                                   </div>
                                   <div className="flex items-center space-x-3">
-                                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                                      grade.level === 6 ? 'bg-blue-500/20 text-blue-300' :
-                                      grade.level === 7 ? 'bg-green-500/20 text-green-300' :
-                                      grade.level === 8 ? 'bg-orange-500/20 text-orange-300' :
-                                      'bg-red-500/20 text-red-300'
+                                    <span className={`text-xs px-2 py-1 rounded-full font-bold ${
+                                      grade.level === 6 ? 'bg-blue-600/80 text-blue-100' :
+                                      grade.level === 7 ? 'bg-green-600/80 text-green-100' :
+                                      grade.level === 8 ? 'bg-orange-600/80 text-orange-100' :
+                                      'bg-red-600/80 text-red-100'
                                     }`}>
                                       G{grade.level}
                                     </span>
                                     {lesson.isMajorWork && (
-                                      <span className="text-xs px-2 py-1 bg-yellow-500/20 text-yellow-300 rounded-full font-medium">
+                                      <span className="text-xs px-2 py-1 bg-yellow-600/80 text-yellow-100 rounded-full font-bold">
                                         MW
                                       </span>
                                     )}
                                   </div>
                                   <div>
-                                    <h5 className="font-medium text-white group-hover:text-purple-200">
+                                    <h5 className="font-medium text-white group-hover:text-blue-200">
                                       {lesson.title}
                                     </h5>
-                                    <p className="text-xs text-purple-400">
+                                    <p className="text-xs text-gray-300 font-medium">
                                       G{grade.level} U{unit.number} L{lesson.number} • {lesson.sessions} sessions • Pages {lesson.startPage}-{lesson.endPage}
                                     </p>
                                   </div>
                                 </div>
                                 <Link
                                   href={getLessonViewerUrl(grade.level, 1, lesson.number, lesson.startPage)}
-                                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors"
+                                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-sm font-bold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
                                 >
                                   View →
                                 </Link>
@@ -411,14 +433,14 @@ export function LessonNavigationGrid() {
               <div className="ml-4">
                 <button
                   onClick={() => toggleVolume(`grade${grade.level}-v2`)}
-                  className="flex items-center space-x-3 text-left group mb-3"
+                  className="flex items-center space-x-3 text-left group mb-3 p-2 rounded-lg hover:bg-white/10 transition-colors"
                 >
                   {expandedVolumes.has(`grade${grade.level}-v2`) ? (
-                    <span className="text-purple-200">▼</span>
+                    <span className="text-blue-300 font-bold">▼</span>
                   ) : (
-                    <span className="text-purple-200">▶</span>
+                    <span className="text-blue-300 font-bold">▶</span>
                   )}
-                  <h3 className="text-xl font-semibold text-white group-hover:text-purple-200">
+                  <h3 className="text-xl font-semibold text-white group-hover:text-blue-200">
                     Volume 2
                   </h3>
                 </button>
@@ -426,23 +448,23 @@ export function LessonNavigationGrid() {
                 {expandedVolumes.has(`grade${grade.level}-v2`) && (
                   <div className="ml-8 space-y-3">
                     {grade.volume2.map((unit) => (
-                      <div key={unit.number} className="border border-white/10 rounded-lg p-4 bg-white/5">
+                      <div key={unit.number} className="border border-purple-400/30 rounded-lg p-4 bg-gradient-to-r from-purple-800/50 to-indigo-800/50">
                         <button
                           onClick={() => toggleUnit(`grade${grade.level}-v2-unit${unit.number}`)}
-                          className="w-full flex items-center justify-between text-left group"
+                          className="w-full flex items-center justify-between text-left group p-2 rounded hover:bg-white/10 transition-colors"
                         >
                           <div className="flex items-center space-x-3">
                             {expandedUnits.has(`grade${grade.level}-v2-unit${unit.number}`) ? (
-                              <span className="text-purple-300">▼</span>
+                              <span className="text-green-300 font-bold">▼</span>
                             ) : (
-                              <span className="text-purple-300">▶</span>
+                              <span className="text-green-300 font-bold">▶</span>
                             )}
                             <div>
-                              <h4 className="font-semibold text-white group-hover:text-purple-200">
+                              <h4 className="font-semibold text-white group-hover:text-green-200">
                                 Unit {unit.number}: {unit.title}
                               </h4>
-                              <p className="text-sm text-purple-300">{unit.description}</p>
-                              <p className="text-xs text-purple-400">
+                              <p className="text-sm text-gray-200">{unit.description}</p>
+                              <p className="text-xs text-gray-300 font-medium">
                                 {unit.totalLessons} lessons • {unit.estimatedDays} days estimated • {unit.majorWorkCount} major work
                               </p>
                             </div>
@@ -452,40 +474,40 @@ export function LessonNavigationGrid() {
                         {expandedUnits.has(`grade${grade.level}-v2-unit${unit.number}`) && (
                           <div className="mt-4 space-y-2">
                             {unit.lessons.map((lesson) => (
-                              <div key={lesson.number} className="flex items-center justify-between bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors group">
+                              <div key={lesson.number} className="flex items-center justify-between bg-gradient-to-r from-gray-800/80 to-gray-700/80 rounded-lg p-3 hover:from-gray-700/80 hover:to-gray-600/80 transition-all duration-200 group border border-gray-600/40">
                                 <div className="flex items-center space-x-4">
                                   <div className="flex-shrink-0">
-                                    <span className="inline-flex items-center justify-center w-8 h-8 bg-purple-600 text-white text-sm font-bold rounded-full">
+                                    <span className="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-bold rounded-full">
                                       {lesson.number}
                                     </span>
                                   </div>
                                   <div className="flex items-center space-x-3">
-                                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                                      grade.level === 6 ? 'bg-blue-500/20 text-blue-300' :
-                                      grade.level === 7 ? 'bg-green-500/20 text-green-300' :
-                                      grade.level === 8 ? 'bg-orange-500/20 text-orange-300' :
-                                      'bg-red-500/20 text-red-300'
+                                    <span className={`text-xs px-2 py-1 rounded-full font-bold ${
+                                      grade.level === 6 ? 'bg-blue-600/80 text-blue-100' :
+                                      grade.level === 7 ? 'bg-green-600/80 text-green-100' :
+                                      grade.level === 8 ? 'bg-orange-600/80 text-orange-100' :
+                                      'bg-red-600/80 text-red-100'
                                     }`}>
                                       G{grade.level}
                                     </span>
                                     {lesson.isMajorWork && (
-                                      <span className="text-xs px-2 py-1 bg-yellow-500/20 text-yellow-300 rounded-full font-medium">
+                                      <span className="text-xs px-2 py-1 bg-yellow-600/80 text-yellow-100 rounded-full font-bold">
                                         MW
                                       </span>
                                     )}
                                   </div>
                                   <div>
-                                    <h5 className="font-medium text-white group-hover:text-purple-200">
+                                    <h5 className="font-medium text-white group-hover:text-blue-200">
                                       {lesson.title}
                                     </h5>
-                                    <p className="text-xs text-purple-400">
+                                    <p className="text-xs text-gray-300 font-medium">
                                       G{grade.level} U{unit.number} L{lesson.number} • {lesson.sessions} sessions • Pages {lesson.startPage}-{lesson.endPage}
                                     </p>
                                   </div>
                                 </div>
                                 <Link
                                   href={getLessonViewerUrl(grade.level, 2, lesson.number, lesson.startPage)}
-                                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors"
+                                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-sm font-bold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
                                 >
                                   View →
                                 </Link>
