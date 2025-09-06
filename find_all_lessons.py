@@ -15,18 +15,38 @@ def find_lesson_boundaries(volume_path, volume_name):
     with open(document_path, 'r', encoding='utf-8') as f:
         document = json.load(f)
     
-    total_pages = document['total_pages']
+    # Handle different document structures
+    if 'metadata' in document:
+        total_pages = document['metadata']['total_pages']
+    else:
+        total_pages = document['total_pages']
+        
     print(f"\n📚 ======= {volume_name} =======")
     print(f"📄 Total pages: {total_pages}")
     
     lessons = {}
     lesson_starts = {}
     
-    # Find all lesson start pages (pages with "Dear Family")
+    # Find all lesson start pages
     for page in document['pages']:
-        text_preview = page.get('text_preview', '')
+        # For Grade 6: Look for table of contents patterns
+        if 'lesson_indicators' in page and page['lesson_indicators']:
+            for indicator in page['lesson_indicators']:
+                # Pattern: "LESSON 3  Use Nets to Find Surface Area   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 41"
+                match = re.search(r'LESSON\s+(\d+)\s+(.*?)\s+\.+\s+(\d+)', indicator)
+                if match:
+                    lesson_num = int(match.group(1))
+                    title = match.group(2).strip()
+                    textbook_page = int(match.group(3))
+                    
+                    lessons[lesson_num] = {
+                        'textbook_page': textbook_page,
+                        'title': title,
+                        'source': 'table_of_contents'
+                    }
         
-        # Look for lesson start pattern
+        # For Grades 7-8: Look for lesson start pattern ("Dear Family")
+        text_preview = page.get('text_preview', '')
         match = re.search(r'LESSON\s+(\d+)\s+.*?Dear Family', text_preview, re.IGNORECASE)
         if match:
             lesson_num = int(match.group(1))
@@ -38,7 +58,8 @@ def find_lesson_boundaries(volume_path, volume_name):
                 title = title_match.group(1).strip()
                 lessons[lesson_num] = {
                     'start': page['page_number'],
-                    'title': title
+                    'title': title,
+                    'source': 'dear_family'
                 }
     
     # Calculate end pages based on next lesson starts
@@ -64,6 +85,8 @@ def generate_typescript_boundaries():
     """Generate TypeScript boundaries for all volumes"""
     
     volumes = {
+        'RCM06_NA_SW_V1': 'Grade 6 - Volume 1',
+        'RCM06_NA_SW_V2': 'Grade 6 - Volume 2',
         'RCM07_NA_SW_V1': 'Grade 7 - Volume 1',
         'RCM07_NA_SW_V2': 'Grade 7 - Volume 2', 
         'RCM08_NA_SW_V1': 'Grade 8 - Volume 1',
@@ -73,7 +96,7 @@ def generate_typescript_boundaries():
     all_boundaries = {}
     
     for volume_id, volume_name in volumes.items():
-        volume_path = f'/workspaces/MathCurriculumA/webapp_pages/{volume_id}'
+        volume_path = f'c:/Users/scoso/MathCurriculum/MathCurriculumA/webapp_pages/{volume_id}'
         if os.path.exists(volume_path):
             boundaries = find_lesson_boundaries(volume_path, volume_name)
             if boundaries:

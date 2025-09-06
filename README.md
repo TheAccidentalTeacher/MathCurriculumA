@@ -7,7 +7,17 @@
 
 The Math Curriculum Platform is a comprehensive full-stack application that transforms static PDF textbooks into dynamic, searchable, and interactive educational resources. Built with cutting-edge technologies and deployed to production, this platform represents months of enterprise development completed in record time.
 
-## 🚀 Live Production Platform
+## � Important Documentation
+
+> **⚠️ BEFORE PROCEEDING**: Read these essential documents for complete context:
+
+- **[SESSION_RECAP.md](./SESSION_RECAP.md)** - Latest development updates, bug fixes, and current platform status
+- **[virtualtutor/README.md](./virtualtutor/README.md)** - Virtual tutor system implementation guide and roadmap
+- **Git commit history** - Recent changes and deployment notes
+
+**💡 Pro Tip**: Always check `SESSION_RECAP.md` first for the most recent updates and any critical changes that may affect your work.
+
+## �🚀 Live Production Platform
 
 **🌐 Production URL**: *[Your Railway App URL]*  
 **📊 Status**: Fully operational with comprehensive curriculum library  
@@ -19,7 +29,9 @@ The Math Curriculum Platform is a comprehensive full-stack application that tran
 
 An intelligent, AI-powered mathematics curriculum platform featuring comprehensive lesson navigation, virtual tutoring, and adaptive learning pathways. Built with Next.js 15, React 19, and TypeScript for modern educational delivery.
 
-> **⚡ LATEST UPDATE**: Complete lesson navigation system with virtual tutor integration for Grades 6-9 (126 total lessons) - See [SESSION_RECAP.md](./SESSION_RECAP.md) for details
+> **⚡ LATEST UPDATE**: Complete lesson navigation system with virtual tutor integration for Grades 6-9 (126 total lessons) - See [SESSION_RECAP.md](./SESSION_RECAP.md) for detailed implementation notes and current status
+
+> **🔄 ALWAYS CHECK**: [SESSION_RECAP.md](./SESSION_RECAP.md) contains the most recent development updates, bug fixes, and deployment status
 
 ---
 
@@ -184,6 +196,12 @@ This platform features comprehensive GeoGebra integration for dynamic mathematic
 ---
 
 ## 🚀 Getting Started
+
+### **📖 Essential Reading First**
+Before starting development, read these critical documents:
+1. **[SESSION_RECAP.md](./SESSION_RECAP.md)** - Current status, recent fixes, and deployment notes
+2. **[virtualtutor/README.md](./virtualtutor/README.md)** - Virtual tutor implementation guide
+3. Check recent git commits for latest changes
 
 ### **Prerequisites**
 - Node.js 18+ 
@@ -665,6 +683,11 @@ This Math Curriculum Platform represents:
 ---
 
 ## 📋 Developer Quick Reference
+
+### **📚 Required Reading for Developers**
+- **[SESSION_RECAP.md](./SESSION_RECAP.md)** - Latest development status and critical updates
+- **[virtualtutor/README.md](./virtualtutor/README.md)** - Virtual tutor system architecture
+- **Git log** - Recent commits and deployment history
 
 ### **GeoGebra Integration Checklist**
 ```bash
