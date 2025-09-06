@@ -1,0 +1,100 @@
+[
+  {
+    "number": 0,
+    "title": "is on the Teacher Digital Experience. See the Classroom Resources tab on the Teache...",
+    "startPage": 37,
+    "endPage": 12,
+    "sessions": 1
+  },
+  {
+    "number": 1,
+    "title": "Represent Quantities and Relationships Example A parking lot has 8 identical square flower beds. The total area of the parking lot, including the flower beds, is 6,500 ft2. Write an equation",
+    "startPage": 13,
+    "endPage": 25,
+    "sessions": 1
+  },
+  {
+    "number": 2,
+    "title": "Reason About Solving Equations",
+    "startPage": 26,
+    "endPage": 157,
+    "sessions": 5
+  },
+  {
+    "number": 3,
+    "title": "Linear Equations in Two Variables Overview",
+    "startPage": 158,
+    "endPage": 187,
+    "sessions": 4
+  },
+  {
+    "number": 4,
+    "title": "Linear Inequalities in One Variable Overview",
+    "startPage": 188,
+    "endPage": 251,
+    "sessions": 4
+  },
+  {
+    "number": 5,
+    "title": "Function Concepts Overview",
+    "startPage": 252,
+    "endPage": 281,
+    "sessions": 4
+  },
+  {
+    "number": 6,
+    "title": "Interpret Graphs of Functions Overview",
+    "startPage": 282,
+    "endPage": 317,
+    "sessions": 5
+  },
+  {
+    "number": 7,
+    "title": "Linear Functions Overview",
+    "startPage": 318,
+    "endPage": 353,
+    "sessions": 5
+  },
+  {
+    "number": 8,
+    "title": "Fit Linear Functions to Data Overview",
+    "startPage": 354,
+    "endPage": 389,
+    "sessions": 5
+  },
+  {
+    "number": 9,
+    "title": "Piecewise Functions Overview",
+    "startPage": 390,
+    "endPage": 465,
+    "sessions": 6
+  },
+  {
+    "number": 10,
+    "title": "Solve Linear Systems by Graphing or Substitution Overview",
+    "startPage": 466,
+    "endPage": 495,
+    "sessions": 4
+  },
+  {
+    "number": 11,
+    "title": "Solve Linear Systems by Elimination Overview",
+    "startPage": 496,
+    "endPage": 525,
+    "sessions": 4
+  },
+  {
+    "number": 12,
+    "title": "Linear Inequalities in Two Variables Overview",
+    "startPage": 526,
+    "endPage": 555,
+    "sessions": 4
+  },
+  {
+    "number": 13,
+    "title": "Systems of Linear Inequalities Overview",
+    "startPage": 556,
+    "endPage": 656,
+    "sessions": 3
+  }
+]

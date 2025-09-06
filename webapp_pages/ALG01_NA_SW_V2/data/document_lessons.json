@@ -1,0 +1,128 @@
+[
+  {
+    "number": 0,
+    "title": "is on the Teacher Digital Experience. See the Classroom Resources tab on the Teache...",
+    "startPage": 11,
+    "endPage": 32,
+    "sessions": 1
+  },
+  {
+    "number": 1,
+    "title": "Represent Quantities and Relationships",
+    "startPage": 33,
+    "endPage": 690,
+    "sessions": 1
+  },
+  {
+    "number": 10,
+    "title": "Solve Linear Systems by Graphing or Substitution",
+    "startPage": 691,
+    "endPage": 35,
+    "sessions": 1
+  },
+  {
+    "number": 14,
+    "title": "Sequences Overview",
+    "startPage": 36,
+    "endPage": 71,
+    "sessions": 5
+  },
+  {
+    "number": 15,
+    "title": "Graphs of Exponential Functions Overview",
+    "startPage": 72,
+    "endPage": 101,
+    "sessions": 4
+  },
+  {
+    "number": 16,
+    "title": "Model with Exponential Functions Overview",
+    "startPage": 102,
+    "endPage": 137,
+    "sessions": 5
+  },
+  {
+    "number": 17,
+    "title": "Compare Linear and Exponential Functions Overview",
+    "startPage": 138,
+    "endPage": 167,
+    "sessions": 4
+  },
+  {
+    "number": 18,
+    "title": "Rational Exponents Overview",
+    "startPage": 168,
+    "endPage": 229,
+    "sessions": 4
+  },
+  {
+    "number": 19,
+    "title": "Operations with Polynomials Overview",
+    "startPage": 230,
+    "endPage": 259,
+    "sessions": 4
+  },
+  {
+    "number": 20,
+    "title": "Graphs of Quadratic Functions Overview",
+    "startPage": 260,
+    "endPage": 295,
+    "sessions": 5
+  },
+  {
+    "number": 21,
+    "title": "Model with Quadratic Functions Overview",
+    "startPage": 296,
+    "endPage": 331,
+    "sessions": 5
+  },
+  {
+    "number": 22,
+    "title": "Factor Polynomials Overview",
+    "startPage": 332,
+    "endPage": 401,
+    "sessions": 5
+  },
+  {
+    "number": 23,
+    "title": "Quadratic Equations in One Variable Overview",
+    "startPage": 402,
+    "endPage": 437,
+    "sessions": 5
+  },
+  {
+    "number": 24,
+    "title": "Completing the Square Overview",
+    "startPage": 438,
+    "endPage": 467,
+    "sessions": 4
+  },
+  {
+    "number": 25,
+    "title": "The Quadratic Formula Overview",
+    "startPage": 468,
+    "endPage": 531,
+    "sessions": 4
+  },
+  {
+    "number": 26,
+    "title": "One-Variable Statistics Overview",
+    "startPage": 532,
+    "endPage": 561,
+    "sessions": 4
+  },
+  {
+    "number": 27,
+    "title": "Comparing Data Sets Overview",
+    "startPage": 562,
+    "endPage": 591,
+    "sessions": 4
+  },
+  {
+    "number": 28,
+    "title": "Two-Way Frequency Tables Overview",
+    "startPage": 592,
+    "endPage": 698,
+    "sessions": 4
+  }
+]
