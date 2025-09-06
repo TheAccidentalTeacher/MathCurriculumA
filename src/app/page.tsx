@@ -393,6 +393,21 @@ export default function Home() {
           <p className="text-slate-300 mb-6 text-lg">
             Transform six volumes into one powerful accelerated pathway
           </p>
+          
+          {/* Comprehensive Lesson Navigation */}
+          <div className="mb-8">
+            <Link 
+              href="/lessons" 
+              className="inline-flex items-center space-x-3 px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl shadow-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105"
+            >
+              <div className="text-2xl">🗂️</div>
+              <div>
+                <div className="font-bold text-lg">Complete Lesson Navigation</div>
+                <div className="text-sm opacity-90">Browse all lessons across all grades</div>
+              </div>
+            </Link>
+          </div>
+          
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
             {/* Grade 6 Volumes */}
             <Link href="/viewer/grade6-volume1" data-volume-card className="block p-4 bg-indigo-600 text-white rounded-xl shadow-lg hover:bg-indigo-700 transition-colors relative overflow-hidden group">
