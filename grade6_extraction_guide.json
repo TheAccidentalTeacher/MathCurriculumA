@@ -1,0 +1,44 @@
+{
+  "file_analysis_order": [
+    {
+      "file": "4.avif",
+      "expected_content": "Table of Contents start, Unit 1"
+    },
+    {
+      "file": "5.avif",
+      "expected_content": "Unit 1 continued, Unit 2 start"
+    },
+    {
+      "file": "6.avif",
+      "expected_content": "Unit 2-3 content"
+    },
+    {
+      "file": "7.avif",
+      "expected_content": "Unit 3-4 content"
+    },
+    {
+      "file": "8.avif",
+      "expected_content": "Unit 4-5 content"
+    },
+    {
+      "file": "9.avif",
+      "expected_content": "Unit 5 continued"
+    },
+    {
+      "file": "10.avif",
+      "expected_content": "End of contents, appendices"
+    }
+  ],
+  "extraction_pattern": {
+    "unit_header": "Look for 'UNIT X:' followed by title",
+    "lesson_header": "Look for 'LESSON X:' followed by title",
+    "session_indicators": [
+      "Explore",
+      "Develop",
+      "Refine",
+      "Apply"
+    ],
+    "standards_format": "6.XX.X.X (e.g., 6.G.A.1, 6.NS.B.3)",
+    "page_format": "Numbers in right margin or 'pp. XX-YY'"
+  }
+}

@@ -1,0 +1,484 @@
+{
+  "grade": 8,
+  "title": "Ready Classroom Mathematics Grade 8",
+  "curriculum_publisher": "Curriculum Associates",
+  "curriculum_type": "Complete Mathematics Program",
+  "total_pages": 1008,
+  "total_lessons": 32,
+  "total_units": 9,
+  "volumes": {
+    "Volume 1": {
+      "volume_name": "Volume 1",
+      "units": [
+        {
+          "unit_number": 1,
+          "title": "Geometric Figures: Rigid Transformations and Congruence",
+          "description": "Transformations, congruence, coordinate plane",
+          "lessons": [
+            {
+              "lesson_number": 1,
+              "title": "Understand Rigid Transformations and Their Properties",
+              "start_page": 15,
+              "standards_focus": [
+                "8.G.1"
+              ],
+              "key_concepts": [
+                "Rigid transformations",
+                "Properties of transformations",
+                "Coordinate plane"
+              ]
+            },
+            {
+              "lesson_number": 2,
+              "title": "Work with Single Rigid Transformations in the Coordinate Plane",
+              "start_page": 28,
+              "standards_focus": [
+                "8.G.2"
+              ],
+              "key_concepts": [
+                "Single transformations",
+                "Reflections, rotations, translations"
+              ]
+            },
+            {
+              "lesson_number": 3,
+              "title": "Work with Sequences of Transformations and Congruence Work with Sequences of Transformations and Congruence",
+              "start_page": 55,
+              "standards_focus": [
+                "8.G.2"
+              ],
+              "key_concepts": [
+                "Sequence of transformations",
+                "Congruence",
+                "Composite transformations"
+              ]
+            }
+          ]
+        },
+        {
+          "unit_number": 2,
+          "title": "Geometric Figures: Transformations, Similarity, and Angle Relationships",
+          "description": "Dilations, similarity, angle relationships, triangles",
+          "lessons": [
+            {
+              "lesson_number": 4,
+              "title": "Understand Dilations and Similarity Understand Dilations and Similarity",
+              "start_page": 95,
+              "standards_focus": [
+                "8.G.3"
+              ],
+              "key_concepts": [
+                "Dilations",
+                "Similarity",
+                "Scale factors"
+              ]
+            },
+            {
+              "lesson_number": 5,
+              "title": "Perform and Describe Transformations Involving Dilations Perform and Describe Transformations Involving Dilations",
+              "start_page": 107,
+              "standards_focus": [
+                "8.G.4"
+              ],
+              "key_concepts": [
+                "Transformation sequences with dilations",
+                "Similar figures"
+              ]
+            },
+            {
+              "lesson_number": 6,
+              "title": "Describe Angle Relationships Describe Angle Relationships",
+              "start_page": 129,
+              "standards_focus": [
+                "8.G.5"
+              ],
+              "key_concepts": [
+                "Angle relationships",
+                "Vertical angles",
+                "Linear pairs"
+              ]
+            },
+            {
+              "lesson_number": 7,
+              "title": "Describe Angle Relationships in Triangles Describe Angle Relationships in Triangles",
+              "start_page": 151,
+              "standards_focus": [
+                "8.G.5"
+              ],
+              "key_concepts": [
+                "Triangle angle relationships",
+                "Interior and exterior angles"
+              ]
+            }
+          ]
+        },
+        {
+          "unit_number": 3,
+          "title": "Linear Relationships: Slope, Linear Equations, and Systems",
+          "description": "Slope, linear equations, systems of equations",
+          "lessons": [
+            {
+              "lesson_number": 8,
+              "title": "Graph Proportional Relationships and Define Slope",
+              "start_page": 191,
+              "standards_focus": [
+                "8.EE.5"
+              ],
+              "key_concepts": [
+                "Proportional relationships",
+                "Slope",
+                "Rate of change"
+              ]
+            },
+            {
+              "lesson_number": 9,
+              "title": "Derive and Graph Linear Equations of the Form y 5 mx 1 b",
+              "start_page": 213,
+              "standards_focus": [
+                "8.EE.6"
+              ],
+              "key_concepts": [
+                "Linear equations",
+                "y = mx + b form",
+                "Slope-intercept"
+              ]
+            },
+            {
+              "lesson_number": 10,
+              "title": "Solve Linear Equations in One Variable",
+              "start_page": 242,
+              "standards_focus": [
+                "8.EE.7"
+              ],
+              "key_concepts": [
+                "Solving linear equations",
+                "One variable",
+                "Solution methods"
+              ]
+            },
+            {
+              "lesson_number": 11,
+              "title": "Determine the Number of Solutions to One-Variable Equations",
+              "start_page": 264,
+              "standards_focus": [
+                "8.EE.7"
+              ],
+              "key_concepts": [
+                "Number of solutions",
+                "Infinite, one, or no solution"
+              ]
+            },
+            {
+              "lesson_number": 12,
+              "title": "Understand Systems of Linear Equations in Two Variables",
+              "start_page": 285,
+              "standards_focus": [
+                "8.EE.8"
+              ],
+              "key_concepts": [
+                "Systems of equations",
+                "Graphical solutions"
+              ]
+            },
+            {
+              "lesson_number": 13,
+              "title": "Solve Systems of Linear Equations Algebraically",
+              "start_page": 297,
+              "standards_focus": [
+                "8.EE.8"
+              ],
+              "key_concepts": [
+                "Algebraic methods",
+                "Substitution",
+                "Elimination"
+              ]
+            },
+            {
+              "lesson_number": 14,
+              "title": "Represent and Solve Problems with Systems of Linear Equations",
+              "start_page": 325,
+              "standards_focus": [
+                "8.EE.8"
+              ],
+              "key_concepts": [
+                "Real-world applications",
+                "System modeling"
+              ]
+            }
+          ]
+        },
+        {
+          "unit_number": 4,
+          "title": "Linear and Nonlinear Relationships: Functions",
+          "description": "Functions, modeling relationships, functional analysis",
+          "lessons": [
+            {
+              "lesson_number": 15,
+              "title": "Understand Functions",
+              "start_page": 368,
+              "standards_focus": [
+                "8.F.1"
+              ],
+              "key_concepts": [
+                "Function definition",
+                "Input-output relationships"
+              ]
+            },
+            {
+              "lesson_number": 16,
+              "title": "Use Functions to Model Linear Relationships",
+              "start_page": 379,
+              "standards_focus": [
+                "8.F.2"
+              ],
+              "key_concepts": [
+                "Linear functions",
+                "Function notation"
+              ]
+            },
+            {
+              "lesson_number": 17,
+              "title": "Compare Different Representations of Functions",
+              "start_page": 406,
+              "standards_focus": [
+                "8.F.3"
+              ],
+              "key_concepts": [
+                "Multiple representations",
+                "Tables, graphs, equations"
+              ]
+            },
+            {
+              "lesson_number": 18,
+              "title": "Analyze Functional Relationships Qualitatively",
+              "start_page": 429,
+              "standards_focus": [
+                "8.F.5"
+              ],
+              "key_concepts": [
+                "Qualitative analysis",
+                "Increasing, decreasing, constant"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "Volume 2": {
+      "volume_name": "Volume 2",
+      "units": [
+        {
+          "unit_number": 5,
+          "title": "Integer Exponents: Properties and Scientific Notation",
+          "description": "Exponent properties, scientific notation, powers of 10",
+          "lessons": [
+            {
+              "lesson_number": 19,
+              "title": "Apply Exponent Properties for Positive Integer Exponents",
+              "start_page": 15,
+              "standards_focus": [
+                "8.EE.1"
+              ],
+              "key_concepts": [
+                "Exponent properties",
+                "Product rule",
+                "Quotient rule"
+              ]
+            },
+            {
+              "lesson_number": 20,
+              "title": "Apply Exponent Properties for All Integer Exponents",
+              "start_page": 38,
+              "standards_focus": [
+                "8.EE.1"
+              ],
+              "key_concepts": [
+                "Integer exponents",
+                "Negative exponents",
+                "Zero exponent"
+              ]
+            },
+            {
+              "lesson_number": 21,
+              "title": "Express Numbers Using Integer Powers of 10",
+              "start_page": 59,
+              "standards_focus": [
+                "8.EE.3"
+              ],
+              "key_concepts": [
+                "Powers of 10",
+                "Scientific notation basics"
+              ]
+            },
+            {
+              "lesson_number": 22,
+              "title": "Work with Scientific Notation",
+              "start_page": 83,
+              "standards_focus": [
+                "8.EE.4"
+              ],
+              "key_concepts": [
+                "Scientific notation",
+                "Operations",
+                "Real-world applications"
+              ]
+            }
+          ]
+        },
+        {
+          "unit_number": 6,
+          "title": "The Real Number System: Rational and Irrational Numbers",
+          "description": "Square roots, cube roots, rational approximations, Pythagorean theorem",
+          "lessons": [
+            {
+              "lesson_number": 23,
+              "title": "Find Square Roots and Cube Roots to Solve Problems",
+              "start_page": 129,
+              "standards_focus": [
+                "8.EE.2"
+              ],
+              "key_concepts": [
+                "Square roots",
+                "Cube roots",
+                "Perfect squares and cubes"
+              ]
+            },
+            {
+              "lesson_number": 24,
+              "title": "Express Rational Numbers as Fractions and Decimals",
+              "start_page": 150,
+              "standards_focus": [
+                "8.NS.1"
+              ],
+              "key_concepts": [
+                "Rational numbers",
+                "Decimal representations"
+              ]
+            },
+            {
+              "lesson_number": 25,
+              "title": "Find Rational Approximations of Irrational Numbers",
+              "start_page": 166,
+              "standards_focus": [
+                "8.NS.2"
+              ],
+              "key_concepts": [
+                "Irrational numbers",
+                "Rational approximations"
+              ]
+            }
+          ]
+        },
+        {
+          "unit_number": 7,
+          "title": "The Real Number System: The Pythagorean Theorem",
+          "description": "Pythagorean theorem applications, real-world problems",
+          "lessons": [
+            {
+              "lesson_number": 26,
+              "title": "Understand the Pythagorean Theorem and Its Converse",
+              "start_page": 195,
+              "standards_focus": [
+                "8.G.6"
+              ],
+              "key_concepts": [
+                "Pythagorean theorem",
+                "Right triangles",
+                "Converse"
+              ]
+            },
+            {
+              "lesson_number": 27,
+              "title": "Apply the Pythagorean Theorem",
+              "start_page": 201,
+              "standards_focus": [
+                "8.G.7"
+              ],
+              "key_concepts": [
+                "Applications",
+                "Distance formula",
+                "Real-world problems"
+              ]
+            }
+          ]
+        },
+        {
+          "unit_number": 8,
+          "title": "Measurement and Geometry: Volume and Surface Area",
+          "description": "Cylinders, cones, spheres volume calculations",
+          "lessons": [
+            {
+              "lesson_number": 28,
+              "title": "Solve Problems with Volumes of Cylinders, Cones, and Spheres",
+              "start_page": 227,
+              "standards_focus": [
+                "8.G.9"
+              ],
+              "key_concepts": [
+                "Volume formulas",
+                "Cylinders, cones, spheres"
+              ]
+            }
+          ]
+        },
+        {
+          "unit_number": 9,
+          "title": "Two-Variable Data and Fitting a Linear Model",
+          "description": "Scatter plots, linear models, two-way tables, data analysis",
+          "lessons": [
+            {
+              "lesson_number": 29,
+              "title": "Analyze Scatter Plots and Fit a Linear Model to Data",
+              "start_page": 268,
+              "standards_focus": [
+                "8.SP.1"
+              ],
+              "key_concepts": [
+                "Scatter plots",
+                "Linear associations",
+                "Outliers"
+              ]
+            },
+            {
+              "lesson_number": 30,
+              "title": "Write and Analyze an Equation for Fitting a Linear Model to Data",
+              "start_page": 297,
+              "standards_focus": [
+                "8.SP.2"
+              ],
+              "key_concepts": [
+                "Linear models",
+                "Line of best fit",
+                "Predictions"
+              ]
+            },
+            {
+              "lesson_number": 31,
+              "title": "Understand Two-Way Tables",
+              "start_page": 320,
+              "standards_focus": [
+                "8.SP.4"
+              ],
+              "key_concepts": [
+                "Two-way tables",
+                "Frequency tables"
+              ]
+            },
+            {
+              "lesson_number": 32,
+              "title": "Construct and Interpret Two-Way Tables",
+              "start_page": 329,
+              "standards_focus": [
+                "8.SP.4"
+              ],
+              "key_concepts": [
+                "Interpreting two-way tables",
+                "Associations"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

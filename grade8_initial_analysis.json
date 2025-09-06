@@ -1,0 +1,255 @@
+{
+  "grade": 8,
+  "title": "Ready Classroom Mathematics Grade 8",
+  "total_pages": 1008,
+  "volumes": {
+    "Volume 1": {
+      "volume_name": "Volume 1",
+      "total_pages": 552,
+      "lessons": [
+        {
+          "lesson_number": 1,
+          "title": "Understand Rigid Transformations and Their Properties",
+          "start_page": 15,
+          "page_id": "page_15"
+        },
+        {
+          "lesson_number": 2,
+          "title": "Work with Single Rigid Transformations in the Coordinate Plane Work with Single Rigid Transformations in the Coordinate Plane",
+          "start_page": 27,
+          "page_id": "page_27"
+        },
+        {
+          "lesson_number": 3,
+          "title": "Work with Sequences of Transformations and Congruence Work with Sequences of Transformations and Congruence",
+          "start_page": 55,
+          "page_id": "page_55"
+        },
+        {
+          "lesson_number": 4,
+          "title": "Understand Dilations and Similarity Understand Dilations and Similarity",
+          "start_page": 95,
+          "page_id": "page_95"
+        },
+        {
+          "lesson_number": 5,
+          "title": "Perform and Describe Transformations Involving Dilations Perform and Describe Transformations Involving Dilations",
+          "start_page": 107,
+          "page_id": "page_107"
+        },
+        {
+          "lesson_number": 6,
+          "title": "Describe Angle Relationships Describe Angle Relationships",
+          "start_page": 129,
+          "page_id": "page_129"
+        },
+        {
+          "lesson_number": 7,
+          "title": "Describe Angle Relationships in Triangles Describe Angle Relationships in Triangles",
+          "start_page": 151,
+          "page_id": "page_151"
+        },
+        {
+          "lesson_number": 8,
+          "title": "Graph Proportional Relationships and Define Slope",
+          "start_page": 191,
+          "page_id": "page_191"
+        },
+        {
+          "lesson_number": 9,
+          "title": "Derive and Graph Linear Equations of the Form y 5 mx 1 b",
+          "start_page": 213,
+          "page_id": "page_213"
+        },
+        {
+          "lesson_number": 10,
+          "title": "Solve Linear Equations in One Variable",
+          "start_page": 241,
+          "page_id": "page_241"
+        },
+        {
+          "lesson_number": 11,
+          "title": "Determine the Number of Solutions to One-Variable Equations",
+          "start_page": 263,
+          "page_id": "page_263"
+        },
+        {
+          "lesson_number": 12,
+          "title": "Understand Systems of Linear Equations in Two Variables",
+          "start_page": 285,
+          "page_id": "page_285"
+        },
+        {
+          "lesson_number": 13,
+          "title": "Solve Systems of Linear Equations Algebraically",
+          "start_page": 297,
+          "page_id": "page_297"
+        },
+        {
+          "lesson_number": 14,
+          "title": "Represent and Solve Problems with Systems of Linear Equations",
+          "start_page": 325,
+          "page_id": "page_325"
+        },
+        {
+          "lesson_number": 15,
+          "title": "Understand Functions",
+          "start_page": 365,
+          "page_id": "page_365"
+        },
+        {
+          "lesson_number": 16,
+          "title": "Use Functions to Model Linear Relationships",
+          "start_page": 377,
+          "page_id": "page_377"
+        },
+        {
+          "lesson_number": 17,
+          "title": "Compare Different Representations of Functions",
+          "start_page": 405,
+          "page_id": "page_405"
+        },
+        {
+          "lesson_number": 18,
+          "title": "Analyze Functional Relationships Qualitatively",
+          "start_page": 427,
+          "page_id": "page_427"
+        }
+      ],
+      "contents_pages": [
+        {
+          "page_number": 4,
+          "text_preview": "Geometric Figures Rigid Transformations and Congruence Unit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ...",
+          "page_type": "contents"
+        },
+        {
+          "page_number": 6,
+          "text_preview": "Contents (continued) Linear Relationships Slope, Linear Equations, and Systems",
+          "page_type": "contents"
+        },
+        {
+          "page_number": 8,
+          "text_preview": "Contents (continued) Integer Exponents Properties and Scientific Notation",
+          "page_type": "contents"
+        },
+        {
+          "page_number": 10,
+          "text_preview": "Contents (continued) Two-Variable Data and Fitting a Linear Model Unit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ....",
+          "page_type": "contents"
+        }
+      ]
+    },
+    "Volume 2": {
+      "volume_name": "Volume 2",
+      "total_pages": 456,
+      "lessons": [
+        {
+          "lesson_number": 19,
+          "title": "Apply Exponent Properties for Positive Integer Exponents",
+          "start_page": 15,
+          "page_id": "page_15"
+        },
+        {
+          "lesson_number": 20,
+          "title": "Apply Exponent Properties for All Integer Exponents",
+          "start_page": 37,
+          "page_id": "page_37"
+        },
+        {
+          "lesson_number": 21,
+          "title": "Express Numbers Using Integer Powers of 10",
+          "start_page": 59,
+          "page_id": "page_59"
+        },
+        {
+          "lesson_number": 22,
+          "title": "Work with Scientific Notation",
+          "start_page": 81,
+          "page_id": "page_81"
+        },
+        {
+          "lesson_number": 23,
+          "title": "Find Square Roots and Cube Roots to Solve Problems",
+          "start_page": 127,
+          "page_id": "page_127"
+        },
+        {
+          "lesson_number": 24,
+          "title": "Express Rational Numbers as Fractions and Decimals",
+          "start_page": 149,
+          "page_id": "page_149"
+        },
+        {
+          "lesson_number": 25,
+          "title": "Find Rational Approximations of Irrational Numbers",
+          "start_page": 165,
+          "page_id": "page_165"
+        },
+        {
+          "lesson_number": 26,
+          "title": "Understand the Pythagorean Theorem and Its Converse",
+          "start_page": 187,
+          "page_id": "page_187"
+        },
+        {
+          "lesson_number": 27,
+          "title": "Apply the Pythagorean Theorem",
+          "start_page": 199,
+          "page_id": "page_199"
+        },
+        {
+          "lesson_number": 28,
+          "title": "Solve Problems with Volumes of Cylinders, Cones, and Spheres",
+          "start_page": 227,
+          "page_id": "page_227"
+        },
+        {
+          "lesson_number": 29,
+          "title": "Analyze Scatter Plots and Fit a Linear Model to Data",
+          "start_page": 267,
+          "page_id": "page_267"
+        },
+        {
+          "lesson_number": 30,
+          "title": "Write and Analyze an Equation for Fitting a Linear Model to Data",
+          "start_page": 295,
+          "page_id": "page_295"
+        },
+        {
+          "lesson_number": 31,
+          "title": "Understand Two-Way Tables",
+          "start_page": 317,
+          "page_id": "page_317"
+        },
+        {
+          "lesson_number": 32,
+          "title": "Construct and Interpret Two-Way Tables",
+          "start_page": 329,
+          "page_id": "page_329"
+        }
+      ],
+      "contents_pages": [
+        {
+          "page_number": 4,
+          "text_preview": "Geometric Figures Rigid Transformations and Congruence Unit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ...",
+          "page_type": "contents"
+        },
+        {
+          "page_number": 6,
+          "text_preview": "Contents (continued) Linear Relationships Slope, Linear Equations, and Systems",
+          "page_type": "contents"
+        },
+        {
+          "page_number": 8,
+          "text_preview": "Contents (continued) Integer Exponents Properties and Scientific Notation",
+          "page_type": "contents"
+        },
+        {
+          "page_number": 10,
+          "text_preview": "Contents (continued) Two-Variable Data and Fitting a Linear Model Unit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ....",
+          "page_type": "contents"
+        }
+      ]
+    }
+  }
+}

@@ -243,6 +243,61 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Curriculum Navigation */}
+        <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-500/30 rounded-xl p-4 mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold text-blue-200">📚 Curriculum Scope & Sequence</h2>
+            <Link 
+              href="/curriculum" 
+              className="text-sm text-blue-300 hover:text-blue-200 transition-colors"
+            >
+              View All →
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <Link
+              href="/curriculum/grade-6"
+              className="flex items-center p-3 bg-blue-800/40 hover:bg-blue-700/50 rounded-lg transition-all duration-200 border border-blue-600/30 hover:border-blue-500/50"
+            >
+              <span className="text-2xl mr-3">6️⃣</span>
+              <div>
+                <div className="font-medium text-blue-200">Grade 6</div>
+                <div className="text-xs text-blue-300">33 lessons</div>
+              </div>
+            </Link>
+            <Link
+              href="/curriculum/grade-7"
+              className="flex items-center p-3 bg-green-800/40 hover:bg-green-700/50 rounded-lg transition-all duration-200 border border-green-600/30 hover:border-green-500/50"
+            >
+              <span className="text-2xl mr-3">7️⃣</span>
+              <div>
+                <div className="font-medium text-green-200">Grade 7</div>
+                <div className="text-xs text-green-300">33 lessons</div>
+              </div>
+            </Link>
+            <Link
+              href="/curriculum/grade-8"
+              className="flex items-center p-3 bg-purple-800/40 hover:bg-purple-700/50 rounded-lg transition-all duration-200 border border-purple-600/30 hover:border-purple-500/50"
+            >
+              <span className="text-2xl mr-3">8️⃣</span>
+              <div>
+                <div className="font-medium text-purple-200">Grade 8</div>
+                <div className="text-xs text-purple-300">32 lessons</div>
+              </div>
+            </Link>
+            <Link
+              href="/curriculum/algebra-1"
+              className="flex items-center p-3 bg-red-800/40 hover:bg-red-700/50 rounded-lg transition-all duration-200 border border-red-600/30 hover:border-red-500/50"
+            >
+              <span className="text-2xl mr-3">🔴</span>
+              <div>
+                <div className="font-medium text-red-200">Algebra 1</div>
+                <div className="text-xs text-red-300">28 lessons</div>
+              </div>
+            </Link>
+          </div>
+        </div>
+
         {/* Database Selection Toggle */}
         <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 border border-purple-500/30 rounded-xl p-4 mb-6">
           <div className="flex items-center justify-between">

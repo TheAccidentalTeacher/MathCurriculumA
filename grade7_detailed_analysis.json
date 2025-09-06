@@ -1,0 +1,324 @@
+{
+  "metadata": {
+    "title": "Ready Classroom Mathematics Grade 7 - DETAILED Analysis",
+    "grade": 7,
+    "curriculum": "Ready Classroom Mathematics",
+    "publisher": "Curriculum Associates",
+    "total_volumes": 2,
+    "extraction_source": "Direct document.json analysis",
+    "extraction_date": "2025-09-06",
+    "vol1_total_pages": 504,
+    "vol2_total_pages": 440,
+    "vol1_lessons_found": 13,
+    "vol2_lessons_found": 9
+  },
+  "volume_1_analysis": {
+    "total_pages": 504,
+    "contents_pages": [
+      {
+        "page_number": 4,
+        "text_preview": "Proportional Relationships Ratios, Rates, and Circles Unit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ....",
+        "keywords": [
+          "fraction",
+          "ratio",
+          "proportion",
+          "circle",
+          "area"
+        ]
+      },
+      {
+        "page_number": 6,
+        "text_preview": "Contents (continued) Numbers and Operations Multiply and Divide Rational Numbers",
+        "keywords": [
+          "decimal",
+          "ratio",
+          "integer",
+          "rational"
+        ]
+      },
+      {
+        "page_number": 8,
+        "text_preview": "Contents (continued) Proportional Reasoning Percents and Statistical Samples",
+        "keywords": [
+          "percent",
+          "proportion"
+        ]
+      },
+      {
+        "page_number": 10,
+        "text_preview": "Contents (continued) Probability Theoretical Probability, Experimental",
+        "keywords": [
+          "probability",
+          "mode"
+        ]
+      }
+    ],
+    "lessons_found": [
+      {
+        "lesson_number": 2,
+        "lesson_title": "| SESSION 2 \u00e2\u017e\u00a4Explore different ways to understand unit rates for ratios",
+        "page_number": 50,
+        "keywords": [
+          "fraction",
+          "ratio",
+          "number line",
+          "mode"
+        ]
+      },
+      {
+        "lesson_number": 3,
+        "lesson_title": "| SESSION 2",
+        "page_number": 65,
+        "keywords": [
+          "ratio",
+          "proportion",
+          "equation",
+          "mean",
+          "mode"
+        ]
+      },
+      {
+        "lesson_number": 4,
+        "lesson_title": "| SESSION 3 \u00e2\u017e\u00a4Explore different ways to identify graphs of proportional relationships",
+        "page_number": 84,
+        "keywords": [
+          "ratio",
+          "proportion",
+          "graph",
+          "mode"
+        ]
+      },
+      {
+        "lesson_number": 5,
+        "lesson_title": "| SESSION 1 Previously, you learned to identify and model proportional",
+        "page_number": 95,
+        "keywords": [
+          "ratio",
+          "proportion",
+          "graph",
+          "number line",
+          "mode"
+        ]
+      },
+      {
+        "lesson_number": 6,
+        "lesson_title": "| SESSION 3 \u00e2\u017e\u00a4Explore different ways to find the area of a circle",
+        "page_number": 122,
+        "keywords": [
+          "triangle",
+          "circle",
+          "angle",
+          "area",
+          "mode"
+        ]
+      },
+      {
+        "lesson_number": 8,
+        "lesson_title": "| SESSION 2 \u00e2\u017e\u00a4Explore different ways to add with negative numbers",
+        "page_number": 168,
+        "keywords": [
+          "expression",
+          "number line",
+          "mode"
+        ]
+      },
+      {
+        "lesson_number": 9,
+        "lesson_title": "| UNDERSTAND SUBTRACTION WITH NEGATIVE INTEGERS Activity Exploring Subtraction with Negative Integers",
+        "page_number": 184,
+        "keywords": [
+          "equation",
+          "integer"
+        ]
+      },
+      {
+        "lesson_number": 10,
+        "lesson_title": "| SESSION 3 \u00e2\u017e\u00a4Explore different ways to understand adding and",
+        "page_number": 208,
+        "keywords": [
+          "mode"
+        ]
+      },
+      {
+        "lesson_number": 13,
+        "lesson_title": "| SESSION 2 \u00e2\u017e\u00a4Explore different ways to express a fraction as a terminating decimal",
+        "page_number": 276,
+        "keywords": [
+          "fraction",
+          "decimal",
+          "ratio",
+          "rational",
+          "mode"
+        ]
+      },
+      {
+        "lesson_number": 14,
+        "lesson_title": "| SESSION 2 \u00e2\u017e\u00a4Explore different ways to solve problems involving negative numbers",
+        "page_number": 298,
+        "keywords": [
+          "ratio",
+          "expression",
+          "mode"
+        ]
+      },
+      {
+        "lesson_number": 17,
+        "lesson_title": "| SESSION 1",
+        "page_number": 361,
+        "keywords": [
+          "equation",
+          "variable",
+          "mean",
+          "mode"
+        ]
+      },
+      {
+        "lesson_number": 18,
+        "lesson_title": "| SESSION 2 \u00e2\u017e\u00a4Explore different ways to find an unknown value in an equation",
+        "page_number": 378,
+        "keywords": [
+          "equation",
+          "mode"
+        ]
+      },
+      {
+        "lesson_number": 19,
+        "lesson_title": "| SESSION 3 \u00e2\u017e\u00a4Explore different ways to show the solution to inequalities",
+        "page_number": 406,
+        "keywords": [
+          "graph",
+          "mode"
+        ]
+      }
+    ],
+    "estimated_units": 3
+  },
+  "volume_2_analysis": {
+    "total_pages": 440,
+    "contents_pages": [
+      {
+        "page_number": 4,
+        "text_preview": "Proportional Relationships Ratios, Rates, and Circles Unit Opener  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ....",
+        "keywords": [
+          "fraction",
+          "ratio",
+          "proportion",
+          "circle",
+          "area"
+        ]
+      },
+      {
+        "page_number": 6,
+        "text_preview": "Contents (continued) Numbers and Operations Multiply and Divide Rational Numbers",
+        "keywords": [
+          "decimal",
+          "ratio",
+          "integer",
+          "rational"
+        ]
+      },
+      {
+        "page_number": 8,
+        "text_preview": "Contents (continued) Proportional Reasoning Percents and Statistical Samples",
+        "keywords": [
+          "percent",
+          "proportion"
+        ]
+      },
+      {
+        "page_number": 10,
+        "text_preview": "Contents (continued) Probability Theoretical Probability, Experimental",
+        "keywords": [
+          "probability",
+          "mode"
+        ]
+      }
+    ],
+    "lessons_found": [
+      {
+        "lesson_number": 20,
+        "lesson_title": "| SESSION 2",
+        "page_number": 21,
+        "keywords": [
+          "percent",
+          "number line"
+        ]
+      },
+      {
+        "lesson_number": 21,
+        "lesson_title": "| SESSION 3 \u00e2\u017e\u00a4Explore different ways to find percent error",
+        "page_number": 56,
+        "keywords": [
+          "percent",
+          "number line",
+          "mode"
+        ]
+      },
+      {
+        "lesson_number": 24,
+        "lesson_title": "| SESSION 3 \u00e2\u017e\u00a4Explore different ways to compare two populations by using random samples",
+        "page_number": 112,
+        "keywords": [
+          "mean",
+          "median"
+        ]
+      },
+      {
+        "lesson_number": 25,
+        "lesson_title": "| SESSION 3 \u00e2\u017e\u00a4Explore different ways to solve problems involving surface area",
+        "page_number": 152,
+        "keywords": [
+          "equation",
+          "rectangle",
+          "angle",
+          "area",
+          "mode"
+        ]
+      },
+      {
+        "lesson_number": 28,
+        "lesson_title": "| SESSION 3 \u00e2\u017e\u00a4Explore different ways to find an unknown angle measure",
+        "page_number": 218,
+        "keywords": [
+          "equation",
+          "angle",
+          "mode"
+        ]
+      },
+      {
+        "lesson_number": 29,
+        "lesson_title": "| SESSION 4 \u00e2\u017e\u00a4Explore different ways to draw quadrilaterals",
+        "page_number": 246,
+        "keywords": []
+      },
+      {
+        "lesson_number": 31,
+        "lesson_title": "| SESSION 3 \u00e2\u017e\u00a4Explore different ways to use experimental probability",
+        "page_number": 298,
+        "keywords": [
+          "equation",
+          "probability",
+          "mode"
+        ]
+      },
+      {
+        "lesson_number": 32,
+        "lesson_title": "| SESSION 2 \u00e2\u017e\u00a4Explore different ways to understand finding theoretical probabilities",
+        "page_number": 314,
+        "keywords": [
+          "probability",
+          "mode"
+        ]
+      },
+      {
+        "lesson_number": 33,
+        "lesson_title": "| SESSION 1",
+        "page_number": 331,
+        "keywords": [
+          "probability"
+        ]
+      }
+    ],
+    "estimated_units": 3
+  }
+}

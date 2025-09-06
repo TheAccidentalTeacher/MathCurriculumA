@@ -1,0 +1,467 @@
+{
+  "grade": 7,
+  "title": "Ready Classroom Mathematics Grade 7",
+  "curriculum_publisher": "Curriculum Associates",
+  "curriculum_type": "Complete Mathematics Program",
+  "total_pages": 944,
+  "total_lessons": 33,
+  "total_units": 7,
+  "volumes": {
+    "Volume 1": {
+      "volume_name": "Volume 1",
+      "units": [
+        {
+          "unit_number": 1,
+          "title": "Proportional Relationships: Ratios, Rates, and Circles",
+          "description": "Scale drawings, unit rates with fractions, proportional relationships, circles",
+          "lessons": [
+            {
+              "lesson_number": 1,
+              "title": "Solve Problems Involving Scale",
+              "start_page": 15,
+              "standards_focus": [
+                "7.G.1"
+              ],
+              "key_concepts": [
+                "Scale drawings",
+                "Proportional reasoning",
+                "Similar figures"
+              ]
+            },
+            {
+              "lesson_number": 2,
+              "title": "Find Unit Rates Involving Ratios of Fractions",
+              "start_page": 44,
+              "standards_focus": [
+                "7.RP.1"
+              ],
+              "key_concepts": [
+                "Unit rates",
+                "Ratios with fractions",
+                "Complex fractions"
+              ]
+            },
+            {
+              "lesson_number": 3,
+              "title": "Understand Proportional Relationships Understand Proportional Relationships",
+              "start_page": 59,
+              "standards_focus": [
+                "7.RP.2"
+              ],
+              "key_concepts": [
+                "Proportional relationships",
+                "Constant of proportionality"
+              ]
+            },
+            {
+              "lesson_number": 4,
+              "title": "Represent Proportional Relationships Represent Proportional Relationships",
+              "start_page": 71,
+              "standards_focus": [
+                "7.RP.2"
+              ],
+              "key_concepts": [
+                "Representing proportions",
+                "Tables, graphs, equations"
+              ]
+            },
+            {
+              "lesson_number": 5,
+              "title": "Solve Proportional Relationship Problems",
+              "start_page": 93,
+              "standards_focus": [
+                "7.RP.3"
+              ],
+              "key_concepts": [
+                "Solving proportion problems",
+                "Real-world applications"
+              ]
+            },
+            {
+              "lesson_number": 6,
+              "title": "Solve Area and Circumference Problems Involving Circles Solve Area and Circumference Problems Involving Circles",
+              "start_page": 109,
+              "standards_focus": [
+                "7.G.4"
+              ],
+              "key_concepts": [
+                "Area of circles",
+                "Circumference",
+                "π (pi)"
+              ]
+            }
+          ]
+        },
+        {
+          "unit_number": 2,
+          "title": "Numbers and Operations: Add and Subtract Rational Numbers",
+          "description": "Adding and subtracting positive and negative numbers",
+          "lessons": [
+            {
+              "lesson_number": 7,
+              "title": "Understand Addition with Negative Integers",
+              "start_page": 152,
+              "standards_focus": [
+                "7.NS.1"
+              ],
+              "key_concepts": [
+                "Adding integers",
+                "Number line",
+                "Absolute value"
+              ]
+            },
+            {
+              "lesson_number": 8,
+              "title": "Add with Negative Numbers Add with Negative Numbers",
+              "start_page": 161,
+              "standards_focus": [
+                "7.NS.1"
+              ],
+              "key_concepts": [
+                "Adding negative numbers",
+                "Integer operations"
+              ]
+            },
+            {
+              "lesson_number": 9,
+              "title": "Understand Subtraction with Negative Integers",
+              "start_page": 183,
+              "standards_focus": [
+                "7.NS.1"
+              ],
+              "key_concepts": [
+                "Subtracting integers",
+                "Relationship to addition"
+              ]
+            },
+            {
+              "lesson_number": 10,
+              "title": "Add and Subtract Positive and Negative Numbers Add and Subtract Positive and Negative Numbers",
+              "start_page": 195,
+              "standards_focus": [
+                "7.NS.1"
+              ],
+              "key_concepts": [
+                "Operations with rational numbers",
+                "Problem solving"
+              ]
+            }
+          ]
+        },
+        {
+          "unit_number": 3,
+          "title": "Numbers and Operations: Multiply and Divide Rational Numbers",
+          "description": "Multiplying and dividing with negative numbers, rational number operations",
+          "lessons": [
+            {
+              "lesson_number": 11,
+              "title": "Understand Multiplication with Negative Integers",
+              "start_page": 243,
+              "standards_focus": [
+                "7.NS.2"
+              ],
+              "key_concepts": [
+                "Multiplying integers",
+                "Sign rules"
+              ]
+            },
+            {
+              "lesson_number": 12,
+              "title": "Multiply and Divide with Negative Numbers",
+              "start_page": 249,
+              "standards_focus": [
+                "7.NS.2"
+              ],
+              "key_concepts": [
+                "Multiplying and dividing rational numbers"
+              ]
+            },
+            {
+              "lesson_number": 13,
+              "title": "Express Rational Numbers as Terminating or Repeating Decimals",
+              "start_page": 269,
+              "standards_focus": [
+                "7.NS.2"
+              ],
+              "key_concepts": [
+                "Decimal representations",
+                "Terminating vs repeating"
+              ]
+            },
+            {
+              "lesson_number": 14,
+              "title": "Use the Four Operations with Negative Numbers",
+              "start_page": 291,
+              "standards_focus": [
+                "7.NS.3"
+              ],
+              "key_concepts": [
+                "Four operations with rational numbers"
+              ]
+            }
+          ]
+        },
+        {
+          "unit_number": 4,
+          "title": "Algebraic Thinking: Expressions, Equations, and Inequalities",
+          "description": "Equivalent expressions, multi-step equations, inequalities",
+          "lessons": [
+            {
+              "lesson_number": 15,
+              "title": "Write Equivalent Expressions Involving Rational Numbers",
+              "start_page": 325,
+              "standards_focus": [
+                "7.EE.1"
+              ],
+              "key_concepts": [
+                "Equivalent expressions",
+                "Distributive property"
+              ]
+            },
+            {
+              "lesson_number": 16,
+              "title": "Understand Reasons for Rewriting Expressions",
+              "start_page": 347,
+              "standards_focus": [
+                "7.EE.1"
+              ],
+              "key_concepts": [
+                "Reasons for rewriting expressions"
+              ]
+            },
+            {
+              "lesson_number": 17,
+              "title": "Understand Multi-Step Equations",
+              "start_page": 359,
+              "standards_focus": [
+                "7.EE.4"
+              ],
+              "key_concepts": [
+                "Multi-step equations",
+                "Solution strategies"
+              ]
+            },
+            {
+              "lesson_number": 18,
+              "title": "Write and Solve Multi-Step Equations",
+              "start_page": 371,
+              "standards_focus": [
+                "7.EE.4"
+              ],
+              "key_concepts": [
+                "Writing and solving equations"
+              ]
+            },
+            {
+              "lesson_number": 19,
+              "title": "Write and Solve Inequalities",
+              "start_page": 394,
+              "standards_focus": [
+                "7.EE.4"
+              ],
+              "key_concepts": [
+                "Inequalities",
+                "Solution sets"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "Volume 2": {
+      "volume_name": "Volume 2",
+      "units": [
+        {
+          "unit_number": 5,
+          "title": "Proportional Reasoning: Percents and Statistical Samples",
+          "description": "Percent problems, percent change, random sampling, population comparison",
+          "lessons": [
+            {
+              "lesson_number": 20,
+              "title": "Solve Problems Involving Percents",
+              "start_page": 17,
+              "standards_focus": [
+                "7.RP.3"
+              ],
+              "key_concepts": [
+                "Percent problems",
+                "Part-whole relationships"
+              ]
+            },
+            {
+              "lesson_number": 21,
+              "title": "Solve Problems Involving Percent Change and Percent Error",
+              "start_page": 45,
+              "standards_focus": [
+                "7.RP.3"
+              ],
+              "key_concepts": [
+                "Percent change",
+                "Percent error"
+              ]
+            },
+            {
+              "lesson_number": 22,
+              "title": "Understand Random Sampling",
+              "start_page": 72,
+              "standards_focus": [
+                "7.SP.1"
+              ],
+              "key_concepts": [
+                "Random sampling",
+                "Representative samples"
+              ]
+            },
+            {
+              "lesson_number": 23,
+              "title": "Reason About Random Samples",
+              "start_page": 78,
+              "standards_focus": [
+                "7.SP.1"
+              ],
+              "key_concepts": [
+                "Reasoning about samples",
+                "Inference"
+              ]
+            },
+            {
+              "lesson_number": 24,
+              "title": "Compare Populations",
+              "start_page": 101,
+              "standards_focus": [
+                "7.SP.4"
+              ],
+              "key_concepts": [
+                "Comparing populations",
+                "Statistical measures"
+              ]
+            }
+          ]
+        },
+        {
+          "unit_number": 6,
+          "title": "Geometry: Solids, Triangles, and Angles",
+          "description": "Area, surface area, volume, plane sections, angles, drawing figures",
+          "lessons": [
+            {
+              "lesson_number": 25,
+              "title": "Solve Problems Involving Area and Surface Area Lesson Title",
+              "start_page": 139,
+              "standards_focus": [
+                "7.G.6"
+              ],
+              "key_concepts": [
+                "Area and surface area",
+                "3D figures"
+              ]
+            },
+            {
+              "lesson_number": 26,
+              "title": "Solve Problems Involving Volume",
+              "start_page": 167,
+              "standards_focus": [
+                "7.G.6"
+              ],
+              "key_concepts": [
+                "Volume",
+                "Cubic units"
+              ]
+            },
+            {
+              "lesson_number": 27,
+              "title": "Describe Plane Sections of Three-Dimensional Figures",
+              "start_page": 189,
+              "standards_focus": [
+                "7.G.3"
+              ],
+              "key_concepts": [
+                "Plane sections",
+                "Cross-sections"
+              ]
+            },
+            {
+              "lesson_number": 28,
+              "title": "Find Unknown Angle Measures",
+              "start_page": 206,
+              "standards_focus": [
+                "7.G.5"
+              ],
+              "key_concepts": [
+                "Angle relationships",
+                "Supplementary and complementary"
+              ]
+            },
+            {
+              "lesson_number": 29,
+              "title": "Draw Plane Figures with Given Conditions",
+              "start_page": 227,
+              "standards_focus": [
+                "7.G.2"
+              ],
+              "key_concepts": [
+                "Drawing geometric figures",
+                "Constructions"
+              ]
+            }
+          ]
+        },
+        {
+          "unit_number": 7,
+          "title": "Probability: Theoretical and Experimental Probability",
+          "description": "Understanding probability, experimental probability, probability models, compound events",
+          "lessons": [
+            {
+              "lesson_number": 30,
+              "title": "Understand Probability",
+              "start_page": 273,
+              "standards_focus": [
+                "7.SP.5"
+              ],
+              "key_concepts": [
+                "Probability concepts",
+                "Theoretical probability"
+              ]
+            },
+            {
+              "lesson_number": 31,
+              "title": "Solve Problems Involving Experimental Probability",
+              "start_page": 285,
+              "standards_focus": [
+                "7.SP.6"
+              ],
+              "key_concepts": [
+                "Experimental probability",
+                "Data collection"
+              ]
+            },
+            {
+              "lesson_number": 32,
+              "title": "Solve Problems Involving Probability Models",
+              "start_page": 309,
+              "standards_focus": [
+                "7.SP.7"
+              ],
+              "key_concepts": [
+                "Probability models",
+                "Compound events"
+              ]
+            },
+            {
+              "lesson_number": 33,
+              "title": "Solve Problems Involving Compound Events Explore Compound Events",
+              "start_page": 331,
+              "standards_focus": [
+                "7.SP.8"
+              ],
+              "key_concepts": [
+                "Compound events",
+                "Tree diagrams",
+                "Sample spaces"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

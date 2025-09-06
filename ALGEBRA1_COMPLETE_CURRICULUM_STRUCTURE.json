@@ -1,0 +1,454 @@
+{
+  "grade": 9,
+  "title": "Ready Classroom Mathematics Algebra 1",
+  "curriculum_publisher": "Curriculum Associates",
+  "curriculum_type": "High School Algebra 1 Program",
+  "total_pages": 1354,
+  "total_lessons": 28,
+  "total_units": 7,
+  "volumes": {
+    "Volume 1": {
+      "volume_name": "Volume 1",
+      "units": [
+        {
+          "unit_number": 1,
+          "title": "Expressions, Equations, and Inequalities",
+          "description": "Representing quantities, solving equations, linear equations, linear inequalities",
+          "lessons": [
+            {
+              "lesson_number": 1,
+              "title": "Represent Quantities and Relationships",
+              "start_page": 13,
+              "standards_focus": [
+                "A-SSE.1",
+                "A-CED.1"
+              ],
+              "key_concepts": [
+                "Representing quantities",
+                "Variables and expressions",
+                "Mathematical modeling"
+              ]
+            },
+            {
+              "lesson_number": 2,
+              "title": "Reason About Solving Equations",
+              "start_page": 26,
+              "standards_focus": [
+                "A-REI.1",
+                "A-REI.3"
+              ],
+              "key_concepts": [
+                "Equation solving strategies",
+                "Properties of equality",
+                "Inverse operations"
+              ]
+            },
+            {
+              "lesson_number": 3,
+              "title": "Linear Equations in Two Variables",
+              "start_page": 158,
+              "standards_focus": [
+                "A-CED.2",
+                "A-REI.3"
+              ],
+              "key_concepts": [
+                "Linear equations in two variables",
+                "Standard form",
+                "Slope-intercept form"
+              ]
+            },
+            {
+              "lesson_number": 4,
+              "title": "Linear Inequalities in One Variable",
+              "start_page": 188,
+              "standards_focus": [
+                "A-CED.1",
+                "A-REI.3"
+              ],
+              "key_concepts": [
+                "Linear inequalities",
+                "Inequality notation",
+                "Solution sets"
+              ]
+            }
+          ]
+        },
+        {
+          "unit_number": 2,
+          "title": "Functions and Linear Relationships",
+          "description": "Function concepts, graphs, linear functions, data fitting, piecewise functions",
+          "lessons": [
+            {
+              "lesson_number": 5,
+              "title": "Function Concepts",
+              "start_page": 252,
+              "standards_focus": [
+                "F-IF.1",
+                "F-IF.2"
+              ],
+              "key_concepts": [
+                "Function definition",
+                "Domain and range",
+                "Function notation"
+              ]
+            },
+            {
+              "lesson_number": 6,
+              "title": "Interpret Graphs of Functions",
+              "start_page": 282,
+              "standards_focus": [
+                "F-IF.4",
+                "F-IF.7"
+              ],
+              "key_concepts": [
+                "Interpreting graphs",
+                "Function behavior",
+                "Key features"
+              ]
+            },
+            {
+              "lesson_number": 7,
+              "title": "Linear Functions",
+              "start_page": 318,
+              "standards_focus": [
+                "F-IF.3",
+                "F-LE.2"
+              ],
+              "key_concepts": [
+                "Linear functions",
+                "Slope",
+                "Rate of change"
+              ]
+            },
+            {
+              "lesson_number": 8,
+              "title": "Fit Linear Functions to Data",
+              "start_page": 354,
+              "standards_focus": [
+                "S-ID.6",
+                "F-LE.2"
+              ],
+              "key_concepts": [
+                "Fitting linear models",
+                "Correlation",
+                "Line of best fit"
+              ]
+            },
+            {
+              "lesson_number": 9,
+              "title": "Piecewise Functions",
+              "start_page": 390,
+              "standards_focus": [
+                "F-IF.7",
+                "F-BF.3"
+              ],
+              "key_concepts": [
+                "Piecewise functions",
+                "Absolute value",
+                "Step functions"
+              ]
+            }
+          ]
+        },
+        {
+          "unit_number": 3,
+          "title": "Systems of Linear Equations and Inequalities",
+          "description": "Graphing, substitution, elimination, linear inequalities, systems",
+          "lessons": [
+            {
+              "lesson_number": 10,
+              "title": "Solve Linear Systems by Graphing or Substitution",
+              "start_page": 466,
+              "standards_focus": [
+                "A-REI.6",
+                "A-REI.7"
+              ],
+              "key_concepts": [
+                "Graphing systems",
+                "Substitution method",
+                "Point of intersection"
+              ]
+            },
+            {
+              "lesson_number": 11,
+              "title": "Solve Linear Systems by Elimination",
+              "start_page": 496,
+              "standards_focus": [
+                "A-REI.5",
+                "A-REI.6"
+              ],
+              "key_concepts": [
+                "Elimination method",
+                "Linear combinations",
+                "System solutions"
+              ]
+            },
+            {
+              "lesson_number": 12,
+              "title": "Linear Inequalities in Two Variables",
+              "start_page": 526,
+              "standards_focus": [
+                "A-CED.2",
+                "A-REI.12"
+              ],
+              "key_concepts": [
+                "Linear inequalities in two variables",
+                "Half-plane solutions"
+              ]
+            },
+            {
+              "lesson_number": 13,
+              "title": "Systems of Linear Inequalities",
+              "start_page": 556,
+              "standards_focus": [
+                "A-CED.3",
+                "A-REI.12"
+              ],
+              "key_concepts": [
+                "Systems of inequalities",
+                "Feasible regions",
+                "Optimization"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "Volume 2": {
+      "volume_name": "Volume 2",
+      "units": [
+        {
+          "unit_number": 4,
+          "title": "Sequences and Exponential Functions",
+          "description": "Sequences, exponential graphs, exponential modeling, comparing functions, rational exponents",
+          "lessons": [
+            {
+              "lesson_number": 14,
+              "title": "Sequences",
+              "start_page": 36,
+              "standards_focus": [
+                "F-IF.3",
+                "F-BF.2"
+              ],
+              "key_concepts": [
+                "Arithmetic sequences",
+                "Geometric sequences",
+                "Recursive formulas"
+              ]
+            },
+            {
+              "lesson_number": 15,
+              "title": "Graphs of Exponential Functions",
+              "start_page": 72,
+              "standards_focus": [
+                "F-IF.7",
+                "F-LE.2"
+              ],
+              "key_concepts": [
+                "Exponential functions",
+                "Growth and decay",
+                "Exponential graphs"
+              ]
+            },
+            {
+              "lesson_number": 16,
+              "title": "Model with Exponential Functions",
+              "start_page": 102,
+              "standards_focus": [
+                "F-LE.1",
+                "F-LE.2"
+              ],
+              "key_concepts": [
+                "Exponential modeling",
+                "Real-world applications",
+                "Base and exponent"
+              ]
+            },
+            {
+              "lesson_number": 17,
+              "title": "Compare Linear and Exponential Functions",
+              "start_page": 138,
+              "standards_focus": [
+                "F-LE.3"
+              ],
+              "key_concepts": [
+                "Comparing linear and exponential",
+                "Growth rates",
+                "Function families"
+              ]
+            },
+            {
+              "lesson_number": 18,
+              "title": "Rational Exponents",
+              "start_page": 168,
+              "standards_focus": [
+                "N-RN.1",
+                "N-RN.2"
+              ],
+              "key_concepts": [
+                "Rational exponents",
+                "Radical expressions",
+                "Exponent rules"
+              ]
+            }
+          ]
+        },
+        {
+          "unit_number": 5,
+          "title": "Polynomials and Quadratic Functions",
+          "description": "Polynomial operations, quadratic graphs, quadratic modeling, factoring",
+          "lessons": [
+            {
+              "lesson_number": 19,
+              "title": "Operations with Polynomials",
+              "start_page": 230,
+              "standards_focus": [
+                "A-APR.1"
+              ],
+              "key_concepts": [
+                "Polynomial operations",
+                "Adding, subtracting, multiplying polynomials"
+              ]
+            },
+            {
+              "lesson_number": 20,
+              "title": "Graphs of Quadratic Functions",
+              "start_page": 260,
+              "standards_focus": [
+                "F-IF.7",
+                "F-IF.8"
+              ],
+              "key_concepts": [
+                "Quadratic functions",
+                "Parabolas",
+                "Vertex form"
+              ]
+            },
+            {
+              "lesson_number": 21,
+              "title": "Model with Quadratic Functions",
+              "start_page": 296,
+              "standards_focus": [
+                "A-CED.1",
+                "F-IF.4"
+              ],
+              "key_concepts": [
+                "Quadratic modeling",
+                "Maximum and minimum",
+                "Applications"
+              ]
+            },
+            {
+              "lesson_number": 22,
+              "title": "Factor Polynomials",
+              "start_page": 332,
+              "standards_focus": [
+                "A-SSE.2",
+                "A-SSE.3"
+              ],
+              "key_concepts": [
+                "Factoring polynomials",
+                "Greatest common factor",
+                "Factoring patterns"
+              ]
+            }
+          ]
+        },
+        {
+          "unit_number": 6,
+          "title": "Quadratic Equations and Complex Solutions",
+          "description": "Solving quadratic equations, completing the square, quadratic formula",
+          "lessons": [
+            {
+              "lesson_number": 23,
+              "title": "Quadratic Equations in One Variable",
+              "start_page": 402,
+              "standards_focus": [
+                "A-REI.4"
+              ],
+              "key_concepts": [
+                "Solving quadratic equations",
+                "Zero product property",
+                "Factoring"
+              ]
+            },
+            {
+              "lesson_number": 24,
+              "title": "Completing the Square",
+              "start_page": 438,
+              "standards_focus": [
+                "A-SSE.3",
+                "A-REI.4"
+              ],
+              "key_concepts": [
+                "Completing the square",
+                "Perfect square trinomials",
+                "Vertex form"
+              ]
+            },
+            {
+              "lesson_number": 25,
+              "title": "The Quadratic Formula",
+              "start_page": 468,
+              "standards_focus": [
+                "A-REI.4"
+              ],
+              "key_concepts": [
+                "Quadratic formula",
+                "Discriminant",
+                "Nature of solutions"
+              ]
+            }
+          ]
+        },
+        {
+          "unit_number": 7,
+          "title": "Statistics and Data Analysis",
+          "description": "One-variable statistics, comparing data sets, two-way frequency tables",
+          "lessons": [
+            {
+              "lesson_number": 26,
+              "title": "One-Variable Statistics",
+              "start_page": 532,
+              "standards_focus": [
+                "S-ID.1",
+                "S-ID.2"
+              ],
+              "key_concepts": [
+                "Descriptive statistics",
+                "Measures of center and spread",
+                "Data distributions"
+              ]
+            },
+            {
+              "lesson_number": 27,
+              "title": "Comparing Data Sets",
+              "start_page": 562,
+              "standards_focus": [
+                "S-ID.3"
+              ],
+              "key_concepts": [
+                "Comparing data sets",
+                "Box plots",
+                "Statistical inference"
+              ]
+            },
+            {
+              "lesson_number": 28,
+              "title": "Two-Way Frequency Tables",
+              "start_page": 592,
+              "standards_focus": [
+                "S-ID.5"
+              ],
+              "key_concepts": [
+                "Two-way frequency tables",
+                "Conditional probability",
+                "Independence"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

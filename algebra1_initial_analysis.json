@@ -1,0 +1,290 @@
+{
+  "grade": 9,
+  "title": "Ready Classroom Mathematics Algebra 1",
+  "total_pages": 1354,
+  "volumes": {
+    "Volume 1": {
+      "volume_name": "Volume 1",
+      "total_pages": 656,
+      "lessons": [
+        {
+          "lesson_number": 0,
+          "title": "is on the Teacher Digital Experience. See the Classroom Resources tab on the Teache...",
+          "start_page": 37,
+          "page_id": "page_37"
+        },
+        {
+          "lesson_number": 1,
+          "title": "Represent Quantities and Relationships Example  A parking lot has 8 identical square flower beds. The total area of the parking lot, including the flower beds, is 6,500 ft2. Write an equation",
+          "start_page": 13,
+          "page_id": "page_13"
+        },
+        {
+          "lesson_number": 2,
+          "title": "Reason About Solving Equations",
+          "start_page": 26,
+          "page_id": "page_26"
+        },
+        {
+          "lesson_number": 3,
+          "title": "Linear Equations in Two Variables Overview  |  Linear Equations in Two Variables Learning Progression",
+          "start_page": 158,
+          "page_id": "page_158"
+        },
+        {
+          "lesson_number": 4,
+          "title": "Linear Inequalities in One Variable Overview  |  Linear Inequalities in One Variable Learning Progression",
+          "start_page": 188,
+          "page_id": "page_188"
+        },
+        {
+          "lesson_number": 5,
+          "title": "Function Concepts Overview  |  Function Concepts Learning Progression",
+          "start_page": 252,
+          "page_id": "page_252"
+        },
+        {
+          "lesson_number": 6,
+          "title": "Interpret Graphs of Functions Overview  |  Interpret Graphs of Functions Learning Progression",
+          "start_page": 282,
+          "page_id": "page_282"
+        },
+        {
+          "lesson_number": 7,
+          "title": "Linear Functions Overview  |  Linear Functions Learning Progression",
+          "start_page": 318,
+          "page_id": "page_318"
+        },
+        {
+          "lesson_number": 8,
+          "title": "Fit Linear Functions to Data Overview  |  Fit Linear Functions to Data Learning Progression",
+          "start_page": 354,
+          "page_id": "page_354"
+        },
+        {
+          "lesson_number": 9,
+          "title": "Piecewise Functions Overview  |  Piecewise Functions Learning Progression",
+          "start_page": 390,
+          "page_id": "page_390"
+        },
+        {
+          "lesson_number": 10,
+          "title": "Solve Linear Systems by Graphing or Substitution Overview  |  Solve Linear Systems by Graphing or Substitution Learning Progression",
+          "start_page": 466,
+          "page_id": "page_466"
+        },
+        {
+          "lesson_number": 11,
+          "title": "Solve Linear Systems by Elimination Overview  |  Solve Linear Systems by Elimination Learning Progression",
+          "start_page": 496,
+          "page_id": "page_496"
+        },
+        {
+          "lesson_number": 12,
+          "title": "Linear Inequalities in Two Variables Overview  |  Linear Inequalities in Two Variables Learning Progression",
+          "start_page": 526,
+          "page_id": "page_526"
+        },
+        {
+          "lesson_number": 13,
+          "title": "Systems of Linear Inequalities Overview  |  Systems of Linear Inequalities Learning Progression",
+          "start_page": 556,
+          "page_id": "page_556"
+        }
+      ],
+      "contents_pages": [
+        {
+          "page_number": 4,
+          "text_preview": "Standards in boldface indicate the standards covered by the majority of the lesson content. See page B7 for information and correlation",
+          "page_type": "contents"
+        },
+        {
+          "page_number": 5,
+          "text_preview": "Standards in boldface indicate the standards covered by the majority of the lesson content. See page B7 for information and correlation",
+          "page_type": "contents"
+        },
+        {
+          "page_number": 6,
+          "text_preview": "Standards in boldface indicate the standards covered by the majority of the lesson content. See page B7 for information and correlation",
+          "page_type": "contents"
+        },
+        {
+          "page_number": 7,
+          "text_preview": "Standards in boldface indicate the standards covered by the majority of the lesson content. See page B7 for information and correlation",
+          "page_type": "contents"
+        },
+        {
+          "page_number": 8,
+          "text_preview": "Standards in boldface indicate the standards covered by the majority of the lesson content. See page B7 for information and correlation",
+          "page_type": "contents"
+        },
+        {
+          "page_number": 9,
+          "text_preview": "Standards in boldface indicate the standards covered by the majority of the lesson content. See page B7 for information and correlation",
+          "page_type": "contents"
+        },
+        {
+          "page_number": 12,
+          "text_preview": "PROGRAM OVERVIEW Organization Lesson Types",
+          "page_type": "contents"
+        },
+        {
+          "page_number": 86,
+          "text_preview": "Standards for Mathematical Practice Standards for Mathematical Practice in Every Lesson Embedded SMP within Lessons",
+          "page_type": "contents"
+        }
+      ]
+    },
+    "Volume 2": {
+      "volume_name": "Volume 2",
+      "total_pages": 698,
+      "lessons": [
+        {
+          "lesson_number": 0,
+          "title": "is on the Teacher Digital Experience. See the Classroom Resources tab on the Teache...",
+          "start_page": 11,
+          "page_id": "page_11"
+        },
+        {
+          "lesson_number": 1,
+          "title": "Represent Quantities and Relationships",
+          "start_page": 33,
+          "page_id": "page_33"
+        },
+        {
+          "lesson_number": 10,
+          "title": "Solve Linear Systems by Graphing or Substitution",
+          "start_page": 691,
+          "page_id": "page_691"
+        },
+        {
+          "lesson_number": 14,
+          "title": "Sequences Overview  |  Sequences Learning Progression",
+          "start_page": 36,
+          "page_id": "page_36"
+        },
+        {
+          "lesson_number": 15,
+          "title": "Graphs of Exponential Functions Overview  |  Graphs of Exponential Functions Learning Progression",
+          "start_page": 72,
+          "page_id": "page_72"
+        },
+        {
+          "lesson_number": 16,
+          "title": "Model with Exponential Functions Overview  |  Model with Exponential Functions Learning Progression",
+          "start_page": 102,
+          "page_id": "page_102"
+        },
+        {
+          "lesson_number": 17,
+          "title": "Compare Linear and Exponential Functions Overview  |  Compare Linear and Exponential Functions Learning Progression",
+          "start_page": 138,
+          "page_id": "page_138"
+        },
+        {
+          "lesson_number": 18,
+          "title": "Rational Exponents Overview  |  Rational Exponents Learning Progression",
+          "start_page": 168,
+          "page_id": "page_168"
+        },
+        {
+          "lesson_number": 19,
+          "title": "Operations with Polynomials Overview  |  Operations with Polynomials Learning Progression",
+          "start_page": 230,
+          "page_id": "page_230"
+        },
+        {
+          "lesson_number": 20,
+          "title": "Graphs of Quadratic Functions Overview  |  Graphs of Quadratic Functions Learning Progression",
+          "start_page": 260,
+          "page_id": "page_260"
+        },
+        {
+          "lesson_number": 21,
+          "title": "Model with Quadratic Functions Overview  |  Model with Quadratic Functions Learning Progression",
+          "start_page": 296,
+          "page_id": "page_296"
+        },
+        {
+          "lesson_number": 22,
+          "title": "Factor Polynomials Overview  |  Factor Polynomials Learning Progression",
+          "start_page": 332,
+          "page_id": "page_332"
+        },
+        {
+          "lesson_number": 23,
+          "title": "Quadratic Equations in One Variable Overview  |  Quadratic Equations in One Variable Learning Progression",
+          "start_page": 402,
+          "page_id": "page_402"
+        },
+        {
+          "lesson_number": 24,
+          "title": "Completing the Square Overview  |  Completing the Square Learning Progression",
+          "start_page": 438,
+          "page_id": "page_438"
+        },
+        {
+          "lesson_number": 25,
+          "title": "The Quadratic Formula Overview  |  The Quadratic Formula Learning Progression",
+          "start_page": 468,
+          "page_id": "page_468"
+        },
+        {
+          "lesson_number": 26,
+          "title": "One-Variable Statistics Overview  |  One-Variable Statistics Learning Progression",
+          "start_page": 532,
+          "page_id": "page_532"
+        },
+        {
+          "lesson_number": 27,
+          "title": "Comparing Data Sets Overview  |  Comparing Data Sets Learning Progression",
+          "start_page": 562,
+          "page_id": "page_562"
+        },
+        {
+          "lesson_number": 28,
+          "title": "Two-Way Frequency Tables Overview  |  Two-Way Frequency Tables Learning Progression",
+          "start_page": 592,
+          "page_id": "page_592"
+        }
+      ],
+      "contents_pages": [
+        {
+          "page_number": 4,
+          "text_preview": "Standards in boldface indicate the standards covered by the majority of the lesson content. See page B7 for information and correlation",
+          "page_type": "contents"
+        },
+        {
+          "page_number": 5,
+          "text_preview": "Standards in boldface indicate the standards covered by the majority of the lesson content. See page B7 for information and correlation",
+          "page_type": "contents"
+        },
+        {
+          "page_number": 6,
+          "text_preview": "Standards in boldface indicate the standards covered by the majority of the lesson content. See page B7 for information and correlation",
+          "page_type": "contents"
+        },
+        {
+          "page_number": 7,
+          "text_preview": "Standards in boldface indicate the standards covered by the majority of the lesson content. See page B7 for information and correlation",
+          "page_type": "contents"
+        },
+        {
+          "page_number": 8,
+          "text_preview": "Standards in boldface indicate the standards covered by the majority of the lesson content. See page B7 for information and correlation",
+          "page_type": "contents"
+        },
+        {
+          "page_number": 9,
+          "text_preview": "Standards in boldface indicate the standards covered by the majority of the lesson content. See page B7 for information and correlation",
+          "page_type": "contents"
+        },
+        {
+          "page_number": 30,
+          "text_preview": "Standards for Mathematical Practice Standards for Mathematical Practice in Every Lesson Embedded SMP within Lessons",
+          "page_type": "contents"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,921 @@
+{
+  "metadata": {
+    "title": "Ready Classroom Mathematics Grade 6 - COMPLETE Scope & Sequence",
+    "grade": 6,
+    "curriculum": "Ready Classroom Mathematics",
+    "publisher": "Curriculum Associates",
+    "total_volumes": 2,
+    "total_units": 6,
+    "total_lessons": 33,
+    "total_pages": 894,
+    "extraction_source": "Document JSON analysis - both volumes",
+    "extraction_date": "2025-01-06"
+  },
+  "pacing_configurations": {
+    "traditional": {
+      "description": "Standard 36-week academic year",
+      "weeks_per_unit": 6,
+      "days_per_week": 5,
+      "minutes_per_lesson": 45,
+      "total_instructional_days": 180,
+      "semester_1_units": [
+        1,
+        2,
+        3
+      ],
+      "semester_2_units": [
+        4,
+        5,
+        6
+      ]
+    },
+    "accelerated": {
+      "description": "Accelerated 30-week schedule",
+      "weeks_per_unit": 5,
+      "days_per_week": 5,
+      "minutes_per_lesson": 50,
+      "total_instructional_days": 150,
+      "semester_1_units": [
+        1,
+        2,
+        3
+      ],
+      "semester_2_units": [
+        4,
+        5,
+        6
+      ]
+    },
+    "block_schedule": {
+      "description": "Block schedule with longer periods",
+      "weeks_per_unit": 6,
+      "days_per_week": 3,
+      "minutes_per_lesson": 90,
+      "total_instructional_days": 108,
+      "semester_1_units": [
+        1,
+        2,
+        3
+      ],
+      "semester_2_units": [
+        4,
+        5,
+        6
+      ]
+    }
+  },
+  "volume_1_pacing": {
+    "volume_title": "Grade 6 Volume 1",
+    "page_range": "1-512",
+    "units": [
+      {
+        "unit_number": 1,
+        "unit_title": "Area, Algebraic Expressions, and Exponents",
+        "unit_subtitle": "Expressions and Equations",
+        "page_range": "1-140",
+        "unit_standards": [
+          "6.G.A.1",
+          "6.G.A.4",
+          "6.EE.A.1",
+          "6.EE.A.2",
+          "6.EE.A.3",
+          "6.NS.B.4"
+        ],
+        "stem_spotlight": "Tetsuya 'Ted' Fujita",
+        "math_practices": [
+          "SMP 1",
+          "SMP 2",
+          "SMP 3",
+          "SMP 4",
+          "SMP 5",
+          "SMP 6",
+          "SMP 7",
+          "SMP 8"
+        ],
+        "lessons": [
+          {
+            "lesson_number": 1,
+            "lesson_title": "Find the Area of a Parallelogram",
+            "page_start": 3,
+            "page_end": 18,
+            "primary_standards": [
+              "6.G.A.1"
+            ],
+            "math_practices": [
+              "SMP 1",
+              "SMP 2",
+              "SMP 3",
+              "SMP 4",
+              "SMP 5",
+              "SMP 6"
+            ]
+          },
+          {
+            "lesson_number": 2,
+            "lesson_title": "Find the Area of Triangles and Other Polygons",
+            "page_start": 19,
+            "page_end": 40,
+            "primary_standards": [
+              "6.G.A.1"
+            ],
+            "math_practices": [
+              "SMP 1",
+              "SMP 2",
+              "SMP 3",
+              "SMP 4",
+              "SMP 5",
+              "SMP 6",
+              "SMP 7"
+            ]
+          },
+          {
+            "lesson_number": 3,
+            "lesson_title": "Use Nets to Find Surface Area",
+            "page_start": 41,
+            "page_end": 62,
+            "primary_standards": [
+              "6.G.A.4"
+            ],
+            "math_practices": [
+              "SMP 1",
+              "SMP 2",
+              "SMP 3",
+              "SMP 4",
+              "SMP 5",
+              "SMP 6"
+            ]
+          },
+          {
+            "lesson_number": 4,
+            "lesson_title": "Work with Algebraic Expressions",
+            "page_start": 63,
+            "page_end": 84,
+            "primary_standards": [
+              "6.EE.A.2"
+            ],
+            "math_practices": [
+              "SMP 1",
+              "SMP 2",
+              "SMP 3",
+              "SMP 4",
+              "SMP 5",
+              "SMP 6"
+            ]
+          },
+          {
+            "lesson_number": 5,
+            "lesson_title": "Write and Evaluate Expressions with Exponents",
+            "page_start": 85,
+            "page_end": 106,
+            "primary_standards": [
+              "6.EE.A.1"
+            ],
+            "math_practices": [
+              "SMP 1",
+              "SMP 2",
+              "SMP 3",
+              "SMP 4",
+              "SMP 5",
+              "SMP 6",
+              "SMP 8"
+            ]
+          },
+          {
+            "lesson_number": 6,
+            "lesson_title": "Find Greatest Common Factor and Least Common Multiple",
+            "page_start": 107,
+            "page_end": 128,
+            "primary_standards": [
+              "6.NS.B.4"
+            ],
+            "math_practices": [
+              "SMP 1",
+              "SMP 2",
+              "SMP 3",
+              "SMP 4",
+              "SMP 5",
+              "SMP 6",
+              "SMP 7",
+              "SMP 8"
+            ]
+          }
+        ],
+        "unit_assessment": {
+          "math_in_action": "Area, Surface Area, and Algebraic Expressions",
+          "pages": "129-137",
+          "self_reflection": "page 138",
+          "vocabulary_review": "page 139",
+          "unit_review": "page 140"
+        }
+      },
+      {
+        "unit_number": 2,
+        "unit_title": "Base-Ten Operations, Division with Fractions, and Volume",
+        "unit_subtitle": "Decimals and Fractions",
+        "page_range": "143-262",
+        "unit_standards": [
+          "6.NS.A.1",
+          "6.NS.B.2",
+          "6.NS.B.3",
+          "6.G.A.2"
+        ],
+        "stem_spotlight": "Isabella Aiona Abbott",
+        "math_practices": [
+          "SMP 1",
+          "SMP 2",
+          "SMP 3",
+          "SMP 4",
+          "SMP 5",
+          "SMP 6",
+          "SMP 7",
+          "SMP 8"
+        ],
+        "lessons": [
+          {
+            "lesson_number": 7,
+            "lesson_title": "Add, Subtract, and Multiply Multi-Digit Decimals",
+            "page_start": 145,
+            "page_end": 166,
+            "primary_standards": [
+              "6.NS.B.3"
+            ],
+            "math_practices": [
+              "SMP 1",
+              "SMP 2",
+              "SMP 3",
+              "SMP 4",
+              "SMP 5",
+              "SMP 6",
+              "SMP 7"
+            ]
+          },
+          {
+            "lesson_number": 8,
+            "lesson_title": "Divide Whole Numbers and Multi-Digit Decimals",
+            "page_start": 167,
+            "page_end": 194,
+            "primary_standards": [
+              "6.NS.B.2"
+            ],
+            "math_practices": [
+              "SMP 1",
+              "SMP 2",
+              "SMP 3",
+              "SMP 4",
+              "SMP 5",
+              "SMP 6",
+              "SMP 7",
+              "SMP 8"
+            ]
+          },
+          {
+            "lesson_number": 9,
+            "lesson_title": "Understand Division with Fractions",
+            "page_start": 195,
+            "page_end": 206,
+            "primary_standards": [
+              "6.NS.A.1"
+            ],
+            "math_practices": [
+              "SMP 2",
+              "SMP 3",
+              "SMP 7"
+            ]
+          },
+          {
+            "lesson_number": 10,
+            "lesson_title": "Divide Fractions",
+            "page_start": 207,
+            "page_end": 228,
+            "primary_standards": [
+              "6.NS.A.1"
+            ],
+            "math_practices": [
+              "SMP 1",
+              "SMP 2",
+              "SMP 3",
+              "SMP 4",
+              "SMP 5",
+              "SMP 6",
+              "SMP 7"
+            ]
+          },
+          {
+            "lesson_number": 11,
+            "lesson_title": "Solve Volume Problems with Fractions",
+            "page_start": 229,
+            "page_end": 250,
+            "primary_standards": [
+              "6.G.A.2"
+            ],
+            "math_practices": [
+              "SMP 1",
+              "SMP 2",
+              "SMP 3",
+              "SMP 4",
+              "SMP 5",
+              "SMP 6",
+              "SMP 8"
+            ]
+          }
+        ],
+        "unit_assessment": {
+          "math_in_action": "Volume and Operations with Decimals and Fractions",
+          "pages": "251-259",
+          "self_reflection": "page 260",
+          "vocabulary_review": "page 261",
+          "unit_review": "page 262"
+        }
+      },
+      {
+        "unit_number": 3,
+        "unit_title": "Ratio Concepts and Equivalent Ratios",
+        "unit_subtitle": "Ratio Reasoning",
+        "page_range": "265-340",
+        "unit_standards": [
+          "6.RP.A.1",
+          "6.RP.A.3"
+        ],
+        "stem_spotlight": "Lewis Latimer",
+        "math_practices": [
+          "SMP 1",
+          "SMP 2",
+          "SMP 3",
+          "SMP 4",
+          "SMP 5",
+          "SMP 6",
+          "SMP 7",
+          "SMP 8"
+        ],
+        "lessons": [
+          {
+            "lesson_number": 12,
+            "lesson_title": "Understand Ratio Concepts",
+            "page_start": 267,
+            "page_end": 278,
+            "primary_standards": [
+              "6.RP.A.1"
+            ],
+            "math_practices": [
+              "SMP 2",
+              "SMP 3",
+              "SMP 7"
+            ]
+          },
+          {
+            "lesson_number": 13,
+            "lesson_title": "Find Equivalent Ratios",
+            "page_start": 279,
+            "page_end": 306,
+            "primary_standards": [
+              "6.RP.A.3"
+            ],
+            "math_practices": [
+              "SMP 1",
+              "SMP 2",
+              "SMP 3",
+              "SMP 4",
+              "SMP 5",
+              "SMP 6"
+            ]
+          },
+          {
+            "lesson_number": 14,
+            "lesson_title": "Use Part-to-Part and Part-to-Whole Ratios",
+            "page_start": 307,
+            "page_end": 328,
+            "primary_standards": [
+              "6.RP.A.3"
+            ],
+            "math_practices": [
+              "SMP 1",
+              "SMP 2",
+              "SMP 3",
+              "SMP 4",
+              "SMP 5",
+              "SMP 6",
+              "SMP 7"
+            ]
+          }
+        ],
+        "unit_assessment": {
+          "math_in_action": "Ratios",
+          "pages": "329-337",
+          "self_reflection": "page 338",
+          "vocabulary_review": "page 339",
+          "unit_review": "page 340"
+        }
+      },
+      {
+        "unit_number": 4,
+        "unit_title": "Unit Rates and Percent",
+        "unit_subtitle": "Ratio Reasoning",
+        "page_range": "343-430",
+        "unit_standards": [
+          "6.RP.A.2",
+          "6.RP.A.3"
+        ],
+        "stem_spotlight": "Tessa Lau",
+        "math_practices": [
+          "SMP 1",
+          "SMP 2",
+          "SMP 3",
+          "SMP 4",
+          "SMP 5",
+          "SMP 6",
+          "SMP 7",
+          "SMP 8"
+        ],
+        "lessons": [
+          {
+            "lesson_number": 15,
+            "lesson_title": "Understand Rate Concepts",
+            "page_start": 345,
+            "page_end": 356,
+            "primary_standards": [
+              "6.RP.A.2"
+            ],
+            "math_practices": [
+              "SMP 2",
+              "SMP 3",
+              "SMP 7"
+            ]
+          },
+          {
+            "lesson_number": 16,
+            "lesson_title": "Use Unit Rates to Solve Problems",
+            "page_start": 357,
+            "page_end": 384,
+            "primary_standards": [
+              "6.RP.A.3"
+            ],
+            "math_practices": [
+              "SMP 1",
+              "SMP 2",
+              "SMP 3",
+              "SMP 4",
+              "SMP 5",
+              "SMP 6",
+              "SMP 8"
+            ]
+          },
+          {
+            "lesson_number": 17,
+            "lesson_title": "Understand Percents",
+            "page_start": 385,
+            "page_end": 396,
+            "primary_standards": [
+              "6.RP.A.3"
+            ],
+            "math_practices": [
+              "SMP 2",
+              "SMP 3",
+              "SMP 7"
+            ]
+          },
+          {
+            "lesson_number": 18,
+            "lesson_title": "Use Percents to Solve Problems",
+            "page_start": 397,
+            "page_end": 418,
+            "primary_standards": [
+              "6.RP.A.3"
+            ],
+            "math_practices": [
+              "SMP 1",
+              "SMP 2",
+              "SMP 3",
+              "SMP 4",
+              "SMP 5",
+              "SMP 6"
+            ]
+          }
+        ],
+        "unit_assessment": {
+          "math_in_action": "Rates, Unit Rates, and Percents",
+          "pages": "419-427",
+          "self_reflection": "page 428",
+          "vocabulary_review": "page 429",
+          "unit_review": "page 430"
+        }
+      }
+    ]
+  },
+  "volume_2_pacing": {
+    "volume_title": "Grade 6 Volume 2",
+    "page_range": "433-894",
+    "units": [
+      {
+        "unit_number": 5,
+        "unit_title": "Equivalent Expressions and Equations with Variables",
+        "unit_subtitle": "Algebraic Thinking",
+        "page_range": "433-538",
+        "unit_standards": [
+          "6.EE.A.2",
+          "6.EE.A.3",
+          "6.EE.A.4",
+          "6.EE.B.5",
+          "6.EE.B.6",
+          "6.EE.B.7",
+          "6.EE.C.9"
+        ],
+        "stem_spotlight": "Diana Trujillo",
+        "math_practices": [
+          "SMP 1",
+          "SMP 2",
+          "SMP 3",
+          "SMP 4",
+          "SMP 5",
+          "SMP 6",
+          "SMP 7",
+          "SMP 8"
+        ],
+        "lessons": [
+          {
+            "lesson_number": 19,
+            "lesson_title": "Write and Identify Equivalent Expressions",
+            "page_start": 435,
+            "page_end": 456,
+            "primary_standards": [
+              "6.EE.A.3",
+              "6.EE.A.4"
+            ],
+            "math_practices": [
+              "SMP 1",
+              "SMP 2",
+              "SMP 3",
+              "SMP 4",
+              "SMP 5",
+              "SMP 6",
+              "SMP 7"
+            ]
+          },
+          {
+            "lesson_number": 20,
+            "lesson_title": "Understand Solutions to Equations",
+            "page_start": 457,
+            "page_end": 478,
+            "primary_standards": [
+              "6.EE.B.5"
+            ],
+            "math_practices": [
+              "SMP 1",
+              "SMP 2",
+              "SMP 3",
+              "SMP 4",
+              "SMP 5",
+              "SMP 6"
+            ]
+          },
+          {
+            "lesson_number": 21,
+            "lesson_title": "Write and Solve One-Variable Equations",
+            "page_start": 479,
+            "page_end": 506,
+            "primary_standards": [
+              "6.EE.B.6",
+              "6.EE.B.7"
+            ],
+            "math_practices": [
+              "SMP 1",
+              "SMP 2",
+              "SMP 3",
+              "SMP 4",
+              "SMP 5",
+              "SMP 6",
+              "SMP 8"
+            ]
+          },
+          {
+            "lesson_number": 22,
+            "lesson_title": "Understand Relationships Between Variables",
+            "page_start": 507,
+            "page_end": 528,
+            "primary_standards": [
+              "6.EE.C.9"
+            ],
+            "math_practices": [
+              "SMP 1",
+              "SMP 2",
+              "SMP 3",
+              "SMP 4",
+              "SMP 5",
+              "SMP 6",
+              "SMP 7",
+              "SMP 8"
+            ]
+          }
+        ],
+        "unit_assessment": {
+          "math_in_action": "Expressions and Equations",
+          "pages": "525-533",
+          "self_reflection": "page 534",
+          "vocabulary_review": "page 535",
+          "unit_review": "pages 536-538"
+        }
+      },
+      {
+        "unit_number": 6,
+        "unit_title": "Absolute Value, Inequalities, and the Coordinate Plane",
+        "unit_subtitle": "Positive and Negative Numbers",
+        "page_range": "539-654",
+        "unit_standards": [
+          "6.NS.C.5",
+          "6.NS.C.6",
+          "6.NS.C.7",
+          "6.NS.C.8",
+          "6.EE.B.8"
+        ],
+        "stem_spotlight": "John McCarthy",
+        "math_practices": [
+          "SMP 1",
+          "SMP 2",
+          "SMP 3",
+          "SMP 4",
+          "SMP 5",
+          "SMP 6",
+          "SMP 7",
+          "SMP 8"
+        ],
+        "lessons": [
+          {
+            "lesson_number": 23,
+            "lesson_title": "Understand Positive and Negative Numbers",
+            "page_start": 541,
+            "page_end": 552,
+            "primary_standards": [
+              "6.NS.C.5"
+            ],
+            "math_practices": [
+              "SMP 2",
+              "SMP 3",
+              "SMP 7"
+            ]
+          },
+          {
+            "lesson_number": 24,
+            "lesson_title": "Order Positive and Negative Numbers",
+            "page_start": 553,
+            "page_end": 568,
+            "primary_standards": [
+              "6.NS.C.7"
+            ],
+            "math_practices": [
+              "SMP 1",
+              "SMP 2",
+              "SMP 3",
+              "SMP 4",
+              "SMP 5",
+              "SMP 6"
+            ]
+          },
+          {
+            "lesson_number": 25,
+            "lesson_title": "Understand Absolute Value",
+            "page_start": 569,
+            "page_end": 580,
+            "primary_standards": [
+              "6.NS.C.7"
+            ],
+            "math_practices": [
+              "SMP 2",
+              "SMP 3",
+              "SMP 7"
+            ]
+          },
+          {
+            "lesson_number": 26,
+            "lesson_title": "Write and Graph One-Variable Inequalities",
+            "page_start": 581,
+            "page_end": 608,
+            "primary_standards": [
+              "6.EE.B.8"
+            ],
+            "math_practices": [
+              "SMP 1",
+              "SMP 2",
+              "SMP 3",
+              "SMP 4",
+              "SMP 5",
+              "SMP 6",
+              "SMP 8"
+            ]
+          },
+          {
+            "lesson_number": 27,
+            "lesson_title": "Understand the Four-Quadrant Coordinate Plane",
+            "page_start": 609,
+            "page_end": 620,
+            "primary_standards": [
+              "6.NS.C.6"
+            ],
+            "math_practices": [
+              "SMP 2",
+              "SMP 3",
+              "SMP 7"
+            ]
+          },
+          {
+            "lesson_number": 28,
+            "lesson_title": "Solve Problems in the Coordinate Plane",
+            "page_start": 621,
+            "page_end": 642,
+            "primary_standards": [
+              "6.NS.C.8"
+            ],
+            "math_practices": [
+              "SMP 1",
+              "SMP 2",
+              "SMP 3",
+              "SMP 4",
+              "SMP 5",
+              "SMP 6",
+              "SMP 7"
+            ]
+          }
+        ],
+        "unit_assessment": {
+          "math_in_action": "Negative Numbers, Inequalities, and the Coordinate Plane",
+          "pages": "643-651",
+          "self_reflection": "page 652",
+          "vocabulary_review": "page 653",
+          "unit_review": "page 654"
+        }
+      }
+    ]
+  },
+  "standards_alignment": {
+    "6.RP": {
+      "domain": "Ratios and Proportional Relationships",
+      "clusters": {
+        "6.RP.A": "Understand ratio concepts and use ratio reasoning to solve problems",
+        "6.RP.A.1": "Understand the concept of a ratio and use ratio language to describe a ratio relationship between two quantities",
+        "6.RP.A.2": "Understand the concept of a unit rate a/b associated with a ratio a:b with b \u2260 0, and use rate language in the context of a ratio relationship",
+        "6.RP.A.3": "Use ratio and rate reasoning to solve real-world and mathematical problems"
+      }
+    },
+    "6.NS": {
+      "domain": "The Number System",
+      "clusters": {
+        "6.NS.A": "Apply and extend previous understandings of multiplication and division to divide fractions by fractions",
+        "6.NS.B": "Compute fluently with multi-digit numbers and find common factors and multiples",
+        "6.NS.C": "Apply and extend previous understandings of numbers to the system of rational numbers",
+        "6.NS.A.1": "Interpret and compute quotients of fractions, and solve word problems involving division of fractions by fractions",
+        "6.NS.B.2": "Fluently divide multi-digit numbers using the standard algorithm",
+        "6.NS.B.3": "Fluently add, subtract, multiply, and divide multi-digit decimals using the standard algorithm for each operation",
+        "6.NS.B.4": "Find the greatest common factor of two whole numbers less than or equal to 100 and the least common multiple of two whole numbers less than or equal to 12",
+        "6.NS.C.5": "Understand that positive and negative numbers are used together to describe quantities having opposite directions or values",
+        "6.NS.C.6": "Understand a rational number as a point on the number line",
+        "6.NS.C.7": "Understand ordering and absolute value of rational numbers",
+        "6.NS.C.8": "Solve real-world and mathematical problems by graphing points in all four quadrants of the coordinate plane"
+      }
+    },
+    "6.EE": {
+      "domain": "Expressions and Equations",
+      "clusters": {
+        "6.EE.A": "Apply and extend previous understandings of arithmetic to algebraic expressions",
+        "6.EE.B": "Reason about and solve one-variable equations and inequalities",
+        "6.EE.C": "Represent and analyze quantitative relationships between dependent and independent variables",
+        "6.EE.A.1": "Write and evaluate numerical expressions involving whole-number exponents",
+        "6.EE.A.2": "Write, read, and evaluate expressions in which letters stand for numbers",
+        "6.EE.A.3": "Apply the properties of operations to generate equivalent expressions",
+        "6.EE.A.4": "Identify when two expressions are equivalent",
+        "6.EE.B.5": "Understand solving an equation or inequality as a process of answering a question",
+        "6.EE.B.6": "Use variables to represent numbers and write expressions when solving a real-world or mathematical problem",
+        "6.EE.B.7": "Solve real-world and mathematical problems by writing and solving equations of the form x + p = q and px = q",
+        "6.EE.B.8": "Write an inequality of the form x > c or x < c to represent a constraint or condition in a real-world or mathematical problem",
+        "6.EE.C.9": "Use variables to represent two quantities in a real-world problem that change in relationship to one another"
+      }
+    },
+    "6.G": {
+      "domain": "Geometry",
+      "clusters": {
+        "6.G.A": "Solve real-world and mathematical problems involving area, surface area, and volume",
+        "6.G.A.1": "Find the area of right triangles, other triangles, special quadrilaterals, and polygons by composing into rectangles or decomposing into triangles and other shapes",
+        "6.G.A.2": "Find the volume of a right rectangular prism with fractional edge lengths by packing it with unit cubes",
+        "6.G.A.4": "Represent three-dimensional figures using nets made up of rectangles and triangles"
+      }
+    }
+  },
+  "assessment_calendar": {
+    "formative_assessments": [
+      {
+        "type": "exit_ticket",
+        "frequency": "daily"
+      },
+      {
+        "type": "lesson_quiz",
+        "frequency": "per_lesson"
+      },
+      {
+        "type": "weekly_check",
+        "frequency": "weekly"
+      }
+    ],
+    "summative_assessments": [
+      {
+        "unit": 1,
+        "week": 6,
+        "type": "unit_test",
+        "standards": [
+          "6.G.A.1",
+          "6.G.A.4",
+          "6.EE.A.1",
+          "6.EE.A.2",
+          "6.EE.A.3",
+          "6.NS.B.4"
+        ]
+      },
+      {
+        "unit": 2,
+        "week": 12,
+        "type": "unit_test",
+        "standards": [
+          "6.NS.A.1",
+          "6.NS.B.2",
+          "6.NS.B.3",
+          "6.G.A.2"
+        ]
+      },
+      {
+        "unit": 3,
+        "week": 18,
+        "type": "unit_test",
+        "standards": [
+          "6.RP.A.1",
+          "6.RP.A.3"
+        ]
+      },
+      {
+        "unit": 4,
+        "week": 24,
+        "type": "unit_test",
+        "standards": [
+          "6.RP.A.2",
+          "6.RP.A.3"
+        ]
+      },
+      {
+        "unit": 5,
+        "week": 30,
+        "type": "unit_test",
+        "standards": [
+          "6.EE.A.2",
+          "6.EE.A.3",
+          "6.EE.A.4",
+          "6.EE.B.5",
+          "6.EE.B.6",
+          "6.EE.B.7",
+          "6.EE.C.9"
+        ]
+      },
+      {
+        "unit": 6,
+        "week": 36,
+        "type": "unit_test",
+        "standards": [
+          "6.NS.C.5",
+          "6.NS.C.6",
+          "6.NS.C.7",
+          "6.NS.C.8",
+          "6.EE.B.8"
+        ]
+      }
+    ],
+    "mid_year_assessment": {
+      "week": 18,
+      "covers_units": [
+        1,
+        2,
+        3
+      ]
+    },
+    "end_of_year_assessment": {
+      "week": 36,
+      "covers_units": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    }
+  },
+  "learning_progression": {
+    "semester_1_focus": "Number Systems, Geometry, Ratios",
+    "semester_2_focus": "Algebraic Thinking, Coordinate Plane, Negative Numbers",
+    "vertical_alignment": {
+      "grade_5_prerequisite": [
+        "Operations with decimals",
+        "Basic fractions",
+        "Coordinate plane (first quadrant)"
+      ],
+      "grade_7_preparation": [
+        "Linear equations",
+        "Proportional relationships",
+        "Rational numbers"
+      ]
+    }
+  }
+}

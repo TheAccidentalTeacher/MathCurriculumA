@@ -1,0 +1,199 @@
+{
+  "metadata": {
+    "title": "Grade 6 Mathematics Dynamic Pacing Guide",
+    "grade": 6,
+    "subject": "Mathematics",
+    "curriculum": "Ready Classroom Mathematics",
+    "volume": 1,
+    "school_year": "2025-2026",
+    "created_date": "2025-09-06",
+    "version": "1.0"
+  },
+  "pacing_configurations": {
+    "traditional": {
+      "description": "Standard academic year pacing",
+      "total_weeks": 36,
+      "days_per_week": 5,
+      "minutes_per_session": 45,
+      "buffer_days": 10
+    },
+    "accelerated": {
+      "description": "Accelerated pacing for advanced learners",
+      "total_weeks": 30,
+      "days_per_week": 5,
+      "minutes_per_session": 50,
+      "buffer_days": 5
+    },
+    "block_schedule": {
+      "description": "Block schedule pacing",
+      "total_weeks": 36,
+      "days_per_week": 3,
+      "minutes_per_session": 90,
+      "buffer_days": 8
+    }
+  },
+  "assessment_calendar": {
+    "unit_assessments": [
+      {"unit": 1, "type": "summative", "week": 6},
+      {"unit": 2, "type": "summative", "week": 12},
+      {"unit": 3, "type": "summative", "week": 18},
+      {"unit": 4, "type": "summative", "week": 24},
+      {"unit": 5, "type": "summative", "week": 30}
+    ],
+    "formative_checkpoints": [
+      {"frequency": "weekly", "type": "exit_ticket"},
+      {"frequency": "bi-weekly", "type": "quiz"},
+      {"frequency": "lesson_end", "type": "self_assessment"}
+    ]
+  },
+  "units": [
+    {
+      "unit_number": 1,
+      "unit_title": "Area and Volume",
+      "unit_overview": "Students explore concepts of area and surface area, working with parallelograms, triangles, polygons, and three-dimensional figures.",
+      "unit_standards": ["6.G.A.1", "6.G.A.4", "6.EE.A.2"],
+      "estimated_weeks": 6,
+      "lessons": [
+        {
+          "lesson_number": 1,
+          "lesson_title": "Find the Area of a Parallelogram",
+          "lesson_overview": "Students discover and apply the formula for finding the area of parallelograms.",
+          "primary_standards": ["6.G.A.1"],
+          "supporting_standards": ["6.EE.A.2"],
+          "prerequisite_skills": [
+            "Understanding of multiplication",
+            "Basic geometric shape recognition",
+            "Concept of area as covering"
+          ],
+          "learning_objectives": [
+            "Derive the formula for area of a parallelogram",
+            "Apply the area formula to solve problems",
+            "Connect parallelogram area to rectangle area"
+          ],
+          "estimated_days": 3,
+          "sessions": [
+            {
+              "session_number": 1,
+              "session_title": "Explore: Discovering Parallelogram Area",
+              "session_type": "explore",
+              "duration_minutes": 45,
+              "standards_focus": ["6.G.A.1"],
+              "learning_goals": [
+                "Investigate relationship between parallelograms and rectangles",
+                "Discover that area depends on base and height"
+              ],
+              "key_activities": [
+                "Cut and rearrange parallelogram shapes",
+                "Compare areas of different parallelograms",
+                "Identify base and height measurements"
+              ],
+              "materials": [
+                "Parallelogram cutouts",
+                "Grid paper", 
+                "Rulers",
+                "Scissors"
+              ],
+              "formative_assessments": [
+                "Observation of student reasoning",
+                "Exit ticket: Draw a parallelogram and identify base/height"
+              ],
+              "differentiation": {
+                "support": "Provide pre-cut shapes, use smaller numbers",
+                "extension": "Explore parallelograms on coordinate plane"
+              }
+            },
+            {
+              "session_number": 2,
+              "session_title": "Develop: Area Formula Application",
+              "session_type": "develop",
+              "duration_minutes": 45,
+              "standards_focus": ["6.G.A.1"],
+              "learning_goals": [
+                "Apply area formula A = base × height",
+                "Solve problems involving parallelogram area"
+              ],
+              "key_activities": [
+                "Practice with formula A = bh",
+                "Work through guided examples",
+                "Solve real-world area problems"
+              ],
+              "materials": [
+                "Workbooks",
+                "Calculators",
+                "Area formula reference sheet"
+              ],
+              "formative_assessments": [
+                "Problem-solving check-ins",
+                "Peer explanation activities"
+              ],
+              "differentiation": {
+                "support": "Use formula templates, provide step-by-step guides",
+                "extension": "Multi-step problems with composite figures"
+              }
+            },
+            {
+              "session_number": 3,
+              "session_title": "Refine: Problem Solving and Applications",
+              "session_type": "refine",
+              "duration_minutes": 45,
+              "standards_focus": ["6.G.A.1", "6.EE.A.2"],
+              "learning_goals": [
+                "Apply area concepts to complex problems",
+                "Use algebraic expressions for area"
+              ],
+              "key_activities": [
+                "Independent problem solving",
+                "Create area problems for peers",
+                "Connect to algebraic expressions"
+              ],
+              "materials": [
+                "Problem sets",
+                "Graph paper",
+                "Technology tools"
+              ],
+              "formative_assessments": [
+                "Problem-solving rubric",
+                "Student-created problems"
+              ],
+              "differentiation": {
+                "support": "Provide formula cards, use concrete models",
+                "extension": "Variable expressions for area"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "differentiation_strategies": {
+    "english_learners": [
+      "Visual vocabulary supports",
+      "Bilingual glossaries", 
+      "Peer translation support",
+      "Hands-on manipulatives"
+    ],
+    "special_education": [
+      "Modified problem sets",
+      "Extended time allowances",
+      "Visual organizers",
+      "Step-by-step guides"
+    ],
+    "gifted_talented": [
+      "Extension problems",
+      "Independent research projects",
+      "Peer tutoring opportunities",
+      "Advanced applications"
+    ]
+  },
+  "technology_integration": [
+    "Interactive geometry software",
+    "Online practice platforms",
+    "Digital manipulatives",
+    "Assessment tools"
+  ],
+  "family_engagement": {
+    "unit_overviews": "Send home unit summaries with key vocabulary",
+    "practice_activities": "Provide family-friendly practice suggestions",
+    "progress_updates": "Regular communication about student progress"
+  }
+}

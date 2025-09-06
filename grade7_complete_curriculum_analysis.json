@@ -1,0 +1,219 @@
+{
+  "grade": 7,
+  "title": "Ready Classroom Mathematics Grade 7",
+  "total_pages": 944,
+  "volumes": {
+    "Volume 1": {
+      "volume_name": "Volume 1",
+      "total_pages": 504,
+      "units": [],
+      "lessons": [
+        {
+          "lesson_number": 1,
+          "title": "Solve Problems Involving Scale",
+          "start_page": 15,
+          "page_id": "page_15"
+        },
+        {
+          "lesson_number": 2,
+          "title": "Find Unit Rates Involving Ratios of Fractions",
+          "start_page": 44,
+          "page_id": "page_44"
+        },
+        {
+          "lesson_number": 3,
+          "title": "Understand Proportional Relationships Understand Proportional Relationships",
+          "start_page": 59,
+          "page_id": "page_59"
+        },
+        {
+          "lesson_number": 4,
+          "title": "Represent Proportional Relationships Represent Proportional Relationships",
+          "start_page": 71,
+          "page_id": "page_71"
+        },
+        {
+          "lesson_number": 5,
+          "title": "Solve Proportional Relationship Problems",
+          "start_page": 93,
+          "page_id": "page_93"
+        },
+        {
+          "lesson_number": 6,
+          "title": "Solve Area and Circumference Problems Involving Circles Solve Area and Circumference Problems Involving Circles",
+          "start_page": 109,
+          "page_id": "page_109"
+        },
+        {
+          "lesson_number": 7,
+          "title": "Understand Addition with Negative Integers",
+          "start_page": 152,
+          "page_id": "page_152"
+        },
+        {
+          "lesson_number": 8,
+          "title": "Add with Negative Numbers Add with Negative Numbers",
+          "start_page": 161,
+          "page_id": "page_161"
+        },
+        {
+          "lesson_number": 9,
+          "title": "Understand Subtraction with Negative Integers",
+          "start_page": 183,
+          "page_id": "page_183"
+        },
+        {
+          "lesson_number": 10,
+          "title": "Add and Subtract Positive and Negative Numbers Add and Subtract Positive and Negative Numbers",
+          "start_page": 195,
+          "page_id": "page_195"
+        },
+        {
+          "lesson_number": 11,
+          "title": "Understand Multiplication with Negative Integers",
+          "start_page": 243,
+          "page_id": "page_243"
+        },
+        {
+          "lesson_number": 12,
+          "title": "Multiply and Divide with Negative Numbers",
+          "start_page": 249,
+          "page_id": "page_249"
+        },
+        {
+          "lesson_number": 13,
+          "title": "Express Rational Numbers as Terminating or Repeating Decimals",
+          "start_page": 269,
+          "page_id": "page_269"
+        },
+        {
+          "lesson_number": 14,
+          "title": "Use the Four Operations with Negative Numbers",
+          "start_page": 291,
+          "page_id": "page_291"
+        },
+        {
+          "lesson_number": 15,
+          "title": "Write Equivalent Expressions Involving Rational Numbers",
+          "start_page": 325,
+          "page_id": "page_325"
+        },
+        {
+          "lesson_number": 16,
+          "title": "Understand Reasons for Rewriting Expressions",
+          "start_page": 347,
+          "page_id": "page_347"
+        },
+        {
+          "lesson_number": 17,
+          "title": "Understand Multi-Step Equations",
+          "start_page": 359,
+          "page_id": "page_359"
+        },
+        {
+          "lesson_number": 18,
+          "title": "Write and Solve Multi-Step Equations",
+          "start_page": 371,
+          "page_id": "page_371"
+        },
+        {
+          "lesson_number": 19,
+          "title": "Write and Solve Inequalities",
+          "start_page": 394,
+          "page_id": "page_394"
+        }
+      ]
+    },
+    "Volume 2": {
+      "volume_name": "Volume 2",
+      "total_pages": 440,
+      "units": [],
+      "lessons": [
+        {
+          "lesson_number": 20,
+          "title": "Solve Problems Involving Percents",
+          "start_page": 17,
+          "page_id": "page_17"
+        },
+        {
+          "lesson_number": 21,
+          "title": "Solve Problems Involving Percent Change and Percent Error",
+          "start_page": 45,
+          "page_id": "page_45"
+        },
+        {
+          "lesson_number": 22,
+          "title": "Understand Random Sampling",
+          "start_page": 72,
+          "page_id": "page_72"
+        },
+        {
+          "lesson_number": 23,
+          "title": "Reason About Random Samples",
+          "start_page": 78,
+          "page_id": "page_78"
+        },
+        {
+          "lesson_number": 24,
+          "title": "Compare Populations",
+          "start_page": 101,
+          "page_id": "page_101"
+        },
+        {
+          "lesson_number": 25,
+          "title": "Solve Problems Involving Area and Surface Area Lesson Title",
+          "start_page": 139,
+          "page_id": "page_139"
+        },
+        {
+          "lesson_number": 26,
+          "title": "Solve Problems Involving Volume",
+          "start_page": 167,
+          "page_id": "page_167"
+        },
+        {
+          "lesson_number": 27,
+          "title": "Describe Plane Sections of Three-Dimensional Figures",
+          "start_page": 189,
+          "page_id": "page_189"
+        },
+        {
+          "lesson_number": 28,
+          "title": "Find Unknown Angle Measures",
+          "start_page": 206,
+          "page_id": "page_206"
+        },
+        {
+          "lesson_number": 29,
+          "title": "Draw Plane Figures with Given Conditions",
+          "start_page": 227,
+          "page_id": "page_227"
+        },
+        {
+          "lesson_number": 30,
+          "title": "Understand Probability",
+          "start_page": 273,
+          "page_id": "page_273"
+        },
+        {
+          "lesson_number": 31,
+          "title": "Solve Problems Involving Experimental Probability",
+          "start_page": 285,
+          "page_id": "page_285"
+        },
+        {
+          "lesson_number": 32,
+          "title": "Solve Problems Involving Probability Models",
+          "start_page": 309,
+          "page_id": "page_309"
+        },
+        {
+          "lesson_number": 33,
+          "title": "Solve Problems Involving Compound Events Explore Compound Events",
+          "start_page": 331,
+          "page_id": "page_331"
+        }
+      ]
+    }
+  }
+}
