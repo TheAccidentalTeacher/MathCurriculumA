@@ -39,6 +39,43 @@ export interface LessonData {
 export class DatabaseFreeLessonService {
   private static documentCache = new Map<string, any>();
   private static lessonBoundaries: Record<string, Record<number, { start: number; end: number; title: string }>> = {
+    'RCM06_NA_SW_V1': {
+      1: { start: 3, end: 18, title: 'Find the Area of a Parallelogram' },
+      2: { start: 19, end: 40, title: 'Find the Area of Triangles and Other Polygons' },
+      3: { start: 41, end: 62, title: 'Use Nets to Find Surface Area' },
+      4: { start: 63, end: 84, title: 'Work with Algebraic Expressions' },
+      5: { start: 85, end: 106, title: 'Write and Evaluate Expressions with Exponents' },
+      6: { start: 107, end: 128, title: 'Find Greatest Common Factor and Least Common Multiple' },
+      7: { start: 145, end: 166, title: 'Add, Subtract, and Multiply Multi-Digit Decimals' },
+      8: { start: 167, end: 194, title: 'Divide Whole Numbers and Multi-Digit Decimals' },
+      9: { start: 195, end: 206, title: 'Understand Division with Fractions' },
+      10: { start: 207, end: 228, title: 'Divide Fractions' },
+      11: { start: 229, end: 250, title: 'Solve Volume Problems with Fractions' },
+      12: { start: 267, end: 278, title: 'Understand Ratio Concepts' },
+      13: { start: 279, end: 306, title: 'Find Equivalent Ratios' },
+      14: { start: 307, end: 328, title: 'Use Part-to-Part and Part-to-Whole Ratios' }
+    },
+    'RCM06_NA_SW_V2': {
+      15: { start: 345, end: 356, title: 'Understand Rate Concepts' },
+      16: { start: 357, end: 384, title: 'Use Unit Rates to Solve Problems' },
+      17: { start: 385, end: 396, title: 'Understand Percents' },
+      18: { start: 397, end: 418, title: 'Use Percents to Solve Problems' },
+      19: { start: 435, end: 462, title: 'Write and Identify Equivalent Expressions' },
+      20: { start: 463, end: 474, title: 'Understand Solutions of Equations' },
+      21: { start: 475, end: 502, title: 'Write and Solve One-Variable Equations' },
+      22: { start: 503, end: 524, title: 'Analyze Two-Variable Relationships' },
+      23: { start: 541, end: 552, title: 'Understand Positive and Negative Numbers' },
+      24: { start: 553, end: 568, title: 'Order Positive and Negative Numbers' },
+      25: { start: 569, end: 580, title: 'Understand Absolute Value' },
+      26: { start: 581, end: 608, title: 'Write and Graph One-Variable Inequalities' },
+      27: { start: 609, end: 620, title: 'Understand the Four-Quadrant Coordinate Plane' },
+      28: { start: 621, end: 642, title: 'Solve Problems in the Coordinate Plane' },
+      29: { start: 659, end: 670, title: 'Understand Statistical Questions and Data Distributions' },
+      30: { start: 671, end: 692, title: 'Use Dot Plots and Histograms to Describe Data Distributions' },
+      31: { start: 693, end: 714, title: 'Interpret Median and Interquartile Range in Box Plots' },
+      32: { start: 715, end: 736, title: 'Interpret Mean and Mean Absolute Deviation' },
+      33: { start: 737, end: 752, title: 'Use Measures of Center and Variability to Summarize Data' }
+    },
     'RCM07_NA_SW_V1': {
       1: { start: 15, end: 42, title: 'Solve Problems Involving Scale' },
       2: { start: 43, end: 58, title: 'Find Unit Rates Involving Ratios of Fractions' },
