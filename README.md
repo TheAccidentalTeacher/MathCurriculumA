@@ -195,7 +195,54 @@ This platform features comprehensive GeoGebra integration for dynamic mathematic
 
 ---
 
-## 🚀 Getting Started
+## �️ Troubleshooting Lesson Navigation
+
+### **Common Issues & Solutions**
+
+#### **Grade 6 Lessons Show Wrong Pages**
+**Problem**: Lesson shows incorrect content due to front matter offset
+```bash
+# Fix: Apply the 12-page offset correction
+python apply_grade6_offset.py
+
+# Verify the fix worked
+python verify_grade6_fix.py
+
+# Test specific lesson
+# URL: /lesson/RCM06_NA_SW_V1/3 should show "Surface Area" lesson
+```
+
+#### **Lesson Boundaries Need Regeneration**
+**Problem**: New PDF versions or content changes
+```bash
+# Detect all lesson patterns
+python find_all_lessons.py
+
+# For Grade 6 specifically
+python find_grade6_lessons.py
+```
+
+#### **Database-Free Lesson Service**
+The lesson boundaries are stored in `src/lib/database-free-lesson-service.ts`:
+- **No database required** - Uses static lesson mappings
+- **Fast performance** - Direct PNG file access
+- **Easy maintenance** - Edit boundaries in TypeScript file
+
+### **Verification Commands**
+```bash
+# Test Grade 6 Lesson 3 (Surface Area)
+curl localhost:3000/lesson/RCM06_NA_SW_V1/3
+
+# Test Grade 7 Lesson 4  
+curl localhost:3000/lesson/RCM07_NA_SW_V1/4
+
+# Check lesson boundaries in code
+grep -A 5 "Lesson 3" src/lib/database-free-lesson-service.ts
+```
+
+---
+
+## �🚀 Getting Started
 
 ### **📖 Essential Reading First**
 Before starting development, read these critical documents:
@@ -309,6 +356,15 @@ The platform is production-ready and deployed on Railway:
 - `npm run seed` - Full database setup (migrate + extract)
 - `npm run process-pdfs` - Batch process multiple PDFs
 
+### **Lesson Boundary Scripts**
+- `python find_all_lessons.py` - Detect lesson boundaries across all grades
+- `python apply_grade6_offset.py` - Fix Grade 6 front matter offset issue
+- `python verify_grade6_fix.py` - Verify lesson boundary corrections
+
+### **Database Tools**
+- `npx prisma studio` - Visual database browser
+- `npx prisma generate` - Regenerate Prisma client
+
 ---
 
 ## 🏗️ System Architecture
@@ -316,9 +372,44 @@ The platform is production-ready and deployed on Railway:
 ### **Data Flow Pipeline**
 ```
 📄 PDF Input → 🔍 Text Extraction → 🧠 Structure Analysis → 
-📊 Data Modeling → 💾 Database Storage → 🔎 Search Indexing → 
+   **📊 Data Modeling** → 💾 Database Storage → 🔎 Search Indexing → 
 🌐 Web Interface → 👤 User Experience
 ```
+
+## 🔍 Lesson Extraction Methodology
+
+### **How Lesson Boundaries Are Detected**
+
+The platform uses different extraction methods for each grade level due to varying PDF structures:
+
+#### **Grade 6: Table of Contents + Offset Correction**
+```bash
+# Problem: Grade 6 has 12-page front matter offset
+# Textbook page 41 = PNG file page_053.png
+
+python apply_grade6_offset.py  # Applies +12 page offset
+```
+- **Method**: Extract from table of contents, apply 12-page offset
+- **Files**: `database-free-lesson-service.ts` contains corrected boundaries
+- **Test**: `/lesson/RCM06_NA_SW_V1/3` → Lesson 3 "Surface Area"
+
+#### **Grades 7-8: Pattern Recognition**
+```bash
+python find_all_lessons.py     # Detects "LESSON X ... Dear Family" patterns
+```
+- **Method**: Search for "LESSON X" + "Dear Family" text patterns
+- **Accuracy**: 100% automatic detection
+- **Files**: Boundaries stored in `database-free-lesson-service.ts`
+
+#### **Grade 9 (Algebra 1): Manual Mapping**
+- **Method**: Manual lesson boundary identification
+- **Status**: Pre-configured in `database-free-lesson-service.ts`
+
+### **Key Scripts Location**
+- **Root Directory**: All Python extraction scripts
+- **Service File**: `src/lib/database-free-lesson-service.ts` - Master lesson boundaries
+- **PNG Assets**: `webapp_pages/{VOLUME}/pages/page_XXX.png` - High-resolution images
+- **Metadata**: `webapp_pages/{VOLUME}/data/document.json` - Text content and structure
 
 ### **Processing Layers**
 
@@ -345,11 +436,23 @@ The platform is production-ready and deployed on Railway:
 - `extract-grade6-volume2-json.ts` - Volume 2 with enhanced concept detection
 - **Features**: Lesson indicators, visual elements, mathematical concepts, structured JSON output
 
+**Grade 6 Lesson Boundary Scripts:**
+- `apply_grade6_offset.py` - **CRITICAL**: Applies 12-page offset to fix lesson navigation
+- `find_grade6_lessons.py` - Detects lesson patterns and "Dear Family" letters
+- `verify_grade6_fix.py` - Verifies lesson boundary corrections
+- **Issue**: Grade 6 has 12-page front matter offset (textbook page 41 = PNG page 53)
+- **Solution**: All Grade 6 lesson boundaries adjusted in `database-free-lesson-service.ts`
+
 **Grades 7-8 Visual-Based Extraction:**
 - High-resolution page image processing at 150 DPI
 - Visual element detection and classification
 - Page structure and content organization
 - Optimized for mathematics diagrams and visual content
+
+**Lesson Boundary Detection:**
+- `find_all_lessons.py` - Universal lesson detection script for all grades
+- Searches for "LESSON X ... Dear Family" patterns
+- Works perfectly for Grades 7-8, requires offset correction for Grade 6
 
 3. **Data Storage Layer**
    - Normalized relational database design
@@ -374,8 +477,20 @@ The platform is production-ready and deployed on Railway:
 - **📖 8 PDF documents** (Complete Grade 6, 7, 8, and Algebra 1)
 - **📄 4,226 pages** extracted and processed
 - **🖼️ 4,226 high-resolution PNG files** (2550x3263 pixels each)
-- **📝 Thousands of lessons and problems** categorized and indexed
+- **📝 126 lessons total** with accurate lesson boundaries:
+  - Grade 6: 33 lessons (✅ **Fixed with offset correction**)
+  - Grade 7: 33 lessons (✅ Working perfectly)
+  - Grade 8: 32 lessons (✅ Working perfectly) 
+  - Grade 9: 28 lessons (✅ Working perfectly)
 - **🏷️ Comprehensive curriculum database** with lesson boundaries
+
+### **Extraction Status by Grade**
+| Grade | Status | Method | Lessons | Notes |
+|-------|--------|--------|---------|-------|
+| Grade 6 | ✅ **FIXED** | Table of Contents + 12-page offset | 33 | Recently corrected front matter offset |
+| Grade 7 | ✅ Working | Pattern Recognition ("Dear Family") | 33 | Fully automated detection |
+| Grade 8 | ✅ Working | Pattern Recognition ("Dear Family") | 32 | Fully automated detection |
+| Grade 9 | ✅ Working | Manual Mapping | 28 | Pre-configured boundaries |
 
 ---
 
@@ -688,6 +803,28 @@ This Math Curriculum Platform represents:
 - **[SESSION_RECAP.md](./SESSION_RECAP.md)** - Latest development status and critical updates
 - **[virtualtutor/README.md](./virtualtutor/README.md)** - Virtual tutor system architecture
 - **Git log** - Recent commits and deployment history
+
+### **🔧 Lesson Extraction Quick Commands**
+```bash
+# Fix Grade 6 lesson boundaries (if needed)
+python apply_grade6_offset.py
+
+# Verify all lesson mappings
+python verify_grade6_fix.py
+
+# Detect lesson patterns (Grades 7-8)
+python find_all_lessons.py
+
+# Test lesson navigation
+curl localhost:3000/lesson/RCM06_NA_SW_V1/3  # Grade 6 Lesson 3
+curl localhost:3000/lesson/RCM07_NA_SW_V1/4  # Grade 7 Lesson 4
+```
+
+### **📁 Key Files for Lesson System**
+- `src/lib/database-free-lesson-service.ts` - Master lesson boundaries
+- `webapp_pages/{VOLUME}/data/document.json` - Extracted text content
+- `webapp_pages/{VOLUME}/pages/page_XXX.png` - High-resolution page images
+- `apply_grade6_offset.py` - Grade 6 offset correction script
 
 ### **GeoGebra Integration Checklist**
 ```bash
