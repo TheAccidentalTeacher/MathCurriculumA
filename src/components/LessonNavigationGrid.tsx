@@ -38,87 +38,107 @@ const GRADE_DATA: Grade[] = [
     volume1: [
       {
         number: 1,
-        title: "Area and Surface Area",
-        description: "Area of parallelograms, triangles, and surface area",
-        totalLessons: 7,
-        estimatedDays: 28,
-        majorWorkCount: 7,
+        title: "Expressions and Equations",
+        description: "Area, Algebraic Expressions, and Exponents",
+        totalLessons: 6,
+        estimatedDays: 30,
+        majorWorkCount: 6,
         lessons: [
           { number: 1, title: "Find the Area of a Parallelogram", sessions: 3, startPage: 3, endPage: 18, isMajorWork: true },
-          { number: 2, title: "Find the Area of Triangles", sessions: 3, startPage: 19, endPage: 30, isMajorWork: true },
-          { number: 3, title: "Find the Area of Polygons", sessions: 3, startPage: 31, endPage: 40, isMajorWork: true },
-          { number: 4, title: "Use Nets to Find Surface Area", sessions: 3, startPage: 41, endPage: 52, isMajorWork: true },
-          { number: 5, title: "Find Surface Area of Prisms", sessions: 3, startPage: 53, endPage: 62, isMajorWork: true },
-          { number: 6, title: "Find Surface Area of Pyramids", sessions: 4, startPage: 63, endPage: 76, isMajorWork: true },
-          { number: 7, title: "Solve Surface Area Problems", sessions: 4, startPage: 77, endPage: 90, isMajorWork: true }
+          { number: 2, title: "Find the Area of Triangles and Other Polygons", sessions: 3, startPage: 19, endPage: 40, isMajorWork: true },
+          { number: 3, title: "Use Nets to Find Surface Area", sessions: 3, startPage: 41, endPage: 62, isMajorWork: true },
+          { number: 4, title: "Work with Algebraic Expressions", sessions: 3, startPage: 63, endPage: 84, isMajorWork: true },
+          { number: 5, title: "Write and Evaluate Expressions with Exponents", sessions: 3, startPage: 85, endPage: 106, isMajorWork: true },
+          { number: 6, title: "Find Greatest Common Factor and Least Common Multiple", sessions: 3, startPage: 107, endPage: 128, isMajorWork: true }
         ]
       },
       {
         number: 2,
-        title: "Algebraic Expressions",
-        description: "Writing and evaluating algebraic expressions",
-        totalLessons: 6,
-        estimatedDays: 24,
-        majorWorkCount: 6,
+        title: "Decimals and Fractions",
+        description: "Base-Ten Operations, Division with Fractions, and Volume",
+        totalLessons: 5,
+        estimatedDays: 25,
+        majorWorkCount: 5,
         lessons: [
-          { number: 8, title: "Work with Algebraic Expressions", sessions: 3, startPage: 91, endPage: 102, isMajorWork: true },
-          { number: 9, title: "Write Equivalent Expressions", sessions: 3, startPage: 103, endPage: 114, isMajorWork: true },
-          { number: 10, title: "Evaluate Expressions", sessions: 3, startPage: 115, endPage: 126, isMajorWork: true },
-          { number: 11, title: "Write and Evaluate Expressions with Exponents", sessions: 4, startPage: 127, endPage: 140, isMajorWork: true },
-          { number: 12, title: "Find Greatest Common Factor", sessions: 3, startPage: 141, endPage: 152, isMajorWork: true },
-          { number: 13, title: "Find Least Common Multiple", sessions: 3, startPage: 153, endPage: 164, isMajorWork: true }
+          { number: 7, title: "Add, Subtract, and Multiply Multi-Digit Decimals", sessions: 3, startPage: 145, endPage: 166, isMajorWork: true },
+          { number: 8, title: "Divide Whole Numbers and Multi-Digit Decimals", sessions: 4, startPage: 167, endPage: 194, isMajorWork: true },
+          { number: 9, title: "Understand Division with Fractions", sessions: 3, startPage: 195, endPage: 206, isMajorWork: true },
+          { number: 10, title: "Divide Fractions", sessions: 3, startPage: 207, endPage: 228, isMajorWork: true },
+          { number: 11, title: "Solve Volume Problems with Fractions", sessions: 3, startPage: 229, endPage: 250, isMajorWork: true }
         ]
       },
       {
         number: 3,
-        title: "Operations with Decimals",
-        description: "Adding, subtracting, multiplying, and dividing decimals",
-        totalLessons: 7,
-        estimatedDays: 28,
-        majorWorkCount: 7,
+        title: "Ratio Reasoning",
+        description: "Ratio Concepts and Equivalent Ratios",
+        totalLessons: 3,
+        estimatedDays: 15,
+        majorWorkCount: 3,
         lessons: [
-          { number: 14, title: "Add and Subtract Multi-Digit Decimals", sessions: 3, startPage: 165, endPage: 176, isMajorWork: true },
-          { number: 15, title: "Multiply Multi-Digit Decimals", sessions: 3, startPage: 177, endPage: 188, isMajorWork: true },
-          { number: 16, title: "Divide Whole Numbers", sessions: 3, startPage: 189, endPage: 200, isMajorWork: true },
-          { number: 17, title: "Divide Multi-Digit Decimals", sessions: 4, startPage: 201, endPage: 214, isMajorWork: true },
-          { number: 18, title: "Solve Decimal Problems", sessions: 3, startPage: 215, endPage: 226, isMajorWork: true },
-          { number: 19, title: "Estimate with Decimals", sessions: 3, startPage: 227, endPage: 238, isMajorWork: true },
-          { number: 20, title: "Apply Decimal Operations", sessions: 4, startPage: 239, endPage: 252, isMajorWork: true }
+          { number: 12, title: "Understand Ratio Concepts", sessions: 3, startPage: 267, endPage: 278, isMajorWork: true },
+          { number: 13, title: "Find Equivalent Ratios", sessions: 4, startPage: 279, endPage: 306, isMajorWork: true },
+          { number: 14, title: "Use Part-to-Part and Part-to-Whole Ratios", sessions: 3, startPage: 307, endPage: 328, isMajorWork: true }
         ]
       }
     ],
     volume2: [
       {
         number: 4,
-        title: "Operations with Fractions",
-        description: "Division with fractions and volume problems",
-        totalLessons: 7,
-        estimatedDays: 28,
-        majorWorkCount: 7,
+        title: "Ratio Reasoning",
+        description: "Unit Rates and Percent",
+        totalLessons: 4,
+        estimatedDays: 20,
+        majorWorkCount: 4,
         lessons: [
-          { number: 21, title: "Understand Division with Fractions", sessions: 3, startPage: 253, endPage: 264, isMajorWork: true },
-          { number: 22, title: "Divide Fractions by Whole Numbers", sessions: 3, startPage: 265, endPage: 276, isMajorWork: true },
-          { number: 23, title: "Divide Whole Numbers by Fractions", sessions: 3, startPage: 277, endPage: 288, isMajorWork: true },
-          { number: 24, title: "Divide Fractions by Fractions", sessions: 4, startPage: 289, endPage: 302, isMajorWork: true },
-          { number: 25, title: "Solve Problems with Fraction Division", sessions: 3, startPage: 303, endPage: 314, isMajorWork: true },
-          { number: 26, title: "Find Volume with Fractions", sessions: 3, startPage: 315, endPage: 326, isMajorWork: true },
-          { number: 27, title: "Solve Volume Problems with Fractions", sessions: 4, startPage: 327, endPage: 340, isMajorWork: true }
+          { number: 15, title: "Understand Rate Concepts", sessions: 3, startPage: 345, endPage: 356, isMajorWork: true },
+          { number: 16, title: "Use Unit Rates to Solve Problems", sessions: 4, startPage: 357, endPage: 384, isMajorWork: true },
+          { number: 17, title: "Understand Percents", sessions: 3, startPage: 385, endPage: 396, isMajorWork: true },
+          { number: 18, title: "Use Percents to Solve Problems", sessions: 3, startPage: 397, endPage: 418, isMajorWork: true }
         ]
       },
       {
         number: 5,
-        title: "Ratios and Rates",
-        description: "Ratio concepts, equivalent ratios, and rates",
+        title: "Algebraic Thinking",
+        description: "Equivalent Expressions and Equations with Variables",
+        totalLessons: 4,
+        estimatedDays: 20,
+        majorWorkCount: 4,
+        lessons: [
+          { number: 19, title: "Write and Identify Equivalent Expressions", sessions: 3, startPage: 435, endPage: 462, isMajorWork: true },
+          { number: 20, title: "Understand Solutions of Equations", sessions: 3, startPage: 463, endPage: 474, isMajorWork: true },
+          { number: 21, title: "Write and Solve One-Variable Equations", sessions: 4, startPage: 475, endPage: 502, isMajorWork: true },
+          { number: 22, title: "Analyze Two-Variable Relationships", sessions: 3, startPage: 503, endPage: 524, isMajorWork: true }
+        ]
+      },
+      {
+        number: 6,
+        title: "Positive and Negative Numbers",
+        description: "Absolute Value, Inequalities, and the Coordinate Plane",
         totalLessons: 6,
-        estimatedDays: 24,
+        estimatedDays: 30,
         majorWorkCount: 6,
         lessons: [
-          { number: 28, title: "Understand Ratio Concepts", sessions: 3, startPage: 341, endPage: 352, isMajorWork: true },
-          { number: 29, title: "Find Equivalent Ratios", sessions: 4, startPage: 353, endPage: 366, isMajorWork: true },
-          { number: 30, title: "Use Part-to-Part and Part-to-Whole Ratios", sessions: 3, startPage: 367, endPage: 378, isMajorWork: true },
-          { number: 31, title: "Understand Rate Concepts", sessions: 3, startPage: 379, endPage: 390, isMajorWork: true },
-          { number: 32, title: "Solve Unit Rate Problems", sessions: 4, startPage: 391, endPage: 404, isMajorWork: true },
-          { number: 33, title: "Solve Percent Problems", sessions: 4, startPage: 405, endPage: 418, isMajorWork: true }
+          { number: 23, title: "Understand Positive and Negative Numbers", sessions: 3, startPage: 541, endPage: 552, isMajorWork: true },
+          { number: 24, title: "Order Positive and Negative Numbers", sessions: 3, startPage: 553, endPage: 568, isMajorWork: true },
+          { number: 25, title: "Understand Absolute Value", sessions: 3, startPage: 569, endPage: 580, isMajorWork: true },
+          { number: 26, title: "Write and Graph One-Variable Inequalities", sessions: 4, startPage: 581, endPage: 608, isMajorWork: true },
+          { number: 27, title: "Understand the Four-Quadrant Coordinate Plane", sessions: 3, startPage: 609, endPage: 620, isMajorWork: true },
+          { number: 28, title: "Solve Problems in the Coordinate Plane", sessions: 3, startPage: 621, endPage: 642, isMajorWork: true }
+        ]
+      },
+      {
+        number: 7,
+        title: "Statistical Thinking",
+        description: "Data Distributions and Measures of Center and Variability",
+        totalLessons: 5,
+        estimatedDays: 25,
+        majorWorkCount: 5,
+        lessons: [
+          { number: 29, title: "Understand Statistical Questions and Data Distributions", sessions: 3, startPage: 659, endPage: 670, isMajorWork: true },
+          { number: 30, title: "Use Dot Plots and Histograms to Describe Data Distributions", sessions: 4, startPage: 671, endPage: 692, isMajorWork: true },
+          { number: 31, title: "Interpret Median and Interquartile Range in Box Plots", sessions: 3, startPage: 693, endPage: 714, isMajorWork: true },
+          { number: 32, title: "Interpret Mean and Mean Absolute Deviation", sessions: 3, startPage: 715, endPage: 736, isMajorWork: true },
+          { number: 33, title: "Use Measures of Center and Variability to Summarize Data", sessions: 3, startPage: 737, endPage: 752, isMajorWork: true }
         ]
       }
     ]
