@@ -298,8 +298,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Database Selection Toggle */}
-        <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 border border-purple-500/30 rounded-xl p-4 mb-6">
+        {/* Database Selection Toggle - HIDDEN */}
+        {/* <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 border border-purple-500/30 rounded-xl p-4 mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <h2 className="text-lg font-semibold text-purple-200">Database Source</h2>
@@ -357,10 +357,10 @@ export default function Home() {
               </div>
             </div>
           )}
-        </div>
+        </div> */}
 
-        {/* Change Log */}
-        <div className="bg-slate-800 border border-slate-600 rounded-lg p-4 mb-6">
+        {/* Change Log - HIDDEN */}
+        {/* <div className="bg-slate-800 border border-slate-600 rounded-lg p-4 mb-6">
           <details className="group">
             <summary className="flex items-center gap-2 cursor-pointer text-slate-300 hover:text-white font-medium">
               📋 Change Log 
@@ -438,7 +438,7 @@ export default function Home() {
               </div>
             </div>
           </details>
-        </div>
+        </div> */}
 
         {/* Interactive Curriculum Transformer */}
         <div className="bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 border border-blue-700 rounded-2xl p-8 mb-8">
