@@ -15,107 +15,17 @@ The Math Curriculum Platform is a comprehensive full-stack application that tran
 
 ---
 
-## 🎓 Complete Curriculum Library
+## 🎓 Advanced Math Curriculum Platform
 
-### **� Comprehensive Mathematics Content**
-- ✅ **Grade 6**: Volume 1 (545,621 chars, 33 lessons) + Volume 2 (482,246 chars, 33 lessons)
-- ✅ **Grade 7**: Volume 1 (504 pages, visual-based) + Volume 2 (440 pages, visual-based)
-- ✅ **Grade 8**: Volume 1 (552 pages, visual-based) + Volume 2 (456 pages, visual-based)
-- ✅ **Total**: 5,248 pages across 6 complete curriculum volumes
+An intelligent, AI-powered mathematics curriculum platform featuring comprehensive lesson navigation, virtual tutoring, and adaptive learning pathways. Built with Next.js 15, React 19, and TypeScript for modern educational delivery.
 
-### **🔬 Dual Extraction Methods**
-- **Text-Based Extraction** (Grade 6): Full lesson detection, mathematical concept identification
-- **Visual-Based Extraction** (Grades 7-8): High-resolution image processing, visual element analysis
-- **Comprehensive Coverage**: All middle school mathematics standards represented
+> **⚡ LATEST UPDATE**: Complete lesson navigation system with virtual tutor integration for Grades 6-9 (126 total lessons) - See [SESSION_RECAP.md](./SESSION_RECAP.md) for details
 
 ---
 
-## 🏆 Project Achievements
+## 🚀 **Platform Overview**
 
-### **📖 Content Processing Excellence**
-- ✅ **5,248 total pages** extracted and processed across 6 volumes
-- ✅ **6 complete curriculum volumes** (Grades 6-8, both volumes each)
-- ✅ **1,027,867 characters** of text content extracted (Grade 6)
-- ✅ **719+ lesson instances** identified and cataloged
-- ✅ **34+ unique mathematical concepts** mapped
-- ✅ **100% content fidelity** preservation across all formats
-
-### **🔧 Technical Architecture**
-- ✅ **Next.js 15** with React 19 (latest versions)
-- ✅ **PostgreSQL** production database
-- ✅ **Railway deployment** with auto-scaling
-- ✅ **Prisma ORM** with complex relationships
-- ✅ **TypeScript** throughout for type safety
-
-### **🎯 Educational Features**
-- ✅ **Advanced PDF viewer** with page navigation
-- ✅ **Full-text search** across all content
-- ✅ **Structured curriculum data** (Units → Lessons → Sessions → Activities)
-- ✅ **Keyword tagging** and categorization
-- ✅ **Standards mapping** support
-- ✅ **Admin dashboard** for content management
-
----
-
-## 📁 Complete Project Structure
-
-```
-MathCurriculumA/
-├── 📱 Frontend Application
-│   ├── src/app/              # Next.js App Router
-│   │   ├── page.tsx         # Main dashboard
-│   │   ├── viewer/          # PDF page viewer
-│   │   │   ├── volume1/     # Grade 7 Volume 1 viewer
-│   │   │   └── volume2/     # Grade 7 Volume 2 viewer
-│   │   ├── search/          # Advanced search interface
-│   │   ├── admin/           # Database admin tools
-│   │   ├── documents/       # Document browser
-│   │   ├── keywords/        # Keyword explorer
-│   │   └── api/            # REST API endpoints
-│   ├── src/components/      # React components
-│   │   ├── PageViewer.tsx   # Main PDF viewer component
-│   │   └── ...             # Additional UI components
-│   └── src/lib/            # Core business logic
-│       ├── curriculum-service.ts  # Main service layer
-│       └── db.ts           # Database client
-│
-├── 🗄️ Database & Schema
-│   └── prisma/
-│       └── schema.prisma    # Complete data model
-│
-├── 🛠️ Processing Scripts
-│   ├── scripts/
-│   │   ├── advanced-pdf-extractor.ts    # Main extraction engine
-│   │   ├── extract-curriculum.ts        # Volume 1 processor
-│   │   ├── extract-volume2.ts          # Volume 2 processor
-│   │   ├── comprehensive_visual_extractor.py  # Visual processing
-│   │   ├── full_page_extractor.py      # Page image extraction
-│   │   └── [15+ specialized scripts]   # Additional processing tools
-│
-├── 📄 Source Materials
-│   ├── pdfs/               # Original curriculum PDFs
-│   │   ├── RCM07_NA_SW_V1.pdf  (31.6MB)
-│   │   ├── RCM07_NA_SW_V2.pdf  (28.5MB)
-│   │   ├── RCM08_NA_SW_V1.pdf  (47.4MB)
-│   │   └── RCM08_NA_SW_V2.pdf  (38.3MB)
-│
-├── 🖼️ Processed PNG Assets (4,226 Total Pages)
-│   └── webapp_pages/       # Complete high-resolution page images
-│       ├── RCM06_NA_SW_V1/ # Grade 6 Volume 1 (512 PNG files)
-│       ├── RCM06_NA_SW_V2/ # Grade 6 Volume 2 (408 PNG files)
-│       ├── RCM07_NA_SW_V1/ # Grade 7 Volume 1 (504 PNG files)
-│       ├── RCM07_NA_SW_V2/ # Grade 7 Volume 2 (440 PNG files)
-│       ├── RCM08_NA_SW_V1/ # Grade 8 Volume 1 (552 PNG files)
-│       ├── RCM08_NA_SW_V2/ # Grade 8 Volume 2 (456 PNG files)
-│       ├── ALG01_NA_SW_V1/ # Algebra 1 Volume 1 (656 PNG files)
-│       └── ALG01_NA_SW_V2/ # Algebra 1 Volume 2 (698 PNG files)
-│
-└── 📚 Documentation
-    ├── README.md           # This comprehensive guide
-    ├── DEPLOY_TO_RAILWAY.md # Deployment instructions
-    ├── EXTRACTION_STRATEGY.md # Processing methodology
-    └── ADVANCED_EXTRACTION_GUIDE.md # Technical details
-```
+This platform transforms traditional math education through:
 
 ---
 
