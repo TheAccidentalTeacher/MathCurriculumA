@@ -149,6 +149,38 @@ export class DatabaseFreeLessonService {
       30: { start: 295, end: 316, title: 'Write and Analyze an Equation for Fitting a Linear Model' },
       31: { start: 317, end: 328, title: 'Understand Two-Way Tables' },
       32: { start: 329, end: 456, title: 'Construct and Interpret Two-Way Tables' }
+    },
+    'ALG01_NA_SW_V1': {
+      1: { start: 13, end: 25, title: 'Represent Quantities and Relationships' },
+      2: { start: 26, end: 157, title: 'Reason About Solving Equations' },
+      3: { start: 158, end: 187, title: 'Linear Equations in Two Variables' },
+      4: { start: 188, end: 251, title: 'Linear Inequalities in One Variable' },
+      5: { start: 252, end: 281, title: 'Function Concepts' },
+      6: { start: 282, end: 317, title: 'Interpret Graphs of Functions' },
+      7: { start: 318, end: 353, title: 'Linear Functions' },
+      8: { start: 354, end: 389, title: 'Fit Linear Functions to Data' },
+      9: { start: 390, end: 465, title: 'Piecewise Functions' },
+      10: { start: 466, end: 495, title: 'Solve Linear Systems by Graphing or Substitution' },
+      11: { start: 496, end: 525, title: 'Solve Linear Systems by Elimination' },
+      12: { start: 526, end: 555, title: 'Linear Inequalities in Two Variables' },
+      13: { start: 556, end: 656, title: 'Systems of Linear Inequalities' }
+    },
+    'ALG01_NA_SW_V2': {
+      14: { start: 36, end: 71, title: 'Sequences' },
+      15: { start: 72, end: 101, title: 'Graphs of Exponential Functions' },
+      16: { start: 102, end: 137, title: 'Model with Exponential Functions' },
+      17: { start: 138, end: 167, title: 'Compare Linear and Exponential Functions' },
+      18: { start: 168, end: 229, title: 'Rational Exponents' },
+      19: { start: 230, end: 259, title: 'Operations with Polynomials' },
+      20: { start: 260, end: 295, title: 'Graphs of Quadratic Functions' },
+      21: { start: 296, end: 331, title: 'Model with Quadratic Functions' },
+      22: { start: 332, end: 401, title: 'Factor Polynomials' },
+      23: { start: 402, end: 437, title: 'Quadratic Equations in One Variable' },
+      24: { start: 438, end: 467, title: 'Completing the Square' },
+      25: { start: 468, end: 531, title: 'The Quadratic Formula' },
+      26: { start: 532, end: 561, title: 'One-Variable Statistics' },
+      27: { start: 562, end: 591, title: 'Comparing Data Sets' },
+      28: { start: 592, end: 698, title: 'Two-Way Frequency Tables' }
     }
   };
 
@@ -286,7 +318,9 @@ export class DatabaseFreeLessonService {
       'RCM07_NA_SW_V1': 'Grade 7 - Volume 1',
       'RCM07_NA_SW_V2': 'Grade 7 - Volume 2', 
       'RCM08_NA_SW_V1': 'Grade 8 - Volume 1',
-      'RCM08_NA_SW_V2': 'Grade 8 - Volume 2'
+      'RCM08_NA_SW_V2': 'Grade 8 - Volume 2',
+      'ALG01_NA_SW_V1': 'Algebra 1 - Volume 1',
+      'ALG01_NA_SW_V2': 'Algebra 1 - Volume 2'
     };
     return volumeMap[documentId] || 'Unknown Volume';
   }
