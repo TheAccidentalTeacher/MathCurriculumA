@@ -56,6 +56,10 @@ export class DatabaseFreeLessonService {
       14: { start: 319, end: 340, title: 'Use Part-to-Part and Part-to-Whole Ratios' },
     },
     'RCM06_NA_SW_V2': {
+      15: { start: 1, end: 17, title: 'Understand Rate Concepts' },
+      16: { start: 1, end: 17, title: 'Use Unit Rates to Solve Problems' },
+      17: { start: 1, end: 17, title: 'Understand Percents' },
+      18: { start: 1, end: 17, title: 'Use Percents to Solve Problems' },
       19: { start: 18, end: 56, title: 'Write and Identify Equivalent Expressions' },
       20: { start: 57, end: 85, title: 'Understand Solutions of Equations' },
       21: { start: 86, end: 158, title: 'Write and Solve One-Variable Equations' },
@@ -65,6 +69,12 @@ export class DatabaseFreeLessonService {
       25: { start: 314, end: 333, title: 'Understand Absolute Value' },
       26: { start: 334, end: 385, title: 'Write and Graph One-Variable Inequalities' },
       27: { start: 386, end: 408, title: 'Understand the Four-Quadrant Coordinate Plane' },
+      28: { start: 386, end: 408, title: 'Solve Problems in the Coordinate Plane' },
+      29: { start: 386, end: 408, title: 'Understand Statistical Questions and Data Distributions' },
+      30: { start: 386, end: 408, title: 'Use Dot Plots and Histograms to Describe Data Distributions' },
+      31: { start: 386, end: 408, title: 'Interpret Median and Interquartile Range in Box Plots' },
+      32: { start: 386, end: 408, title: 'Interpret Mean and Mean Absolute Deviation' },
+      33: { start: 386, end: 408, title: 'Use Measures of Center and Variability to Summarize Data' },
     
     },
     'RCM07_NA_SW_V1': {
