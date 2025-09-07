@@ -295,7 +295,7 @@ export class EnhancedAIService {
               content: detailedPrompt
             }
           ],
-          max_completion_tokens: 6000   // More tokens for detailed response
+          max_completion_tokens: 4000   // Reduced from 6000 to avoid length truncation
         });
       } catch (apiError) {
         console.error('❌ [AI Service] OpenAI API Error:', apiError);
@@ -322,6 +322,12 @@ export class EnhancedAIService {
           message: completion.choices?.[0]?.message
         });
         throw new Error(`No response from AI service. Completion ID: ${completion.id}, Finish reason: ${completion.choices?.[0]?.finish_reason || 'unknown'}`);
+      }
+      
+      // Check if response was truncated due to length limit
+      if (completion.choices?.[0]?.finish_reason === 'length') {
+        console.warn('⚠️ [AI Service] Response was truncated due to token limit, but continuing with partial content');
+        console.log('📏 [AI Service] Truncated response length:', aiResponse.length);
       }
       
       console.log('📨 [AI Service] Received detailed response, length:', aiResponse.length);
@@ -448,6 +454,12 @@ export class EnhancedAIService {
           message: completion.choices?.[0]?.message
         });
         throw new Error(`No response from AI service. Completion ID: ${completion.id}, Finish reason: ${completion.choices?.[0]?.finish_reason || 'unknown'}`);
+      }
+      
+      // Check if response was truncated due to length limit
+      if (completion.choices?.[0]?.finish_reason === 'length') {
+        console.warn('⚠️ [AI Service] Response was truncated due to token limit, but continuing with partial content');
+        console.log('📏 [AI Service] Truncated response length:', aiResponse.length);
       }
       
       console.log('📝 [AI Service] AI response length:', aiResponse.length, 'characters');
@@ -987,13 +999,11 @@ ${scopeData.map(scope => `
 - **Estimated Days**: ${scope.estimatedDays}
 - **Documents Available**: ${scope.documents.map(doc => `${doc.title} (${doc.lessons} lessons)`).join(', ')}
 
-**Unit Breakdown**:
-${scope.units.map(unit => `
-  ${unit.unitNumber}. ${unit.unitTitle}
-     - Lessons: ${unit.lessonCount}
-     - Estimated Days: ${unit.estimatedDays}
-     - Key Topics: ${unit.topics.slice(0, 3).join(', ')}${unit.topics.length > 3 ? '...' : ''}
+**Unit Breakdown** (Top 3 units):
+${scope.units.slice(0, 3).map(unit => `
+  ${unit.unitNumber}. ${unit.unitTitle} - ${unit.lessonCount} lessons (${unit.estimatedDays} days)
 `).join('')}
+... and ${scope.totalUnits - 3} more units
 `).join('\n')}
 
 ## DYNAMIC PACING CONFIGURATIONS
@@ -1019,29 +1029,24 @@ ${relevantPathways.length > 0 ? relevantPathways.map(pathway => `
 `).join('\n') : 'No specific accelerated pathways found for this grade combination.'}
 
 ## ACCELERATED PATHWAY CURRICULUM DATA
-The following is the complete accelerated pathway curriculum with ${acceleratedPathway.length} lessons:
+The following is a sample from the accelerated pathway curriculum with ${acceleratedPathway.length} total lessons:
 
-${acceleratedPathway.slice(0, 10).map(lesson => `
+${acceleratedPathway.slice(0, 5).map(lesson => `
 **Lesson ${lesson.lessonNumber}: ${lesson.title}**
-- Grade: ${lesson.grade}
-- Unit: ${lesson.unit}
-- Sessions: ${lesson.sessions}
+- Grade: ${lesson.grade} | Unit: ${lesson.unit} | Sessions: ${lesson.sessions}
 - Major Work: ${lesson.majorWork ? 'Yes' : 'No'}
-- Original Code: ${lesson.originalCode}
 `).join('\n')}
-${acceleratedPathway.length > 10 ? `\n... and ${acceleratedPathway.length - 10} more lessons` : ''}
+... and ${acceleratedPathway.length - 5} more lessons covering the complete pathway.
 
-## CURRICULUM CONTEXT
-Total Lessons Available: ${context.totalLessons}
-Major Standards Focus: ${context.majorStandards.map(s => Array.isArray(s.standards) ? s.standards.join(', ') : s.standards).join('; ')}
-Available Standards: ${context.availableStandards.map(s => Array.isArray(s.standards) ? s.standards.join(', ') : s.standards).join('; ')}
+## CURRICULUM CONTEXT (Summary)
+Total Lessons: ${context.totalLessons} | Units: ${context.unitStructure.length}
 
-Unit Structure:
-${context.unitStructure.map(unit => `
+Major Standards: ${context.majorStandards.slice(0, 3).map(s => Array.isArray(s.standards) ? s.standards.slice(0, 2).join(', ') : s.standards).join('; ')}${context.majorStandards.length > 3 ? '...' : ''}
+
+Key Units (Top 5):
+${context.unitStructure.slice(0, 5).map(unit => `
 - ${unit.unitTitle}: ${unit.lessonCount} lessons
-  Standards: ${Array.isArray(unit.standards) ? unit.standards.join(', ') : (unit.standards || 'None')}
-  Focus Distribution: Major(${unit.focusDistribution?.major || 0}%), Supporting(${unit.focusDistribution?.supporting || 0}%), Additional(${unit.focusDistribution?.additional || 0}%)
-`).join('')}
+`).join('')}${context.unitStructure.length > 5 ? `... and ${context.unitStructure.length - 5} more units` : ''}
 
 ## ANALYSIS REQUIREMENTS
 
