@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Accelerated Pathway API</title>
+</head>
+<body>
+    <h1>Test Accelerated Pathway API</h1>
+    <button onclick="testAPI()">Test API Call</button>
+    <pre id="result"></pre>
+
+    <script>
+        async function testAPI() {
+            const resultEl = document.getElementById('result');
+            resultEl.textContent = 'Testing...';
+            
+            try {
+                const response = await fetch('/api/pacing-guide', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        gradeLevel: 'Grades 8+9 (Accelerated)',
+                        gradeCombination: {
+                            selectedGrades: ['8', '9'],
+                            pathwayType: 'accelerated',
+                            emphasis: 'advanced'
+                        },
+                        timeframe: '36 weeks',
+                        studentPopulation: 'Advanced learners ready for accelerated content',
+                        priorities: ['Algebraic Reasoning', 'Advanced Problem Solving'],
+                        scheduleConstraints: {
+                            daysPerWeek: 5,
+                            minutesPerClass: 50
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                resultEl.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultEl.textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

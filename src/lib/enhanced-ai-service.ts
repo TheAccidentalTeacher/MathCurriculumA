@@ -255,30 +255,19 @@ export class EnhancedAIService {
     console.log('🎯 [AI Service] Accelerated pathway detected');
     
     try {
-      // Import the accelerated pathway data
+      // Just get basic lesson count without loading massive data
       const { ACCELERATED_PATHWAY } = await import('./accelerated-pathway');
-      console.log('📖 [AI Service] Loaded accelerated pathway data, unit count:', ACCELERATED_PATHWAY.length);
-      
-      // Flatten the pathway to get all lessons
-      const allLessons = ACCELERATED_PATHWAY.flatMap(unit => unit.lessons);
-      console.log('📊 [AI Service] Total lessons in pathway:', allLessons.length);
+      const lessonCount = ACCELERATED_PATHWAY.reduce((total, unit) => total + unit.lessons.length, 0);
+      console.log('� [AI Service] Total available lessons:', lessonCount);
       
       // Determine effective grade configuration
       const gradeConfig = this.parseGradeConfiguration(request);
       console.log('📊 [AI Service] Grade config:', gradeConfig);
       
-      // Build comprehensive curriculum context
-      const contexts = await Promise.all(
-        gradeConfig.selectedGrades.map(grade => 
-          this.curriculumService.buildCurriculumContext(grade)
-        )
-      );
-      const mergedContext = this.mergeCurriculumContexts(contexts, gradeConfig);
-      
-      // Create enhanced prompt for detailed analysis
-      const detailedPrompt = await this.buildDetailedLessonPrompt(request, allLessons, mergedContext);
-      console.log('📝 [AI Service] Built detailed prompt, length:', detailedPrompt.length);
-      
+      // Create simple prompt without massive data structures
+      const detailedPrompt = this.buildSimpleLessonPrompt(request, lessonCount);
+      console.log('📝 [AI Service] Built simple prompt, length:', detailedPrompt.length);
+
       // Call OpenAI with GPT-5 for comprehensive analysis
       console.log('🤖 [AI Service] Calling OpenAI API for detailed analysis...');
       let completion;
@@ -288,14 +277,14 @@ export class EnhancedAIService {
           messages: [
             {
               role: "system",
-              content: "You are an expert mathematics curriculum specialist and instructional designer with deep expertise in accelerated pathways, Grade 7-8 combined sequences, and Algebra I preparation. You excel at creating detailed lesson-by-lesson guides that analyze curriculum choices against scope and sequence, standards alignment, and pedagogical progression. You provide comprehensive, actionable lesson plans with all pertinent information for implementation."
+              content: "You are a mathematics curriculum specialist. Create practical, implementable pacing guides for accelerated pathways with proper standards alignment and pedagogical progression."
             },
             {
               role: "user", 
               content: detailedPrompt
             }
           ],
-          max_completion_tokens: 3000   // Reduced for simplified output format
+          max_completion_tokens: 2000   // Further reduced to avoid length issues
         });
       } catch (apiError) {
         console.error('❌ [AI Service] OpenAI API Error:', apiError);
@@ -332,15 +321,13 @@ export class EnhancedAIService {
       
       console.log('📨 [AI Service] Received detailed response, length:', aiResponse.length);
       
-      // Parse the detailed response
-      const detailedGuide = await this.parseDetailedLessonResponse(aiResponse, request, allLessons);
-      
+      // For simplified version, just return the AI response directly
       console.log('✅ [AI Service] Detailed lesson guide generated successfully');
       console.groupEnd();
       
       return {
         success: true,
-        detailedLessonGuide: detailedGuide
+        detailedLessonGuide: aiResponse
       };
       
     } catch (error) {
@@ -352,6 +339,23 @@ export class EnhancedAIService {
         error: error instanceof Error ? error.message : 'Unknown error occurred'
       };
     }
+  }
+
+  private buildSimpleLessonPrompt(request: PacingGuideRequest, lessonCount: number): string {
+    return `Create a pacing guide for accelerated Grade ${request.gradeLevel} math over ${request.timeframe}.
+
+Requirements:
+- Student Population: ${request.studentPopulation}
+- Schedule: ${request.scheduleConstraints?.daysPerWeek || 5} days/week, ${request.scheduleConstraints?.minutesPerClass || 50} min/class
+- Available Lessons: ${lessonCount}
+
+Generate a JSON response with:
+1. Pathway overview
+2. Weekly schedule (30-36 weeks)
+3. Assessment plan
+4. Standards alignment
+
+Keep response concise and practical for classroom implementation.`;
   }
 
   async generateStandardPacingGuide(request: PacingGuideRequest): Promise<PacingGuideResponse> {
@@ -960,7 +964,13 @@ Return the response in JSON format with the same structure as single-grade pacin
   private async buildDetailedLessonPrompt(request: PacingGuideRequest, acceleratedPathway: any[], context: CurriculumContext): Promise<string> {
     const grades = request.gradeCombination?.selectedGrades || [request.gradeLevel];
     
-    return `Create an accelerated mathematics pathway for grades ${grades.join('+')} over ${request.timeframe}.
+    console.log('🔍 [AI Service] Building detailed prompt with:', {
+      gradesCount: grades.length,
+      acceleratedPathwayLessons: acceleratedPathway.length,
+      sampleLesson: acceleratedPathway[0]
+    });
+    
+    const prompt = `Create an accelerated mathematics pathway for grades ${grades.join('+')} over ${request.timeframe}.
 
 **Requirements:**
 - Student Population: ${request.studentPopulation}
@@ -977,6 +987,9 @@ Create a detailed JSON response with:
 4. Standards alignment
 
 Format as JSON with "pathway", "weeklySchedule", "assessmentPlan", and "standardsAlignment" sections. Each weekly entry should include unit, lessons, standards, and objectives.`;
+
+    console.log('📏 [AI Service] Prompt length:', prompt.length, 'characters');
+    return prompt;
   }
 
   // DISABLED - Parse AI response into DetailedLessonGuide format
