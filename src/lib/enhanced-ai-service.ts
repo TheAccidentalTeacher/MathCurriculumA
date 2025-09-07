@@ -352,20 +352,124 @@ export class EnhancedAIService {
   }
 
   private buildSimpleLessonPrompt(request: PacingGuideRequest, lessonCount: number): string {
-    return `Create a pacing guide for accelerated Grade ${request.gradeLevel} math over ${request.timeframe}.
+    const grades = request.gradeCombination?.selectedGrades || [request.gradeLevel];
+    
+    return `Create a comprehensive accelerated mathematics pathway for grades ${grades.join('+')} over ${request.timeframe}.
 
-Requirements:
+**Requirements:**
 - Student Population: ${request.studentPopulation}
 - Schedule: ${request.scheduleConstraints?.daysPerWeek || 5} days/week, ${request.scheduleConstraints?.minutesPerClass || 50} min/class
-- Available Lessons: ${lessonCount}
+- Total Available Lessons: ${lessonCount}
+- Differentiation Needs: ${request.differentiationNeeds?.join(', ') || 'Standard'}
+- Priorities: ${request.priorities?.join(', ') || 'Standards alignment'}
 
-Generate a JSON response with:
-1. Pathway overview
-2. Weekly schedule (30-36 weeks)
-3. Assessment plan
-4. Standards alignment
+**CRITICAL: Generate a JSON response with this EXACT structure (field names must match exactly):**
 
-Keep response concise and practical for classroom implementation.`;
+{
+  "pathway": {
+    "name": "Accelerated Grade ${grades.join('+')} Mathematics Pathway",
+    "description": "Comprehensive description of the accelerated pathway combining these grade levels",
+    "targetOutcome": "Clear learning outcomes and objectives for students",
+    "duration": "${request.timeframe}"
+  },
+  "analysisResults": {
+    "choicesAnalyzed": {
+      "gradesCombined": ${JSON.stringify(grades)},
+      "pathwayType": "accelerated",
+      "emphasis": "foundational",
+      "studentPopulation": "${request.studentPopulation}"
+    },
+    "scopeAndSequenceMatch": "Detailed analysis of how curriculum aligns with standards progression",
+    "standardsCoverage": {
+      "majorWork": ["List of major standards covered (e.g., 8.EE.7, A-REI.3)"],
+      "supportingWork": ["List of supporting standards"],
+      "additionalWork": ["List of additional standards"],
+      "crossGradeConnections": ["How standards connect across grade levels"]
+    },
+    "prerequisiteCheck": {
+      "prerequisitesRequired": ["Required prerequisite skills for this pathway"],
+      "prerequisitesMet": ["Prerequisites addressed by this pathway"],
+      "potentialGaps": ["Potential learning gaps to monitor and address"]
+    }
+  },
+  "lessonByLessonBreakdown": [
+    {
+      "lessonNumber": 1,
+      "title": "Specific lesson title from curriculum",
+      "unit": "Unit name (e.g., Number Systems)",
+      "grade": "8",
+      "duration": { "sessions": 2, "totalMinutes": 100 },
+      "standards": {
+        "primary": ["8.NS.1", "8.NS.2"],
+        "supporting": ["8.EE.1"],
+        "mathematical_practices": ["MP1", "MP3", "MP6"]
+      },
+      "learningObjectives": ["Clear, measurable learning objectives"],
+      "keyVocabulary": ["Key mathematical terms"],
+      "materials": ["Required instructional materials"],
+      "lessonStructure": [
+        {
+          "phase": "Opening",
+          "duration": 10,
+          "activities": ["Warm-up activities and agenda review"]
+        }
+      ],
+      "differentiation": {
+        "supports": ["Strategies for struggling learners"],
+        "extensions": ["Advanced activities for ready learners"],
+        "accommodations": ["Specific accommodations needed"]
+      },
+      "assessment": {
+        "formative": ["Formative assessment strategies"],
+        "summative": "Unit test or performance assessment",
+        "exitTicket": "Specific exit ticket question"
+      },
+      "homework": "Homework assignment details",
+      "connectionToNext": "How this lesson connects to the next"
+    }
+  ],
+  "progressionMap": [
+    {
+      "stage": 1,
+      "name": "Foundation Building",
+      "weeks": [1, 2, 3, 4],
+      "focus": "Core foundational concepts",
+      "milestones": ["Key learning milestones for this stage"],
+      "assessments": ["Major assessments in this stage"]
+    }
+  ],
+  "assessmentStrategy": {
+    "formativeApproaches": ["Daily formative assessment methods"],
+    "summativeSchedule": [
+      {
+        "week": 4,
+        "type": "Unit Test",
+        "standards": ["8.NS.1-2"],
+        "description": "Assessment description and format"
+      }
+    ],
+    "diagnosticCheckpoints": [6, 12, 18, 24, 30],
+    "portfolioComponents": ["Portfolio requirements and components"],
+    "masteryIndicators": ["How students demonstrate mastery"]
+  },
+  "teachingSupport": {
+    "pacingRecommendations": ["Specific pacing guidance and flexibility options"],
+    "professionalDevelopment": ["PD needs and recommendations"],
+    "resources": {
+      "instructional": ["Required teaching resources"],
+      "assessment": ["Assessment tools and rubrics"],
+      "digital": ["Digital tools and platforms"]
+    },
+    "parentCommunication": ["Parent communication strategies and templates"]
+  }
+}
+
+**CRITICAL REQUIREMENTS:**
+- Use EXACTLY the field names shown above (pathway, not pathway_overview)
+- Generate comprehensive content for 25-35 lessons covering the full ${request.timeframe}
+- Include detailed lesson breakdowns with proper standards alignment
+- Provide practical, teacher-ready implementation guidance
+- Return ONLY valid JSON with no extra text or formatting`;
   }
 
   async generateStandardPacingGuide(request: PacingGuideRequest): Promise<PacingGuideResponse> {
