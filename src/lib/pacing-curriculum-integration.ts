@@ -108,6 +108,30 @@ export class PacingCurriculumIntegration {
       30: { start: 295, end: 316, title: 'Write and Analyze an Equation for Fitting a Linear Model' },
       31: { start: 317, end: 328, title: 'Understand Two-Way Tables' },
       32: { start: 329, end: 456, title: 'Construct and Interpret Two-Way Tables' }
+    },
+    
+    // Grade 9 - Algebra I / High School content (placeholder structure)
+    'RCM09_ALG_SW_V1': {
+      1: { start: 15, end: 36, title: 'Linear Equations in One Variable' },
+      2: { start: 37, end: 58, title: 'Linear Inequalities in One Variable' },
+      3: { start: 59, end: 80, title: 'Two-Variable Linear Equations and Their Graphs' },
+      4: { start: 81, end: 102, title: 'More Two-Variable Linear Equations and Their Graphs' },
+      5: { start: 103, end: 124, title: 'Linear Inequalities in Two Variables' },
+      6: { start: 125, end: 146, title: 'Systems of Linear Equations in Two Variables' },
+      7: { start: 147, end: 168, title: 'Exponents and Exponential Functions' },
+      8: { start: 169, end: 190, title: 'Polynomials and Factoring' },
+      9: { start: 191, end: 212, title: 'Quadratic Functions and Equations' },
+      10: { start: 213, end: 234, title: 'Radical Expressions and Equations' },
+      11: { start: 235, end: 256, title: 'Rational Expressions and Functions' },
+      12: { start: 257, end: 278, title: 'Data Analysis and Statistics' },
+      13: { start: 279, end: 300, title: 'Probability and Combinatorics' },
+      14: { start: 301, end: 322, title: 'Sequences and Series' },
+      15: { start: 323, end: 344, title: 'Exponential and Logarithmic Functions' },
+      16: { start: 345, end: 366, title: 'Trigonometric Functions Introduction' },
+      17: { start: 367, end: 388, title: 'Polynomial Functions and Graphs' },
+      18: { start: 389, end: 410, title: 'Advanced Function Analysis' },
+      19: { start: 411, end: 432, title: 'Conic Sections' },
+      20: { start: 433, end: 454, title: 'Mathematical Modeling and Applications' }
     }
   };
 

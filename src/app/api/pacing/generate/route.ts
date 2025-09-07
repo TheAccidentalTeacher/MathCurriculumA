@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate grade level - support both single grades and combinations
-    const validGrades = ['6', '7', '8'];
+    const validGrades = ['6', '7', '8', '9'];
     let gradesToValidate: string[] = [];
     
     console.log('🔍 [API] Validating grade combination...');
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           success: false, 
-          error: `Invalid grade level(s): ${invalidGrades.join(', ')}. Must be 6, 7, or 8` 
+          error: `Invalid grade level(s): ${invalidGrades.join(', ')}. Must be 6, 7, 8, or 9` 
         },
         { status: 400 }
       );
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           success: false, 
-          error: 'No valid grade levels specified. Must select at least one grade (6, 7, or 8)' 
+          error: 'No valid grade levels specified. Must select at least one grade (6, 7, 8, or 9)' 
         },
         { status: 400 }
       );

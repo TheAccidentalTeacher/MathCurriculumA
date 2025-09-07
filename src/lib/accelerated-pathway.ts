@@ -1,9 +1,9 @@
-// Accelerated Pathway: Grade 7/8 Combined Sequence for Algebra 1 Preparation
+// Accelerated Pathway: Grade 7/8/9 Combined Sequence for Advanced Mathematics Preparation
 // Based on the scope and sequence document analysis
 
 export interface LessonReference {
   id: string;
-  grade: 7 | 8;
+  grade: 7 | 8 | 9;
   unit: string;
   unitNumber: number;
   lesson: string;
@@ -1212,6 +1212,407 @@ export const ACCELERATED_PATHWAY: AcceleratedUnit[] = [
         originalCode: "G7 U6 L33"
       }
     ]
+  },
+  // Grade 8-9 Accelerated Pathway (Advanced Functions & Algebra II)
+  {
+    id: "accelerated-8-9",
+    title: "Grade 8-9 Accelerated Mathematics",
+    description: "An accelerated pathway combining advanced Grade 8 algebra concepts with Grade 9 Algebra II content for high-achieving students.",
+    estimatedDays: 180,
+    lessons: [
+      // Unit 1: Exponents and Scientific Notation
+      {
+        id: "g8-g9-u1-l1",
+        grade: 8,
+        unit: "Exponents and Scientific Notation",
+        unitNumber: 1,
+        lesson: "Exponent Rules",
+        lessonNumber: 1,
+        title: "Exponent Rules",
+        volume: 1,
+        navigationId: "lesson-1",
+        searchPattern: "LESSON 1 | EXPONENT RULES",
+        fallbackPattern: "Exponent Rules",
+        sessions: 3,
+        majorWork: true,
+        originalCode: "G8 U1 L1"
+      },
+      {
+        id: "g8-g9-u1-l2",
+        grade: 8,
+        unit: "Exponents and Scientific Notation",
+        unitNumber: 1,
+        lesson: "Scientific Notation",
+        lessonNumber: 2,
+        title: "Scientific Notation",
+        volume: 1,
+        navigationId: "lesson-2",
+        searchPattern: "LESSON 2 | SCIENTIFIC NOTATION",
+        fallbackPattern: "Scientific Notation",
+        sessions: 4,
+        majorWork: true,
+        originalCode: "G8 U1 L2"
+      },
+      {
+        id: "g8-g9-u1-l3",
+        grade: 8,
+        unit: "Exponents and Scientific Notation",
+        unitNumber: 1,
+        lesson: "Operations with Scientific Notation",
+        lessonNumber: 3,
+        title: "Operations with Scientific Notation",
+        volume: 1,
+        navigationId: "lesson-3",
+        searchPattern: "LESSON 3 | OPERATIONS WITH SCIENTIFIC NOTATION",
+        fallbackPattern: "Operations with Scientific Notation",
+        sessions: 3,
+        majorWork: true,
+        originalCode: "G8 U1 L3"
+      },
+      // Unit 2: Rational Numbers and Square Roots
+      {
+        id: "g8-g9-u2-l1",
+        grade: 8,
+        unit: "Rational Numbers",
+        unitNumber: 2,
+        lesson: "Square Roots and Cube Roots",
+        lessonNumber: 4,
+        title: "Square Roots and Cube Roots",
+        volume: 1,
+        navigationId: "lesson-4",
+        searchPattern: "LESSON 4 | SQUARE ROOTS AND CUBE ROOTS",
+        fallbackPattern: "Square Roots and Cube Roots",
+        sessions: 3,
+        majorWork: true,
+        originalCode: "G8 U2 L4"
+      },
+      {
+        id: "g8-g9-u2-l2",
+        grade: 8,
+        unit: "Rational Numbers",
+        unitNumber: 2,
+        lesson: "Irrational Numbers",
+        lessonNumber: 5,
+        title: "Irrational Numbers",
+        volume: 1,
+        navigationId: "lesson-5",
+        searchPattern: "LESSON 5 | IRRATIONAL NUMBERS",
+        fallbackPattern: "Irrational Numbers",
+        sessions: 3,
+        majorWork: true,
+        originalCode: "G8 U2 L5"
+      },
+      {
+        id: "g8-g9-u2-l3",
+        grade: 8,
+        unit: "Rational Numbers",
+        unitNumber: 2,
+        lesson: "Pythagorean Theorem",
+        lessonNumber: 6,
+        title: "Pythagorean Theorem",
+        volume: 1,
+        navigationId: "lesson-6",
+        searchPattern: "LESSON 6 | PYTHAGOREAN THEOREM",
+        fallbackPattern: "Pythagorean Theorem",
+        sessions: 4,
+        majorWork: true,
+        originalCode: "G8 U2 L6"
+      },
+      // Unit 3: Linear Relationships and Functions
+      {
+        id: "g8-g9-u3-l1",
+        grade: 8,
+        unit: "Linear Relationships",
+        unitNumber: 3,
+        lesson: "Introduction to Functions",
+        lessonNumber: 7,
+        title: "Introduction to Functions",
+        volume: 1,
+        navigationId: "lesson-7",
+        searchPattern: "LESSON 7 | INTRODUCTION TO FUNCTIONS",
+        fallbackPattern: "Introduction to Functions",
+        sessions: 4,
+        majorWork: true,
+        originalCode: "G8 U3 L7"
+      },
+      {
+        id: "g8-g9-u3-l2",
+        grade: 8,
+        unit: "Linear Relationships",
+        unitNumber: 3,
+        lesson: "Linear Functions",
+        lessonNumber: 8,
+        title: "Linear Functions",
+        volume: 1,
+        navigationId: "lesson-8",
+        searchPattern: "LESSON 8 | LINEAR FUNCTIONS",
+        fallbackPattern: "Linear Functions",
+        sessions: 5,
+        majorWork: true,
+        originalCode: "G8 U3 L8"
+      },
+      {
+        id: "g8-g9-u3-l3",
+        grade: 8,
+        unit: "Linear Relationships",
+        unitNumber: 3,
+        lesson: "Systems of Linear Equations",
+        lessonNumber: 9,
+        title: "Systems of Linear Equations",
+        volume: 1,
+        navigationId: "lesson-9",
+        searchPattern: "LESSON 9 | SYSTEMS OF LINEAR EQUATIONS",
+        fallbackPattern: "Systems of Linear Equations",
+        sessions: 6,
+        majorWork: true,
+        originalCode: "G8 U3 L9"
+      },
+      // Unit 4: Quadratic Functions (Grade 9)
+      {
+        id: "g8-g9-u4-l1",
+        grade: 9,
+        unit: "Quadratic Functions",
+        unitNumber: 4,
+        lesson: "Introduction to Quadratic Functions",
+        lessonNumber: 10,
+        title: "Introduction to Quadratic Functions",
+        volume: 1,
+        navigationId: "lesson-10",
+        searchPattern: "LESSON 10 | INTRODUCTION TO QUADRATIC FUNCTIONS",
+        fallbackPattern: "Introduction to Quadratic Functions",
+        sessions: 4,
+        majorWork: true,
+        originalCode: "G9 U4 L10"
+      },
+      {
+        id: "g8-g9-u4-l2",
+        grade: 9,
+        unit: "Quadratic Functions",
+        unitNumber: 4,
+        lesson: "Solving Quadratic Equations",
+        lessonNumber: 11,
+        title: "Solving Quadratic Equations",
+        volume: 1,
+        navigationId: "lesson-11",
+        searchPattern: "LESSON 11 | SOLVING QUADRATIC EQUATIONS",
+        fallbackPattern: "Solving Quadratic Equations",
+        sessions: 5,
+        majorWork: true,
+        originalCode: "G9 U4 L11"
+      },
+      {
+        id: "g8-g9-u4-l3",
+        grade: 9,
+        unit: "Quadratic Functions",
+        unitNumber: 4,
+        lesson: "Quadratic Formula and Discriminant",
+        lessonNumber: 12,
+        title: "Quadratic Formula and Discriminant",
+        volume: 1,
+        navigationId: "lesson-12",
+        searchPattern: "LESSON 12 | QUADRATIC FORMULA AND DISCRIMINANT",
+        fallbackPattern: "Quadratic Formula and Discriminant",
+        sessions: 4,
+        majorWork: true,
+        originalCode: "G9 U4 L12"
+      },
+      {
+        id: "g8-g9-u4-l4",
+        grade: 9,
+        unit: "Quadratic Functions",
+        unitNumber: 4,
+        lesson: "Graphing Quadratic Functions",
+        lessonNumber: 13,
+        title: "Graphing Quadratic Functions",
+        volume: 1,
+        navigationId: "lesson-13",
+        searchPattern: "LESSON 13 | GRAPHING QUADRATIC FUNCTIONS",
+        fallbackPattern: "Graphing Quadratic Functions",
+        sessions: 5,
+        majorWork: true,
+        originalCode: "G9 U4 L13"
+      },
+      // Unit 5: Exponential Functions (Grade 9)
+      {
+        id: "g8-g9-u5-l1",
+        grade: 9,
+        unit: "Exponential Functions",
+        unitNumber: 5,
+        lesson: "Exponential Growth and Decay",
+        lessonNumber: 14,
+        title: "Exponential Growth and Decay",
+        volume: 2,
+        navigationId: "lesson-14",
+        searchPattern: "LESSON 14 | EXPONENTIAL GROWTH AND DECAY",
+        fallbackPattern: "Exponential Growth and Decay",
+        sessions: 5,
+        majorWork: true,
+        originalCode: "G9 U5 L14"
+      },
+      {
+        id: "g8-g9-u5-l2",
+        grade: 9,
+        unit: "Exponential Functions",
+        unitNumber: 5,
+        lesson: "Logarithmic Functions",
+        lessonNumber: 15,
+        title: "Logarithmic Functions",
+        volume: 2,
+        navigationId: "lesson-15",
+        searchPattern: "LESSON 15 | LOGARITHMIC FUNCTIONS",
+        fallbackPattern: "Logarithmic Functions",
+        sessions: 6,
+        majorWork: true,
+        originalCode: "G9 U5 L15"
+      },
+      {
+        id: "g8-g9-u5-l3",
+        grade: 9,
+        unit: "Exponential Functions",
+        unitNumber: 5,
+        lesson: "Properties of Logarithms",
+        lessonNumber: 16,
+        title: "Properties of Logarithms",
+        volume: 2,
+        navigationId: "lesson-16",
+        searchPattern: "LESSON 16 | PROPERTIES OF LOGARITHMS",
+        fallbackPattern: "Properties of Logarithms",
+        sessions: 4,
+        majorWork: true,
+        originalCode: "G9 U5 L16"
+      },
+      // Unit 6: Polynomial Functions (Grade 9)
+      {
+        id: "g8-g9-u6-l1",
+        grade: 9,
+        unit: "Polynomial Functions",
+        unitNumber: 6,
+        lesson: "Polynomial Operations",
+        lessonNumber: 17,
+        title: "Polynomial Operations",
+        volume: 2,
+        navigationId: "lesson-17",
+        searchPattern: "LESSON 17 | POLYNOMIAL OPERATIONS",
+        fallbackPattern: "Polynomial Operations",
+        sessions: 4,
+        majorWork: true,
+        originalCode: "G9 U6 L17"
+      },
+      {
+        id: "g8-g9-u6-l2",
+        grade: 9,
+        unit: "Polynomial Functions",
+        unitNumber: 6,
+        lesson: "Factoring Polynomials",
+        lessonNumber: 18,
+        title: "Factoring Polynomials",
+        volume: 2,
+        navigationId: "lesson-18",
+        searchPattern: "LESSON 18 | FACTORING POLYNOMIALS",
+        fallbackPattern: "Factoring Polynomials",
+        sessions: 5,
+        majorWork: true,
+        originalCode: "G9 U6 L18"
+      },
+      {
+        id: "g8-g9-u6-l3",
+        grade: 9,
+        unit: "Polynomial Functions",
+        unitNumber: 6,
+        lesson: "Polynomial Equations",
+        lessonNumber: 19,
+        title: "Polynomial Equations",
+        volume: 2,
+        navigationId: "lesson-19",
+        searchPattern: "LESSON 19 | POLYNOMIAL EQUATIONS",
+        fallbackPattern: "Polynomial Equations",
+        sessions: 3,
+        majorWork: true,
+        originalCode: "G9 U6 L19"
+      },
+      // Unit 7: Rational Functions (Grade 9)
+      {
+        id: "g8-g9-u7-l1",
+        grade: 9,
+        unit: "Rational Functions",
+        unitNumber: 7,
+        lesson: "Rational Expressions",
+        lessonNumber: 20,
+        title: "Rational Expressions",
+        volume: 2,
+        navigationId: "lesson-20",
+        searchPattern: "LESSON 20 | RATIONAL EXPRESSIONS",
+        fallbackPattern: "Rational Expressions",
+        sessions: 4,
+        majorWork: true,
+        originalCode: "G9 U7 L20"
+      },
+      {
+        id: "g8-g9-u7-l2",
+        grade: 9,
+        unit: "Rational Functions",
+        unitNumber: 7,
+        lesson: "Solving Rational Equations",
+        lessonNumber: 21,
+        title: "Solving Rational Equations",
+        volume: 2,
+        navigationId: "lesson-21",
+        searchPattern: "LESSON 21 | SOLVING RATIONAL EQUATIONS",
+        fallbackPattern: "Solving Rational Equations",
+        sessions: 5,
+        majorWork: true,
+        originalCode: "G9 U7 L21"
+      },
+      {
+        id: "g8-g9-u7-l3",
+        grade: 9,
+        unit: "Rational Functions",
+        unitNumber: 7,
+        lesson: "Graphing Rational Functions",
+        lessonNumber: 22,
+        title: "Graphing Rational Functions",
+        volume: 2,
+        navigationId: "lesson-22",
+        searchPattern: "LESSON 22 | GRAPHING RATIONAL FUNCTIONS",
+        fallbackPattern: "Graphing Rational Functions",
+        sessions: 3,
+        majorWork: true,
+        originalCode: "G9 U7 L22"
+      },
+      // Unit 8: Advanced Topics (Grade 9)
+      {
+        id: "g8-g9-u8-l1",
+        grade: 9,
+        unit: "Advanced Topics",
+        unitNumber: 8,
+        lesson: "Sequences and Series",
+        lessonNumber: 23,
+        title: "Sequences and Series",
+        volume: 2,
+        navigationId: "lesson-23",
+        searchPattern: "LESSON 23 | SEQUENCES AND SERIES",
+        fallbackPattern: "Sequences and Series",
+        sessions: 4,
+        majorWork: true,
+        originalCode: "G9 U8 L23"
+      },
+      {
+        id: "g8-g9-u8-l2",
+        grade: 9,
+        unit: "Advanced Topics",
+        unitNumber: 8,
+        lesson: "Introduction to Trigonometry",
+        lessonNumber: 24,
+        title: "Introduction to Trigonometry",
+        volume: 2,
+        navigationId: "lesson-24",
+        searchPattern: "LESSON 24 | INTRODUCTION TO TRIGONOMETRY",
+        fallbackPattern: "Introduction to Trigonometry",
+        sessions: 6,
+        majorWork: true,
+        originalCode: "G9 U8 L24"
+      }
+    ]
   }
 ];
 
@@ -1226,7 +1627,7 @@ export class AcceleratedPathwayService {
     return this.getAllLessons().find(lesson => lesson.id === id);
   }
   
-  getLessonsByGrade(grade: 7 | 8): LessonReference[] {
+  getLessonsByGrade(grade: 7 | 8 | 9): LessonReference[] {
     return this.getAllLessons().filter(lesson => lesson.grade === grade);
   }
   
@@ -1242,7 +1643,8 @@ export class AcceleratedPathwayService {
     // Map to document IDs for the new lesson viewer
     const documentMap = {
       7: { 1: 'RCM07_NA_SW_V1', 2: 'RCM07_NA_SW_V2' },
-      8: { 1: 'RCM08_NA_SW_V1', 2: 'RCM08_NA_SW_V2' }
+      8: { 1: 'RCM08_NA_SW_V1', 2: 'RCM08_NA_SW_V2' },
+      9: { 1: 'RCM09_ALG_SW_V1', 2: 'RCM09_ALG_SW_V2' }
     };
     
     const documentId = documentMap[lesson.grade]?.[lesson.volume];
@@ -1267,6 +1669,7 @@ export class AcceleratedPathwayService {
     const majorWorkLessons = this.getMajorWorkLessons().length;
     const grade7Lessons = this.getLessonsByGrade(7).length;
     const grade8Lessons = this.getLessonsByGrade(8).length;
+    const grade9Lessons = this.getLessonsByGrade(9).length;
     const totalSessions = this.getTotalSessions();
     
     return {
@@ -1275,6 +1678,7 @@ export class AcceleratedPathwayService {
       supportingWorkLessons: totalLessons - majorWorkLessons,
       grade7Lessons,
       grade8Lessons,
+      grade9Lessons,
       estimatedDays: this.getEstimatedDuration(),
       totalSessions
     };

@@ -13,7 +13,7 @@ import {
 export default function PacingGeneratorPage() {
   const [currentStep, setCurrentStep] = useState<'form' | 'results'>('form');
   const [isLoading, setIsLoading] = useState(false);
-  const [availableGrades, setAvailableGrades] = useState<string[]>(['6', '7', '8']);
+  const [availableGrades, setAvailableGrades] = useState<string[]>(['6', '7', '8', '9']);
   const [pacingGuide, setPacingGuide] = useState<GeneratedPacingGuide | null>(null);
   const [detailedLessonGuide, setDetailedLessonGuide] = useState<DetailedLessonGuide | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +25,7 @@ export default function PacingGeneratorPage() {
       try {
         // This would normally fetch from an API that queries the database
         // For now, we'll use the hardcoded grades
-        setAvailableGrades(['6', '7', '8']);
+        setAvailableGrades(['6', '7', '8', '9']);
         setAnnouncements('Available grades loaded');
       } catch (error) {
         console.error('Error loading available grades:', error);
