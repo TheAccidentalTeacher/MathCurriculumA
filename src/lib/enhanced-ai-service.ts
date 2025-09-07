@@ -293,7 +293,6 @@ export class EnhancedAIService {
             content: detailedPrompt
           }
         ],
-        temperature: 0.3, // Lower temperature for more precise analysis
         max_completion_tokens: 6000   // More tokens for detailed response
       });
       
@@ -394,7 +393,6 @@ export class EnhancedAIService {
             content: prompt
           }
         ],
-        temperature: 0.7,
         max_completion_tokens: 4000
       });
 

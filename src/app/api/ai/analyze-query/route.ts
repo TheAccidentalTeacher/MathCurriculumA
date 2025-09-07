@@ -80,7 +80,6 @@ Please return a JSON response with the following structure:
             content: prompt
           }
         ],
-        temperature: 0.1, // Low temperature for consistent analysis
         max_completion_tokens: 800
       });
     }
@@ -163,7 +162,6 @@ Please return a JSON response with the following structure:
               content: (await request.json()).prompt
             }
           ],
-          temperature: 0.1,
           max_completion_tokens: 800
         });
 
