@@ -226,7 +226,8 @@ export class EnhancedAIService {
     
     try {
       // Check if this is a request for detailed lesson-by-lesson generation
-      const isDetailedRequest = request.priorities?.includes('detailed-lesson-guide') || 
+      const isDetailedRequest = request.priorities?.includes('Detailed lesson-by-lesson guide (AI-generated)') || 
+                               request.priorities?.includes('detailed-lesson-guide') || 
                                request.studentPopulation?.toLowerCase().includes('accelerated') ||
                                request.gradeCombination?.pathwayType === 'accelerated';
       
@@ -255,7 +256,11 @@ export class EnhancedAIService {
     try {
       // Import the accelerated pathway data
       const { ACCELERATED_PATHWAY } = await import('./accelerated-pathway');
-      console.log('📖 [AI Service] Loaded accelerated pathway data, lesson count:', ACCELERATED_PATHWAY.length);
+      console.log('📖 [AI Service] Loaded accelerated pathway data, unit count:', ACCELERATED_PATHWAY.length);
+      
+      // Flatten the pathway to get all lessons
+      const allLessons = ACCELERATED_PATHWAY.flatMap(unit => unit.lessons);
+      console.log('📊 [AI Service] Total lessons in pathway:', allLessons.length);
       
       // Determine effective grade configuration
       const gradeConfig = this.parseGradeConfiguration(request);
@@ -270,7 +275,7 @@ export class EnhancedAIService {
       const mergedContext = this.mergeCurriculumContexts(contexts, gradeConfig);
       
       // Create enhanced prompt for detailed analysis
-      const detailedPrompt = this.buildDetailedLessonPrompt(request, ACCELERATED_PATHWAY, mergedContext);
+      const detailedPrompt = this.buildDetailedLessonPrompt(request, allLessons, mergedContext);
       console.log('📝 [AI Service] Built detailed prompt, length:', detailedPrompt.length);
       
       // Call OpenAI with GPT-4 Turbo for comprehensive analysis
@@ -299,7 +304,7 @@ export class EnhancedAIService {
       console.log('📨 [AI Service] Received detailed response, length:', aiResponse.length);
       
       // Parse the detailed response
-      const detailedGuide = await this.parseDetailedLessonResponse(aiResponse, request, ACCELERATED_PATHWAY);
+      const detailedGuide = await this.parseDetailedLessonResponse(aiResponse, request, allLessons);
       
       console.log('✅ [AI Service] Detailed lesson guide generated successfully');
       console.groupEnd();
@@ -801,7 +806,7 @@ PEDAGOGICAL REQUIREMENTS:
 
 TIMEFRAME: ${request.timeframe}
 STUDENT POPULATION: ${request.studentPopulation}
-PRIORITIES: ${request.priorities.join(', ')}
+PRIORITIES: ${request.priorities ? request.priorities.join(', ') : 'Not specified'}
 
 SCHEDULE CONSTRAINTS:
 - ${request.scheduleConstraints?.daysPerWeek || 5} days per week
@@ -920,20 +925,20 @@ ${acceleratedPathway.map(lesson => `
 - Grade: ${lesson.grade}
 - Unit: ${lesson.unit}
 - Sessions: ${lesson.sessions}
-- Standards: ${lesson.standards.join(', ')}
-- Major Work: ${lesson.isMajorWork ? 'Yes' : 'No'}
+- Standards: ${lesson.standards ? lesson.standards.join(', ') : 'Standards TBD'}
+- Major Work: ${lesson.majorWork ? 'Yes' : 'No'}
 - Description: ${lesson.description || 'Core lesson content'}
 `).join('\n')}
 
 ## CURRICULUM CONTEXT
 Total Lessons Available: ${context.totalLessons}
-Major Standards Focus: ${context.majorStandards.join(', ')}
-Available Standards: ${context.availableStandards.join(', ')}
+Major Standards Focus: ${context.majorStandards.map(s => s.standards.join(', ')).join('; ')}
+Available Standards: ${context.availableStandards.map(s => s.standards.join(', ')).join('; ')}
 
 Unit Structure:
 ${context.unitStructure.map(unit => `
 - ${unit.unitTitle}: ${unit.lessonCount} lessons
-  Standards: ${unit.standards.join(', ')}
+  Standards: ${unit.standards ? unit.standards.join(', ') : 'None'}
   Focus Distribution: Major(${unit.focusDistribution.major}%), Supporting(${unit.focusDistribution.supporting}%), Additional(${unit.focusDistribution.additional}%)
 `).join('')}
 
