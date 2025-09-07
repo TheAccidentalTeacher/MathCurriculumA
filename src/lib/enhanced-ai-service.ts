@@ -294,7 +294,7 @@ export class EnhancedAIService {
           }
         ],
         temperature: 0.3, // Lower temperature for more precise analysis
-        max_tokens: 6000   // More tokens for detailed response
+        max_completion_tokens: 6000   // More tokens for detailed response
       });
       
       const aiResponse = completion.choices[0]?.message?.content;
@@ -395,7 +395,7 @@ export class EnhancedAIService {
           }
         ],
         temperature: 0.7,
-        max_tokens: 4000
+        max_completion_tokens: 4000
       });
 
       // Parse the AI response into structured data

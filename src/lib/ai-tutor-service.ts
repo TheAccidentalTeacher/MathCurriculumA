@@ -194,7 +194,7 @@ export class AITutorService {
         completion = await this.client.chat.completions.create({
           model: preferredModel,
           messages: messages.map(msg => ({ role: msg.role, content: msg.content })),
-          max_tokens: 2000,
+          max_completion_tokens: 2000,
           temperature: 0.7,
           presence_penalty: 0.1,
           frequency_penalty: 0.1,
@@ -578,7 +578,7 @@ Remember: You're a mathematically gifted, enthusiastic dog helping with ${lesson
       const completion = await this.client.chat.completions.create({
         model,
         messages: [{ role: 'user', content: testPrompt }],
-        max_tokens: 50,
+        max_completion_tokens: 50,
         temperature: 0.3
       });
 

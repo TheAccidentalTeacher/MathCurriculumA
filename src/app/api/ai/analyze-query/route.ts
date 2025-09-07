@@ -81,7 +81,7 @@ Please return a JSON response with the following structure:
           }
         ],
         temperature: 0.1, // Low temperature for consistent analysis
-        max_tokens: 800
+        max_completion_tokens: 800
       });
     }
 
@@ -164,7 +164,7 @@ Please return a JSON response with the following structure:
             }
           ],
           temperature: 0.1,
-          max_tokens: 800
+          max_completion_tokens: 800
         });
 
         const fallbackContent = fallbackCompletion.choices[0]?.message?.content;
