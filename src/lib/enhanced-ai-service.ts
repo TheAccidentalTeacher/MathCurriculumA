@@ -281,24 +281,47 @@ export class EnhancedAIService {
       
       // Call OpenAI with GPT-5 for comprehensive analysis
       console.log('🤖 [AI Service] Calling OpenAI API for detailed analysis...');
-      const completion = await this.openai.chat.completions.create({
-        model: "gpt-5",
-        messages: [
-          {
-            role: "system",
-            content: "You are an expert mathematics curriculum specialist and instructional designer with deep expertise in accelerated pathways, Grade 7-8 combined sequences, and Algebra I preparation. You excel at creating detailed lesson-by-lesson guides that analyze curriculum choices against scope and sequence, standards alignment, and pedagogical progression. You provide comprehensive, actionable lesson plans with all pertinent information for implementation."
-          },
-          {
-            role: "user", 
-            content: detailedPrompt
-          }
-        ],
-        max_completion_tokens: 6000   // More tokens for detailed response
+      let completion;
+      try {
+        completion = await this.openai.chat.completions.create({
+          model: "gpt-5",
+          messages: [
+            {
+              role: "system",
+              content: "You are an expert mathematics curriculum specialist and instructional designer with deep expertise in accelerated pathways, Grade 7-8 combined sequences, and Algebra I preparation. You excel at creating detailed lesson-by-lesson guides that analyze curriculum choices against scope and sequence, standards alignment, and pedagogical progression. You provide comprehensive, actionable lesson plans with all pertinent information for implementation."
+            },
+            {
+              role: "user", 
+              content: detailedPrompt
+            }
+          ],
+          max_completion_tokens: 6000   // More tokens for detailed response
+        });
+      } catch (apiError) {
+        console.error('❌ [AI Service] OpenAI API Error:', apiError);
+        throw new Error(`OpenAI API Error: ${apiError instanceof Error ? apiError.message : 'Unknown error'}`);
+      }
+      
+      console.log('📊 [AI Service] OpenAI completion received:', {
+        id: completion.id,
+        model: completion.model,
+        choices: completion.choices?.length || 0,
+        usage: completion.usage,
+        choice0: completion.choices?.[0] ? {
+          index: completion.choices[0].index,
+          finish_reason: completion.choices[0].finish_reason,
+          content_length: completion.choices[0].message?.content?.length || 0
+        } : null
       });
       
       const aiResponse = completion.choices[0]?.message?.content;
       if (!aiResponse) {
-        throw new Error('No response from AI service');
+        console.error('❌ [AI Service] No response content from OpenAI:', {
+          completion: completion,
+          choice: completion.choices?.[0],
+          message: completion.choices?.[0]?.message
+        });
+        throw new Error(`No response from AI service. Completion ID: ${completion.id}, Finish reason: ${completion.choices?.[0]?.finish_reason || 'unknown'}`);
       }
       
       console.log('📨 [AI Service] Received detailed response, length:', aiResponse.length);
@@ -381,28 +404,50 @@ export class EnhancedAIService {
 
       // Generate pacing guide with enhanced AI reasoning
       console.log('🤖 [AI Service] Calling OpenAI API...');
-      const completion = await this.openai.chat.completions.create({
-        model: "gpt-5",
-        messages: [
-          {
-            role: "system",
-            content: "You are an expert mathematics curriculum specialist with deep knowledge of grade 6-8 mathematics standards, pacing, and differentiation strategies. You create practical, research-based pacing guides that teachers can implement effectively. You excel at analyzing multi-grade combinations and creating pedagogically sound accelerated pathways."
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        max_completion_tokens: 4000
-      });
+      let completion;
+      try {
+        completion = await this.openai.chat.completions.create({
+          model: "gpt-5",
+          messages: [
+            {
+              role: "system",
+              content: "You are an expert mathematics curriculum specialist with deep knowledge of grade 6-8 mathematics standards, pacing, and differentiation strategies. You create practical, research-based pacing guides that teachers can implement effectively. You excel at analyzing multi-grade combinations and creating pedagogically sound accelerated pathways."
+            },
+            {
+              role: "user",
+              content: prompt
+            }
+          ],
+          max_completion_tokens: 4000
+        });
+      } catch (apiError) {
+        console.error('❌ [AI Service] OpenAI API Error:', apiError);
+        throw new Error(`OpenAI API Error: ${apiError instanceof Error ? apiError.message : 'Unknown error'}`);
+      }
 
       // Parse the AI response into structured data
       console.log('📨 [AI Service] OpenAI response received');
+      console.log('📊 [AI Service] OpenAI completion details:', {
+        id: completion.id,
+        model: completion.model,
+        choices: completion.choices?.length || 0,
+        usage: completion.usage,
+        choice0: completion.choices?.[0] ? {
+          index: completion.choices[0].index,
+          finish_reason: completion.choices[0].finish_reason,
+          content_length: completion.choices[0].message?.content?.length || 0
+        } : null
+      });
+      
       const aiResponse = completion.choices[0]?.message?.content;
       
       if (!aiResponse) {
-        console.error('❌ [AI Service] No response content from OpenAI');
-        throw new Error('No response from AI service');
+        console.error('❌ [AI Service] No response content from OpenAI:', {
+          completion: completion,
+          choice: completion.choices?.[0],
+          message: completion.choices?.[0]?.message
+        });
+        throw new Error(`No response from AI service. Completion ID: ${completion.id}, Finish reason: ${completion.choices?.[0]?.finish_reason || 'unknown'}`);
       }
       
       console.log('📝 [AI Service] AI response length:', aiResponse.length, 'characters');
