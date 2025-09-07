@@ -1125,6 +1125,29 @@ Return your response as a valid JSON object with this exact structure:
       "learningObjectives": ["Understand rigid transformations", "Apply transformations in coordinate plane"],
       "assessmentType": "formative",
       "differentiationNotes": "Optional notes for differentiation"
+    },
+    {
+      "week": 2,
+      "unit": "Continue with next unit from curriculum data",
+      "textbookSource": "Grade 8 Ready Classroom Mathematics",
+      "volume": "Volume 1",
+      "unitNumber": 1,
+      "lessons": ["Continue with exact lesson titles and page numbers"],
+      "focusStandards": ["Continue with actual standards"],
+      "learningObjectives": ["Continue with learning objectives"],
+      "assessmentType": "formative"
+    },
+    "... CONTINUE THIS PATTERN FOR ALL 36 WEEKS (weeks 1-36) - DO NOT STOP AT 20 WEEKS!",
+    {
+      "week": 36,
+      "unit": "Final unit from curriculum data",
+      "textbookSource": "Algebra 1 Ready Classroom Mathematics",
+      "volume": "Volume 2", 
+      "unitNumber": 7,
+      "lessons": ["Final lessons with exact titles and page numbers"],
+      "focusStandards": ["Final standards"],
+      "learningObjectives": ["Final learning objectives"],
+      "assessmentType": "summative"
     }
   ],
   "assessmentPlan": {
@@ -1165,7 +1188,7 @@ Return your response as a valid JSON object with this exact structure:
 }
 \`\`\`
 
-Create at least 20 weeks of detailed weekly schedule covering the essential concepts from both grades with proper prerequisite sequencing.
+**YOU MUST CREATE ALL ${this.calculateWeeks(request.timeframe)} WEEKS OF DETAILED WEEKLY SCHEDULE covering the essential concepts from both grades with proper prerequisite sequencing. NO PARTIAL SCHEDULES ACCEPTED.**
 
 CRITICAL REQUIREMENTS:
 - Focus on PACING and SEQUENCE, not detailed lesson content
@@ -1178,14 +1201,19 @@ CRITICAL REQUIREMENTS:
 - This is a PACING GUIDE - focus on timing, sequence, and organization
 
 PACING REQUIREMENTS:
-- Generate exactly ${this.calculateWeeks(request.timeframe)} weeks
+- **MUST GENERATE EXACTLY ${this.calculateWeeks(request.timeframe)} WEEKS - NO FEWER!**
+- **ALL ${this.calculateWeeks(request.timeframe)} WEEKS ARE REQUIRED FOR FULL YEAR COVERAGE**
 - Sequence topics for optimal learning progression
 - Provide realistic timeline estimates
 - Include differentiation strategies
 - Identify potential acceleration opportunities
 - Suggest assessment checkpoints
 
+**CRITICAL: The weeklySchedule array MUST contain all ${this.calculateWeeks(request.timeframe)} weeks numbered from 1 to ${this.calculateWeeks(request.timeframe)}. Incomplete schedules will not meet curriculum requirements.**
+
 ABSOLUTELY CRITICAL: Your JSON response must contain a "weeklySchedule" array with actual lesson content. Empty arrays will cause system failure.
+
+**FINAL REMINDER: GENERATE ALL ${this.calculateWeeks(request.timeframe)} WEEKS. DO NOT STOP AT WEEK 20. THE SCHOOL YEAR REQUIRES THE COMPLETE ${this.calculateWeeks(request.timeframe)}-WEEK SCHEDULE.**
 
 Return the response in JSON format with the same structure as single-grade pacing guides.
       `;
