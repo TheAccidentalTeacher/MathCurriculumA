@@ -992,104 +992,123 @@ Return the response in JSON format with the same structure as single-grade pacin
 **Sample Lesson Topics:**
 ${acceleratedPathway.slice(0, 8).map(lesson => `${lesson.lessonNumber}. ${lesson.title} (Grade ${lesson.grade})`).join('\n')}
 
-Create a detailed JSON response with this EXACT structure:
+Create a detailed JSON response with this EXACT structure (field names must match exactly):
 
 {
   "pathway": {
     "name": "Accelerated Grade ${grades.join('+')} Mathematics Pathway",
-    "description": "Comprehensive description of the pathway",
-    "targetOutcome": "Clear learning outcomes for students",
+    "description": "Comprehensive description of the accelerated pathway combining these grade levels",
+    "targetOutcome": "Clear learning outcomes and objectives for students",
     "duration": "${request.timeframe}"
   },
   "analysisResults": {
     "choicesAnalyzed": {
       "gradesCombined": ${JSON.stringify(grades)},
       "pathwayType": "accelerated",
-      "emphasis": "foundational"
+      "emphasis": "foundational",
+      "studentPopulation": "${request.studentPopulation}"
     },
-    "scopeAndSequenceMatch": "Detailed analysis of curriculum alignment",
+    "scopeAndSequenceMatch": "Detailed analysis of how curriculum aligns with standards progression",
     "standardsCoverage": {
-      "majorWork": ["List of major standards covered"],
+      "majorWork": ["List of major standards covered (e.g., 8.EE.7, A-REI.3)"],
       "supportingWork": ["List of supporting standards"],
-      "additionalWork": ["List of additional standards"]
+      "additionalWork": ["List of additional standards"],
+      "crossGradeConnections": ["How standards connect across grade levels"]
     },
     "prerequisiteCheck": {
-      "prerequisitesRequired": ["Required prerequisite skills"],
-      "prerequisitesMet": ["Prerequisites addressed by pathway"],
-      "potentialGaps": ["Potential learning gaps to address"]
+      "prerequisitesRequired": ["Required prerequisite skills for this pathway"],
+      "prerequisitesMet": ["Prerequisites addressed by this pathway"],
+      "potentialGaps": ["Potential learning gaps to monitor and address"]
     }
   },
   "lessonByLessonBreakdown": [
     {
       "lessonNumber": 1,
-      "title": "Lesson title",
-      "unit": "Unit name",
+      "title": "Specific lesson title from curriculum",
+      "unit": "Unit name (e.g., Number Systems)",
       "grade": "8",
       "duration": { "sessions": 2, "totalMinutes": 100 },
       "standards": {
-        "primary": ["8.NS.1"],
-        "supporting": ["8.NS.2"],
-        "mathematical_practices": ["MP1", "MP3"]
+        "primary": ["8.NS.1", "8.NS.2"],
+        "supporting": ["8.EE.1"],
+        "mathematical_practices": ["MP1", "MP3", "MP6"]
       },
-      "learningObjectives": ["Clear, measurable objectives"],
-      "keyVocabulary": ["Key terms"],
-      "materials": ["Required materials"],
+      "learningObjectives": ["Clear, measurable learning objectives"],
+      "keyVocabulary": ["Key mathematical terms"],
+      "materials": ["Required instructional materials"],
       "lessonStructure": [
         {
           "phase": "Opening",
           "duration": 10,
-          "activities": ["Warm-up activities"]
+          "activities": ["Warm-up activities and agenda review"]
+        },
+        {
+          "phase": "Instruction",
+          "duration": 25,
+          "activities": ["Direct instruction and guided practice"]
+        },
+        {
+          "phase": "Practice",
+          "duration": 10,
+          "activities": ["Independent or partner practice"]
+        },
+        {
+          "phase": "Closure",
+          "duration": 5,
+          "activities": ["Exit ticket and summary"]
         }
       ],
       "differentiation": {
-        "supports": ["Support strategies"],
-        "extensions": ["Extension activities"],
-        "accommodations": ["Accommodations needed"]
+        "supports": ["Strategies for struggling learners"],
+        "extensions": ["Advanced activities for ready learners"],
+        "accommodations": ["Specific accommodations needed"]
       },
       "assessment": {
-        "formative": ["Formative assessment methods"],
-        "exitTicket": "Exit ticket question"
+        "formative": ["Formative assessment strategies"],
+        "summative": "Unit test or performance assessment",
+        "exitTicket": "Specific exit ticket question"
       },
-      "homework": "Homework assignment",
-      "connectionToNext": "How this connects to next lesson"
+      "homework": "Homework assignment details",
+      "connectionToNext": "How this lesson connects to the next"
     }
   ],
   "progressionMap": [
     {
       "stage": 1,
       "name": "Foundation Building",
-      "weeks": [1, 2, 3],
-      "focus": "Core concepts",
-      "milestones": ["Key milestones"]
+      "weeks": [1, 2, 3, 4],
+      "focus": "Core foundational concepts",
+      "milestones": ["Key learning milestones for this stage"],
+      "assessments": ["Major assessments in this stage"]
     }
   ],
   "assessmentStrategy": {
-    "formativeApproaches": ["Daily formative methods"],
+    "formativeApproaches": ["Daily formative assessment methods"],
     "summativeSchedule": [
       {
         "week": 4,
         "type": "Unit Test",
         "standards": ["8.NS.1-2"],
-        "description": "Assessment description"
+        "description": "Assessment description and format"
       }
     ],
     "diagnosticCheckpoints": [6, 12, 18, 24, 30],
-    "portfolioComponents": ["Portfolio requirements"],
-    "masteryIndicators": ["How mastery is demonstrated"]
+    "portfolioComponents": ["Portfolio requirements and components"],
+    "masteryIndicators": ["How students demonstrate mastery"]
   },
   "teachingSupport": {
-    "pacingRecommendations": ["Pacing guidance"],
-    "professionalDevelopment": ["PD needs"],
+    "pacingRecommendations": ["Specific pacing guidance and flexibility options"],
+    "professionalDevelopment": ["PD needs and recommendations"],
     "resources": {
-      "instructional": ["Teaching resources"],
-      "assessment": ["Assessment tools"],
-      "digital": ["Digital resources"]
+      "instructional": ["Required teaching resources"],
+      "assessment": ["Assessment tools and rubrics"],
+      "digital": ["Digital tools and platforms"]
     },
-    "parentCommunication": ["Communication strategies"]
+    "parentCommunication": ["Parent communication strategies and templates"]
   }
 }
 
-Generate comprehensive, practical content for a full ${request.timeframe} accelerated pathway covering grades ${grades.join('+')}. Include 30-36 weeks of detailed lesson breakdowns with proper standards alignment and differentiation strategies.`;
+CRITICAL: Generate comprehensive content for 25-35 lessons covering the full ${request.timeframe}. Include detailed lesson breakdowns with proper standards alignment, differentiation strategies, and practical implementation guidance that teachers can use immediately.`;
 
     console.log('📏 [AI Service] Prompt length:', prompt.length, 'characters');
     return prompt;
