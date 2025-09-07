@@ -279,10 +279,10 @@ export class EnhancedAIService {
       const detailedPrompt = await this.buildDetailedLessonPrompt(request, allLessons, mergedContext);
       console.log('📝 [AI Service] Built detailed prompt, length:', detailedPrompt.length);
       
-      // Call OpenAI with GPT-4 Turbo for comprehensive analysis
+      // Call OpenAI with GPT-5 for comprehensive analysis
       console.log('🤖 [AI Service] Calling OpenAI API for detailed analysis...');
       const completion = await this.openai.chat.completions.create({
-        model: "gpt-4-turbo",
+        model: "gpt-5",
         messages: [
           {
             role: "system",
@@ -383,7 +383,7 @@ export class EnhancedAIService {
       // Generate pacing guide with enhanced AI reasoning
       console.log('🤖 [AI Service] Calling OpenAI API...');
       const completion = await this.openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-5",
         messages: [
           {
             role: "system",
@@ -1110,7 +1110,9 @@ Return a comprehensive JSON object with this exact structure:
 }
 \`\`\`
 
-Focus on creating a practical, implementable guide that teachers can use immediately. The lesson-by-lesson breakdown should include at least 20-30 lessons covering the essential pathway content with proper sequencing based on the dynamic scope and sequence data provided.`;
+Focus on creating a practical, implementable guide that teachers can use immediately. The lesson-by-lesson breakdown should include at least 20-30 lessons covering the essential pathway content with proper sequencing based on the dynamic scope and sequence data provided.
+
+## ANALYSIS REQUIREMENTS
 
 3. **Standards Coverage Analysis**: Map all lessons to standards and identify:
    - Major work vs. supporting/additional work
@@ -1130,6 +1132,150 @@ Focus on creating a practical, implementable guide that teachers can use immedia
 
 Please provide a detailed JSON response with the following structure:
 
+\`\`\`json
+{
+  "pathway": {
+    "name": "Accelerated 8th Grade to Algebra I Pathway",
+    "description": "Description of the pathway approach",
+    "targetOutcome": "Students prepared for Algebra II or Geometry",
+    "duration": "Academic year timeframe"
+  },
+  "analysisResults": {
+    "choicesAnalyzed": ${JSON.stringify(choicesAnalysis)},
+    "scopeAndSequenceMatch": "Detailed analysis of how choices align with accelerated pathway",
+    "standardsCoverage": {
+      "majorWork": ["List of major work standards"],
+      "supportingWork": ["List of supporting standards"],
+      "additionalWork": ["List of additional standards"],
+      "crossGradeConnections": ["Connections between grades"],
+      "algebraReadinessIndicators": ["Key indicators for Algebra readiness"]
+    },
+    "prerequisiteCheck": {
+      "prerequisitesRequired": ["Required prerequisite skills"],
+      "prerequisitesMet": ["Prerequisites met by this pathway"],
+      "potentialGaps": ["Potential learning gaps"],
+      "interventionSuggestions": ["Suggested interventions"]
+    }
+  },
+  "lessonByLessonBreakdown": [
+    {
+      "lessonNumber": 1,
+      "title": "Lesson title from accelerated pathway",
+      "unit": "Unit name",
+      "grade": "7 or 8",
+      "duration": {
+        "sessions": 2,
+        "totalMinutes": 90
+      },
+      "standards": {
+        "primary": ["Primary standards"],
+        "supporting": ["Supporting standards"],
+        "mathematical_practices": ["Mathematical practices"]
+      },
+      "learningObjectives": ["Clear learning objectives"],
+      "keyVocabulary": ["Important vocabulary terms"],
+      "materials": ["Required materials"],
+      "lessonStructure": [
+        {
+          "phase": "Warm-Up",
+          "timeMinutes": 10,
+          "description": "Phase description",
+          "teacherActions": ["Teacher actions"],
+          "studentActions": ["Student actions"],
+          "keyQuestions": ["Essential questions"]
+        }
+      ],
+      "differentiation": {
+        "supports": ["Support strategies"],
+        "extensions": ["Extension activities"],
+        "accommodations": ["Accommodations"]
+      },
+      "assessment": {
+        "formative": ["Formative assessments"],
+        "exitTicket": "Exit ticket question"
+      },
+      "homework": "Homework assignment",
+      "connectionToNext": "Connection to next lesson",
+      "realWorldApplication": "Real-world application"
+    }
+  ],
+  "progressionMap": [
+    {
+      "stage": "Stage name",
+      "weeks": [1, 2, 3],
+      "focus": "Stage focus",
+      "milestones": ["Key milestones"],
+      "assessmentPoints": ["Assessment points"]
+    }
+  ],
+  "assessmentFramework": {
+    "formativeAssessments": [
+      {
+        "type": "Assessment type",
+        "frequency": "How often",
+        "format": "Assessment format",
+        "duration": "Time required",
+        "purpose": "Assessment purpose",
+        "gradingCriteria": ["Grading criteria"]
+      }
+    ],
+    "diagnosticCheckpoints": [
+      {
+        "timing": "When administered",
+        "focus": "Focus area",
+        "assessmentMethod": "Method used",
+        "interventionTriggers": ["When to intervene"]
+      }
+    ],
+    "portfolioElements": ["Portfolio components"],
+    "masteryIndicators": ["How to measure mastery"]
+  },
+  "teachingSupport": {
+    "pedagogicalApproach": "Overall teaching philosophy",
+    "classroomManagement": ["Management strategies"],
+    "parentCommunication": ["Communication strategies"],
+    "professionalDevelopment": ["PD recommendations"],
+    "resources": {
+      "required": ["Essential resources"],
+      "recommended": ["Recommended resources"],
+      "digital": ["Digital tools and platforms"]
+    }
+  }
+}
+\`\`\`
+
+## SPECIAL FOCUS AREAS
+
+Since this is specifically for accelerated 8th grade students preparing for Algebra II or Geometry:
+
+1. Emphasize algebraic thinking and linear relationships
+2. Ensure strong foundation in coordinate geometry
+3. Build robust understanding of functions
+4. Develop facility with systems of equations
+5. Strengthen proportional reasoning
+6. Prepare for polynomial operations through exponent work
+
+Generate a comprehensive, implementable guide that teachers can use immediately to deliver this accelerated pathway effectively.\`;
+  }
+
+  private async parseDetailedLessonResponse(aiResponse: string, request: PacingGuideRequest, acceleratedPathway: any[]): Promise<DetailedLessonGuide> {
+    try {
+      console.log('🔍 [AI Service] Parsing detailed lesson response...');
+   - Prerequisite checking
+
+4. **Generate Detailed Lesson Plans**: For each lesson in the accelerated pathway, create comprehensive lesson plans including:
+   - Learning objectives
+   - Key vocabulary
+   - Lesson structure (Warm-Up, Explore, Develop, Refine phases)
+   - Differentiation strategies
+   - Assessment methods
+   - Real-world applications
+
+## OUTPUT FORMAT
+
+Please provide a detailed JSON response with the following structure:
+
+\`\`\`json
 {
   "pathway": {
     "name": "Accelerated 8th Grade to Algebra I Pathway",

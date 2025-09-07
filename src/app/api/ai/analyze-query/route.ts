@@ -148,11 +148,11 @@ Please return a JSON response with the following structure:
     
     // Check if it's a model availability error
     if (error instanceof Error && error.message.includes('model')) {
-      // Fallback to gpt-4o-mini if o1 is not available
+      // Fallback to gpt-5 if o1 is not available
       try {
         const fallbackOpenai = getOpenAIClient();
         const fallbackCompletion = await fallbackOpenai.chat.completions.create({
-          model: 'gpt-4o-mini',
+          model: 'gpt-5',
           messages: [
             {
               role: 'system',

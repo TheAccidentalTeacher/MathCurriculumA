@@ -122,7 +122,7 @@ export class IntelligentTutorEngine {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           prompt, 
-          model: 'gpt-4o-mini' // Use faster model for analysis
+          model: 'gpt-5' // Use GPT-5 for analysis
         })
       });
 
@@ -283,7 +283,7 @@ export class IntelligentTutorEngine {
         body: JSON.stringify({
           message: prompt,
           character,
-          model: 'gpt-4o', // Use GPT-4o for response generation
+          model: 'gpt-5', // Use GPT-5 for response generation
           lessonContext: {
             lessonTitle: lessonContext?.objectives?.[0] || 'Math Lesson',
             topics: lessonContext?.topics || [],

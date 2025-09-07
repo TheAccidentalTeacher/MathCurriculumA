@@ -4,7 +4,7 @@ import { AITutorService, type AIModel } from '@/lib/ai-tutor-service';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { model = 'gpt-4o' } = body;
+    const { model = 'gpt-5' } = body;
 
     console.log(`🧪 Testing AI connection with model: ${model}`);
     
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  const model = searchParams.get('model') || 'gpt-4o';
+  const model = searchParams.get('model') || 'gpt-5';
 
   try {
     console.log(`🧪 Quick AI test with model: ${model}`);

@@ -157,7 +157,7 @@ export class AITutorService {
     character: 'somers' | 'gimli',
     lessonContext: LessonContext,
     conversationHistory: ChatMessage[] = [],
-    preferredModel: AIModel = 'gpt-4o'
+    preferredModel: AIModel = 'gpt-5'
   ): Promise<TutorResponse> {
     this.initialize();
 
@@ -562,7 +562,7 @@ Remember: You're a mathematically gifted, enthusiastic dog helping with ${lesson
   /**
    * Test AI connection and model availability
    */
-  static async testConnection(model: AIModel = 'gpt-4o'): Promise<{
+  static async testConnection(model: AIModel = 'gpt-5'): Promise<{
     success: boolean;
     model: string;
     response?: string;
