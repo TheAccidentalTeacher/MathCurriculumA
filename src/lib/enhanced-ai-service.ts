@@ -284,7 +284,7 @@ export class EnhancedAIService {
               content: detailedPrompt
             }
           ],
-          max_completion_tokens: 2000   // Further reduced to avoid length issues
+          max_completion_tokens: 28000   // Use GPT-5's full capacity for comprehensive responses
         });
       } catch (apiError) {
         console.error('❌ [AI Service] OpenAI API Error:', apiError);
@@ -428,7 +428,7 @@ Keep response concise and practical for classroom implementation.`;
               content: prompt
             }
           ],
-          max_completion_tokens: 4000
+          max_completion_tokens: 28000   // Use GPT-5's full capacity for comprehensive responses
         });
       } catch (apiError) {
         console.error('❌ [AI Service] OpenAI API Error:', apiError);
@@ -970,23 +970,57 @@ Return the response in JSON format with the same structure as single-grade pacin
       sampleLesson: acceleratedPathway[0]
     });
     
-    const prompt = `Create an accelerated mathematics pathway for grades ${grades.join('+')} over ${request.timeframe}.
+    const prompt = `Create a comprehensive accelerated mathematics pathway for grades ${grades.join('+')} over ${request.timeframe}.
 
 **Requirements:**
 - Student Population: ${request.studentPopulation}
 - Schedule: ${request.scheduleConstraints?.daysPerWeek || 5} days/week, ${request.scheduleConstraints?.minutesPerClass || 50} min/class
 - Total Available Lessons: ${acceleratedPathway.length}
+- Differentiation Needs: ${request.differentiationNeeds?.join(', ') || 'Standard'}
+- Priorities: ${request.priorities?.join(', ') || 'Standards alignment'}
 
 **Sample Lesson Topics:**
-${acceleratedPathway.slice(0, 5).map(lesson => `${lesson.lessonNumber}. ${lesson.title} (Grade ${lesson.grade})`).join('\n')}
+${acceleratedPathway.slice(0, 8).map(lesson => `${lesson.lessonNumber}. ${lesson.title} (Grade ${lesson.grade})`).join('\n')}
 
-Create a detailed JSON response with:
-1. Pathway overview and goals
-2. Weekly lesson schedule (30-36 weeks)
-3. Assessment plan
-4. Standards alignment
+Create a detailed, comprehensive JSON response that includes:
 
-Format as JSON with "pathway", "weeklySchedule", "assessmentPlan", and "standardsAlignment" sections. Each weekly entry should include unit, lessons, standards, and objectives.`;
+1. **Pathway Overview**: Name, description, target outcomes, duration, rationale for grade combination
+2. **Weekly Lesson Schedule**: Detailed week-by-week breakdown (30-36 weeks) with:
+   - Week number and unit focus
+   - Specific lesson titles and learning objectives
+   - Standards addressed (CCSS codes)
+   - Assessment opportunities
+   - Differentiation notes
+   - Prerequisites and connections
+
+3. **Assessment Strategy**: Comprehensive plan including:
+   - Formative assessment approaches
+   - Summative assessment schedule with timing
+   - Diagnostic checkpoints
+   - Portfolio components
+   - Mastery indicators
+
+4. **Standards Alignment**: Detailed mapping showing:
+   - Major work vs supporting/additional standards
+   - Grade-level progression
+   - Cross-curricular connections
+   - Prerequisite relationships
+
+5. **Differentiation Strategies**: Specific approaches for:
+   - Advanced learners needing acceleration
+   - Students needing additional support
+   - Various learning modalities
+   - Flexible grouping strategies
+
+6. **Implementation Support**: Practical guidance including:
+   - Pacing recommendations
+   - Resource requirements
+   - Professional development needs
+   - Parent communication strategies
+
+Format as comprehensive JSON with detailed "pathway", "weeklySchedule", "assessmentPlan", "standardsAlignment", "differentiationStrategies", and "implementationSupport" sections. 
+
+Provide thorough, actionable content that teachers can implement immediately. Include specific lesson objectives, assessment methods, and practical classroom strategies.`;
 
     console.log('📏 [AI Service] Prompt length:', prompt.length, 'characters');
     return prompt;
