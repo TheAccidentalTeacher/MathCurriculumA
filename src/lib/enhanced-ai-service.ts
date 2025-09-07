@@ -268,23 +268,24 @@ export class EnhancedAIService {
       const detailedPrompt = this.buildSimpleLessonPrompt(request, lessonCount);
       console.log('📝 [AI Service] Built simple prompt, length:', detailedPrompt.length);
 
-      // Call OpenAI with GPT-5 for comprehensive analysis
+      // Call OpenAI with GPT-4o for fast, comprehensive analysis
       console.log('🤖 [AI Service] Calling OpenAI API for detailed analysis...');
       let completion;
       try {
         completion = await this.openai.chat.completions.create({
-          model: "gpt-5",
+          model: "gpt-4o",
           messages: [
             {
               role: "system",
-              content: "You are a mathematics curriculum specialist. Create practical, implementable pacing guides for accelerated pathways with proper standards alignment and pedagogical progression."
+              content: "You are a mathematics curriculum specialist. Create practical, implementable pacing guides efficiently. Focus on clear structure and essential information."
             },
             {
               role: "user", 
               content: detailedPrompt
             }
           ],
-          max_completion_tokens: 28000   // Use GPT-5's full capacity for comprehensive responses
+          max_completion_tokens: 8000,   // Maintain comprehensive responses with faster GPT-4o
+          temperature: 0.1               // Lower temperature for faster, more focused responses
         });
       } catch (apiError) {
         console.error('❌ [AI Service] OpenAI API Error:', apiError);
@@ -531,7 +532,7 @@ export class EnhancedAIService {
       let completion;
       try {
         completion = await this.openai.chat.completions.create({
-          model: "gpt-5",
+          model: "gpt-4o",
           messages: [
             {
               role: "system",
@@ -542,7 +543,7 @@ export class EnhancedAIService {
               content: prompt
             }
           ],
-          max_completion_tokens: 28000   // Use GPT-5's full capacity for comprehensive responses
+          max_completion_tokens: 28000   // Maintain comprehensive responses with faster GPT-4o
         });
       } catch (apiError) {
         console.error('❌ [AI Service] OpenAI API Error:', apiError);
