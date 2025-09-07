@@ -284,7 +284,7 @@ export class EnhancedAIService {
               content: detailedPrompt
             }
           ],
-          max_completion_tokens: 8000,   // Maintain comprehensive responses with faster GPT-4o
+          max_completion_tokens: 16000,   // GPT-4o maximum limit for comprehensive responses
           temperature: 0.1               // Lower temperature for faster, more focused responses
         });
       } catch (apiError) {
@@ -543,7 +543,7 @@ export class EnhancedAIService {
               content: prompt
             }
           ],
-          max_completion_tokens: 28000   // Maintain comprehensive responses with faster GPT-4o
+          max_completion_tokens: 16000   // GPT-4o maximum limit for comprehensive responses
         });
       } catch (apiError) {
         console.error('❌ [AI Service] OpenAI API Error:', apiError);
