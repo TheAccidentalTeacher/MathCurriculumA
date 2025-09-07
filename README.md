@@ -1,5 +1,41 @@
+# 📚 Math Curriculum Platform
 
-# 📚 Ma## � Important Documentation
+> **A revolutionary EdTech platform for extracting, managing, and searching mathematics curriculum content with enterprise-level precision and scalability.**
+
+## 🌟 Overview
+
+The Math Curriculum Platform is a comprehensive full-stack application that transforms static PDF textbooks into dynamic, searchable, and interactive educational resources. Built with cutting-edge technologies and deployed to production, this platform represents months of enterprise development completed in record time.
+
+## 🧠 Important Documentation
+
+> **⚠️ BEFORE PROCEEDING**: Read these essential documents for complete context:
+
+- **[AI_PROCESS_EXPLAINED.md](./AI_PROCESS_EXPLAINED.md)** - **� NEW**: Complete guide to how GPT-5 AI generates comprehensive pacing guides
+- **[SESSION_RECAP.md](./SESSION_RECAP.md)** - Latest development updates, bug fixes, and current platform status
+- **[virtualtutor/README.md](./virtualtutor/README.md)** - Virtual tutor system implementation guide and roadmap
+- **[docs/GRADE6_CURRICULUM_ANALYSIS.md](./docs/GRADE6_CURRICULUM_ANALYSIS.md)** - Complete Grade 6 curriculum scope & sequence with dynamic pacing guides
+- **Git commit history** - Recent changes and deployment notes
+
+**💡 Pro Tip**: Always check `SESSION_RECAP.md` first for the most recent updates and any critical changes that may affect your work.
+
+### 🤖 AI-Powered Pacing Guide Generation
+This platform features **revolutionary AI capabilities** that transform curriculum planning:
+
+- **GPT-5 Integration**: Uses OpenAI's most advanced model for curriculum analysis
+- **28,000 Token Responses**: Generates comprehensive, detailed pacing guides
+- **1,683+ Lesson Database**: Analyzes vast curriculum content for optimal sequencing
+- **Standards Alignment**: Automatic Common Core mapping and prerequisite analysis
+- **Differentiation Support**: Built-in strategies for diverse learning needs
+- **Teacher-Ready Output**: Immediate implementation guides with assessment strategies
+
+**🎯 Key AI Features:**
+- Accelerated pathway generation for grades 6-9 combinations
+- Lesson-by-lesson breakdown with learning objectives
+- Assessment schedules and differentiation strategies
+- Professional development recommendations
+- Parent communication templates
+
+> **📖 For complete technical details**: See [AI_PROCESS_EXPLAINED.md](./AI_PROCESS_EXPLAINED.md) � Important Documentation
 
 > **⚠️ BEFORE PROCEEDING**: Read these essential documents for complete context:
 
