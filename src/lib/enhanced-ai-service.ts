@@ -979,19 +979,8 @@ Create a detailed JSON response with:
 Format as JSON with "pathway", "weeklySchedule", "assessmentPlan", and "standardsAlignment" sections. Each weekly entry should include unit, lessons, standards, and objectives.`;
   }
 
-\`\`\`json
-{
-  "pathway": {
-    "name": "Accelerated 8th Grade to Algebra I Pathway",
-    "description": "Description of the pathway approach",
-    "targetOutcome": "Students prepared for Algebra II or Geometry",
-    "duration": "Academic year timeframe"
-  },
-  "analysisResults": {
-    "choicesAnalyzed": ${JSON.stringify(choicesAnalysis)},
-    "scopeAndSequenceMatch": "Detailed analysis of how choices align with accelerated pathway",
-    "standardsCoverage": {
-      "majorWork": ["List of major work standards"],
+  // DISABLED - Parse AI response into DetailedLessonGuide format
+  /*
       "supportingWork": ["List of supporting standards"],
       "additionalWork": ["List of additional standards"],
       "crossGradeConnections": ["Connections between grades"],
@@ -1250,6 +1239,7 @@ Since this is specifically for accelerated 8th grade students preparing for Alge
 
 Generate a comprehensive, implementable guide that teachers can use immediately to deliver this accelerated pathway effectively.`;
   }
+  */
 
   private async parseDetailedLessonResponse(aiResponse: string, request: PacingGuideRequest, acceleratedPathway: any[]): Promise<DetailedLessonGuide> {
     try {
