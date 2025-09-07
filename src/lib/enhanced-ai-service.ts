@@ -295,7 +295,7 @@ export class EnhancedAIService {
               content: detailedPrompt
             }
           ],
-          max_completion_tokens: 4000   // Reduced from 6000 to avoid length truncation
+          max_completion_tokens: 3000   // Reduced for simplified output format
         });
       } catch (apiError) {
         console.error('❌ [AI Service] OpenAI API Error:', apiError);
@@ -958,227 +958,26 @@ Return the response in JSON format with the same structure as single-grade pacin
   }
 
   private async buildDetailedLessonPrompt(request: PacingGuideRequest, acceleratedPathway: any[], context: CurriculumContext): Promise<string> {
-    const choicesAnalysis = {
-      gradeLevel: request.gradeLevel,
-      gradeCombination: request.gradeCombination,
-      timeframe: request.timeframe,
-      studentPopulation: request.studentPopulation,
-      priorities: request.priorities,
-      scheduleConstraints: request.scheduleConstraints,
-      differentiationNeeds: request.differentiationNeeds
-    };
-
-    // Get dynamic scope and sequence data for the selected grades
     const grades = request.gradeCombination?.selectedGrades || [request.gradeLevel];
-    const scopeDataPromises = grades.map(grade => dynamicScopeSequenceService.getScopeSequenceForGrade(grade));
-    const scopeData = await Promise.all(scopeDataPromises);
     
-    // Get dynamic pacing configurations
-    const pacingConfigPromises = grades.map(grade => dynamicScopeSequenceService.getDynamicPacingConfig(grade));
-    const pacingConfigs = await Promise.all(pacingConfigPromises);
-    
-    // Get accelerated pathway configurations if applicable
-    const acceleratedConfigs = await dynamicScopeSequenceService.getAcceleratedPathwayConfigs();
-    
-    const relevantPathways = acceleratedConfigs.filter(config => 
-      grades.every(grade => config.grades.includes(grade))
-    );
+    return `Create an accelerated mathematics pathway for grades ${grades.join('+')} over ${request.timeframe}.
 
-    return `You are tasked with creating a comprehensive lesson-by-lesson guide for an accelerated mathematics pathway. This is a sophisticated analysis that requires you to examine all user choices, compare them to the appropriate scope and sequence, analyze standards coverage, and generate detailed lesson plans.
+**Requirements:**
+- Student Population: ${request.studentPopulation}
+- Schedule: ${request.scheduleConstraints?.daysPerWeek || 5} days/week, ${request.scheduleConstraints?.minutesPerClass || 50} min/class
+- Total Available Lessons: ${acceleratedPathway.length}
 
-## USER CHOICES ANALYSIS
-${JSON.stringify(choicesAnalysis, null, 2)}
+**Sample Lesson Topics:**
+${acceleratedPathway.slice(0, 5).map(lesson => `${lesson.lessonNumber}. ${lesson.title} (Grade ${lesson.grade})`).join('\n')}
 
-## DYNAMIC SCOPE & SEQUENCE DATA
-The following scope and sequence data is generated dynamically from the actual curriculum structure:
+Create a detailed JSON response with:
+1. Pathway overview and goals
+2. Weekly lesson schedule (30-36 weeks)
+3. Assessment plan
+4. Standards alignment
 
-${scopeData.map(scope => `
-### ${scope.displayName} (Grade ${scope.grade})
-- **Total Lessons**: ${scope.totalLessons}
-- **Total Units**: ${scope.totalUnits}
-- **Estimated Days**: ${scope.estimatedDays}
-- **Documents Available**: ${scope.documents.map(doc => `${doc.title} (${doc.lessons} lessons)`).join(', ')}
-
-**Unit Breakdown** (Top 3 units):
-${scope.units.slice(0, 3).map(unit => `
-  ${unit.unitNumber}. ${unit.unitTitle} - ${unit.lessonCount} lessons (${unit.estimatedDays} days)
-`).join('')}
-... and ${scope.totalUnits - 3} more units
-`).join('\n')}
-
-## DYNAMIC PACING CONFIGURATIONS
-${pacingConfigs.map(config => `
-### Grade ${config.grade} Pacing Options
-- **Total Lessons**: ${config.totalLessons}
-- **Total Sessions**: ${config.totalSessions}
-- **Average Sessions per Lesson**: ${config.averageSessionsPerLesson}
-- **Estimated Days**: ${config.estimatedDays}
-- **Pacing Options**:
-  - Standard: ${config.pacing.standard} lessons/week
-  - Accelerated: ${config.pacing.accelerated} lessons/week  
-  - Intensive: ${config.pacing.intensive} lessons/week
-`).join('\n')}
-
-## AVAILABLE ACCELERATED PATHWAYS
-${relevantPathways.length > 0 ? relevantPathways.map(pathway => `
-### ${pathway.pathway}
-- **Grades**: ${pathway.grades.join(' + ')}
-- **Total Lessons**: ${pathway.totalLessons}
-- **Estimated Days**: ${pathway.estimatedDays}
-- **Description**: ${pathway.description}
-`).join('\n') : 'No specific accelerated pathways found for this grade combination.'}
-
-## ACCELERATED PATHWAY CURRICULUM DATA
-The following is a sample from the accelerated pathway curriculum with ${acceleratedPathway.length} total lessons:
-
-${acceleratedPathway.slice(0, 5).map(lesson => `
-**Lesson ${lesson.lessonNumber}: ${lesson.title}**
-- Grade: ${lesson.grade} | Unit: ${lesson.unit} | Sessions: ${lesson.sessions}
-- Major Work: ${lesson.majorWork ? 'Yes' : 'No'}
-`).join('\n')}
-... and ${acceleratedPathway.length - 5} more lessons covering the complete pathway.
-
-## CURRICULUM CONTEXT (Summary)
-Total Lessons: ${context.totalLessons} | Units: ${context.unitStructure.length}
-
-Major Standards: ${context.majorStandards.slice(0, 3).map(s => Array.isArray(s.standards) ? s.standards.slice(0, 2).join(', ') : s.standards).join('; ')}${context.majorStandards.length > 3 ? '...' : ''}
-
-Key Units (Top 5):
-${context.unitStructure.slice(0, 5).map(unit => `
-- ${unit.unitTitle}: ${unit.lessonCount} lessons
-`).join('')}${context.unitStructure.length > 5 ? `... and ${context.unitStructure.length - 5} more units` : ''}
-
-## ANALYSIS REQUIREMENTS
-
-1. **Analyze User Choices**: Examine the grade combination, timeframe, student population, and priorities to understand the specific pathway needs.
-
-2. **Dynamic Scope and Sequence Validation**: Compare the user's choices against the dynamically generated scope and sequence data to ensure pedagogical soundness and appropriate progression.
-
-3. **Standards Coverage Analysis**: Using the dynamic curriculum data, analyze which standards are covered, identify any gaps, and ensure proper prerequisite relationships.
-
-4. **Detailed Lesson Progression**: Create a lesson-by-lesson breakdown that follows the dynamic pacing recommendations and scope/sequence structure.
-
-5. **Assessment Strategy**: Design assessment approaches that align with the dynamic scope and sequence timing and natural unit boundaries.
-
-## REQUIRED OUTPUT FORMAT
-
-Return a comprehensive JSON object with this exact structure:
-
-\`\`\`json
-{
-  "pathway": {
-    "name": "Grade 8-9 Accelerated Mathematics Pathway",
-    "description": "Detailed description of the accelerated pathway",
-    "targetOutcome": "Learning goals and outcomes",
-    "duration": "${request.timeframe || 'Academic Year'}"
-  },
-  "analysisResults": {
-    "choicesAnalyzed": {
-      "alignment": "How user choices align with curriculum",
-      "feasibility": "Assessment of timing and scope feasibility", 
-      "recommendations": "Specific recommendations for optimization"
-    },
-    "scopeAndSequenceMatch": "Analysis of how this pathway fits within scope and sequence",
-    "standardsCoverage": {
-      "standardsAddressed": ["List of standards covered"],
-      "prerequisiteAlignment": "How prerequisites are met",
-      "progressionLogic": "Explanation of learning progression",
-      "gapAnalysis": ["Any identified gaps or concerns"]
-    },
-    "prerequisiteCheck": {
-      "prerequisitesRequired": ["Required prior knowledge"],
-      "prerequisitesMet": ["Prerequisites satisfied by pathway"],
-      "potentialGaps": ["Areas that may need reinforcement"],
-      "interventionSuggestions": ["Suggested interventions for gaps"]
-    }
-  },
-  "lessonByLessonBreakdown": [
-    {
-      "sequenceNumber": 1,
-      "gradeLevel": 8,
-      "unitTitle": "Unit Name",
-      "lessonTitle": "Specific Lesson Title",
-      "sessions": 3,
-      "learningObjectives": ["Objective 1", "Objective 2"],
-      "standardsAddressed": ["Standard codes"],
-      "keyMathematicalPractices": ["Practice 1", "Practice 2"],
-      "assessmentOpportunities": ["Quick check", "Exit ticket"],
-      "differentiationNotes": "Notes for different learners",
-      "prerequisiteSkills": ["Required prior skills"],
-      "vocabularyFocus": ["Key terms"],
-      "connectionsToPriorLearning": "How this connects to previous lessons",
-      "connectionsToFutureLearning": "How this prepares for future lessons"
-    }
-  ],
-  "progressionMap": [
-    {
-      "stage": "Foundation Building",
-      "weeks": [1, 2, 3, 4],
-      "focus": "Essential prerequisite skills and concepts",
-      "milestones": ["Milestone 1", "Milestone 2"],
-      "assessmentPoints": ["Week 2 check", "Week 4 assessment"]
-    }
-  ],
-  "assessmentStrategy": {
-    "overallApproach": "Comprehensive assessment philosophy",
-    "formativeStrategies": ["Daily strategies", "Weekly checks"],
-    "summativeAssessments": [
-      {
-        "name": "Unit 1 Assessment",
-        "timing": "End of Week 6",
-        "standards": ["Standards assessed"],
-        "format": "Traditional, Performance, Portfolio",
-        "duration": "50 minutes",
-        "purpose": "Measure unit mastery",
-        "gradingCriteria": ["Accuracy", "Reasoning", "Communication"]
-      }
-    ],
-    "diagnosticCheckpoints": [
-      {
-        "timing": "Week 1",
-        "focus": "Prerequisite skills",
-        "assessmentMethod": "Diagnostic pre-assessment",
-        "interventionTriggers": ["Score below 70%"]
-      }
-    ],
-    "portfolioElements": ["Portfolio components"],
-    "masteryIndicators": ["Indicators of mastery"]
-  },
-  "teachingSupport": {
-    "pedagogicalApproach": "Teaching philosophy and methods",
-    "classroomManagement": ["Management strategies"],
-    "parentCommunication": ["Communication strategies"],
-    "professionalDevelopment": ["PD recommendations"],
-    "resources": {
-      "required": ["Essential resources"],
-      "recommended": ["Helpful additions"],
-      "digital": ["Technology tools"]
-    }
+Format as JSON with "pathway", "weeklySchedule", "assessmentPlan", and "standardsAlignment" sections. Each weekly entry should include unit, lessons, standards, and objectives.`;
   }
-}
-\`\`\`
-
-Focus on creating a practical, implementable guide that teachers can use immediately. The lesson-by-lesson breakdown should include at least 20-30 lessons covering the essential pathway content with proper sequencing based on the dynamic scope and sequence data provided.
-
-## ANALYSIS REQUIREMENTS
-
-3. **Standards Coverage Analysis**: Map all lessons to standards and identify:
-   - Major work vs. supporting/additional work
-   - Cross-grade connections  
-   - Algebra I readiness indicators
-   - Prerequisite checking
-
-4. **Generate Detailed Lesson Plans**: For each lesson in the accelerated pathway, create comprehensive lesson plans including:
-   - Learning objectives
-   - Key vocabulary
-   - Lesson structure (Warm-Up, Explore, Develop, Refine phases)
-   - Differentiation strategies
-   - Assessment methods
-   - Real-world applications
-
-## OUTPUT FORMAT
-
-Please provide a detailed JSON response with the following structure:
 
 \`\`\`json
 {
