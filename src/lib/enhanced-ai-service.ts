@@ -321,13 +321,23 @@ export class EnhancedAIService {
       
       console.log('📨 [AI Service] Received detailed response, length:', aiResponse.length);
       
-      // For simplified version, just return the AI response directly
+      // Parse the JSON response from AI into structured data
+      let parsedResponse;
+      try {
+        parsedResponse = JSON.parse(aiResponse);
+        console.log('📊 [AI Service] Successfully parsed AI response');
+      } catch (parseError) {
+        console.error('❌ [AI Service] Failed to parse AI response as JSON:', parseError);
+        console.log('🔍 [AI Service] Raw response preview:', aiResponse.substring(0, 500));
+        throw new Error('AI returned invalid JSON format');
+      }
+      
       console.log('✅ [AI Service] Detailed lesson guide generated successfully');
       console.groupEnd();
       
       return {
         success: true,
-        detailedLessonGuide: aiResponse
+        detailedLessonGuide: parsedResponse
       };
       
     } catch (error) {
@@ -982,45 +992,104 @@ Return the response in JSON format with the same structure as single-grade pacin
 **Sample Lesson Topics:**
 ${acceleratedPathway.slice(0, 8).map(lesson => `${lesson.lessonNumber}. ${lesson.title} (Grade ${lesson.grade})`).join('\n')}
 
-Create a detailed, comprehensive JSON response that includes:
+Create a detailed JSON response with this EXACT structure:
 
-1. **Pathway Overview**: Name, description, target outcomes, duration, rationale for grade combination
-2. **Weekly Lesson Schedule**: Detailed week-by-week breakdown (30-36 weeks) with:
-   - Week number and unit focus
-   - Specific lesson titles and learning objectives
-   - Standards addressed (CCSS codes)
-   - Assessment opportunities
-   - Differentiation notes
-   - Prerequisites and connections
+{
+  "pathway": {
+    "name": "Accelerated Grade ${grades.join('+')} Mathematics Pathway",
+    "description": "Comprehensive description of the pathway",
+    "targetOutcome": "Clear learning outcomes for students",
+    "duration": "${request.timeframe}"
+  },
+  "analysisResults": {
+    "choicesAnalyzed": {
+      "gradesCombined": ${JSON.stringify(grades)},
+      "pathwayType": "accelerated",
+      "emphasis": "foundational"
+    },
+    "scopeAndSequenceMatch": "Detailed analysis of curriculum alignment",
+    "standardsCoverage": {
+      "majorWork": ["List of major standards covered"],
+      "supportingWork": ["List of supporting standards"],
+      "additionalWork": ["List of additional standards"]
+    },
+    "prerequisiteCheck": {
+      "prerequisitesRequired": ["Required prerequisite skills"],
+      "prerequisitesMet": ["Prerequisites addressed by pathway"],
+      "potentialGaps": ["Potential learning gaps to address"]
+    }
+  },
+  "lessonByLessonBreakdown": [
+    {
+      "lessonNumber": 1,
+      "title": "Lesson title",
+      "unit": "Unit name",
+      "grade": "8",
+      "duration": { "sessions": 2, "totalMinutes": 100 },
+      "standards": {
+        "primary": ["8.NS.1"],
+        "supporting": ["8.NS.2"],
+        "mathematical_practices": ["MP1", "MP3"]
+      },
+      "learningObjectives": ["Clear, measurable objectives"],
+      "keyVocabulary": ["Key terms"],
+      "materials": ["Required materials"],
+      "lessonStructure": [
+        {
+          "phase": "Opening",
+          "duration": 10,
+          "activities": ["Warm-up activities"]
+        }
+      ],
+      "differentiation": {
+        "supports": ["Support strategies"],
+        "extensions": ["Extension activities"],
+        "accommodations": ["Accommodations needed"]
+      },
+      "assessment": {
+        "formative": ["Formative assessment methods"],
+        "exitTicket": "Exit ticket question"
+      },
+      "homework": "Homework assignment",
+      "connectionToNext": "How this connects to next lesson"
+    }
+  ],
+  "progressionMap": [
+    {
+      "stage": 1,
+      "name": "Foundation Building",
+      "weeks": [1, 2, 3],
+      "focus": "Core concepts",
+      "milestones": ["Key milestones"]
+    }
+  ],
+  "assessmentStrategy": {
+    "formativeApproaches": ["Daily formative methods"],
+    "summativeSchedule": [
+      {
+        "week": 4,
+        "type": "Unit Test",
+        "standards": ["8.NS.1-2"],
+        "description": "Assessment description"
+      }
+    ],
+    "diagnosticCheckpoints": [6, 12, 18, 24, 30],
+    "portfolioComponents": ["Portfolio requirements"],
+    "masteryIndicators": ["How mastery is demonstrated"]
+  },
+  "teachingSupport": {
+    "pacingRecommendations": ["Pacing guidance"],
+    "professionalDevelopment": ["PD needs"],
+    "resources": {
+      "instructional": ["Teaching resources"],
+      "assessment": ["Assessment tools"],
+      "digital": ["Digital resources"]
+    },
+    "parentCommunication": ["Communication strategies"]
+  }
+}
 
-3. **Assessment Strategy**: Comprehensive plan including:
-   - Formative assessment approaches
-   - Summative assessment schedule with timing
-   - Diagnostic checkpoints
-   - Portfolio components
-   - Mastery indicators
-
-4. **Standards Alignment**: Detailed mapping showing:
-   - Major work vs supporting/additional standards
-   - Grade-level progression
-   - Cross-curricular connections
-   - Prerequisite relationships
-
-5. **Differentiation Strategies**: Specific approaches for:
-   - Advanced learners needing acceleration
-   - Students needing additional support
-   - Various learning modalities
-   - Flexible grouping strategies
-
-6. **Implementation Support**: Practical guidance including:
-   - Pacing recommendations
-   - Resource requirements
-   - Professional development needs
-   - Parent communication strategies
-
-Format as comprehensive JSON with detailed "pathway", "weeklySchedule", "assessmentPlan", "standardsAlignment", "differentiationStrategies", and "implementationSupport" sections. 
-
-Provide thorough, actionable content that teachers can implement immediately. Include specific lesson objectives, assessment methods, and practical classroom strategies.`;
+Generate comprehensive, practical content for a full ${request.timeframe} accelerated pathway covering grades ${grades.join('+')}. Include 30-36 weeks of detailed lesson breakdowns with proper standards alignment and differentiation strategies.`;
 
     console.log('📏 [AI Service] Prompt length:', prompt.length, 'characters');
     return prompt;
