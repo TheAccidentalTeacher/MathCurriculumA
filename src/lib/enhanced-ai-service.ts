@@ -1,6 +1,8 @@
 import OpenAI from 'openai';
 import { AICurriculumContextService, CurriculumContext, PacingRecommendation } from './ai-curriculum-context';
 import { dynamicScopeSequenceService, DynamicPacingConfig } from './dynamic-scope-sequence';
+import fs from 'fs';
+import path from 'path';
 
 export interface PacingGuideRequest {
   gradeLevel: string; // Keep for backwards compatibility
@@ -221,6 +223,35 @@ export class EnhancedAIService {
     this.curriculumService = new AICurriculumContextService();
   }
 
+  /**
+   * Load actual curriculum structures from JSON files
+   */
+  private loadCurriculumData(grades: string[]): any {
+    const curriculumData: any = {};
+    
+    try {
+      for (const grade of grades) {
+        if (grade === '8') {
+          const grade8Path = path.join(process.cwd(), 'GRADE8_COMPLETE_CURRICULUM_STRUCTURE.json');
+          if (fs.existsSync(grade8Path)) {
+            curriculumData.grade8 = JSON.parse(fs.readFileSync(grade8Path, 'utf8'));
+            console.log('📚 [Curriculum] Loaded Grade 8 structure:', curriculumData.grade8.total_units, 'units,', curriculumData.grade8.total_lessons, 'lessons');
+          }
+        } else if (grade === '9') {
+          const algebra1Path = path.join(process.cwd(), 'ALGEBRA1_COMPLETE_CURRICULUM_STRUCTURE.json');
+          if (fs.existsSync(algebra1Path)) {
+            curriculumData.algebra1 = JSON.parse(fs.readFileSync(algebra1Path, 'utf8'));
+            console.log('📚 [Curriculum] Loaded Algebra 1 structure:', curriculumData.algebra1.total_units, 'units,', curriculumData.algebra1.total_lessons, 'lessons');
+          }
+        }
+      }
+    } catch (error) {
+      console.error('❌ [Curriculum] Error loading curriculum data:', error);
+    }
+    
+    return curriculumData;
+  }
+
   async generatePacingGuide(request: PacingGuideRequest): Promise<PacingGuideResponse> {
     console.group('🧠 [AI Service] Generating Pacing Guide');
     console.log('📝 [AI Service] Request received:', JSON.stringify(request, null, 2));
@@ -355,9 +386,46 @@ export class EnhancedAIService {
   private buildSimpleLessonPrompt(request: PacingGuideRequest, lessonCount: number): string {
     const grades = request.gradeCombination?.selectedGrades || [request.gradeLevel];
     
+    // Load actual curriculum data
+    const curriculumData = this.loadCurriculumData(grades);
+    
+    // Build curriculum context from actual textbook data
+    let curriculumContext = '';
+    if (curriculumData.grade8) {
+      curriculumContext += `\n**GRADE 8 CURRICULUM (Ready Classroom Mathematics Grade 8):**\n`;
+      for (const [volumeName, volume] of Object.entries(curriculumData.grade8.volumes as any)) {
+        curriculumContext += `\n${volumeName}:\n`;
+        for (const unit of (volume as any).units) {
+          curriculumContext += `  Unit ${unit.unit_number}: ${unit.title}\n`;
+          for (const lesson of unit.lessons) {
+            curriculumContext += `    Lesson ${lesson.lesson_number}: ${lesson.title} (Page ${lesson.start_page})\n`;
+          }
+        }
+      }
+    }
+    
+    if (curriculumData.algebra1) {
+      curriculumContext += `\n**ALGEBRA 1 CURRICULUM (Ready Classroom Mathematics Algebra 1):**\n`;
+      for (const [volumeName, volume] of Object.entries(curriculumData.algebra1.volumes as any)) {
+        curriculumContext += `\n${volumeName}:\n`;
+        for (const unit of (volume as any).units) {
+          curriculumContext += `  Unit ${unit.unit_number}: ${unit.title}\n`;
+          for (const lesson of unit.lessons) {
+            curriculumContext += `    Lesson ${lesson.lesson_number}: ${lesson.title} (Page ${lesson.start_page})\n`;
+          }
+        }
+      }
+    }
+    
     return `Create a comprehensive accelerated mathematics pathway for grades ${grades.join('+')} over ${request.timeframe}.
 
-**Requirements:**
+**CURRICULUM DATA TO USE:**${curriculumContext}
+
+**CRITICAL REQUIREMENTS:**
+- **USE ONLY THE EXACT UNIT AND LESSON TITLES** from the curriculum data above
+- **SPECIFY THE TEXTBOOK SOURCE** (Grade 8 book vs Algebra 1 book) for each lesson
+- **INCLUDE ACTUAL PAGE NUMBERS** from the curriculum data
+- **MAP TO REAL UNIT STRUCTURES** from the Ready Classroom Mathematics series
 - Student Population: ${request.studentPopulation}
 - Schedule: ${request.scheduleConstraints?.daysPerWeek || 5} days/week, ${request.scheduleConstraints?.minutesPerClass || 50} min/class
 - Total Available Lessons: ${lessonCount}
@@ -396,23 +464,27 @@ export class EnhancedAIService {
   "lessonByLessonBreakdown": [
     {
       "lessonNumber": 1,
-      "title": "Specific lesson title from curriculum",
-      "unit": "Unit name (e.g., Number Systems)",
-      "grade": "8",
+      "title": "EXACT lesson title from curriculum data above",
+      "textbookSource": "Grade 8 Ready Classroom Mathematics" OR "Algebra 1 Ready Classroom Mathematics",
+      "volume": "Volume 1" OR "Volume 2",
+      "unit": "EXACT unit title from curriculum data (e.g., 'Geometric Figures: Rigid Transformations and Congruence')",
+      "unitNumber": 1,
+      "pageNumber": "ACTUAL page number from curriculum data",
+      "grade": "8" OR "9",
       "duration": { "sessions": 2, "totalMinutes": 100 },
       "standards": {
         "primary": ["8.NS.1", "8.NS.2"],
         "supporting": ["8.EE.1"],
         "mathematical_practices": ["MP1", "MP3", "MP6"]
       },
-      "learningObjectives": ["Clear, measurable learning objectives"],
-      "keyVocabulary": ["Key mathematical terms"],
-      "materials": ["Required instructional materials"],
+      "learningObjectives": ["Clear, measurable learning objectives based on lesson content"],
+      "keyVocabulary": ["Key mathematical terms from the specific lesson"],
+      "materials": ["Ready Classroom Mathematics textbook page references"],
       "lessonStructure": [
         {
           "phase": "Opening",
           "duration": 10,
-          "activities": ["Warm-up activities and agenda review"]
+          "activities": ["Warm-up activities based on lesson content"]
         }
       ],
       "differentiation": {
@@ -425,7 +497,7 @@ export class EnhancedAIService {
         "summative": "Unit test or performance assessment",
         "exitTicket": "Specific exit ticket question"
       },
-      "homework": "Homework assignment details",
+      "homework": "Homework assignment from textbook pages",
       "connectionToNext": "How this lesson connects to the next"
     }
   ],
@@ -960,9 +1032,48 @@ Ensure the pacing guide is realistic, pedagogically sound, and addresses the spe
   private buildAdvancedPrompt(context: CurriculumContext, gradeConfig: any, request: PacingGuideRequest): string {
     const isMultiGrade = gradeConfig.selectedGrades.length > 1;
     
+    // Load actual curriculum data
+    const curriculumData = this.loadCurriculumData(gradeConfig.selectedGrades);
+    
+    // Build curriculum context from actual textbook data
+    let curriculumContext = '';
+    if (curriculumData.grade8) {
+      curriculumContext += `\n**GRADE 8 TEXTBOOK (Ready Classroom Mathematics Grade 8):**\n`;
+      for (const [volumeName, volume] of Object.entries(curriculumData.grade8.volumes as any)) {
+        curriculumContext += `\n${volumeName}:\n`;
+        for (const unit of (volume as any).units) {
+          curriculumContext += `  Unit ${unit.unit_number}: ${unit.title}\n`;
+          for (const lesson of unit.lessons) {
+            curriculumContext += `    Lesson ${lesson.lesson_number}: ${lesson.title} (Page ${lesson.start_page})\n`;
+          }
+        }
+      }
+    }
+    
+    if (curriculumData.algebra1) {
+      curriculumContext += `\n**ALGEBRA 1 TEXTBOOK (Ready Classroom Mathematics Algebra 1):**\n`;
+      for (const [volumeName, volume] of Object.entries(curriculumData.algebra1.volumes as any)) {
+        curriculumContext += `\n${volumeName}:\n`;
+        for (const unit of (volume as any).units) {
+          curriculumContext += `  Unit ${unit.unit_number}: ${unit.title}\n`;
+          for (const lesson of unit.lessons) {
+            curriculumContext += `    Lesson ${lesson.lesson_number}: ${lesson.title} (Page ${lesson.start_page})\n`;
+          }
+        }
+      }
+    }
+    
     if (isMultiGrade) {
       return `
 Create a comprehensive ${gradeConfig.pathwayType} pacing guide for ${gradeConfig.selectedGrades.join(' + ')} mathematics curriculum.
+
+**CURRICULUM DATA TO USE:**${curriculumContext}
+
+**CRITICAL REQUIREMENTS:**
+- **USE ONLY THE EXACT UNIT AND LESSON TITLES** from the curriculum data above
+- **SPECIFY THE TEXTBOOK SOURCE** (Grade 8 book vs Algebra 1 book) for each lesson
+- **INCLUDE ACTUAL PAGE NUMBERS** from the curriculum data
+- **MAP TO REAL UNIT STRUCTURES** from the Ready Classroom Mathematics series
 
 GRADE COMBINATION ANALYSIS:
 - Selected Grades: ${gradeConfig.selectedGrades.join(', ')}
@@ -1000,10 +1111,18 @@ Return your response as a valid JSON object with this exact structure:
   "weeklySchedule": [
     {
       "week": 1,
-      "unit": "Unit Name (e.g., 'Ratios and Proportional Relationships')",
-      "lessons": ["Unit 1, Lesson 1", "Unit 1, Lesson 2", "Unit 1, Lesson 3", "Unit 1, Lesson 4"],
-      "focusStandards": ["6.RP.A.1", "6.RP.A.2"],
-      "learningObjectives": ["Understand ratio concepts", "Use ratio language to describe relationships"],
+      "unit": "EXACT unit title from curriculum data (e.g., 'Geometric Figures: Rigid Transformations and Congruence')",
+      "textbookSource": "Grade 8 Ready Classroom Mathematics" OR "Algebra 1 Ready Classroom Mathematics",
+      "volume": "Volume 1" OR "Volume 2",
+      "unitNumber": 1,
+      "lessons": [
+        "Grade 8, Unit 1, Lesson 1: Understand Rigid Transformations and Their Properties (Page 15)",
+        "Grade 8, Unit 1, Lesson 2: Work with Single Rigid Transformations in the Coordinate Plane (Page 28)",
+        "Grade 8, Unit 1, Lesson 3: Work with Sequences of Transformations and Congruence (Page 55)",
+        "CONTINUE with exact lesson titles and page numbers from curriculum data"
+      ],
+      "focusStandards": ["8.G.A.1", "8.G.A.2"],
+      "learningObjectives": ["Understand rigid transformations", "Apply transformations in coordinate plane"],
       "assessmentType": "formative",
       "differentiationNotes": "Optional notes for differentiation"
     }
