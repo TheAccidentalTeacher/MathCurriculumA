@@ -286,7 +286,14 @@ export class EnhancedAIService {
       
       if (isMultiGrade && totalWeeks >= 30) {
         console.log('📊 [AI Service] Large multi-grade request detected, using chunked generation');
-        return await this.generateChunkedPacingGuide(request);
+        try {
+          return await this.generateChunkedPacingGuide(request);
+        } catch (chunkError) {
+          console.warn('⚠️ [AI Service] Chunked generation failed, falling back to standard generation:', chunkError);
+          console.log('🔄 [AI Service] Attempting standard generation with reduced scope...');
+          // Fall back to standard generation
+          return await this.generateStandardPacingGuide(request);
+        }
       }
       
       // Standard pacing guide generation (existing logic)
@@ -414,14 +421,14 @@ export class EnhancedAIService {
         messages: [
           {
             role: "system",
-            content: "You are a mathematics curriculum specialist. Create practical, implementable pacing guides efficiently. Focus on clear structure and essential information."
+            content: "You are a mathematics curriculum specialist. Create practical, implementable pacing guides efficiently. Focus on clear structure and essential information. ALWAYS return valid JSON format."
           },
           {
             role: "user", 
             content: prompt
           }
         ],
-        max_completion_tokens: 16000,   // GPT-4o maximum limit for comprehensive responses
+        max_completion_tokens: 12000,   // Reduced token limit for chunk stability
         temperature: 0.1               // Lower temperature for faster, more focused responses
       });
       
@@ -446,12 +453,16 @@ export class EnhancedAIService {
       
       // Check if response was truncated due to length limit
       if (completion.choices?.[0]?.finish_reason === 'length') {
-        console.warn('⚠️ [AI Service] Response was truncated due to token limit, but continuing with partial content');
+        console.warn('⚠️ [AI Service] Response was truncated due to token limit');
         console.log('📏 [AI Service] Truncated response length:', aiResponse.length);
+        
+        // For chunked generation, we need complete JSON, so this is a critical error
+        throw new Error('AI response was truncated, resulting in incomplete JSON. Please try again or reduce scope.');
       }
       
       console.log('📝 [AI Service] AI response length:', aiResponse.length, 'characters');
-      console.log('🔍 [AI Service] AI response preview:', aiResponse.substring(0, 200) + '...');
+      console.log('🔍 [AI Service] AI response preview:', aiResponse.substring(0, 300) + '...');
+      console.log('🔍 [AI Service] AI response ending:', '...' + aiResponse.substring(Math.max(0, aiResponse.length - 300)));
       
       return aiResponse;
       
@@ -476,6 +487,12 @@ export class EnhancedAIService {
       const gradeConfig = this.determineGradeConfig(request);
       const mergedContext = await this.curriculumService.getMergedCurriculumContext(gradeConfig.selectedGrades);
       
+      console.log('🎯 [AI Service] Context prepared:', {
+        gradeConfig: gradeConfig,
+        contextUnits: mergedContext.unitStructure.length,
+        totalLessons: mergedContext.totalLessons
+      });
+      
       // Generate first chunk
       console.log('🎯 [AI Service] Generating first chunk with overview...');
       const chunk1Request = { 
@@ -488,14 +505,18 @@ export class EnhancedAIService {
         }
       };
       
+      console.log('📝 [AI Service] Building prompt for chunk 1...');
       const chunk1Prompt = this.buildAdvancedPrompt(mergedContext, gradeConfig, chunk1Request);
-      const chunk1Response = await this.callOpenAI(chunk1Prompt);
+      console.log('📏 [AI Service] Chunk 1 prompt length:', chunk1Prompt.length, 'characters');
       
-      if (!chunk1Response) {
-        throw new Error('Failed to generate first chunk');
-      }
+      const chunk1Response = await this.callOpenAI(chunk1Prompt);
+      console.log('✅ [AI Service] Chunk 1 response received, parsing...');
       
       const chunk1Guide = await this.parseAIResponse(chunk1Response, mergedContext, chunk1Request);
+      console.log('✅ [AI Service] Chunk 1 parsed successfully:', {
+        weeklyScheduleLength: chunk1Guide.weeklySchedule?.length || 0,
+        hasOverview: !!chunk1Guide.overview
+      });
       
       // Generate second chunk
       console.log('🎯 [AI Service] Generating second chunk...');
@@ -509,14 +530,18 @@ export class EnhancedAIService {
         }
       };
       
+      console.log('📝 [AI Service] Building prompt for chunk 2...');
       const chunk2Prompt = this.buildAdvancedPrompt(mergedContext, gradeConfig, chunk2Request);
-      const chunk2Response = await this.callOpenAI(chunk2Prompt);
+      console.log('📏 [AI Service] Chunk 2 prompt length:', chunk2Prompt.length, 'characters');
       
-      if (!chunk2Response) {
-        throw new Error('Failed to generate second chunk');
-      }
+      const chunk2Response = await this.callOpenAI(chunk2Prompt);
+      console.log('✅ [AI Service] Chunk 2 response received, parsing...');
       
       const chunk2Guide = await this.parseAIResponse(chunk2Response, mergedContext, chunk2Request);
+      console.log('✅ [AI Service] Chunk 2 parsed successfully:', {
+        weeklyScheduleLength: chunk2Guide.weeklySchedule?.length || 0,
+        hasOverview: !!chunk2Guide.overview
+      });
       
       // Merge the two chunks
       console.log('🔗 [AI Service] Merging chunks...');
@@ -547,7 +572,9 @@ export class EnhancedAIService {
       console.log('✅ [AI Service] Successfully merged chunks:', {
         totalWeeks: mergedPacingGuide.weeklySchedule.length,
         chunk1Weeks: chunk1Guide.weeklySchedule.length,
-        chunk2Weeks: chunk2Guide.weeklySchedule.length
+        chunk2Weeks: chunk2Guide.weeklySchedule.length,
+        mergedOverview: !!mergedPacingGuide.overview,
+        mergedAssessmentPlan: !!mergedPacingGuide.assessmentPlan
       });
       console.groupEnd();
       
@@ -1283,49 +1310,20 @@ ${chunkNumber === totalChunks ? '- End with advanced Algebra 1 concepts' : ''}
 
     if (isMultiGrade) {
       return `
-Create a STREAMLINED ${gradeConfig.pathwayType} pacing guide for ${gradeConfig.selectedGrades.join(' + ')} mathematics curriculum.
+Create a ${gradeConfig.pathwayType} pacing guide for ${gradeConfig.selectedGrades.join(' + ')} mathematics.
 
 ${chunkInstructions}
 
-**CURRICULUM DATA TO USE:**${curriculumContext}
+**CURRICULUM DATA:**${curriculumContext}
 
-**CRITICAL REQUIREMENTS:**
-- **USE ONLY THE EXACT UNIT AND LESSON TITLES** from the curriculum data above
-- **SPECIFY THE TEXTBOOK SOURCE** (Grade 8 book vs Algebra 1 book) for each lesson
-- **INCLUDE ACTUAL PAGE NUMBERS** from the curriculum data
-- **MAP TO REAL UNIT STRUCTURES** from the Ready Classroom Mathematics series
+**REQUIREMENTS:**
+- Use exact unit/lesson titles from curriculum data above
+- Include textbook source and page numbers  
+- Create logical progression for ${weekRange}
+- Focus on essential standards alignment
 
-**OPTIMIZATION FOR SPEED**: Create a CONCISE but COMPLETE ${weekRange} overview focusing on:
-- Weekly unit progression
-- Essential lesson references (not detailed content)
-- Key standards alignment
-- Assessment timing
-
-GRADE COMBINATION ANALYSIS:
-- Selected Grades: ${gradeConfig.selectedGrades.join(', ')}
-- Pathway Type: ${gradeConfig.pathwayType}
-- Emphasis: ${gradeConfig.emphasis}
-- Total Unit Structures: ${context.unitStructure.length}
-- Total Lessons: ${context.totalLessons}
-- Total Instructional Days: ${context.totalInstructionalDays}
-
-PEDAGOGICAL REQUIREMENTS:
-1. Analyze prerequisite relationships between grade levels
-2. Identify essential foundational concepts that cannot be skipped
-3. Create logical progression that builds mathematical understanding
-4. Balance content coverage with sufficient practice time
-5. Consider cognitive load and developmental appropriateness
-
-TIMEFRAME: ${request.timeframe}
-STUDENT POPULATION: ${request.studentPopulation}
-PRIORITIES: ${request.priorities ? request.priorities.join(', ') : 'Not specified'}
-
-SCHEDULE CONSTRAINTS:
-- ${request.scheduleConstraints?.daysPerWeek || 5} days per week
-- ${request.scheduleConstraints?.minutesPerClass || 50} minutes per class
-
-REQUIRED OUTPUT FORMAT:
-Return your response as a valid JSON object with this exact structure:
+**JSON OUTPUT REQUIRED:**
+Return ONLY valid JSON in this exact format:
 
 \`\`\`json
 {
@@ -1338,90 +1336,41 @@ Return your response as a valid JSON object with this exact structure:
       "isChunked": true
     },` : ''}
     "lessonsPerWeek": 4,
-    "description": "Brief description of the combined pathway approach${isChunked ? ` (Chunk ${chunkNumber} of ${totalChunks})` : ''}"
+    "description": "Brief description${isChunked ? ` (Chunk ${chunkNumber} of ${totalChunks})` : ''}"
   },
   "weeklySchedule": [
-${isChunked ? `    // Generate weeks ${(chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks) + 1} through ${Math.min(chunkNumber * Math.ceil(totalWeeks / totalChunks), totalWeeks)}` : '    // Generate all weeks 1 through ' + totalWeeks}
+${isChunked ? `    // Generate weeks ${(chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks) + 1} through ${Math.min(chunkNumber * Math.ceil(totalWeeks / totalChunks), totalWeeks)} ONLY` : '    // Generate all weeks 1 through ' + totalWeeks}
     {
       "week": ${isChunked ? (chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks) + 1 : 1},
-      "unit": "EXACT unit title from curriculum data (e.g., 'Geometric Figures: Rigid Transformations and Congruence')",
-      "textbookSource": "Grade 8 Ready Classroom Mathematics" OR "Algebra 1 Ready Classroom Mathematics",
-      "volume": "Volume 1" OR "Volume 2",
+      "unit": "EXACT unit title from curriculum data",
+      "textbookSource": "Grade 8 Ready Classroom Mathematics",
+      "volume": "Volume 1",
       "unitNumber": 1,
       "lessons": [
-        "Grade 8, Unit 1, Lesson 1: Understand Rigid Transformations and Their Properties (Page 15)",
-        "Grade 8, Unit 1, Lesson 2: Work with Single Rigid Transformations in the Coordinate Plane (Page 28)",
-        "Grade 8, Unit 1, Lesson 3: Work with Sequences of Transformations and Congruence (Page 55)",
-        "CONTINUE with exact lesson titles and page numbers from curriculum data"
+        "Grade 8, Unit 1, Lesson 1: Exact lesson title (Page #)"
       ],
-      "focusStandards": ["8.G.A.1", "8.G.A.2"],
-      "learningObjectives": ["Understand rigid transformations", "Apply transformations in coordinate plane"],
-      "assessmentType": "formative",
-      "differentiationNotes": "Optional notes for differentiation"
+      "focusStandards": ["8.G.A.1"],
+      "learningObjectives": ["Clear objective"],
+      "assessmentType": "formative"
     }${isChunked ? `,
-    // ... CONTINUE THIS PATTERN FOR WEEKS ${(chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks) + 1} THROUGH ${Math.min(chunkNumber * Math.ceil(totalWeeks / totalChunks), totalWeeks)} ONLY` : `,
-    // ... CONTINUE THIS PATTERN FOR ALL ${totalWeeks} WEEKS (weeks 1-${totalWeeks}) - DO NOT STOP AT 20 WEEKS!`}
+    // Continue for ${Math.min(Math.ceil(totalWeeks / totalChunks), totalWeeks - (chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks)) - 1} more weeks in this chunk` : `,
+    // Continue for all ${totalWeeks - 1} more weeks`}
   ],
   "assessmentPlan": {
     "formativeFrequency": "Weekly",
-    "summativeSchedule": [
-      {
-        "week": 8,
-        "type": "Unit Assessment",
-        "standards": ["6.RP.A.1", "6.RP.A.2", "6.RP.A.3"],
-        "description": "Assessment covering ratio and proportion concepts"
-      }
-    ],
-    "diagnosticCheckpoints": [4, 12, 24],
-    "portfolioComponents": ["Problem solving samples", "Reflection pieces"]
+    "summativeSchedule": [],
+    "diagnosticCheckpoints": [],
+    "portfolioComponents": []
   },
-  "differentiationStrategies": [
-    {
-      "studentGroup": "Students with Disabilities",
-      "modifications": ["Extended time", "Visual supports"],
-      "resources": ["Manipulatives", "Graphic organizers"],
-      "assessmentAdjustments": ["Alternative formats", "Oral responses"]
-    }
-  ],
-  "flexibilityOptions": [
-    {
-      "scenario": "If students struggle with ratios",
-      "adjustments": ["Add concrete examples", "Use manipulatives"],
-      "impactAnalysis": "May need 1-2 extra days"
-    }
-  ],
-  "standardsAlignment": [
-    {
-      "standard": "6.RP.A.1 - Understand the concept of ratio",
-      "weeksCovered": [1, 2],
-      "connections": ["Links to fraction concepts", "Foundation for proportions"]
-    }
-  ]
+  "differentiationStrategies": [],
+  "flexibilityOptions": [],
+  "standardsAlignment": []
 }
 \`\`\`
 
-${isChunked ? `**CHUNK ${chunkNumber} REQUIREMENTS:**
-- Generate ONLY the weeks specified for this chunk (weeks ${(chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks) + 1}-${Math.min(chunkNumber * Math.ceil(totalWeeks / totalChunks), totalWeeks)})
-- Ensure proper curriculum progression within this chunk
-- Use appropriate Grade 8 or Algebra 1 content based on week number
-- The weeklySchedule array should contain exactly ${Math.min(Math.ceil(totalWeeks / totalChunks), totalWeeks - (chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks))} weeks` : `**FULL CURRICULUM REQUIREMENTS:**
-- Generate ALL ${totalWeeks} weeks of the curriculum
-- Cover complete progression from Grade 8 through Algebra 1
-- The weeklySchedule array MUST contain all ${totalWeeks} weeks numbered from 1 to ${totalWeeks}`}
+${isChunked ? `**GENERATE EXACTLY ${Math.min(Math.ceil(totalWeeks / totalChunks), totalWeeks - (chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks))} WEEKS FOR CHUNK ${chunkNumber}**` : `**GENERATE ALL ${totalWeeks} WEEKS**`}
 
-CRITICAL REQUIREMENTS:
-- Focus on PACING and SEQUENCE, not detailed lesson content
-- Each week should reference existing curriculum units and lessons (e.g., "Unit 3, Lesson 2")
-- Lessons array should contain lesson REFERENCES, not detailed content
-- Each week MUST have 2-4 learning objectives that describe WHAT students will learn
-- Each week MUST have 2-3 focus standards using standard codes (e.g., "6.RP.A.1")
-- Use "assessmentType": "formative", "summative", or "diagnostic" 
-- Standards should use actual standard codes when possible
-- This is a PACING GUIDE - focus on timing, sequence, and organization
-
-ABSOLUTELY CRITICAL: Your JSON response must contain a "weeklySchedule" array with actual lesson content. Empty arrays will cause system failure.
-
-Return the response in JSON format with the same structure as single-grade pacing guides.
+CRITICAL: Return ONLY the JSON object. No additional text before or after.
       `;
     }
 
