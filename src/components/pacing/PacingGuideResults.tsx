@@ -32,32 +32,9 @@ export function PacingGuideResults({
   const [selectedLesson, setSelectedLesson] = useState<number | null>(null);
   const [announcements, setAnnouncements] = useState<string>('');
 
-  // Determine if this is a detailed lesson guide
-  const isDetailedGuide = !!detailedLessonGuide;
-  const currentGuide = pacingGuide || (detailedLessonGuide ? {
-    overview: {
-      gradeLevel: "7-8 Accelerated",
-      timeframe: detailedLessonGuide.pathway.duration,
-      totalWeeks: Math.ceil(detailedLessonGuide.lessonByLessonBreakdown.length / 4),
-      lessonsPerWeek: 4,
-      totalLessons: detailedLessonGuide.lessonByLessonBreakdown.length
-    },
-    weeklySchedule: [],
-    assessmentPlan: {
-      formativeFrequency: detailedLessonGuide.assessmentStrategy.overallApproach,
-      summativeSchedule: detailedLessonGuide.assessmentStrategy.summativeAssessments.map(assessment => ({
-        week: parseInt(assessment.timing.replace(/\D/g, '')) || 1,
-        type: assessment.name,
-        standards: assessment.standards,
-        description: assessment.purpose
-      })),
-      diagnosticCheckpoints: detailedLessonGuide.assessmentStrategy.diagnosticCheckpoints.map((_, idx) => idx + 1),
-      portfolioComponents: detailedLessonGuide.assessmentStrategy.portfolioElements
-    },
-    differentiationStrategies: [],
-    flexibilityOptions: [],
-    standardsAlignment: []
-  } : null);
+  // Force simple mode - we want basic tabs only
+  const isDetailedGuide = false;  // Always use simple mode
+  const currentGuide = pacingGuide || null;
 
   if (!currentGuide) {
     return <div className="text-center p-8">No pacing guide data available</div>;
@@ -109,16 +86,11 @@ export function PacingGuideResults({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              {isDetailedGuide ? detailedLessonGuide!.pathway.name : `Grade ${currentGuide.overview.gradeLevel} Pacing Guide`}
+              Grade {currentGuide.overview.gradeLevel} Pacing Guide
             </h1>
             <p className="mt-2 text-lg text-gray-600">
               {currentGuide.overview.timeframe} • {currentGuide.overview.totalWeeks} weeks • {currentGuide.overview.lessonsPerWeek} lessons/week
             </p>
-            {isDetailedGuide && (
-              <p className="mt-1 text-sm text-blue-600">
-                {detailedLessonGuide!.pathway.description}
-              </p>
-            )}
           </div>
           <div className="mt-4 sm:mt-0 flex space-x-3">
             <button
@@ -147,10 +119,7 @@ export function PacingGuideResults({
       {/* Navigation Tabs */}
       <div className="border-b border-gray-200 mb-8">
         <nav className="-mb-px flex space-x-8" aria-label="Pacing guide navigation">
-          {(isDetailedGuide 
-            ? ['overview', 'detailed-lessons', 'progression', 'assessments', 'lesson-plans'] 
-            : ['overview', 'weekly', 'assessments', 'differentiation', 'standards']
-          ).map((view) => (
+          {['overview', 'weekly', 'progression'].map((view) => (
             <button
               key={view}
               onClick={() => handleViewChange(view as ViewMode)}
@@ -173,54 +142,27 @@ export function PacingGuideResults({
         {activeView === 'overview' && (
           <OverviewView 
             pacingGuide={currentGuide} 
-            detailedLessonGuide={detailedLessonGuide}
           />
         )}
 
-        {activeView === 'detailed-lessons' && isDetailedGuide && (
-          <DetailedLessonsView 
-            lessonGuide={detailedLessonGuide!}
-            selectedLesson={selectedLesson}
-            onLessonSelect={(lesson) => setSelectedLesson(lesson)}
-          />
-        )}
-
-        {activeView === 'progression' && isDetailedGuide && (
-          <ProgressionMapView progressionMap={detailedLessonGuide!.progressionMap} />
-        )}
-
-        {activeView === 'lesson-plans' && isDetailedGuide && (
-          <LessonPlansView 
-            lessons={detailedLessonGuide!.lessonByLessonBreakdown}
-            selectedLesson={selectedLesson}
-            onLessonSelect={(lesson) => setSelectedLesson(lesson)}
-          />
-        )}
-
-        {activeView === 'weekly' && !isDetailedGuide && pacingGuide && (
+        {activeView === 'weekly' && (
           <WeeklyScheduleView 
-            schedule={pacingGuide.weeklySchedule}
+            schedule={currentGuide.weeklySchedule}
             selectedWeek={selectedWeek}
             onWeekSelect={handleWeekSelect}
           />
         )}
 
-        {activeView === 'assessments' && (
-          <AssessmentPlanView 
-            assessmentPlan={currentGuide.assessmentPlan}
-            detailedStrategy={isDetailedGuide ? detailedLessonGuide!.assessmentStrategy : undefined}
-          />
-        )}
-
-        {activeView === 'differentiation' && !isDetailedGuide && pacingGuide && (
-          <DifferentiationView 
-            strategies={pacingGuide.differentiationStrategies}
-            flexibilityOptions={pacingGuide.flexibilityOptions}
-          />
-        )}
-
-        {activeView === 'standards' && !isDetailedGuide && pacingGuide && (
-          <StandardsAlignmentView alignment={pacingGuide.standardsAlignment} />
+        {activeView === 'progression' && (
+          <ProgressionMapView progressionMap={[
+            {
+              stage: "1",
+              weeks: Array.from({length: currentGuide.overview.totalWeeks}, (_, i) => i + 1),
+              focus: "Complete mathematics curriculum",
+              milestones: ["Weekly assessments", "Unit completions"],
+              assessmentPoints: ["Formative assessments", "Unit tests"]
+            }
+          ]} />
         )}
       </div>
     </div>
@@ -229,14 +171,10 @@ export function PacingGuideResults({
 
 // Overview Component
 function OverviewView({ 
-  pacingGuide, 
-  detailedLessonGuide 
+  pacingGuide
 }: { 
   pacingGuide: GeneratedPacingGuide;
-  detailedLessonGuide?: DetailedLessonGuide;
 }) {
-  const isDetailedGuide = !!detailedLessonGuide;
-  
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -254,57 +192,15 @@ function OverviewView({
         </div>
       </div>
 
-      {isDetailedGuide && detailedLessonGuide && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-orange-50 p-6 rounded-lg">
-            <h3 className="text-lg font-semibold text-orange-900 mb-2">Target Outcome</h3>
-            <p className="text-sm text-orange-800">{detailedLessonGuide.pathway.targetOutcome}</p>
-          </div>
-          <div className="bg-teal-50 p-6 rounded-lg">
-            <h3 className="text-lg font-semibold text-teal-900 mb-2">Algebra Readiness</h3>
-            <p className="text-sm text-teal-800">
-              {detailedLessonGuide.analysisResults.standardsCoverage.algebralReadinessIndicators.length} indicators
-            </p>
-          </div>
-        </div>
-      )}
-
       <div>
         <h3 className="text-xl font-semibold text-gray-900 mb-4">
-          {isDetailedGuide ? 'Pathway Summary' : 'Quick Summary'}
+          Curriculum Summary
         </h3>
         <div className="bg-gray-50 p-6 rounded-lg">
-          {isDetailedGuide && detailedLessonGuide ? (
-            <div className="space-y-4">
-              <p className="text-gray-700 leading-relaxed">
-                <strong>{detailedLessonGuide.pathway.name}</strong>: {detailedLessonGuide.pathway.description}
-              </p>
-              <p className="text-gray-700">
-                <strong>Analysis Results:</strong> {detailedLessonGuide.analysisResults.scopeAndSequenceMatch}
-              </p>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="font-medium text-gray-900">Major Work Standards:</p>
-                  <p className="text-sm text-gray-600">
-                    {detailedLessonGuide.analysisResults.standardsCoverage.majorWork.length} standards
-                  </p>
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900">Cross-Grade Connections:</p>
-                  <p className="text-sm text-gray-600">
-                    {detailedLessonGuide.analysisResults.standardsCoverage.crossGradeConnections.length} connections
-                  </p>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <p className="text-gray-700 leading-relaxed">
-              This pacing guide covers <strong>{pacingGuide.overview.totalLessons} lessons</strong> over{' '}
-              <strong>{pacingGuide.overview.totalWeeks} weeks</strong> for Grade {pacingGuide.overview.gradeLevel} mathematics.
-              The schedule includes <strong>{pacingGuide.assessmentPlan.summativeSchedule?.length || 0} major assessments</strong> and{' '}
-              <strong>{pacingGuide.differentiationStrategies?.length || 0} differentiation strategies</strong> to support diverse learners.
-            </p>
-          )}
+          <p className="text-gray-700 leading-relaxed">
+            This pacing guide covers <strong>{pacingGuide.overview.totalWeeks} weeks</strong> of Grade {pacingGuide.overview.gradeLevel} mathematics curriculum.
+            The schedule includes <strong>{pacingGuide.overview.lessonsPerWeek} lessons per week</strong> with comprehensive coverage of essential mathematical concepts.
+          </p>
         </div>
       </div>
     </div>
@@ -557,16 +453,16 @@ function DetailedLessonsView({
           </div>
           <div>
             <p className="text-2xl font-bold text-green-600">
-              {lessonGuide.analysisResults.standardsCoverage.algebralReadinessIndicators.length}
+              {lessonGuide.analysisResults.standardsCoverage.crossGradeConnections?.length || 0}
             </p>
-            <p className="text-sm text-green-800">Algebra Ready</p>
+            <p className="text-sm text-green-800">Cross-Grade Connections</p>
           </div>
         </div>
       </div>
 
       {/* Lessons Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {lessonGuide.lessonByLessonBreakdown.map((lesson) => (
+        {(lessonGuide.lessonByLessonBreakdown || []).map((lesson) => (
           <div 
             key={lesson.lessonNumber}
             className={`border rounded-lg p-4 cursor-pointer transition-all ${
@@ -585,12 +481,25 @@ function DetailedLessonsView({
             <h5 className="text-sm font-medium text-gray-800 mb-2">{lesson.title}</h5>
             <p className="text-xs text-gray-600 mb-2">{lesson.unit}</p>
             <div className="flex justify-between text-xs text-gray-500">
-              <span>{lesson.duration.sessions} sessions</span>
-              <span>{lesson.duration.totalMinutes} min</span>
+              <span>{
+                (lesson as any).sessions?.length || 
+                (lesson as any).estimatedDays || 
+                (lesson as any).duration?.sessions || 
+                1
+              } sessions</span>
+              <span>{
+                (lesson as any).estimatedDays || 
+                Math.round(((lesson as any).duration?.totalMinutes || 50) / 50) || 
+                1
+              } days</span>
             </div>
             <div className="mt-2">
               <div className="flex flex-wrap gap-1">
-                {lesson.standards.primary.slice(0, 2).map((standard, idx) => (
+                {(
+                  (lesson as any).standards?.primary || 
+                  (lesson as any).standards || 
+                  []
+                ).slice(0, 2).map((standard: string, idx: number) => (
                   <span 
                     key={idx} 
                     className="text-xs bg-blue-100 text-blue-700 px-1 py-0.5 rounded"
@@ -598,8 +507,14 @@ function DetailedLessonsView({
                     {standard}
                   </span>
                 ))}
-                {lesson.standards.primary.length > 2 && (
-                  <span className="text-xs text-gray-500">+{lesson.standards.primary.length - 2}</span>
+                {(
+                  (lesson as any).standards?.primary || 
+                  (lesson as any).standards || 
+                  []
+                ).length > 2 && (
+                  <span className="text-xs text-gray-500">+{
+                    ((lesson as any).standards?.primary || (lesson as any).standards || []).length - 2
+                  }</span>
                 )}
               </div>
             </div>
@@ -622,7 +537,11 @@ function ProgressionMapView({ progressionMap }: { progressionMap: ProgressionSta
             <div className="flex items-center justify-between mb-4">
               <h4 className="text-lg font-medium text-gray-900">{stage.stage}</h4>
               <span className="text-sm text-gray-500">
-                Weeks {Math.min(...stage.weeks)} - {Math.max(...stage.weeks)}
+                {stage.weeks && stage.weeks.length > 0 ? (
+                  `Weeks ${Math.min(...stage.weeks)} - ${Math.max(...stage.weeks)}`
+                ) : (
+                  'No weeks specified'
+                )}
               </span>
             </div>
             
@@ -632,7 +551,7 @@ function ProgressionMapView({ progressionMap }: { progressionMap: ProgressionSta
               <div>
                 <h5 className="text-sm font-medium text-gray-900 mb-2">Key Milestones</h5>
                 <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-                  {stage.milestones.map((milestone, idx) => (
+                  {(stage.milestones || []).map((milestone, idx) => (
                     <li key={idx}>{milestone}</li>
                   ))}
                 </ul>
@@ -641,7 +560,7 @@ function ProgressionMapView({ progressionMap }: { progressionMap: ProgressionSta
               <div>
                 <h5 className="text-sm font-medium text-gray-900 mb-2">Assessment Points</h5>
                 <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-                  {stage.assessmentPoints.map((point, idx) => (
+                  {(stage.assessmentPoints || []).map((point, idx) => (
                     <li key={idx}>{point}</li>
                   ))}
                 </ul>
@@ -696,10 +615,10 @@ function LessonPlansView({
               </div>
               <div className="text-right">
                 <p className="text-sm font-medium text-gray-900">
-                  {currentLesson.duration.sessions} sessions
+                  {(currentLesson as any).duration?.sessions || (currentLesson as any).estimatedDays || 1} sessions
                 </p>
                 <p className="text-sm text-gray-600">
-                  {currentLesson.duration.totalMinutes} minutes total
+                  {(currentLesson as any).duration?.totalMinutes || ((currentLesson as any).estimatedDays || 1) * 50} minutes total
                 </p>
               </div>
             </div>
@@ -713,7 +632,7 @@ function LessonPlansView({
                 <div>
                   <p className="text-sm font-medium text-gray-700 mb-2">Primary Standards</p>
                   <div className="space-y-1">
-                    {currentLesson.standards.primary.map((standard, idx) => (
+                    {((currentLesson as any).standards?.primary || []).map((standard: string, idx: number) => (
                       <span key={idx} className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-1">
                         {standard}
                       </span>
@@ -723,7 +642,7 @@ function LessonPlansView({
                 <div>
                   <p className="text-sm font-medium text-gray-700 mb-2">Supporting Standards</p>
                   <div className="space-y-1">
-                    {currentLesson.standards.supporting.map((standard, idx) => (
+                    {((currentLesson as any).standards?.supporting || []).map((standard: string, idx: number) => (
                       <span key={idx} className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded mr-1">
                         {standard}
                       </span>
@@ -733,7 +652,7 @@ function LessonPlansView({
                 <div>
                   <p className="text-sm font-medium text-gray-700 mb-2">Mathematical Practices</p>
                   <div className="space-y-1">
-                    {currentLesson.standards.mathematical_practices.map((practice, idx) => (
+                    {((currentLesson as any).standards?.mathematicalPractices || (currentLesson as any).standards?.mathematical_practices || []).map((practice: string, idx: number) => (
                       <span key={idx} className="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded mr-1">
                         {practice}
                       </span>
@@ -747,7 +666,7 @@ function LessonPlansView({
             <div>
               <h5 className="text-lg font-medium text-gray-900 mb-3">Learning Objectives</h5>
               <ul className="list-disc list-inside text-gray-700 space-y-1">
-                {currentLesson.learningObjectives.map((objective, idx) => (
+                {(currentLesson.learningObjectives || []).map((objective, idx) => (
                   <li key={idx}>{objective}</li>
                 ))}
               </ul>
@@ -757,7 +676,7 @@ function LessonPlansView({
             <div>
               <h5 className="text-lg font-medium text-gray-900 mb-3">Lesson Structure</h5>
               <div className="space-y-4">
-                {currentLesson.lessonStructure.map((phase, idx) => (
+                {(currentLesson.lessonStructure || []).map((phase, idx) => (
                   <div key={idx} className="border border-gray-200 rounded-lg p-4">
                     <div className="flex justify-between items-center mb-2">
                       <h6 className="font-medium text-gray-900">{phase.phase}</h6>
@@ -804,14 +723,14 @@ function LessonPlansView({
                   <div>
                     <p className="text-sm font-medium text-gray-700">Formative Strategies</p>
                     <ul className="list-disc list-inside text-sm text-gray-600">
-                      {currentLesson.assessment.formative.map((strategy, idx) => (
+                      {(currentLesson.assessment?.formative || []).map((strategy, idx) => (
                         <li key={idx}>{strategy}</li>
                       ))}
                     </ul>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-700">Exit Ticket</p>
-                    <p className="text-sm text-gray-600">{currentLesson.assessment.exitTicket}</p>
+                    <p className="text-sm text-gray-600">{currentLesson.assessment?.exitTicket || 'No exit ticket specified'}</p>
                   </div>
                 </div>
               </div>
@@ -844,7 +763,7 @@ function LessonPlansView({
                 <div>
                   <p className="text-sm font-medium text-gray-700 mb-2">Supports</p>
                   <ul className="list-disc list-inside text-sm text-gray-600 space-y-0.5">
-                    {currentLesson.differentiation.supports.map((support, idx) => (
+                    {(currentLesson.differentiation?.supports || []).map((support, idx) => (
                       <li key={idx}>{support}</li>
                     ))}
                   </ul>
@@ -852,7 +771,7 @@ function LessonPlansView({
                 <div>
                   <p className="text-sm font-medium text-gray-700 mb-2">Extensions</p>
                   <ul className="list-disc list-inside text-sm text-gray-600 space-y-0.5">
-                    {currentLesson.differentiation.extensions.map((extension, idx) => (
+                    {(currentLesson.differentiation?.extensions || []).map((extension, idx) => (
                       <li key={idx}>{extension}</li>
                     ))}
                   </ul>
@@ -860,7 +779,7 @@ function LessonPlansView({
                 <div>
                   <p className="text-sm font-medium text-gray-700 mb-2">Accommodations</p>
                   <ul className="list-disc list-inside text-sm text-gray-600 space-y-0.5">
-                    {currentLesson.differentiation.accommodations.map((accommodation, idx) => (
+                    {(currentLesson.differentiation?.accommodations || []).map((accommodation, idx) => (
                       <li key={idx}>{accommodation}</li>
                     ))}
                   </ul>

@@ -14,7 +14,7 @@ export interface PacingGuideRequest {
   };
   timeframe: string;
   studentPopulation: string;
-  priorities: string[];
+  priorities?: string[];
   scheduleConstraints?: {
     daysPerWeek: number;
     minutesPerClass: number;
@@ -65,33 +65,52 @@ export interface DetailedLessonGuide {
 export interface DetailedLesson {
   lessonNumber: number;
   title: string;
+  textbookSource?: string;
+  volume?: string;
   unit: string;
+  unitNumber?: number;
+  pageNumber?: string;
   grade: string;
-  duration: {
-    sessions: number;
-    totalMinutes: number;
-  };
+  week?: number;
   standards: {
     primary: string[];
     supporting: string[];
-    mathematical_practices: string[];
+    mathematicalPractices: string[];
+    ccssCode?: string;
+    description?: string;
+  } | string[]; // Support both old and new formats
+  objectives: string;
+  keyTopics: string[];
+  sessions?: Array<{
+    sessionNumber: number;
+    sessionTitle: string;
+    duration: string;
+    focus: string;
+  }>;
+  estimatedDays: number;
+  prerequisites?: string;
+  connectionToNext?: string;
+  teachingNotes?: string;
+  // Legacy fields for backward compatibility
+  duration?: {
+    sessions: number;
+    totalMinutes: number;
   };
-  learningObjectives: string[];
-  keyVocabulary: string[];
-  materials: string[];
-  lessonStructure: LessonPhase[];
-  differentiation: {
+  learningObjectives?: string[];
+  keyVocabulary?: string[];
+  materials?: string[];
+  lessonStructure?: LessonPhase[];
+  differentiation?: {
     supports: string[];
     extensions: string[];
     accommodations: string[];
   };
-  assessment: {
+  assessment?: {
     formative: string[];
     summative?: string;
     exitTicket: string;
   };
   homework: string;
-  connectionToNext: string;
   realWorldApplication: string;
 }
 
@@ -243,7 +262,19 @@ export class EnhancedAIService {
     
     try {
       for (const grade of grades) {
-        if (grade === '8') {
+        if (grade === '6') {
+          const grade6Path = path.join(process.cwd(), 'GRADE6_COMPLETE_CURRICULUM_STRUCTURE.json');
+          if (fs.existsSync(grade6Path)) {
+            curriculumData.grade6 = JSON.parse(fs.readFileSync(grade6Path, 'utf8'));
+            console.log('📚 [Curriculum] Loaded Grade 6 structure:', curriculumData.grade6.total_units, 'units,', curriculumData.grade6.total_lessons, 'lessons');
+          }
+        } else if (grade === '7') {
+          const grade7Path = path.join(process.cwd(), 'GRADE7_COMPLETE_CURRICULUM_STRUCTURE.json');
+          if (fs.existsSync(grade7Path)) {
+            curriculumData.grade7 = JSON.parse(fs.readFileSync(grade7Path, 'utf8'));
+            console.log('📚 [Curriculum] Loaded Grade 7 structure:', curriculumData.grade7.total_units, 'units,', curriculumData.grade7.total_lessons, 'lessons');
+          }
+        } else if (grade === '8') {
           const grade8Path = path.join(process.cwd(), 'GRADE8_COMPLETE_CURRICULUM_STRUCTURE.json');
           if (fs.existsSync(grade8Path)) {
             curriculumData.grade8 = JSON.parse(fs.readFileSync(grade8Path, 'utf8'));
@@ -275,30 +306,17 @@ export class EnhancedAIService {
     });
     
     try {
-      // Check if this is a request for detailed lesson-by-lesson generation
-      const isDetailedRequest = request.priorities?.includes('Detailed lesson-by-lesson guide (AI-generated)') || 
-                               request.priorities?.includes('detailed-lesson-guide') || 
-                               request.studentPopulation?.toLowerCase().includes('accelerated') ||
-                               request.gradeCombination?.pathwayType === 'accelerated';
+      // Check if this is a multi-grade combination that needs chunked generation
+      const isMultiGrade = (request.gradeCombination?.selectedGrades?.length || 0) > 1;
+      const totalWeeks = this.calculateWeeks(request.timeframe);
       
       console.log('🎯 [Main Generator] Generation path analysis:', {
-        isDetailedRequest,
-        isMultiGrade: request.gradeCombination?.selectedGrades?.length > 1,
-        totalWeeks: this.calculateWeeks(request.timeframe),
+        isMultiGrade: isMultiGrade,
+        totalWeeks: totalWeeks,
         selectedGrades: request.gradeCombination?.selectedGrades,
         pathwayType: request.gradeCombination?.pathwayType
       });
-      
-      if (isDetailedRequest) {
-        console.log('🎯 [Main Generator] ➡️ Routing to DETAILED LESSON GUIDE generation');
-        console.groupEnd();
-        return await this.generateDetailedLessonGuide(request);
-      }
-      
-      // Check if this is a multi-grade combination that needs chunked generation
-      const isMultiGrade = request.gradeCombination?.selectedGrades?.length > 1;
-      const totalWeeks = this.calculateWeeks(request.timeframe);
-      
+
       if (isMultiGrade && totalWeeks >= 30) {
         console.log('📊 [Main Generator] ➡️ Routing to CHUNKED GENERATION (multi-grade, ' + totalWeeks + ' weeks)');
         console.groupEnd();
@@ -357,7 +375,7 @@ export class EnhancedAIService {
           messages: [
             {
               role: "system",
-              content: "You are a mathematics curriculum specialist. Create practical, implementable pacing guides efficiently. Focus on clear structure and essential information."
+              content: "You are a mathematics curriculum specialist. Create practical, implementable pacing guides efficiently. Focus on clear structure and essential information. CRITICAL: Your response must be ONLY valid JSON - no markdown, no explanations, no code blocks, just pure JSON starting with { and ending with }."
             },
             {
               role: "user", 
@@ -405,12 +423,59 @@ export class EnhancedAIService {
       // Parse the JSON response from AI into structured data
       let parsedResponse;
       try {
-        parsedResponse = JSON.parse(aiResponse);
+        // Try to extract JSON from the response (in case it's wrapped in markdown or other text)
+        let jsonContent = aiResponse.trim();
+        
+        // Check if response is wrapped in markdown code blocks
+        if (jsonContent.includes('```json')) {
+          console.log('🔍 [AI Service] Extracting JSON from markdown code block');
+          const jsonMatch = jsonContent.match(/```json\s*([\s\S]*?)\s*```/);
+          if (jsonMatch) {
+            jsonContent = jsonMatch[1];
+          }
+        } else if (jsonContent.includes('```')) {
+          console.log('🔍 [AI Service] Extracting JSON from generic code block');
+          const jsonMatch = jsonContent.match(/```\s*([\s\S]*?)\s*```/);
+          if (jsonMatch) {
+            jsonContent = jsonMatch[1];
+          }
+        }
+        
+        // Try to find JSON object in the response if it starts with text
+        if (!jsonContent.startsWith('{') && jsonContent.includes('{')) {
+          console.log('🔍 [AI Service] Extracting JSON object from mixed content');
+          const jsonStart = jsonContent.indexOf('{');
+          const jsonEnd = jsonContent.lastIndexOf('}') + 1;
+          if (jsonStart !== -1 && jsonEnd > jsonStart) {
+            jsonContent = jsonContent.substring(jsonStart, jsonEnd);
+          }
+        }
+        
+        console.log('🔍 [AI Service] JSON content to parse (first 200 chars):', jsonContent.substring(0, 200));
+        console.log('🔍 [AI Service] JSON content to parse (last 200 chars):', jsonContent.substring(Math.max(0, jsonContent.length - 200)));
+        
+        parsedResponse = JSON.parse(jsonContent);
         console.log('📊 [AI Service] Successfully parsed AI response');
       } catch (parseError) {
         console.error('❌ [AI Service] Failed to parse AI response as JSON:', parseError);
-        console.log('🔍 [AI Service] Raw response preview:', aiResponse.substring(0, 500));
-        throw new Error('AI returned invalid JSON format');
+        console.log('🔍 [AI Service] Raw response preview (first 1000 chars):', aiResponse.substring(0, 1000));
+        console.log('🔍 [AI Service] Raw response ending (last 500 chars):', aiResponse.substring(Math.max(0, aiResponse.length - 500)));
+        
+        // Try to provide more helpful error information
+        const hasOpenBrace = aiResponse.includes('{');
+        const hasCloseBrace = aiResponse.includes('}');
+        const hasJsonKeyword = aiResponse.toLowerCase().includes('json');
+        const hasCodeBlock = aiResponse.includes('```');
+        
+        console.log('🔍 [AI Service] Response analysis:', {
+          hasOpenBrace,
+          hasCloseBrace,
+          hasJsonKeyword,
+          hasCodeBlock,
+          length: aiResponse.length
+        });
+        
+        throw new Error(`AI returned invalid JSON format. Analysis: hasOpenBrace=${hasOpenBrace}, hasCloseBrace=${hasCloseBrace}, hasCodeBlock=${hasCodeBlock}, length=${aiResponse.length}`);
       }
       
       console.log('✅ [AI Service] Detailed lesson guide generated successfully');
@@ -454,7 +519,7 @@ export class EnhancedAIService {
             content: prompt
           }
         ],
-        max_completion_tokens: 12000,   // Reduced token limit for chunk stability
+        max_completion_tokens: 16000,   // Increased for 30-36 concise lessons
         temperature: 0.1               // Lower temperature for faster, more focused responses
       });
       
@@ -549,8 +614,17 @@ export class EnhancedAIService {
       
       // Prepare context for both chunks
       console.log('🔧 [Chunked Generation] Preparing curriculum context...');
-      const gradeConfig = this.determineGradeConfig(request);
-      const mergedContext = await this.curriculumService.getMergedCurriculumContext(gradeConfig.selectedGrades);
+      const gradeConfig = this.parseGradeConfiguration(request);
+      
+      // Build curriculum contexts for all selected grades
+      const contexts = await Promise.all(
+        gradeConfig.selectedGrades.map(grade => 
+          this.curriculumService.buildCurriculumContext(grade)
+        )
+      );
+      
+      // Merge contexts
+      const mergedContext = this.mergeCurriculumContexts(contexts, gradeConfig);
       
       console.log('🎯 [Chunked Generation] Context prepared:', {
         gradeConfig: gradeConfig,
@@ -566,9 +640,11 @@ export class EnhancedAIService {
       const chunk1Request = { 
         ...request, 
         chunkInfo: { 
-          isChunked: true, 
+          isChunk: true, 
           chunkNumber: 1, 
           totalChunks: 2, 
+          startWeek: 1,
+          endWeek: chunk1Weeks,
           totalWeeks 
         }
       };
@@ -603,9 +679,11 @@ export class EnhancedAIService {
       const chunk2Request = { 
         ...request, 
         chunkInfo: { 
-          isChunked: true, 
+          isChunk: true, 
           chunkNumber: 2, 
           totalChunks: 2, 
+          startWeek: chunk1Weeks + 1,
+          endWeek: totalWeeks,
           totalWeeks
         }
       };
@@ -666,7 +744,7 @@ export class EnhancedAIService {
         overview: {
           ...chunk1Guide.overview,
           totalWeeks: totalWeeks,
-          description: (chunk1Guide.overview.description || '').replace(/(Chunk \d+ of \d+)/g, '').trim() + ' (Complete 36-week curriculum)'
+          description: 'Complete 36-week curriculum combining multiple grade levels'
         },
         weeklySchedule: [
           ...chunk1Guide.weeklySchedule,
@@ -762,14 +840,53 @@ export class EnhancedAIService {
     
     // Build curriculum context from actual textbook data
     let curriculumContext = '';
+    let totalLessonsAvailable = 0;
+    const gradeDescriptions: string[] = [];
+    const gradeFocus: string[] = [];
+    
+    if (curriculumData.grade6) {
+      curriculumContext += `\n**GRADE 6 CURRICULUM (Ready Classroom Mathematics Grade 6):**\n`;
+      gradeDescriptions.push("Grade 6: Ratios, Fractions, Basic Algebra");
+      gradeFocus.push("foundational number operations and proportional reasoning");
+      for (const [volumeName, volume] of Object.entries(curriculumData.grade6.volumes as any)) {
+        curriculumContext += `\n${volumeName}:\n`;
+        for (const unit of (volume as any).units) {
+          curriculumContext += `  Unit ${unit.unit_number}: ${unit.title}\n`;
+          for (const lesson of unit.lessons) {
+            curriculumContext += `    Lesson ${lesson.lesson_number}: ${lesson.title} (Page ${lesson.start_page})\n`;
+            totalLessonsAvailable++;
+          }
+        }
+      }
+    }
+    
+    if (curriculumData.grade7) {
+      curriculumContext += `\n**GRADE 7 CURRICULUM (Ready Classroom Mathematics Grade 7):**\n`;
+      gradeDescriptions.push("Grade 7: Proportional Reasoning, Operations");
+      gradeFocus.push("advanced proportional relationships and algebraic thinking");
+      for (const [volumeName, volume] of Object.entries(curriculumData.grade7.volumes as any)) {
+        curriculumContext += `\n${volumeName}:\n`;
+        for (const unit of (volume as any).units) {
+          curriculumContext += `  Unit ${unit.unit_number}: ${unit.title}\n`;
+          for (const lesson of unit.lessons) {
+            curriculumContext += `    Lesson ${lesson.lesson_number}: ${lesson.title} (Page ${lesson.start_page})\n`;
+            totalLessonsAvailable++;
+          }
+        }
+      }
+    }
+    
     if (curriculumData.grade8) {
       curriculumContext += `\n**GRADE 8 CURRICULUM (Ready Classroom Mathematics Grade 8):**\n`;
+      gradeDescriptions.push("Grade 8: Functions, Transformations, HS Prep");
+      gradeFocus.push("linear functions, transformations, and high school preparation");
       for (const [volumeName, volume] of Object.entries(curriculumData.grade8.volumes as any)) {
         curriculumContext += `\n${volumeName}:\n`;
         for (const unit of (volume as any).units) {
           curriculumContext += `  Unit ${unit.unit_number}: ${unit.title}\n`;
           for (const lesson of unit.lessons) {
             curriculumContext += `    Lesson ${lesson.lesson_number}: ${lesson.title} (Page ${lesson.start_page})\n`;
+            totalLessonsAvailable++;
           }
         }
       }
@@ -777,33 +894,58 @@ export class EnhancedAIService {
     
     if (curriculumData.algebra1) {
       curriculumContext += `\n**ALGEBRA 1 CURRICULUM (Ready Classroom Mathematics Algebra 1):**\n`;
+      gradeDescriptions.push("Algebra 1: Advanced Algebra, College Readiness");
+      gradeFocus.push("advanced algebraic concepts and college preparation");
       for (const [volumeName, volume] of Object.entries(curriculumData.algebra1.volumes as any)) {
         curriculumContext += `\n${volumeName}:\n`;
         for (const unit of (volume as any).units) {
           curriculumContext += `  Unit ${unit.unit_number}: ${unit.title}\n`;
           for (const lesson of unit.lessons) {
             curriculumContext += `    Lesson ${lesson.lesson_number}: ${lesson.title} (Page ${lesson.start_page})\n`;
+            totalLessonsAvailable++;
           }
         }
       }
     }
+
+    // Calculate total weeks for the timeframe
+    const totalWeeks = this.calculateWeeks(request.timeframe);
+    
+    // Dynamic pathway description based on selected grades
+    const pathwayDescription = this.generatePathwayDescription(grades, gradeDescriptions, gradeFocus);
+    const selectionStrategy = this.generateSelectionStrategy(grades, totalLessonsAvailable);
+    const gradeIndicators = this.generateGradeIndicators(grades);
     
     return `Create a comprehensive accelerated mathematics pathway for grades ${grades.join('+')} over ${request.timeframe}.
 
+**CRITICAL REQUIREMENT: MUST GENERATE EXACTLY ${totalWeeks} WEEKS OF CURRICULUM**
+
+${pathwayDescription}
+
 **CURRICULUM DATA TO USE:**${curriculumContext}
 
-**CRITICAL REQUIREMENTS:**
-- **USE ONLY THE EXACT UNIT AND LESSON TITLES** from the curriculum data above
-- **SPECIFY THE TEXTBOOK SOURCE** (Grade 8 book vs Algebra 1 book) for each lesson
-- **INCLUDE ACTUAL PAGE NUMBERS** from the curriculum data
-- **MAP TO REAL UNIT STRUCTURES** from the Ready Classroom Mathematics series
-- Student Population: ${request.studentPopulation}
-- Schedule: ${request.scheduleConstraints?.daysPerWeek || 5} days/week, ${request.scheduleConstraints?.minutesPerClass || 50} min/class
-- Total Available Lessons: ${lessonCount}
-- Differentiation Needs: ${request.differentiationNeeds?.join(', ') || 'Standard'}
-- Priorities: ${request.priorities?.join(', ') || 'Standards alignment'}
+**TOTAL LESSONS AVAILABLE: ${totalLessonsAvailable}** (across ${grades.length} grade levels: ${gradeDescriptions.join(', ')})
 
-**CRITICAL: Generate a JSON response with this EXACT structure (field names must match exactly):**
+**MANDATORY REQUIREMENTS:**
+- **MUST CREATE ${totalWeeks} WEEKS** of weekly curriculum entries
+- **TIMEFRAME**: ${request.timeframe} (${totalWeeks} weeks total)
+- **WEEKLY SCHEDULE**: Must include weeks 1 through ${totalWeeks} in your JSON response
+
+**DYNAMIC PATHWAY REQUIREMENTS:**
+${selectionStrategy}
+
+**GRADE-SPECIFIC CONSIDERATIONS:**
+- **Include Grade Indicators**: ${gradeIndicators}
+- **Focus Areas**: ${gradeFocus.join(', ')}
+- **Pathway Type**: Super-accelerated (${grades.length}-grade combination)
+- **Student Population**: ${request.studentPopulation}
+- **Schedule**: ${request.scheduleConstraints?.daysPerWeek || 5} days/week, ${request.scheduleConstraints?.minutesPerClass || 50} min/class
+
+**RESPONSE FORMAT:** Return ONLY valid JSON - no markdown blocks, no explanations. Start with { and end with }.
+
+**CRITICAL: Your weeklySchedule array MUST contain exactly ${totalWeeks} week objects (weeks 1-${totalWeeks})** 
+
+**JSON Structure (field names must match exactly):**
 
 {
   "pathway": {
@@ -836,40 +978,16 @@ export class EnhancedAIService {
     {
       "lessonNumber": 1,
       "title": "EXACT lesson title from curriculum data above",
-      "textbookSource": "Grade 8 Ready Classroom Mathematics" OR "Algebra 1 Ready Classroom Mathematics",
+      "textbookSource": "Grade 8 Ready Classroom Mathematics" OR "Algebra 1 Ready Classroom Mathematics", 
       "volume": "Volume 1" OR "Volume 2",
-      "unit": "EXACT unit title from curriculum data (e.g., 'Geometric Figures: Rigid Transformations and Congruence')",
+      "unit": "EXACT unit title from curriculum data",
       "unitNumber": 1,
-      "pageNumber": "ACTUAL page number from curriculum data",
       "grade": "8" OR "9",
-      "duration": { "sessions": 2, "totalMinutes": 100 },
-      "standards": {
-        "primary": ["8.NS.1", "8.NS.2"],
-        "supporting": ["8.EE.1"],
-        "mathematical_practices": ["MP1", "MP3", "MP6"]
-      },
-      "learningObjectives": ["Clear, measurable learning objectives based on lesson content"],
-      "keyVocabulary": ["Key mathematical terms from the specific lesson"],
-      "materials": ["Ready Classroom Mathematics textbook page references"],
-      "lessonStructure": [
-        {
-          "phase": "Opening",
-          "duration": 10,
-          "activities": ["Warm-up activities based on lesson content"]
-        }
-      ],
-      "differentiation": {
-        "supports": ["Strategies for struggling learners"],
-        "extensions": ["Advanced activities for ready learners"],
-        "accommodations": ["Specific accommodations needed"]
-      },
-      "assessment": {
-        "formative": ["Formative assessment strategies"],
-        "summative": "Unit test or performance assessment",
-        "exitTicket": "Specific exit ticket question"
-      },
-      "homework": "Homework assignment from textbook pages",
-      "connectionToNext": "How this lesson connects to the next"
+      "week": 1,
+      "standards": ["8.NS.1", "8.NS.2"],
+      "sessions": 2,
+      "majorWork": true,
+      "originalCode": "G8 U1 L1"
     }
   ],
   "progressionMap": [
@@ -1064,7 +1182,7 @@ export class EnhancedAIService {
       context,
       request.timeframe,
       request.studentPopulation,
-      request.priorities
+      request.priorities || []
     );
 
     const constraintsSection = request.scheduleConstraints ? `
@@ -1086,63 +1204,28 @@ ${constraintsSection}
 ${differentiationSection}
 
 RESPONSE FORMAT:
-Please structure your response as a detailed JSON object with the following structure:
+Please structure your response as a simple JSON object with this EXACT structure:
+
+\`\`\`json
 {
   "overview": {
     "totalWeeks": number,
     "lessonsPerWeek": number,
-    "paceDescription": "string"
+    "description": "Brief description of the curriculum"
   },
   "weeklySchedule": [
     {
       "week": number,
-      "unit": "string",
+      "unit": "Unit name",
       "lessons": ["lesson1", "lesson2"],
       "focusStandards": ["standard1", "standard2"],
-      "learningObjectives": ["objective1", "objective2"],
-      "assessmentType": "formative|summative|diagnostic",
-      "differentiationNotes": "string"
-    }
-  ],
-  "assessmentPlan": {
-    "formativeFrequency": "string",
-    "summativeSchedule": [
-      {
-        "week": number,
-        "type": "string",
-        "standards": ["standard1"],
-        "description": "string"
-      }
-    ],
-    "diagnosticCheckpoints": [week_numbers],
-    "portfolioComponents": ["component1", "component2"]
-  },
-  "differentiationStrategies": [
-    {
-      "studentGroup": "string",
-      "modifications": ["mod1", "mod2"],
-      "resources": ["resource1", "resource2"],
-      "assessmentAdjustments": ["adj1", "adj2"]
-    }
-  ],
-  "flexibilityOptions": [
-    {
-      "scenario": "string",
-      "adjustments": ["adj1", "adj2"],
-      "impactAnalysis": "string"
-    }
-  ],
-  "standardsAlignment": [
-    {
-      "standard": "string",
-      "weeksCovered": [week_numbers],
-      "depth": "introduction|development|mastery",
-      "connections": ["connection1", "connection2"]
+      "learningObjectives": ["objective1", "objective2"]
     }
   ]
 }
+\`\`\`
 
-Ensure the pacing guide is realistic, pedagogically sound, and addresses the specific needs of the ${request.studentPopulation} student population.`;
+Generate exactly ${this.calculateWeeks(request.timeframe)} weeks of curriculum content.`;
   }
 
   private async parseAIResponse(
@@ -1326,98 +1409,7 @@ Ensure the pacing guide is realistic, pedagogically sound, and addresses the spe
     }
   }
 
-  private async parseAIResponse(
-    aiResponse: string,
-    context: CurriculumContext,
-    request: PacingGuideRequest
-  ): Promise<GeneratedPacingGuide> {
-    console.group('🔧 [JSON Parser] Starting AI Response Parsing');
-    
-    try {
-      console.log('📊 [JSON Parser] AI Response analysis:', {
-        totalLength: aiResponse.length,
-        startsWithJson: aiResponse.trim().startsWith('{'),
-        startsWithCodeBlock: aiResponse.trim().startsWith('```'),
-        endsWithJson: aiResponse.trim().endsWith('}'),
-        endsWithCodeBlock: aiResponse.trim().endsWith('```'),
-        containsJsonKeyword: aiResponse.includes('```json'),
-        weeklyScheduleLength: aiResponse.includes('weeklySchedule') ? 'present' : 'missing',
-        hasAssessmentPlan: aiResponse.includes('assessmentPlan'),
-        hasDifferentiationStrategies: aiResponse.includes('differentiationStrategies')
-      });
-      console.log('🔍 [AI Service] Detailed parsed response analysis:');
-      
-      if (parsedResponse.weeklySchedule) {
-        console.log('  📅 Weekly Schedule:', {
-          totalWeeks: parsedResponse.weeklySchedule.length,
-          firstWeek: parsedResponse.weeklySchedule[0] || 'undefined',
-          sampleWeekStructure: parsedResponse.weeklySchedule[0] ? Object.keys(parsedResponse.weeklySchedule[0]) : 'none'
-        });
-        
-        if (parsedResponse.weeklySchedule[0]) {
-          console.log('  📝 First week details:', {
-            lessons: parsedResponse.weeklySchedule[0].lessons || 'undefined',
-            lessonsCount: (parsedResponse.weeklySchedule[0].lessons || []).length,
-            focusStandards: parsedResponse.weeklySchedule[0].focusStandards || 'undefined',
-            learningObjectives: parsedResponse.weeklySchedule[0].learningObjectives || 'undefined'
-          });
-        }
-      } else {
-        console.error('❌ [AI Service] No weeklySchedule in parsed response!');
-      }
-      
-      if (parsedResponse.overview) {
-        console.log('  📋 Overview:', parsedResponse.overview);
-      } else {
-        console.error('❌ [AI Service] No overview in parsed response!');
-      }
-      console.log('🔍 [AI Service] Parsed response content analysis:');
-      console.log('  Overview present:', !!parsedResponse.overview);
-      console.log('  WeeklySchedule present:', !!parsedResponse.weeklySchedule);
-      console.log('  WeeklySchedule type:', typeof parsedResponse.weeklySchedule);
-      console.log('  WeeklySchedule length:', parsedResponse.weeklySchedule?.length || 'undefined');
-      console.log('  WeeklySchedule sample:', JSON.stringify(parsedResponse.weeklySchedule?.slice(0, 2), null, 2));
-      console.log('  AssessmentPlan present:', !!parsedResponse.assessmentPlan);
-      console.log('  DifferentiationStrategies present:', !!parsedResponse.differentiationStrategies);
-      
-      // Build the structured pacing guide
-      console.log('🏗️ [AI Service] Building structured pacing guide...');
-      const pacingGuide: GeneratedPacingGuide = {
-        overview: {
-          gradeLevel: request.gradeLevel,
-          timeframe: request.timeframe,
-          totalWeeks: parsedResponse.overview?.totalWeeks || this.calculateWeeks(request.timeframe),
-          lessonsPerWeek: parsedResponse.overview?.lessonsPerWeek || 4,
-          totalLessons: context.totalLessons
-        },
-        weeklySchedule: parsedResponse.weeklySchedule || [],
-        assessmentPlan: parsedResponse.assessmentPlan || {
-          formativeFrequency: 'Weekly',
-          summativeSchedule: [],
-          diagnosticCheckpoints: [],
-          portfolioComponents: []
-        },
-        differentiationStrategies: parsedResponse.differentiationStrategies || [],
-        flexibilityOptions: parsedResponse.flexibilityOptions || [],
-        standardsAlignment: parsedResponse.standardsAlignment || []
-      };
-      
-      console.log('📋 [AI Service] Built pacing guide structure:');
-      console.log('  Overview:', pacingGuide.overview);
-      console.log('  Weekly schedule entries:', pacingGuide.weeklySchedule.length);
-      console.log('  Assessment plan:', !!pacingGuide.assessmentPlan);
-      console.log('  Differentiation strategies:', pacingGuide.differentiationStrategies.length);
-      console.log('  Flexibility options:', pacingGuide.flexibilityOptions.length);
-      console.log('  Standards alignment:', pacingGuide.standardsAlignment.length);
-      
-      return pacingGuide;
-    } catch (error) {
-      console.error('💥 [AI Service] Error parsing AI response:', error);
-      console.log('🛟 [AI Service] Generating fallback pacing guide...');
-      // Return a fallback pacing guide
-      return this.generateFallbackPacingGuide(context, request);
-    }
-  }
+
 
   private generateFallbackPacingGuide(
     context: CurriculumContext, 
@@ -1551,7 +1543,7 @@ Ensure the pacing guide is realistic, pedagogically sound, and addresses the spe
       primaryGrade,
       request.timeframe,
       request.studentPopulation,
-      request.priorities
+      request.priorities || []
     );
   }
 
@@ -1591,7 +1583,7 @@ Ensure the pacing guide is realistic, pedagogically sound, and addresses the spe
     
     // Handle chunked generation for large requests
     const totalWeeks = this.calculateWeeks(request.timeframe);
-    const isChunked = request.chunkInfo?.isChunked || false;
+    const isChunked = request.chunkInfo?.isChunk || false;
     const chunkNumber = request.chunkInfo?.chunkNumber || 1;
     const totalChunks = request.chunkInfo?.totalChunks || 1;
     
@@ -1635,6 +1627,9 @@ ${chunkInstructions}
 - Include textbook source and page numbers  
 - Create logical progression for ${weekRange}
 - Focus on essential standards alignment
+- CRITICAL: Generate exactly ${totalWeeks} weeks of curriculum (NOT ${totalWeeks} total lessons)
+- Each week should contain 4 lessons for a total of ${totalWeeks * 4} individual lessons across all weeks
+- Week 1 = Lessons 1-4, Week 2 = Lessons 5-8, etc.
 
 **JSON OUTPUT REQUIRED:**
 Return ONLY valid JSON in this exact format:
@@ -1653,7 +1648,7 @@ Return ONLY valid JSON in this exact format:
     "description": "Brief description${isChunked ? ` (Chunk ${chunkNumber} of ${totalChunks})` : ''}"
   },
   "weeklySchedule": [
-${isChunked ? `    // Generate weeks ${(chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks) + 1} through ${Math.min(chunkNumber * Math.ceil(totalWeeks / totalChunks), totalWeeks)} ONLY` : '    // Generate all weeks 1 through ' + totalWeeks}
+${isChunked ? `    // CRITICAL: Generate ${Math.min(Math.ceil(totalWeeks / totalChunks), totalWeeks - (chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks))} individual weeks (weeks ${(chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks) + 1} through ${Math.min(chunkNumber * Math.ceil(totalWeeks / totalChunks), totalWeeks)}) ONLY - Each week contains 4 lessons` : `    // CRITICAL: Generate ALL ${totalWeeks} individual weeks (weeks 1 through ${totalWeeks}) - Each week contains 4 lessons for a total of ${totalWeeks * 4} lessons`}
     {
       "week": ${isChunked ? (chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks) + 1 : 1},
       "unit": "EXACT unit title from curriculum data",
@@ -1664,25 +1659,21 @@ ${isChunked ? `    // Generate weeks ${(chunkNumber - 1) * Math.ceil(totalWeeks 
         "Grade 8, Unit 1, Lesson 1: Exact lesson title (Page #)"
       ],
       "focusStandards": ["8.G.A.1"],
-      "learningObjectives": ["Clear objective"],
-      "assessmentType": "formative"
+      "learningObjectives": ["Clear objective"]
     }${isChunked ? `,
     // Continue for ${Math.min(Math.ceil(totalWeeks / totalChunks), totalWeeks - (chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks)) - 1} more weeks in this chunk` : `,
     // Continue for all ${totalWeeks - 1} more weeks`}
-  ],
-  "assessmentPlan": {
-    "formativeFrequency": "Weekly",
-    "summativeSchedule": [],
-    "diagnosticCheckpoints": [],
-    "portfolioComponents": []
-  },
-  "differentiationStrategies": [],
-  "flexibilityOptions": [],
-  "standardsAlignment": []
+  ]
 }
 \`\`\`
 
-${isChunked ? `**GENERATE EXACTLY ${Math.min(Math.ceil(totalWeeks / totalChunks), totalWeeks - (chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks))} WEEKS FOR CHUNK ${chunkNumber}**` : `**GENERATE ALL ${totalWeeks} WEEKS**`}
+${isChunked ? `**GENERATE EXACTLY ${Math.min(Math.ceil(totalWeeks / totalChunks), totalWeeks - (chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks))} INDIVIDUAL WEEKS FOR CHUNK ${chunkNumber}**
+- Each week = 4 lessons
+- Total lessons in this chunk = ${Math.min(Math.ceil(totalWeeks / totalChunks), totalWeeks - (chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks)) * 4}
+- Do NOT confuse weeks with lessons` : `**GENERATE ALL ${totalWeeks} INDIVIDUAL WEEKS**
+- Each week = 4 lessons  
+- Total lessons across all weeks = ${totalWeeks * 4}
+- Do NOT confuse weeks with lessons`}
 
 CRITICAL: Return ONLY the JSON object. No additional text before or after.
       `;
@@ -1694,16 +1685,22 @@ CRITICAL: Return ONLY the JSON object. No additional text before or after.
 
   private async buildDetailedLessonPrompt(request: PacingGuideRequest, acceleratedPathway: any[], context: CurriculumContext): Promise<string> {
     const grades = request.gradeCombination?.selectedGrades || [request.gradeLevel];
+    const totalWeeks = this.calculateWeeks(request.timeframe);
     
     console.log('🔍 [AI Service] Building detailed prompt with:', {
       gradesCount: grades.length,
       acceleratedPathwayLessons: acceleratedPathway.length,
+      totalWeeks: totalWeeks,
       sampleLesson: acceleratedPathway[0]
     });
     
     const prompt = `Create a comprehensive accelerated mathematics pathway for grades ${grades.join('+')} over ${request.timeframe}.
 
+**CRITICAL REQUIREMENT: MUST GENERATE EXACTLY ${totalWeeks} WEEKS OF CURRICULUM**
+
 **Requirements:**
+- **MANDATORY**: Create ${totalWeeks} weeks of content (weeks 1-${totalWeeks})
+- **TIMEFRAME**: ${request.timeframe} (${totalWeeks} weeks total)
 - Student Population: ${request.studentPopulation}
 - Schedule: ${request.scheduleConstraints?.daysPerWeek || 5} days/week, ${request.scheduleConstraints?.minutesPerClass || 50} min/class
 - Total Available Lessons: ${acceleratedPathway.length}
@@ -1712,6 +1709,9 @@ CRITICAL: Return ONLY the JSON object. No additional text before or after.
 
 **Sample Lesson Topics:**
 ${acceleratedPathway.slice(0, 8).map(lesson => `${lesson.lessonNumber}. ${lesson.title} (Grade ${lesson.grade})`).join('\n')}
+
+**IMPORTANT: Your lessonByLessonBreakdown must contain ${totalWeeks} WEEKS of curriculum content, NOT ${totalWeeks} individual lessons**
+**Each week should contain approximately 4-5 lessons for a total of ${totalWeeks * 4} individual lessons across all weeks**
 
 Create a detailed JSON response with this EXACT structure (field names must match exactly):
 
@@ -1829,7 +1829,7 @@ Create a detailed JSON response with this EXACT structure (field names must matc
   }
 }
 
-CRITICAL: Generate comprehensive content for 25-35 lessons covering the full ${request.timeframe}. Include detailed lesson breakdowns with proper standards alignment, differentiation strategies, and practical implementation guidance that teachers can use immediately.`;
+CRITICAL: Generate comprehensive content for 10-15 key lessons covering the most essential concepts for the full ${request.timeframe}. Focus on major work standards and foundational skills. Include detailed lesson breakdowns with proper standards alignment, differentiation strategies, and practical implementation guidance that teachers can use immediately. Each lesson should represent approximately 2-3 weeks of instruction when expanded by teachers.`;
 
     console.log('📏 [AI Service] Prompt length:', prompt.length, 'characters');
     return prompt;
@@ -2288,5 +2288,61 @@ Generate a comprehensive, implementable guide that teachers can use immediately 
 
   async disconnect() {
     await this.curriculumService.disconnect();
+  }
+
+  private generatePathwayDescription(grades: string[], gradeDescriptions: string[], gradeFocus: string[]): string {
+    const gradeCount = grades.length;
+    
+    if (gradeCount === 1) {
+      return `**SINGLE GRADE PATHWAY:** Focus on ${gradeDescriptions[0]} with emphasis on ${gradeFocus[0]}.`;
+    } else if (gradeCount === 2) {
+      return `**DUAL GRADE ACCELERATED PATHWAY:** This combines ${gradeDescriptions.join(' and ')} to create an accelerated learning experience bridging ${gradeFocus.join(' and ')}.`;
+    } else if (gradeCount === 3) {
+      return `**TRI-GRADE SUPER-ACCELERATED PATHWAY:** This ambitious pathway spans ${gradeDescriptions.join(', ')} to create a highly compressed curriculum covering ${gradeFocus.join(', ')}.`;
+    } else {
+      return `**ULTRA-ACCELERATED "BABY EINSTEIN ASGARD" PATHWAY:** This ultimate pathway combines ALL ${gradeCount} grade levels (${gradeDescriptions.join(', ')}) for genius-level students ready to master ${gradeFocus.join(', ')} in a single year.`;
+    }
+  }
+
+  private generateSelectionStrategy(grades: string[], totalLessonsAvailable: number): string {
+    const gradeCount = grades.length;
+    const hasEarlyGrades = grades.includes('6') || grades.includes('7');
+    const hasLateGrades = grades.includes('8') || grades.includes('9');
+    
+    let strategy = `- **ANALYZE ALL ${totalLessonsAvailable}+ LESSONS** from ${gradeCount} grade levels above\n`;
+    strategy += `- **SELECT THE OPTIMAL 36 LESSONS** that provide maximum standards coverage\n`;
+    
+    if (gradeCount === 1) {
+      strategy += `- **SINGLE GRADE FOCUS:** Select the most essential lessons that build core competencies\n`;
+    } else if (gradeCount === 2) {
+      strategy += `- **DUAL GRADE OPTIMIZATION:** Balance foundational and advanced concepts for smooth progression\n`;
+    } else if (gradeCount >= 3) {
+      strategy += `- **MULTI-GRADE CURATION:** Identify overlapping concepts and select the most advanced version\n`;
+      strategy += `- **SKIP REDUNDANT CONTENT:** Eliminate lessons that repeat concepts across grade levels\n`;
+    }
+    
+    if (hasEarlyGrades && hasLateGrades) {
+      strategy += `- **BRIDGE EARLY TO ADVANCED:** Ensure foundational concepts support advanced mathematics\n`;
+    }
+    
+    if (grades.includes('9')) {
+      strategy += `- **ALGEBRA 1 PREPARATION:** Prioritize lessons that prepare for college-level mathematics\n`;
+    }
+    
+    strategy += `- **ENSURE COHERENT PROGRESSION:** Maintain logical learning sequence despite grade compression\n`;
+    strategy += `- **MATCH EXISTING FORMAT:** Use the exact accelerated pathway format shown in the application`;
+    
+    return strategy;
+  }
+
+  private generateGradeIndicators(grades: string[]): string {
+    const indicators = [];
+    
+    if (grades.includes('6')) indicators.push('G6');
+    if (grades.includes('7')) indicators.push('G7');
+    if (grades.includes('8')) indicators.push('G8');
+    if (grades.includes('9')) indicators.push('A1 (Algebra 1)');
+    
+    return indicators.join(', ');
   }
 }

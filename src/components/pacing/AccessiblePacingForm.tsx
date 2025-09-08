@@ -22,9 +22,8 @@ export function AccessiblePacingForm({
       skipGrades: [],
       emphasis: 'balanced'
     },
-    timeframe: '',
+    timeframe: 'year',
     studentPopulation: '',
-    priorities: [],
     scheduleConstraints: {
       daysPerWeek: 5,
       minutesPerClass: 50,
@@ -141,15 +140,6 @@ export function AccessiblePacingForm({
     }
   }, [errors]);
 
-  const handlePrioritiesChange = useCallback((priority: string, checked: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      priorities: checked 
-        ? [...prev.priorities, priority]
-        : prev.priorities.filter(p => p !== priority)
-    }));
-  }, []);
-
   const handleDifferentiationChange = useCallback((need: string, checked: boolean) => {
     setFormData(prev => ({
       ...prev,
@@ -158,17 +148,6 @@ export function AccessiblePacingForm({
         : (prev.differentiationNeeds || []).filter(n => n !== need)
     }));
   }, []);
-
-  const priorityOptions = [
-    'Major standards focus',
-    'Problem solving emphasis',
-    'Mathematical practices',
-    'Real-world applications',
-    'Technology integration',
-    'Collaborative learning',
-    'Detailed lesson-by-lesson guide (AI-generated)',
-    'Accelerated pathway analysis'
-  ];
 
   const differentiationOptions = [
     'English Language Learners',
@@ -484,48 +463,6 @@ export function AccessiblePacingForm({
               )}
             </div>
           </div>
-        </fieldset>
-
-        {/* Priority Areas */}
-        <fieldset className="space-y-6">
-          <legend className="text-lg font-semibold text-gray-900 mb-4">
-            Priority Areas (Optional)
-          </legend>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {priorityOptions.map((priority) => (
-              <label key={priority} className="flex items-center space-x-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={formData.priorities.includes(priority)}
-                  onChange={(e) => handlePrioritiesChange(priority, e.target.checked)}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <span className="text-sm text-gray-700">{priority}</span>
-              </label>
-            ))}
-          </div>
-          
-          {/* Help text for detailed lesson guide */}
-          {formData.priorities.includes('Detailed lesson-by-lesson guide (AI-generated)') && (
-            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h4 className="text-sm font-medium text-blue-900 mb-2">📚 Detailed Lesson-by-Lesson Guide</h4>
-              <p className="text-sm text-blue-800 mb-2">
-                When you select this option, the AI will generate comprehensive lesson plans that include:
-              </p>
-              <ul className="text-sm text-blue-800 list-disc list-inside space-y-1">
-                <li>Analysis of your choices against scope and sequence</li>
-                <li>Standards coverage mapping and prerequisite checking</li>
-                <li>Detailed lesson structure with Warm-Up, Explore, Develop, Refine phases</li>
-                <li>Learning objectives, key vocabulary, and materials for each lesson</li>
-                <li>Differentiation strategies and assessment methods</li>
-                <li>Real-world applications and connections between lessons</li>
-              </ul>
-              <p className="text-sm text-blue-800 mt-2">
-                <strong>Perfect for:</strong> Accelerated pathways, combined grade sequences (like 8th grade-Algebra I), 
-                and when you need implementable lesson plans with all pertinent information.
-              </p>
-            </div>
-          )}
         </fieldset>
 
         {/* Differentiation Needs */}
