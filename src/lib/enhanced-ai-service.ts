@@ -1206,11 +1206,15 @@ ${differentiationSection}
 RESPONSE FORMAT:
 Please structure your response as a simple JSON object with this EXACT structure:
 
+IMPORTANT: Each lesson takes 3-5 days to complete, so each week should contain 1-2 lessons maximum.
+
 \`\`\`json
 {
   "overview": {
+    "gradeLevel": "${context.gradeLevel}",
+    "timeframe": "${request.timeframe}",
     "totalWeeks": number,
-    "lessonsPerWeek": number,
+    "lessonsPerWeek": 1.5,
     "description": "Brief description of the curriculum"
   },
   "weeklySchedule": [
@@ -1218,6 +1222,7 @@ Please structure your response as a simple JSON object with this EXACT structure
       "week": number,
       "unit": "Unit name",
       "lessons": ["lesson1", "lesson2"],
+      "lessonDuration": "3-5 days per lesson",
       "focusStandards": ["standard1", "standard2"],
       "learningObjectives": ["objective1", "objective2"]
     }
@@ -1393,6 +1398,13 @@ Generate exactly ${this.calculateWeeks(request.timeframe)} weeks of curriculum c
       }
       
       console.log('✅ [JSON Parser] JSON structure validation passed');
+      
+      // Ensure grade level is set if not provided by AI
+      if (parsedResponse.overview && !parsedResponse.overview.gradeLevel) {
+        console.log('🔧 [JSON Parser] Adding missing gradeLevel to overview');
+        parsedResponse.overview.gradeLevel = context.gradeLevel;
+      }
+      
       console.groupEnd();
       
       return parsedResponse as GeneratedPacingGuide;
@@ -1417,31 +1429,40 @@ Generate exactly ${this.calculateWeeks(request.timeframe)} weeks of curriculum c
   ): GeneratedPacingGuide {
     console.log('🔧 [AI Service] Generating fallback pacing guide...');
     const totalWeeks = this.calculateWeeks(request.timeframe);
-    const lessonsPerWeek = Math.ceil(context.totalLessons / totalWeeks);
+    // Realistic lesson count: 1-2 lessons per week since each lesson takes 3-5 days
+    const lessonsPerWeek = 1.5;
+    const totalLessonsNeeded = Math.ceil(totalWeeks * lessonsPerWeek);
     
     console.log('📊 [AI Service] Fallback calculations:', {
       totalWeeks,
       lessonsPerWeek,
-      totalLessons: context.totalLessons,
+      totalLessonsNeeded,
+      availableLessons: context.totalLessons,
       unitCount: context.unitStructure.length
     });
 
     return {
       overview: {
-        gradeLevel: request.gradeLevel,
+        gradeLevel: context.gradeLevel,
         timeframe: request.timeframe,
         totalWeeks,
         lessonsPerWeek,
-        totalLessons: context.totalLessons
+        totalLessons: totalLessonsNeeded
       },
-      weeklySchedule: context.unitStructure.map((unit, index) => ({
-        week: index + 1,
-        unit: unit.unitTitle,
-        lessons: [`Lessons 1-${Math.min(lessonsPerWeek, unit.lessonCount)}`],
-        focusStandards: unit.standards.slice(0, 3),
-        learningObjectives: [`Master key concepts in ${unit.unitTitle}`],
-        assessmentType: index % 3 === 2 ? 'summative' : 'formative' as const
-      })),
+      weeklySchedule: Array.from({ length: totalWeeks }, (_, weekIndex) => {
+        const unitIndex = Math.floor((weekIndex * lessonsPerWeek) / 3); // Roughly 3 weeks per unit
+        const unit = context.unitStructure[unitIndex % context.unitStructure.length];
+        
+        return {
+          week: weekIndex + 1,
+          unit: unit.unitTitle,
+          lessons: [`Week ${weekIndex + 1} lessons from ${unit.unitTitle}`],
+          lessonDuration: "3-5 days per lesson",
+          focusStandards: unit.standards.slice(0, 3),
+          learningObjectives: [`Master key concepts in ${unit.unitTitle}`],
+          assessmentType: (weekIndex + 1) % 3 === 0 ? 'summative' : 'formative' as const
+        };
+      }),
       assessmentPlan: {
         formativeFrequency: 'Weekly',
         summativeSchedule: [
@@ -1622,14 +1643,30 @@ ${chunkInstructions}
 
 **CURRICULUM DATA:**${curriculumContext}
 
+**CRITICAL PACING PRINCIPLES:**
+1. **No Lesson Duplication**: Each specific lesson should appear exactly once in the entire sequence
+2. **Realistic Duration**: Each lesson requires 3-5 instructional days to complete properly
+3. **Logical Prerequisites**: Ensure foundational concepts precede advanced applications
+4. **Smooth Transitions**: Avoid abrupt topic switches - create natural bridges between units
+5. **Grade 8 First**: Establish solid foundations from Grade 8 before progressing to Algebra 1
+
+**SEQUENCE STRATEGY:**
+- Start with essential Grade 8 number systems and geometry foundations
+- Progress through Grade 8 linear relationships and equations  
+- Transition to Algebra 1 functions and advanced applications
+- Each lesson should build naturally on previous lessons
+
 **REQUIREMENTS:**
 - Use exact unit/lesson titles from curriculum data above
 - Include textbook source and page numbers  
 - Create logical progression for ${weekRange}
 - Focus on essential standards alignment
-- CRITICAL: Generate exactly ${totalWeeks} weeks of curriculum (NOT ${totalWeeks} total lessons)
-- Each week should contain 4 lessons for a total of ${totalWeeks * 4} individual lessons across all weeks
-- Week 1 = Lessons 1-4, Week 2 = Lessons 5-8, etc.
+- CRITICAL: Each lesson takes 3-5 days to complete (NOT 1 day)
+- CRITICAL: Generate exactly ${totalWeeks} weeks of curriculum
+- Each week should contain 1-2 lessons maximum (since lessons are 3-5 days each)
+- Avoid duplicating lessons - each lesson should appear only once in the sequence
+- Prioritize essential Grade 8 foundations before advancing to Algebra 1
+- Create smooth transitions between topics, not abrupt subject switches
 
 **JSON OUTPUT REQUIRED:**
 Return ONLY valid JSON in this exact format:
@@ -1637,6 +1674,8 @@ Return ONLY valid JSON in this exact format:
 \`\`\`json
 {
   "overview": {
+    "gradeLevel": "${context.gradeLevel}",
+    "timeframe": "${request.timeframe}",
     "totalWeeks": ${isChunked ? `${request.chunkInfo?.totalWeeks || totalWeeks}` : totalWeeks},
     ${isChunked ? `"chunkInfo": {
       "chunkNumber": ${chunkNumber},
@@ -1644,11 +1683,11 @@ Return ONLY valid JSON in this exact format:
       "weeksInThisChunk": ${Math.min(Math.ceil(totalWeeks / totalChunks), totalWeeks - (chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks))},
       "isChunked": true
     },` : ''}
-    "lessonsPerWeek": 4,
+    "lessonsPerWeek": 1.5,
     "description": "Brief description${isChunked ? ` (Chunk ${chunkNumber} of ${totalChunks})` : ''}"
   },
   "weeklySchedule": [
-${isChunked ? `    // CRITICAL: Generate ${Math.min(Math.ceil(totalWeeks / totalChunks), totalWeeks - (chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks))} individual weeks (weeks ${(chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks) + 1} through ${Math.min(chunkNumber * Math.ceil(totalWeeks / totalChunks), totalWeeks)}) ONLY - Each week contains 4 lessons` : `    // CRITICAL: Generate ALL ${totalWeeks} individual weeks (weeks 1 through ${totalWeeks}) - Each week contains 4 lessons for a total of ${totalWeeks * 4} lessons`}
+${isChunked ? `    // CRITICAL: Generate ${Math.min(Math.ceil(totalWeeks / totalChunks), totalWeeks - (chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks))} individual weeks (weeks ${(chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks) + 1} through ${Math.min(chunkNumber * Math.ceil(totalWeeks / totalChunks), totalWeeks)}) ONLY - Each week contains 1-2 lessons (lessons are 3-5 days each)` : `    // CRITICAL: Generate ALL ${totalWeeks} individual weeks (weeks 1 through ${totalWeeks}) - Each week contains 1-2 lessons (lessons are 3-5 days each)`}
     {
       "week": ${isChunked ? (chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks) + 1 : 1},
       "unit": "EXACT unit title from curriculum data",
@@ -1656,8 +1695,10 @@ ${isChunked ? `    // CRITICAL: Generate ${Math.min(Math.ceil(totalWeeks / total
       "volume": "Volume 1",
       "unitNumber": 1,
       "lessons": [
-        "Grade 8, Unit 1, Lesson 1: Exact lesson title (Page #)"
+        "Grade 8, Unit 1, Lesson 1: Exact lesson title (Page #)",
+        "Grade 8, Unit 1, Lesson 2: Next lesson title (Page #)"
       ],
+      "lessonDuration": "3-5 days per lesson",
       "focusStandards": ["8.G.A.1"],
       "learningObjectives": ["Clear objective"]
     }${isChunked ? `,
@@ -1668,12 +1709,12 @@ ${isChunked ? `    // CRITICAL: Generate ${Math.min(Math.ceil(totalWeeks / total
 \`\`\`
 
 ${isChunked ? `**GENERATE EXACTLY ${Math.min(Math.ceil(totalWeeks / totalChunks), totalWeeks - (chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks))} INDIVIDUAL WEEKS FOR CHUNK ${chunkNumber}**
-- Each week = 4 lessons
-- Total lessons in this chunk = ${Math.min(Math.ceil(totalWeeks / totalChunks), totalWeeks - (chunkNumber - 1) * Math.ceil(totalWeeks / totalChunks)) * 4}
-- Do NOT confuse weeks with lessons` : `**GENERATE ALL ${totalWeeks} INDIVIDUAL WEEKS**
-- Each week = 4 lessons  
-- Total lessons across all weeks = ${totalWeeks * 4}
-- Do NOT confuse weeks with lessons`}
+- Each week = 1-2 lessons (each lesson takes 3-5 days)
+- Focus on logical progression without duplication
+- Do NOT repeat lessons from earlier weeks` : `**GENERATE ALL ${totalWeeks} INDIVIDUAL WEEKS**
+- Each week = 1-2 lessons (each lesson takes 3-5 days)
+- Focus on logical progression without duplication
+- Do NOT repeat lessons from earlier weeks`}
 
 CRITICAL: Return ONLY the JSON object. No additional text before or after.
       `;
