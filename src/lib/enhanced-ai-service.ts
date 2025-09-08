@@ -1325,11 +1325,25 @@ Ensure the pacing guide is realistic, pedagogically sound, and addresses the spe
       throw error;
     }
   }
-        weeklyScheduleLength: parsedResponse.weeklySchedule?.length || 0,
-        weeklyScheduleSample: parsedResponse.weeklySchedule?.slice(0, 2) || [],
-        hasAssessmentPlan: !!parsedResponse.assessmentPlan,
-        hasDifferentiationStrategies: !!parsedResponse.differentiationStrategies,
-        differentiationCount: parsedResponse.differentiationStrategies?.length || 0
+
+  private async parseAIResponse(
+    aiResponse: string,
+    context: CurriculumContext,
+    request: PacingGuideRequest
+  ): Promise<GeneratedPacingGuide> {
+    console.group('🔧 [JSON Parser] Starting AI Response Parsing');
+    
+    try {
+      console.log('📊 [JSON Parser] AI Response analysis:', {
+        totalLength: aiResponse.length,
+        startsWithJson: aiResponse.trim().startsWith('{'),
+        startsWithCodeBlock: aiResponse.trim().startsWith('```'),
+        endsWithJson: aiResponse.trim().endsWith('}'),
+        endsWithCodeBlock: aiResponse.trim().endsWith('```'),
+        containsJsonKeyword: aiResponse.includes('```json'),
+        weeklyScheduleLength: aiResponse.includes('weeklySchedule') ? 'present' : 'missing',
+        hasAssessmentPlan: aiResponse.includes('assessmentPlan'),
+        hasDifferentiationStrategies: aiResponse.includes('differentiationStrategies')
       });
       console.log('🔍 [AI Service] Detailed parsed response analysis:');
       
