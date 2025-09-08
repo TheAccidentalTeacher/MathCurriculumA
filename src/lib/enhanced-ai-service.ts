@@ -265,8 +265,14 @@ export class EnhancedAIService {
   }
 
   async generatePacingGuide(request: PacingGuideRequest): Promise<PacingGuideResponse> {
-    console.group('🧠 [AI Service] Generating Pacing Guide');
-    console.log('📝 [AI Service] Request received:', JSON.stringify(request, null, 2));
+    console.group('🧠 [Main Generator] Starting Pacing Guide Generation');
+    console.log('📝 [Main Generator] Request received:', {
+      gradeLevel: request.gradeLevel,
+      timeframe: request.timeframe,
+      studentPopulation: request.studentPopulation,
+      priorities: request.priorities,
+      gradeCombination: request.gradeCombination
+    });
     
     try {
       // Check if this is a request for detailed lesson-by-lesson generation
@@ -275,8 +281,17 @@ export class EnhancedAIService {
                                request.studentPopulation?.toLowerCase().includes('accelerated') ||
                                request.gradeCombination?.pathwayType === 'accelerated';
       
+      console.log('🎯 [Main Generator] Generation path analysis:', {
+        isDetailedRequest,
+        isMultiGrade: request.gradeCombination?.selectedGrades?.length > 1,
+        totalWeeks: this.calculateWeeks(request.timeframe),
+        selectedGrades: request.gradeCombination?.selectedGrades,
+        pathwayType: request.gradeCombination?.pathwayType
+      });
+      
       if (isDetailedRequest) {
-        console.log('🎯 [AI Service] Detected detailed lesson guide request');
+        console.log('🎯 [Main Generator] ➡️ Routing to DETAILED LESSON GUIDE generation');
+        console.groupEnd();
         return await this.generateDetailedLessonGuide(request);
       }
       
@@ -285,18 +300,24 @@ export class EnhancedAIService {
       const totalWeeks = this.calculateWeeks(request.timeframe);
       
       if (isMultiGrade && totalWeeks >= 30) {
-        console.log('📊 [AI Service] Large multi-grade request detected, using chunked generation');
+        console.log('📊 [Main Generator] ➡️ Routing to CHUNKED GENERATION (multi-grade, ' + totalWeeks + ' weeks)');
+        console.groupEnd();
         try {
           return await this.generateChunkedPacingGuide(request);
         } catch (chunkError) {
-          console.warn('⚠️ [AI Service] Chunked generation failed, falling back to standard generation:', chunkError);
-          console.log('🔄 [AI Service] Attempting standard generation with reduced scope...');
+          console.group('⚠️ [Main Generator] Chunked Generation Fallback');
+          console.warn('⚠️ [Main Generator] Chunked generation failed, falling back to standard generation');
+          console.error('🔍 [Main Generator] Chunk error details:', chunkError);
+          console.log('🔄 [Main Generator] ➡️ Routing to STANDARD GENERATION (fallback)');
+          console.groupEnd();
           // Fall back to standard generation
           return await this.generateStandardPacingGuide(request);
         }
       }
       
       // Standard pacing guide generation (existing logic)
+      console.log('📝 [Main Generator] ➡️ Routing to STANDARD GENERATION');
+      console.groupEnd();
       return await this.generateStandardPacingGuide(request);
     } catch (error) {
       console.error('💥 [AI Service] Error generating pacing guide:', error);
@@ -414,8 +435,13 @@ export class EnhancedAIService {
   private async callOpenAI(prompt: string): Promise<string> {
     console.log('🤖 [AI Service] Calling OpenAI API...');
     console.log('📏 [AI Service] Prompt length:', prompt.length, 'characters');
+    console.log('🔍 [AI Service] Prompt preview (first 500 chars):', prompt.substring(0, 500));
+    console.log('🔍 [AI Service] Prompt ending (last 300 chars):', prompt.substring(Math.max(0, prompt.length - 300)));
     
     try {
+      const startTime = Date.now();
+      console.log('⏰ [AI Service] OpenAI API call started at:', new Date().toISOString());
+      
       const completion = await this.openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
@@ -431,6 +457,10 @@ export class EnhancedAIService {
         max_completion_tokens: 12000,   // Reduced token limit for chunk stability
         temperature: 0.1               // Lower temperature for faster, more focused responses
       });
+      
+      const endTime = Date.now();
+      const duration = endTime - startTime;
+      console.log('⏰ [AI Service] OpenAI API call completed in:', duration, 'ms');
       
       console.log('📊 [AI Service] OpenAI completion received:', {
         id: completion.id,
@@ -453,48 +483,86 @@ export class EnhancedAIService {
       
       // Check if response was truncated due to length limit
       if (completion.choices?.[0]?.finish_reason === 'length') {
-        console.warn('⚠️ [AI Service] Response was truncated due to token limit');
+        console.error('❌ [AI Service] CRITICAL: Response was truncated due to token limit');
         console.log('📏 [AI Service] Truncated response length:', aiResponse.length);
+        console.log('🔍 [AI Service] Truncated response ending:', aiResponse.substring(Math.max(0, aiResponse.length - 500)));
         
         // For chunked generation, we need complete JSON, so this is a critical error
         throw new Error('AI response was truncated, resulting in incomplete JSON. Please try again or reduce scope.');
       }
       
       console.log('📝 [AI Service] AI response length:', aiResponse.length, 'characters');
-      console.log('🔍 [AI Service] AI response preview:', aiResponse.substring(0, 300) + '...');
-      console.log('🔍 [AI Service] AI response ending:', '...' + aiResponse.substring(Math.max(0, aiResponse.length - 300)));
+      console.log('🔍 [AI Service] AI response preview (first 300 chars):', aiResponse.substring(0, 300));
+      console.log('🔍 [AI Service] AI response ending (last 300 chars):', aiResponse.substring(Math.max(0, aiResponse.length - 300)));
+      
+      // Check for common JSON issues
+      const jsonBlockCount = (aiResponse.match(/```json/g) || []).length;
+      const jsonEndBlockCount = (aiResponse.match(/```/g) || []).length;
+      const braceCount = (aiResponse.match(/{/g) || []).length - (aiResponse.match(/}/g) || []).length;
+      
+      console.log('🔍 [AI Service] JSON structure analysis:', {
+        jsonBlockStart: jsonBlockCount,
+        totalCodeBlocks: jsonEndBlockCount,
+        braceBalance: braceCount,
+        startsWithCodeBlock: aiResponse.trim().startsWith('```'),
+        endsWithCodeBlock: aiResponse.trim().endsWith('```'),
+        containsJson: aiResponse.includes('{') && aiResponse.includes('}')
+      });
+      
+      if (braceCount !== 0) {
+        console.warn('⚠️ [AI Service] WARNING: Unbalanced braces detected in response');
+      }
+      
+      if (jsonBlockCount > 0 && jsonEndBlockCount % 2 !== 0) {
+        console.warn('⚠️ [AI Service] WARNING: Unmatched code block markers detected');
+      }
       
       return aiResponse;
       
     } catch (apiError) {
       console.error('❌ [AI Service] OpenAI API Error:', apiError);
+      console.error('🔍 [AI Service] Error details:', {
+        name: apiError instanceof Error ? apiError.name : 'Unknown',
+        message: apiError instanceof Error ? apiError.message : String(apiError),
+        stack: apiError instanceof Error ? apiError.stack : undefined
+      });
       throw new Error(`OpenAI API Error: ${apiError instanceof Error ? apiError.message : 'Unknown error'}`);
     }
   }
 
   async generateChunkedPacingGuide(request: PacingGuideRequest): Promise<PacingGuideResponse> {
-    console.group('📊 [AI Service] Generating Chunked Pacing Guide');
-    console.log('🔄 [AI Service] Using 2-chunk approach for full year coverage');
+    console.group('📊 [Chunked Generation] Starting Chunked Pacing Guide Generation');
+    console.log('🔄 [Chunked Generation] Using 2-chunk approach for full year coverage');
     
     try {
       const totalWeeks = this.calculateWeeks(request.timeframe);
       const chunk1Weeks = Math.ceil(totalWeeks / 2); // First 18 weeks (or half)
       const chunk2Weeks = totalWeeks - chunk1Weeks;  // Remaining weeks
       
-      console.log(`📅 [AI Service] Chunk 1: Weeks 1-${chunk1Weeks}, Chunk 2: Weeks ${chunk1Weeks + 1}-${totalWeeks}`);
+      console.log('📅 [Chunked Generation] Chunk breakdown:', {
+        totalWeeks,
+        chunk1Weeks,
+        chunk2Weeks,
+        chunk1Range: `1-${chunk1Weeks}`,
+        chunk2Range: `${chunk1Weeks + 1}-${totalWeeks}`
+      });
       
       // Prepare context for both chunks
+      console.log('🔧 [Chunked Generation] Preparing curriculum context...');
       const gradeConfig = this.determineGradeConfig(request);
       const mergedContext = await this.curriculumService.getMergedCurriculumContext(gradeConfig.selectedGrades);
       
-      console.log('🎯 [AI Service] Context prepared:', {
+      console.log('🎯 [Chunked Generation] Context prepared:', {
         gradeConfig: gradeConfig,
         contextUnits: mergedContext.unitStructure.length,
-        totalLessons: mergedContext.totalLessons
+        totalLessons: mergedContext.totalLessons,
+        availableStandards: mergedContext.availableStandards.length
       });
       
-      // Generate first chunk
-      console.log('🎯 [AI Service] Generating first chunk with overview...');
+      // ===== CHUNK 1 GENERATION =====
+      console.group('🎯 [Chunk 1] Generating first chunk (weeks 1-' + chunk1Weeks + ')');
+      const chunk1StartTime = Date.now();
+      
       const chunk1Request = { 
         ...request, 
         chunkInfo: { 
@@ -505,21 +573,33 @@ export class EnhancedAIService {
         }
       };
       
-      console.log('📝 [AI Service] Building prompt for chunk 1...');
+      console.log('📝 [Chunk 1] Building prompt for chunk 1...');
       const chunk1Prompt = this.buildAdvancedPrompt(mergedContext, gradeConfig, chunk1Request);
-      console.log('📏 [AI Service] Chunk 1 prompt length:', chunk1Prompt.length, 'characters');
+      console.log('📏 [Chunk 1] Prompt length:', chunk1Prompt.length, 'characters');
+      console.log('🔍 [Chunk 1] Prompt preview:', chunk1Prompt.substring(0, 300));
       
+      console.log('🤖 [Chunk 1] Calling OpenAI for chunk 1...');
       const chunk1Response = await this.callOpenAI(chunk1Prompt);
-      console.log('✅ [AI Service] Chunk 1 response received, parsing...');
       
+      const chunk1Duration = Date.now() - chunk1StartTime;
+      console.log('⏰ [Chunk 1] Generated in:', chunk1Duration, 'ms');
+      console.log('📝 [Chunk 1] Response received, length:', chunk1Response.length, 'characters');
+      
+      console.log('🔧 [Chunk 1] Parsing chunk 1 response...');
       const chunk1Guide = await this.parseAIResponse(chunk1Response, mergedContext, chunk1Request);
-      console.log('✅ [AI Service] Chunk 1 parsed successfully:', {
-        weeklyScheduleLength: chunk1Guide.weeklySchedule?.length || 0,
-        hasOverview: !!chunk1Guide.overview
-      });
       
-      // Generate second chunk
-      console.log('🎯 [AI Service] Generating second chunk...');
+      console.log('✅ [Chunk 1] Parsed successfully:', {
+        weeklyScheduleLength: chunk1Guide.weeklySchedule?.length || 0,
+        hasOverview: !!chunk1Guide.overview,
+        firstWeek: chunk1Guide.weeklySchedule?.[0]?.week,
+        lastWeek: chunk1Guide.weeklySchedule?.[chunk1Guide.weeklySchedule.length - 1]?.week
+      });
+      console.groupEnd();
+      
+      // ===== CHUNK 2 GENERATION =====
+      console.group('🎯 [Chunk 2] Generating second chunk (weeks ' + (chunk1Weeks + 1) + '-' + totalWeeks + ')');
+      const chunk2StartTime = Date.now();
+      
       const chunk2Request = { 
         ...request, 
         chunkInfo: { 
@@ -530,34 +610,70 @@ export class EnhancedAIService {
         }
       };
       
-      console.log('📝 [AI Service] Building prompt for chunk 2...');
+      console.log('📝 [Chunk 2] Building prompt for chunk 2...');
       const chunk2Prompt = this.buildAdvancedPrompt(mergedContext, gradeConfig, chunk2Request);
-      console.log('📏 [AI Service] Chunk 2 prompt length:', chunk2Prompt.length, 'characters');
+      console.log('📏 [Chunk 2] Prompt length:', chunk2Prompt.length, 'characters');
+      console.log('🔍 [Chunk 2] Prompt preview:', chunk2Prompt.substring(0, 300));
       
+      console.log('🤖 [Chunk 2] Calling OpenAI for chunk 2...');
       const chunk2Response = await this.callOpenAI(chunk2Prompt);
-      console.log('✅ [AI Service] Chunk 2 response received, parsing...');
       
+      const chunk2Duration = Date.now() - chunk2StartTime;
+      console.log('⏰ [Chunk 2] Generated in:', chunk2Duration, 'ms');
+      console.log('📝 [Chunk 2] Response received, length:', chunk2Response.length, 'characters');
+      
+      console.log('🔧 [Chunk 2] Parsing chunk 2 response...');
       const chunk2Guide = await this.parseAIResponse(chunk2Response, mergedContext, chunk2Request);
-      console.log('✅ [AI Service] Chunk 2 parsed successfully:', {
+      
+      console.log('✅ [Chunk 2] Parsed successfully:', {
         weeklyScheduleLength: chunk2Guide.weeklySchedule?.length || 0,
-        hasOverview: !!chunk2Guide.overview
+        hasOverview: !!chunk2Guide.overview,
+        firstWeek: chunk2Guide.weeklySchedule?.[0]?.week,
+        lastWeek: chunk2Guide.weeklySchedule?.[chunk2Guide.weeklySchedule.length - 1]?.week
+      });
+      console.groupEnd();
+      
+      // ===== MERGING CHUNKS =====
+      console.group('🔗 [Merge] Merging chunks into complete curriculum');
+      console.log('🔧 [Merge] Pre-merge validation...');
+      
+      // Validate chunks before merging
+      if (!chunk1Guide.weeklySchedule || chunk1Guide.weeklySchedule.length === 0) {
+        throw new Error('Chunk 1 has empty or missing weeklySchedule');
+      }
+      
+      if (!chunk2Guide.weeklySchedule || chunk2Guide.weeklySchedule.length === 0) {
+        throw new Error('Chunk 2 has empty or missing weeklySchedule');
+      }
+      
+      console.log('📊 [Merge] Chunk validation passed:', {
+        chunk1Weeks: chunk1Guide.weeklySchedule.length,
+        chunk2Weeks: chunk2Guide.weeklySchedule.length,
+        expectedTotal: totalWeeks
       });
       
-      // Merge the two chunks
-      console.log('🔗 [AI Service] Merging chunks...');
+      // Check for week number conflicts
+      const chunk1WeekNumbers = chunk1Guide.weeklySchedule.map(w => w.week);
+      const chunk2WeekNumbers = chunk2Guide.weeklySchedule.map(w => w.week);
+      const weekOverlap = chunk1WeekNumbers.filter(w => chunk2WeekNumbers.includes(w));
+      
+      if (weekOverlap.length > 0) {
+        console.warn('⚠️ [Merge] Week number overlap detected:', weekOverlap);
+      }
+      
       const mergedPacingGuide = {
         ...chunk1Guide,
         overview: {
           ...chunk1Guide.overview,
           totalWeeks: totalWeeks,
-          description: chunk1Guide.overview.description?.replace(/(Chunk \d+ of \d+)/g, '') + ' (Complete 36-week curriculum)'
+          description: (chunk1Guide.overview.description || '').replace(/(Chunk \d+ of \d+)/g, '').trim() + ' (Complete 36-week curriculum)'
         },
         weeklySchedule: [
           ...chunk1Guide.weeklySchedule,
           ...chunk2Guide.weeklySchedule
         ],
         assessmentPlan: {
-          ...chunk1Guide.assessmentPlan,
+          formativeFrequency: chunk1Guide.assessmentPlan?.formativeFrequency || 'Weekly',
           summativeSchedule: [
             ...(chunk1Guide.assessmentPlan?.summativeSchedule || []),
             ...(chunk2Guide.assessmentPlan?.summativeSchedule || [])
@@ -565,17 +681,55 @@ export class EnhancedAIService {
           diagnosticCheckpoints: [
             ...(chunk1Guide.assessmentPlan?.diagnosticCheckpoints || []),
             ...(chunk2Guide.assessmentPlan?.diagnosticCheckpoints || [])
-          ].sort((a, b) => a - b)
-        }
+          ].sort((a, b) => a - b),
+          portfolioComponents: [
+            ...(chunk1Guide.assessmentPlan?.portfolioComponents || []),
+            ...(chunk2Guide.assessmentPlan?.portfolioComponents || [])
+          ]
+        },
+        differentiationStrategies: [
+          ...(chunk1Guide.differentiationStrategies || []),
+          ...(chunk2Guide.differentiationStrategies || [])
+        ],
+        flexibilityOptions: [
+          ...(chunk1Guide.flexibilityOptions || []),
+          ...(chunk2Guide.flexibilityOptions || [])
+        ],
+        standardsAlignment: [
+          ...(chunk1Guide.standardsAlignment || []),
+          ...(chunk2Guide.standardsAlignment || [])
+        ]
       };
       
-      console.log('✅ [AI Service] Successfully merged chunks:', {
-        totalWeeks: mergedPacingGuide.weeklySchedule.length,
-        chunk1Weeks: chunk1Guide.weeklySchedule.length,
-        chunk2Weeks: chunk2Guide.weeklySchedule.length,
-        mergedOverview: !!mergedPacingGuide.overview,
-        mergedAssessmentPlan: !!mergedPacingGuide.assessmentPlan
+      // Final validation
+      const finalWeekNumbers = mergedPacingGuide.weeklySchedule.map(w => w.week).sort((a, b) => a - b);
+      const expectedWeekNumbers = Array.from({length: totalWeeks}, (_, i) => i + 1);
+      const missingWeeks = expectedWeekNumbers.filter(w => !finalWeekNumbers.includes(w));
+      const duplicateWeeks = finalWeekNumbers.filter((w, i) => finalWeekNumbers.indexOf(w) !== i);
+      
+      console.log('📊 [Merge] Final validation results:', {
+        totalWeeksGenerated: mergedPacingGuide.weeklySchedule.length,
+        expectedWeeks: totalWeeks,
+        weekNumberRange: `${Math.min(...finalWeekNumbers)}-${Math.max(...finalWeekNumbers)}`,
+        missingWeeks: missingWeeks.length > 0 ? missingWeeks : 'None',
+        duplicateWeeks: duplicateWeeks.length > 0 ? duplicateWeeks : 'None',
+        assessmentPlanMerged: !!mergedPacingGuide.assessmentPlan,
+        totalSummativeAssessments: mergedPacingGuide.assessmentPlan?.summativeSchedule?.length || 0
       });
+      
+      if (missingWeeks.length > 0) {
+        console.warn('⚠️ [Merge] Missing weeks detected:', missingWeeks);
+      }
+      
+      if (duplicateWeeks.length > 0) {
+        console.warn('⚠️ [Merge] Duplicate weeks detected:', duplicateWeeks);
+      }
+      
+      console.log('✅ [Merge] Successfully merged chunks');
+      console.groupEnd();
+      
+      const totalDuration = (chunk1Duration + chunk2Duration) / 1000;
+      console.log('🎉 [Chunked Generation] Complete! Total time:', totalDuration.toFixed(1), 'seconds');
       console.groupEnd();
       
       return {
@@ -585,7 +739,12 @@ export class EnhancedAIService {
       };
       
     } catch (error) {
-      console.error('💥 [AI Service] Error generating chunked pacing guide:', error);
+      console.error('💥 [Chunked Generation] Error generating chunked pacing guide:', error);
+      console.error('🔍 [Chunked Generation] Error details:', {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack?.split('\n').slice(0, 5) : undefined
+      });
       console.groupEnd();
       
       return {
@@ -991,40 +1150,181 @@ Ensure the pacing guide is realistic, pedagogically sound, and addresses the spe
     context: CurriculumContext,
     request: PacingGuideRequest
   ): Promise<GeneratedPacingGuide> {
+    console.group('🔧 [JSON Parser] Starting AI Response Parsing');
+    
     try {
-      console.log('🔍 AI Response length:', aiResponse.length);
-      console.log('📝 AI Response preview:', aiResponse.substring(0, 500) + '...');
+      console.log('� [JSON Parser] AI Response analysis:', {
+        totalLength: aiResponse.length,
+        startsWithJson: aiResponse.trim().startsWith('{'),
+        startsWithCodeBlock: aiResponse.trim().startsWith('```'),
+        endsWithJson: aiResponse.trim().endsWith('}'),
+        endsWithCodeBlock: aiResponse.trim().endsWith('```'),
+        containsJsonKeyword: aiResponse.includes('```json')
+      });
+      
+      console.log('� [JSON Parser] Response preview (first 500 chars):');
+      console.log(aiResponse.substring(0, 500));
+      console.log('🔍 [JSON Parser] Response ending (last 300 chars):');
+      console.log(aiResponse.substring(Math.max(0, aiResponse.length - 300)));
+      
+      // Analyze JSON structure
+      const openBraces = (aiResponse.match(/{/g) || []).length;
+      const closeBraces = (aiResponse.match(/}/g) || []).length;
+      const openBrackets = (aiResponse.match(/\[/g) || []).length;
+      const closeBrackets = (aiResponse.match(/\]/g) || []).length;
+      
+      console.log('🔍 [JSON Parser] Structure analysis:', {
+        openBraces,
+        closeBraces,
+        braceBalance: openBraces - closeBraces,
+        openBrackets,
+        closeBrackets,
+        bracketBalance: openBrackets - closeBrackets
+      });
       
       // Try multiple JSON extraction methods
       let parsedResponse: any = null;
+      let extractionMethod = '';
+      let rawJsonString = '';
       
       // Method 1: Look for JSON blocks wrapped in ```json
+      console.log('🔄 [JSON Parser] Attempting Method 1: Code block extraction');
       const jsonBlockMatch = aiResponse.match(/```json\s*([\s\S]*?)\s*```/);
       if (jsonBlockMatch) {
-        console.log('✅ Found JSON block format');
-        parsedResponse = JSON.parse(jsonBlockMatch[1]);
+        console.log('✅ [JSON Parser] Found JSON code block');
+        rawJsonString = jsonBlockMatch[1].trim();
+        extractionMethod = 'Code Block';
+        
+        console.log('📝 [JSON Parser] Extracted JSON length:', rawJsonString.length);
+        console.log('🔍 [JSON Parser] Extracted JSON preview:', rawJsonString.substring(0, 200));
+        
+        try {
+          parsedResponse = JSON.parse(rawJsonString);
+          console.log('✅ [JSON Parser] Successfully parsed JSON from code block');
+        } catch (blockParseError) {
+          console.error('❌ [JSON Parser] Failed to parse code block JSON:', blockParseError);
+          console.log('🔍 [JSON Parser] Problematic JSON section:', rawJsonString.substring(0, 500));
+        }
       } else {
-        // Method 2: Look for any JSON object
+        console.log('❌ [JSON Parser] No JSON code block found');
+      }
+      
+      // Method 2: Look for any JSON object if method 1 failed
+      if (!parsedResponse) {
+        console.log('🔄 [JSON Parser] Attempting Method 2: Direct JSON object extraction');
         const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
-          console.log('✅ Found JSON object format');
-          parsedResponse = JSON.parse(jsonMatch[0]);
-        } else {
-          // Method 3: Try parsing the entire response
+          console.log('✅ [JSON Parser] Found JSON object pattern');
+          rawJsonString = jsonMatch[0];
+          extractionMethod = 'Direct Object';
+          
+          console.log('📝 [JSON Parser] Direct JSON length:', rawJsonString.length);
+          console.log('🔍 [JSON Parser] Direct JSON preview:', rawJsonString.substring(0, 200));
+          
           try {
-            console.log('🔄 Attempting to parse entire response as JSON');
-            parsedResponse = JSON.parse(aiResponse);
-          } catch (e) {
-            console.error('❌ Failed to parse AI response as JSON:', e);
-            throw new Error('No valid JSON found in AI response. Response: ' + aiResponse.substring(0, 200));
+            parsedResponse = JSON.parse(rawJsonString);
+            console.log('✅ [JSON Parser] Successfully parsed direct JSON object');
+          } catch (directParseError) {
+            console.error('❌ [JSON Parser] Failed to parse direct JSON:', directParseError);
+            console.log('🔍 [JSON Parser] Problematic JSON section:', rawJsonString.substring(0, 500));
+          }
+        } else {
+          console.log('❌ [JSON Parser] No direct JSON object found');
+        }
+      }
+      
+      // Method 3: Try parsing the entire response if previous methods failed
+      if (!parsedResponse) {
+        console.log('🔄 [JSON Parser] Attempting Method 3: Full response parsing');
+        rawJsonString = aiResponse.trim();
+        extractionMethod = 'Full Response';
+        
+        try {
+          parsedResponse = JSON.parse(rawJsonString);
+          console.log('✅ [JSON Parser] Successfully parsed entire response as JSON');
+        } catch (fullParseError) {
+          console.error('❌ [JSON Parser] Failed to parse full response:', fullParseError);
+          console.log('🔍 [JSON Parser] Error position (if available):', fullParseError instanceof SyntaxError ? fullParseError.message : 'No position info');
+          
+          // Try to identify the problematic section
+          const lines = rawJsonString.split('\n');
+          console.log('📊 [JSON Parser] Response has', lines.length, 'lines');
+          
+          if (fullParseError instanceof SyntaxError && fullParseError.message.includes('position')) {
+            const match = fullParseError.message.match(/position (\d+)/);
+            if (match) {
+              const errorPos = parseInt(match[1]);
+              const errorContext = rawJsonString.substring(Math.max(0, errorPos - 50), errorPos + 50);
+              console.log('🎯 [JSON Parser] Error context around position', errorPos + ':', errorContext);
+            }
+          }
+          
+          // Show problematic lines
+          console.log('🔍 [JSON Parser] First 10 lines of response:');
+          lines.slice(0, 10).forEach((line, index) => {
+            console.log(`Line ${index + 1}: ${line}`);
+          });
+          
+          if (lines.length > 10) {
+            console.log('🔍 [JSON Parser] Last 5 lines of response:');
+            lines.slice(-5).forEach((line, index) => {
+              console.log(`Line ${lines.length - 5 + index + 1}: ${line}`);
+            });
           }
         }
       }
       
-      console.log('📊 Parsed response structure:', Object.keys(parsedResponse || {}));
-      console.log('🔍 [AI Service] Parsed response content:', {
+      // Final validation
+      if (!parsedResponse) {
+        console.error('💥 [JSON Parser] All parsing methods failed');
+        console.error('🔍 [JSON Parser] Full response for debugging:');
+        console.error(aiResponse);
+        throw new Error('No valid JSON found in AI response. Response preview: ' + aiResponse.substring(0, 200));
+      }
+      
+      console.log('🎉 [JSON Parser] Successfully extracted JSON using method:', extractionMethod);
+      console.log('📊 [JSON Parser] Parsed response structure:', {
+        topLevelKeys: Object.keys(parsedResponse || {}),
         hasOverview: !!parsedResponse.overview,
         hasWeeklySchedule: !!parsedResponse.weeklySchedule,
+        weeklyScheduleLength: parsedResponse.weeklySchedule?.length || 0,
+        hasAssessmentPlan: !!parsedResponse.assessmentPlan,
+        hasDifferentiationStrategies: !!parsedResponse.differentiationStrategies,
+        hasFlexibilityOptions: !!parsedResponse.flexibilityOptions,
+        hasStandardsAlignment: !!parsedResponse.standardsAlignment
+      });
+      
+      // Validate essential structure
+      if (!parsedResponse.overview) {
+        console.warn('⚠️ [JSON Parser] Missing overview section');
+      }
+      
+      if (!parsedResponse.weeklySchedule || !Array.isArray(parsedResponse.weeklySchedule)) {
+        console.error('❌ [JSON Parser] Missing or invalid weeklySchedule array');
+        throw new Error('Invalid pacing guide structure: missing weeklySchedule array');
+      }
+      
+      if (parsedResponse.weeklySchedule.length === 0) {
+        console.error('❌ [JSON Parser] Empty weeklySchedule array');
+        throw new Error('Invalid pacing guide structure: weeklySchedule array is empty');
+      }
+      
+      console.log('✅ [JSON Parser] JSON structure validation passed');
+      console.groupEnd();
+      
+      return parsedResponse as GeneratedPacingGuide;
+      
+    } catch (error) {
+      console.error('💥 [JSON Parser] Critical parsing error:', error);
+      console.error('🔍 [JSON Parser] Error details:', {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
+      console.groupEnd();
+      throw error;
+    }
+  }
         weeklyScheduleLength: parsedResponse.weeklySchedule?.length || 0,
         weeklyScheduleSample: parsedResponse.weeklySchedule?.slice(0, 2) || [],
         hasAssessmentPlan: !!parsedResponse.assessmentPlan,
