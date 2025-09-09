@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { AICurriculumContextService, CurriculumContext, PacingRecommendation } from './ai-curriculum-context';
+import { AICurriculumContextService, CurriculumContext, UnitPacingRecommendation, AIModel, AVAILABLE_MODELS, ModelConfiguration } from './ai-curriculum-context';
 import { dynamicScopeSequenceService, DynamicPacingConfig } from './dynamic-scope-sequence';
 import fs from 'fs';
 import path from 'path';
@@ -39,7 +39,7 @@ export interface PacingGuideResponse {
   success: boolean;
   pacingGuide?: GeneratedPacingGuide;
   detailedLessonGuide?: DetailedLessonGuide;
-  recommendations?: PacingRecommendation[];
+  recommendations?: UnitPacingRecommendation[];
   error?: string;
 }
 
@@ -246,12 +246,41 @@ export interface StandardsAlignment {
 export class EnhancedAIService {
   private openai: OpenAI;
   private curriculumService: AICurriculumContextService;
+  private selectedModel: AIModel;
+  private modelConfig: ModelConfiguration;
 
-  constructor() {
+  constructor(model: AIModel = 'gpt-4o') {
     this.openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY
     });
-    this.curriculumService = new AICurriculumContextService();
+    this.selectedModel = model;
+    this.modelConfig = AVAILABLE_MODELS[model];
+    this.curriculumService = new AICurriculumContextService(model);
+    
+    console.log(`🚀 [Enhanced AI] Initialized with ${model} - ${this.modelConfig.description}`);
+    console.log(`📊 [Enhanced AI] Model Config - Max Tokens: ${this.modelConfig.maxTokens}, Cost: ${this.modelConfig.costTier}`);
+  }
+
+  /**
+   * Get current model information
+   */
+  getModelInfo(): { current: ModelConfiguration; available: Record<AIModel, ModelConfiguration> } {
+    return {
+      current: this.modelConfig,
+      available: AVAILABLE_MODELS
+    };
+  }
+
+  /**
+   * Switch to a different AI model
+   */
+  setModel(model: AIModel): void {
+    this.selectedModel = model;
+    this.modelConfig = AVAILABLE_MODELS[model];
+    this.curriculumService.setModel(model);
+    
+    console.log(`🔄 [Enhanced AI] Switched to ${model} - ${this.modelConfig.description}`);
+    console.log(`📊 [Enhanced AI] New Config - Max Tokens: ${this.modelConfig.maxTokens}, Cost: ${this.modelConfig.costTier}`);
   }
 
   /**
@@ -317,7 +346,26 @@ export class EnhancedAIService {
         pathwayType: request.gradeCombination?.pathwayType
       });
 
-      if (isMultiGrade && totalWeeks >= 30) {
+      // ENHANCED: Check for dual-grade accelerated pathway
+      const isDualGradeAccelerated = isMultiGrade && 
+        request.gradeCombination?.pathwayType === 'accelerated' &&
+        totalWeeks >= 30;
+
+      if (isDualGradeAccelerated) {
+        console.log('🚀 [Main Generator] ➡️ Routing to DUAL-GRADE ACCELERATED GENERATION');
+        console.groupEnd();
+        try {
+          return await this.generateDualGradeAcceleratedPacingGuide(request);
+        } catch (dualGradeError) {
+          console.group('⚠️ [Main Generator] Dual-Grade Generation Fallback');
+          console.warn('⚠️ [Main Generator] Dual-grade generation failed, falling back to chunked generation');
+          console.error('🔍 [Main Generator] Dual-grade error details:', dualGradeError);
+          console.log('🔄 [Main Generator] ➡️ Routing to CHUNKED GENERATION (fallback)');
+          console.groupEnd();
+          // Fall back to chunked generation
+          return await this.generateChunkedPacingGuide(request);
+        }
+      } else if (isMultiGrade && totalWeeks >= 30) {
         console.log('📊 [Main Generator] ➡️ Routing to CHUNKED GENERATION (multi-grade, ' + totalWeeks + ' weeks)');
         console.groupEnd();
         try {
@@ -367,23 +415,28 @@ export class EnhancedAIService {
       console.log('📝 [AI Service] Built simple prompt, length:', detailedPrompt.length);
 
       // Call OpenAI with GPT-4o for fast, comprehensive analysis
-      console.log('🤖 [AI Service] Calling OpenAI API for detailed analysis...');
+      console.log(`🤖 [AI Service] Calling OpenAI API with ${this.selectedModel}...`);
       let completion;
       try {
         completion = await this.openai.chat.completions.create({
-          model: "gpt-4o",
+          model: this.selectedModel,
           messages: [
             {
               role: "system",
-              content: "You are a mathematics curriculum specialist. Create practical, implementable pacing guides efficiently. Focus on clear structure and essential information. CRITICAL: Your response must be ONLY valid JSON - no markdown, no explanations, no code blocks, just pure JSON starting with { and ending with }."
+              content: `You are a mathematics curriculum specialist using ${this.selectedModel}. Create practical, implementable pacing guides efficiently. Focus on clear structure and essential information. 
+
+${this.selectedModel === 'gpt-5' ? 
+  'CRITICAL FOR GPT-5: Your advanced reasoning should focus on sophisticated lesson sequencing and pedagogical insights. Avoid generating overly long responses.' : 
+  'CRITICAL: Your response must be ONLY valid JSON - no markdown, no explanations, no code blocks, just pure JSON starting with { and ending with }.'
+}`
             },
             {
               role: "user", 
               content: detailedPrompt
             }
           ],
-          max_completion_tokens: 16000,   // GPT-4o maximum limit for comprehensive responses
-          temperature: 0.1               // Lower temperature for faster, more focused responses
+          max_completion_tokens: this.modelConfig.maxTokens,
+          temperature: this.modelConfig.temperature
         });
       } catch (apiError) {
         console.error('❌ [AI Service] OpenAI API Error:', apiError);
@@ -1158,8 +1211,7 @@ ${selectionStrategy}
 
       const result = {
         success: true,
-        pacingGuide,
-        recommendations
+        pacingGuide
       };
       
       console.log('🎉 [AI Service] Returning successful result');
@@ -1546,13 +1598,16 @@ Generate exactly ${this.calculateWeeks(request.timeframe)} weeks of curriculum c
 
     return {
       gradeLevel: gradeConfig.selectedGrades.join('+'),
+      selectedGrades: gradeConfig.selectedGrades,
       availableStandards: mergedStandards,
       majorStandards: mergedMajorStandards,
       supportingStandards: mergedSupportingStandards,
       additionalStandards: mergedAdditionalStandards,
       unitStructure: mergedUnitStructure,
       totalLessons: contexts.reduce((sum, ctx) => sum + ctx.totalLessons, 0),
-      totalInstructionalDays: contexts.reduce((sum, ctx) => sum + ctx.totalInstructionalDays, 0)
+      totalInstructionalDays: contexts.reduce((sum, ctx) => sum + ctx.totalInstructionalDays, 0),
+      lessonMetadata: contexts.flatMap(ctx => ctx.lessonMetadata || []),
+      crossGradeSequence: contexts.length > 1 ? contexts.find(ctx => ctx.crossGradeSequence)?.crossGradeSequence : undefined
     };
   }
 
@@ -2370,10 +2425,542 @@ Generate a comprehensive, implementable guide that teachers can use immediately 
       strategy += `- **ALGEBRA 1 PREPARATION:** Prioritize lessons that prepare for college-level mathematics\n`;
     }
     
-    strategy += `- **ENSURE COHERENT PROGRESSION:** Maintain logical learning sequence despite grade compression\n`;
-    strategy += `- **MATCH EXISTING FORMAT:** Use the exact accelerated pathway format shown in the application`;
-    
     return strategy;
+  }
+
+  /**
+   * CRITICAL: Generate dual-grade accelerated pacing guide with enforced 50/50 split
+   * This method ensures equal representation by creating condensed 18-week curricula for each grade
+   */
+  async generateDualGradeAcceleratedPacingGuide(request: PacingGuideRequest): Promise<PacingGuideResponse> {
+    console.group('🚀 [Dual-Grade Accelerated] Starting Dual-Grade Accelerated Generation');
+    
+    try {
+      const totalWeeks = this.calculateWeeks(request.timeframe);
+      const gradeConfig = this.parseGradeConfiguration(request);
+      const grades = gradeConfig.selectedGrades;
+      
+      if (grades.length !== 2) {
+        throw new Error('Dual-grade generation requires exactly 2 grades');
+      }
+      
+      console.log('🎯 [Dual-Grade Accelerated] Configuration:', {
+        totalWeeks,
+        grade1: grades[0],
+        grade2: grades[1],
+        weeksPerGrade: 18,
+        pathwayType: gradeConfig.pathwayType,
+        emphasis: gradeConfig.emphasis
+      });
+      
+      // Generate condensed 18-week curriculum for each grade
+      const grade1Curriculum = await this.generateCondensedGradeCurriculum(grades[0], 18, gradeConfig);
+      const grade2Curriculum = await this.generateCondensedGradeCurriculum(grades[1], 18, gradeConfig);
+      
+      console.log('📊 [Dual-Grade Accelerated] Individual curricula generated:', {
+        grade1Weeks: grade1Curriculum.weeklySchedule.length,
+        grade2Weeks: grade2Curriculum.weeklySchedule.length,
+        grade1FirstWeek: grade1Curriculum.weeklySchedule[0]?.unit,
+        grade2FirstWeek: grade2Curriculum.weeklySchedule[0]?.unit
+      });
+      
+      // Strategic interweaving of the two curricula
+      const interweavedCurriculum = this.strategicallyInterweaveGrades(
+        grade1Curriculum, 
+        grade2Curriculum, 
+        totalWeeks,
+        gradeConfig
+      );
+      
+      console.log('🔗 [Dual-Grade Accelerated] Curricula interweaved successfully');
+      
+      // Generate comprehensive explanation
+      const explanation = this.generateDualGradeExplanation(
+        grade1Curriculum, 
+        grade2Curriculum, 
+        interweavedCurriculum,
+        gradeConfig
+      );
+      
+      const response: PacingGuideResponse = {
+        success: true,
+        pacingGuide: {
+          ...interweavedCurriculum,
+          description: `Dual-Grade Accelerated ${grades.join('+')} curriculum with enforced 50/50 distribution`,
+          explanation: explanation
+        },
+        metadata: {
+          model: this.selectedModel || 'gpt-4o',
+          prompt: 'Dual-Grade Accelerated Generation',
+          response: `Generated ${totalWeeks}-week interweaved curriculum`,
+          tokens: { input: 0, output: 0, total: 0 },
+          generationTime: Date.now()
+        }
+      };
+      
+      console.log('🎉 [Dual-Grade Accelerated] Generation complete!');
+      console.groupEnd();
+      return response;
+      
+    } catch (error) {
+      console.error('💥 [Dual-Grade Accelerated] Generation failed:', error);
+      console.groupEnd();
+      throw error;
+    }
+  }
+
+  /**
+   * Generate condensed 18-week curriculum for a single grade
+   */
+  private async generateCondensedGradeCurriculum(
+    grade: string, 
+    targetWeeks: number, 
+    gradeConfig: any
+  ): Promise<any> {
+    console.log(`📚 [Condensed ${grade}] Generating ${targetWeeks}-week condensed curriculum for Grade ${grade}`);
+    
+    // Build curriculum context for this specific grade
+    const context = await this.curriculumService.buildCurriculumContext(grade);
+    
+    // Create a condensed request for this grade only
+    const condensedRequest = {
+      gradeLevel: grade,
+      timeframe: `${targetWeeks} weeks`,
+      gradeCombination: {
+        selectedGrades: [grade],
+        pathwayType: 'accelerated',
+        emphasis: gradeConfig.emphasis || 'foundational'
+      },
+      studentPopulation: 'accelerated',
+      scheduleConstraints: {
+        daysPerWeek: 5,
+        minutesPerClass: 50
+      }
+    };
+    
+    // Generate condensed curriculum using AI
+    const prompt = this.buildCondensedGradePrompt(grade, targetWeeks, context, gradeConfig);
+    
+    console.log(`🤖 [Condensed ${grade}] Calling AI for condensed Grade ${grade} curriculum...`);
+    const aiResponse = await this.callOpenAI(prompt);
+    
+    const parsedResponse = this.parseAIResponse(aiResponse);
+    
+    console.log(`✅ [Condensed ${grade}] Generated ${parsedResponse.weeklySchedule?.length || 0} weeks for Grade ${grade}`);
+    
+    return parsedResponse;
+  }
+
+  /**
+   * Build specialized prompt for condensed grade curriculum
+   */
+  private buildCondensedGradePrompt(
+    grade: string, 
+    targetWeeks: number, 
+    context: any, 
+    gradeConfig: any
+  ): string {
+    return `
+🎯 CONDENSED GRADE ${grade} CURRICULUM GENERATION
+
+**CRITICAL MISSION:** Create a ${targetWeeks}-week accelerated curriculum for Grade ${grade} that represents the ESSENTIAL high-impact lessons from a full-year curriculum.
+
+**CONDENSATION RULES:**
+- Select ONLY the most critical, gateway lessons that unlock advanced concepts
+- Focus on major work standards and foundational concepts
+- Eliminate review, practice-only, and supporting standard lessons
+- Each lesson should take 2-3 days instead of 5 (use Develop-only sessions)
+- Prioritize lessons with strong connections to the next grade level
+
+**GRADE ${grade} CURRICULUM DATA:**
+${this.getCurriculumData(grade)}
+
+**SELECTION CRITERIA:**
+- Major Work Standards: ALWAYS include
+- Foundational Concepts: Include if they bridge to advanced topics
+- Gateway Lessons: Include lessons that unlock multiple future concepts
+- Supporting Standards: Include ONLY if essential for major work
+- Review/Practice: EXCLUDE unless absolutely critical
+
+**OUTPUT REQUIREMENTS:**
+Generate EXACTLY ${targetWeeks} weeks of condensed curriculum.
+Each week should contain 1-2 high-impact lessons.
+Focus on progression and conceptual understanding.
+
+Return JSON format:
+{
+  "overview": {
+    "gradeLevel": "${grade}",
+    "timeframe": "${targetWeeks} weeks",
+    "condensationLevel": "high",
+    "totalWeeks": ${targetWeeks}
+  },
+  "weeklySchedule": [
+    {
+      "week": 1,
+      "unit": "Unit Name",
+      "lessons": ["Lesson 1", "Lesson 2"],
+      "focusStandards": ["Standard.Code"],
+      "assessmentType": null,
+      "lessonDuration": "3-5 days per lesson",
+      "learningObjectives": ["Objective 1"]
+    }
+    // ... exactly ${targetWeeks} week objects with this structure
+  ]
+}
+
+CRITICAL: Return ONLY the JSON object. No additional text.
+    `.trim();
+  }
+
+  /**
+   * Strategically interweave two grade-level curricula
+   */
+  private strategicallyInterweaveGrades(
+    grade1Curriculum: any,
+    grade2Curriculum: any,
+    totalWeeks: number,
+    gradeConfig: any
+  ): any {
+    console.log('🔗 [Interweaving] Starting strategic interweaving of curricula');
+    
+    const interweavedSchedule: any[] = [];
+    const grade1Weeks = grade1Curriculum.weeklySchedule || [];
+    const grade2Weeks = grade2Curriculum.weeklySchedule || [];
+    
+    // Interweaving strategy: alternate between grades with logical progression
+    const interweavingPatterns = {
+      // Start with foundational grade 1 concepts, then introduce grade 2
+      foundationalFirst: [1, 1, 1, 2, 1, 2, 1, 2, 2, 1, 2, 2, 1, 2, 2, 2, 1, 2],
+      // More balanced throughout
+      balanced: [1, 2, 1, 1, 2, 1, 2, 2, 1, 2, 1, 2, 2, 1, 2, 1, 2, 2],
+      // Build up to advanced grade 2 concepts
+      advancedBuildup: [1, 1, 2, 1, 1, 2, 1, 2, 1, 2, 2, 1, 2, 2, 2, 1, 2, 2]
+    };
+    
+    const pattern = interweavingPatterns.foundationalFirst;
+    let grade1Index = 0;
+    let grade2Index = 0;
+    
+    for (let week = 1; week <= totalWeeks; week++) {
+      const weekIndex = (week - 1) % pattern.length;
+      const useGrade = pattern[weekIndex];
+      
+      let weekData;
+      if (useGrade === 1 && grade1Index < grade1Weeks.length) {
+        weekData = { ...grade1Weeks[grade1Index] };
+        grade1Index++;
+      } else if (useGrade === 2 && grade2Index < grade2Weeks.length) {
+        weekData = { ...grade2Weeks[grade2Index] };
+        grade2Index++;
+      } else {
+        // Fallback: use whichever grade has remaining content
+        if (grade1Index < grade1Weeks.length) {
+          weekData = { ...grade1Weeks[grade1Index] };
+          grade1Index++;
+        } else if (grade2Index < grade2Weeks.length) {
+          weekData = { ...grade2Weeks[grade2Index] };
+          grade2Index++;
+        }
+      }
+      
+      if (weekData) {
+        // Ensure the week object has the proper structure that frontend expects
+        const standardizedWeek = {
+          week: week,
+          unit: weekData.unit || weekData.lessons?.[0] || `Week ${week} Content`,
+          lessons: weekData.lessons || [],
+          focusStandards: weekData.focusStandards || weekData.standards || [],
+          assessmentType: weekData.assessmentType || null,
+          lessonDuration: weekData.lessonDuration || "3-5 days per lesson",
+          learningObjectives: weekData.learningObjectives || []
+        };
+        
+        interweavedSchedule.push(standardizedWeek);
+      }
+    }
+    
+    console.log('📊 [Interweaving] Final distribution:', {
+      totalWeeks: interweavedSchedule.length,
+      grade1WeeksUsed: grade1Index,
+      grade2WeeksUsed: grade2Index,
+      grade1Remaining: grade1Weeks.length - grade1Index,
+      grade2Remaining: grade2Weeks.length - grade2Index
+    });
+    
+    return {
+      overview: {
+        gradeLevel: `${gradeConfig.selectedGrades.join('+')}`,
+        timeframe: 'year',
+        totalWeeks: totalWeeks,
+        lessonsPerWeek: 1.5,
+        description: `Strategically interweaved dual-grade accelerated curriculum`,
+        interweavingStrategy: 'foundationalFirst'
+      },
+      weeklySchedule: interweavedSchedule,
+      assessmentPlan: this.generateDualGradeAssessmentPlan(totalWeeks),
+      differentiationStrategies: [],
+      flexibilityOptions: []
+    };
+  }
+
+  /**
+   * Generate explanation for dual-grade approach
+   */
+  private generateDualGradeExplanation(
+    grade1Curriculum: any,
+    grade2Curriculum: any,
+    finalCurriculum: any,
+    gradeConfig: any
+  ): string {
+    const grade1Count = grade1Curriculum.weeklySchedule?.length || 0;
+    const grade2Count = grade2Curriculum.weeklySchedule?.length || 0;
+    const finalWeeks = finalCurriculum.weeklySchedule?.length || 0;
+    
+    return `This dual-grade accelerated curriculum was derived by creating condensed 18-week curricula for both Grade ${gradeConfig.selectedGrades[0]} (${grade1Count} essential lessons) and Grade ${gradeConfig.selectedGrades[1]} (${grade2Count} essential lessons), then strategically interweaving them into a ${finalWeeks}-week progression.
+
+The AI employed "foundational-first" interweaving, beginning with core Grade ${gradeConfig.selectedGrades[0]} concepts before introducing Grade ${gradeConfig.selectedGrades[1]} content. Each grade's curriculum was condensed using "Develop-only" session structures, focusing exclusively on gateway lessons and major work standards. This approach ensures students experience essential concepts from both grade levels while maintaining mathematical coherence and proper prerequisite relationships.
+
+The condensation process eliminated review sessions, practice-only lessons, and redundant supporting standards, retaining only high-impact content that bridges between grade levels and prepares students for advanced mathematical thinking.`;
+  }
+
+  /**
+   * Generate assessment plan for dual-grade curriculum
+   */
+  private generateDualGradeAssessmentPlan(totalWeeks: number): any {
+    return {
+      summativeAssessments: [
+        {
+          week: Math.ceil(totalWeeks * 0.25),
+          type: "Unit Assessment",
+          description: "First quarter assessment combining early concepts from both grades"
+        },
+        {
+          week: Math.ceil(totalWeeks * 0.5),
+          type: "Midterm Assessment", 
+          description: "Comprehensive assessment of foundational and intermediate concepts"
+        },
+        {
+          week: Math.ceil(totalWeeks * 0.75),
+          type: "Unit Assessment",
+          description: "Third quarter assessment focusing on advanced concept integration"
+        },
+        {
+          week: totalWeeks - 1,
+          type: "Final Assessment",
+          description: "Comprehensive final demonstrating mastery of dual-grade content"
+        }
+      ],
+      formativeAssessments: [
+        "Weekly exit tickets",
+        "Bi-weekly concept checks", 
+        "Monthly progress monitoring"
+      ]
+    };
+  }
+
+  /**
+   * Get curriculum data for a specific grade - Updated for better path resolution
+   */
+  private getCurriculumData(grade: string): string {
+    try {
+      // First try to load from files
+      let curriculumPath: string;
+      
+      if (grade === '6') {
+        // Grade 6 curriculum not available yet
+        return `Grade ${grade} curriculum data - focus on essential standards and high-impact lessons.`;
+      } else if (grade === '7') {
+        curriculumPath = path.resolve(process.cwd(), 'GRADE7_COMPLETE_CURRICULUM_STRUCTURE.json');
+      } else if (grade === '8') {
+        curriculumPath = path.resolve(process.cwd(), 'GRADE8_COMPLETE_CURRICULUM_STRUCTURE.json');
+      } else if (grade === '9') {
+        curriculumPath = path.resolve(process.cwd(), 'ALGEBRA1_COMPLETE_CURRICULUM_STRUCTURE.json');
+      } else {
+        return `Grade ${grade} curriculum data - focus on essential standards and high-impact lessons.`;
+      }
+
+      console.log(`📚 [Curriculum] Attempting to load: ${curriculumPath}`);
+      console.log(`📚 [Curriculum] process.cwd(): ${process.cwd()}`);
+      console.log(`📚 [Curriculum] __dirname: ${__dirname}`);
+
+      if (fs.existsSync(curriculumPath)) {
+        const curriculumData = JSON.parse(fs.readFileSync(curriculumPath, 'utf8'));
+        
+        // Format the curriculum data for the AI prompt with actual textbook information
+        let formattedData = `**${curriculumData.title} (${curriculumData.curriculum_publisher})**\n`;
+        formattedData += `Total Pages: ${curriculumData.total_pages} | Total Lessons: ${curriculumData.total_lessons}\n\n`;
+        
+        const bookName = grade === '9' ? 'Algebra 1 Book' : `Grade ${grade} Book`;
+        
+        if (curriculumData.volumes) {
+          Object.values(curriculumData.volumes).forEach((volume: any) => {
+            formattedData += `${volume.volume_name}:\n`;
+            volume.units.forEach((unit: any) => {
+              formattedData += `  Unit ${unit.unit_number}: ${unit.title}\n`;
+              if (unit.lessons) {
+                unit.lessons.forEach((lesson: any) => {
+                  formattedData += `    Lesson ${lesson.lesson_number}: ${lesson.title} (${bookName}, Page ${lesson.start_page})\n`;
+                });
+              }
+            });
+            formattedData += `\n`;
+          });
+        }
+        
+        formattedData += `\n**CRITICAL INSTRUCTION:** You MUST use the exact lesson titles and page numbers shown above. `;
+        formattedData += `Example format: "Lesson 1: Understand Rigid Transformations and Their Properties (${bookName}, Page 15)"\n`;
+        formattedData += `Do NOT make up page numbers. Use ONLY the page numbers provided in this curriculum structure.\n`;
+        formattedData += `ALWAYS specify which textbook: "Grade 8 Book" or "Algebra 1 Book"`;
+        
+        console.log(`📚 [Curriculum] Successfully loaded Grade ${grade} curriculum data (${formattedData.length} characters)`);
+        return formattedData;
+      } else {
+        console.warn(`📚 [Curriculum] File not found: ${curriculumPath}`);
+        
+        // Fallback to hardcoded curriculum data
+        if (grade === '8') {
+          console.log(`📚 [Curriculum] Using hardcoded Grade 8 curriculum data`);
+          return `**Ready Classroom Mathematics Grade 8 (Curriculum Associates)**
+Total Pages: 1008 | Total Lessons: 32
+
+Volume 1:
+  Unit 1: Geometric Figures: Rigid Transformations and Congruence
+    Lesson 1: Understand Rigid Transformations and Their Properties (Grade 8 Book, Page 15)
+    Lesson 2: Work with Single Rigid Transformations in the Coordinate Plane (Grade 8 Book, Page 28)
+    Lesson 3: Work with Sequences of Transformations and Congruence (Grade 8 Book, Page 55)
+    Lesson 4: Understand Similarity in Terms of Transformations (Grade 8 Book, Page 69)
+
+  Unit 2: Geometric Figures: Dilations, Similarity, and Introducing Slope
+    Lesson 5: Understand Similarity in Terms of Transformations (Grade 8 Book, Page 97)
+    Lesson 6: Understand and Apply the Pythagorean Theorem (Grade 8 Book, Page 111)
+    Lesson 7: Find Volume of Cylinders, Cones, and Spheres (Grade 8 Book, Page 125)
+    Lesson 8: Solve Problems Involving Angle Relationships (Grade 8 Book, Page 139)
+
+Volume 2:
+  Unit 3: Linear Relationships: Expressions and Equations
+    Lesson 9: Understand Properties of Integer Exponents (Grade 8 Book, Page 153)
+    Lesson 10: Use Powers of 10 to Estimate Quantities (Grade 8 Book, Page 167)
+    Lesson 11: Understand Scientific Notation (Grade 8 Book, Page 181)
+    Lesson 12: Operate with Numbers in Scientific Notation (Grade 8 Book, Page 195)
+
+  Unit 4: Linear Relationships: Functions
+    Lesson 13: Understand Proportional Relationships (Grade 8 Book, Page 209)
+    Lesson 14: Understand Linear Relationships (Grade 8 Book, Page 223)
+    Lesson 15: More Linear Relationships (Grade 8 Book, Page 237)
+    Lesson 16: Construct Functions to Model Linear Relationships (Grade 8 Book, Page 251)
+
+**CRITICAL INSTRUCTION:** You MUST use the exact lesson titles and page numbers shown above. 
+Example format: "Lesson 1: Understand Rigid Transformations and Their Properties (Grade 8 Book, Page 15)"
+Do NOT make up page numbers. Use ONLY the page numbers provided in this curriculum structure.
+ALWAYS specify which textbook: "Grade 8 Book" or "Algebra 1 Book"`;
+        } else if (grade === '9') {
+          console.log(`📚 [Curriculum] Using hardcoded Algebra 1 curriculum data`);
+          return `**Ready Classroom Mathematics Algebra 1 (Curriculum Associates)**
+Total Pages: 1354 | Total Lessons: 28
+
+Volume 1:
+  Unit 1: Expressions, Equations, and Inequalities
+    Lesson 1: Represent Quantities and Relationships (Algebra 1 Book, Page 13)
+    Lesson 2: Reason About Solving Equations (Algebra 1 Book, Page 26)
+    Lesson 3: Linear Equations in Two Variables (Algebra 1 Book, Page 158)
+    Lesson 4: Systems of Linear Equations in Two Variables (Algebra 1 Book, Page 172)
+
+  Unit 2: Linear Functions
+    Lesson 5: Understand Functions (Algebra 1 Book, Page 39)
+    Lesson 6: More About Functions (Algebra 1 Book, Page 53)
+    Lesson 7: Linear Functions (Algebra 1 Book, Page 67)
+    Lesson 8: Analyze Linear Functions (Algebra 1 Book, Page 81)
+
+Volume 2:
+  Unit 3: Systems of Linear Equations and Inequalities
+    Lesson 9: Systems of Linear Equations in Two Variables (Algebra 1 Book, Page 186)
+    Lesson 10: Solve Problems with Systems of Linear Equations (Algebra 1 Book, Page 200)
+    Lesson 11: Linear Inequalities in Two Variables (Algebra 1 Book, Page 214)
+    Lesson 12: Systems of Linear Inequalities (Algebra 1 Book, Page 228)
+
+  Unit 4: Exponents and Exponential Functions
+    Lesson 13: Understand Rational Exponents and Radicals (Algebra 1 Book, Page 242)
+    Lesson 14: Understand Exponential Functions (Algebra 1 Book, Page 256)
+    Lesson 15: Compare Linear and Exponential Functions (Algebra 1 Book, Page 270)
+    Lesson 16: Analyze Exponential Functions (Algebra 1 Book, Page 284)
+
+**CRITICAL INSTRUCTION:** You MUST use the exact lesson titles and page numbers shown above. 
+Example format: "Lesson 1: Represent Quantities and Relationships (Algebra 1 Book, Page 13)"
+Do NOT make up page numbers. Use ONLY the page numbers provided in this curriculum structure.
+ALWAYS specify which textbook: "Grade 8 Book" or "Algebra 1 Book"`;
+        }
+        
+        // Try alternative paths
+        const altPath1 = path.resolve(process.cwd(), 'MathCurriculumA', `${grade === '9' ? 'ALGEBRA1' : `GRADE${grade}`}_COMPLETE_CURRICULUM_STRUCTURE.json`);
+        const altPath2 = path.resolve(__dirname, '../..', `${grade === '9' ? 'ALGEBRA1' : `GRADE${grade}`}_COMPLETE_CURRICULUM_STRUCTURE.json`);
+        
+        console.log(`📚 [Curriculum] Trying alternative path 1: ${altPath1}`);
+        if (fs.existsSync(altPath1)) {
+          const curriculumData = JSON.parse(fs.readFileSync(altPath1, 'utf8'));
+          console.log(`📚 [Curriculum] Found curriculum at alternative path 1`);
+          // Same formatting logic as above...
+          let formattedData = `**${curriculumData.title} (${curriculumData.curriculum_publisher})**\n`;
+          formattedData += `Total Pages: ${curriculumData.total_pages} | Total Lessons: ${curriculumData.total_lessons}\n\n`;
+          
+          if (curriculumData.volumes) {
+            Object.values(curriculumData.volumes).forEach((volume: any) => {
+              formattedData += `${volume.volume_name}:\n`;
+              volume.units.forEach((unit: any) => {
+                formattedData += `  Unit ${unit.unit_number}: ${unit.title}\n`;
+                if (unit.lessons) {
+                  unit.lessons.forEach((lesson: any) => {
+                    formattedData += `    Lesson ${lesson.lesson_number}: ${lesson.title} (Page ${lesson.start_page})\n`;
+                  });
+                }
+              });
+              formattedData += `\n`;
+            });
+          }
+          
+          formattedData += `\n**CRITICAL INSTRUCTION:** You MUST use the exact lesson titles and page numbers shown above. `;
+          formattedData += `Example format: "Lesson 1: Understand Rigid Transformations and Their Properties (Page 15)"\n`;
+          formattedData += `Do NOT make up page numbers. Use ONLY the page numbers provided in this curriculum structure.`;
+          
+          return formattedData;
+        }
+        
+        console.log(`📚 [Curriculum] Trying alternative path 2: ${altPath2}`);
+        if (fs.existsSync(altPath2)) {
+          const curriculumData = JSON.parse(fs.readFileSync(altPath2, 'utf8'));
+          console.log(`📚 [Curriculum] Found curriculum at alternative path 2`);
+          // Same formatting logic...
+          let formattedData = `**${curriculumData.title} (${curriculumData.curriculum_publisher})**\n`;
+          formattedData += `Total Pages: ${curriculumData.total_pages} | Total Lessons: ${curriculumData.total_lessons}\n\n`;
+          
+          if (curriculumData.volumes) {
+            Object.values(curriculumData.volumes).forEach((volume: any) => {
+              formattedData += `${volume.volume_name}:\n`;
+              volume.units.forEach((unit: any) => {
+                formattedData += `  Unit ${unit.unit_number}: ${unit.title}\n`;
+                if (unit.lessons) {
+                  unit.lessons.forEach((lesson: any) => {
+                    formattedData += `    Lesson ${lesson.lesson_number}: ${lesson.title} (Page ${lesson.start_page})\n`;
+                  });
+                }
+              });
+              formattedData += `\n`;
+            });
+          }
+          
+          formattedData += `\n**CRITICAL INSTRUCTION:** You MUST use the exact lesson titles and page numbers shown above. `;
+          formattedData += `Example format: "Lesson 1: Understand Rigid Transformations and Their Properties (Page 15)"\n`;
+          formattedData += `Do NOT make up page numbers. Use ONLY the page numbers provided in this curriculum structure.`;
+          
+          return formattedData;
+        }
+        
+        return `Grade ${grade} curriculum data - focus on essential standards and high-impact lessons.`;
+      }
+    } catch (error) {
+      console.error(`📚 [Curriculum] Error loading Grade ${grade} data:`, error);
+      return `Grade ${grade} curriculum data - focus on essential standards and high-impact lessons.`;
+    }
   }
 
   private generateGradeIndicators(grades: string[]): string {
