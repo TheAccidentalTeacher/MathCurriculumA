@@ -1,15 +1,20 @@
-# 📚 Mat## 🧠 Important Documentation
+# 📚 Math Curriculum Platform
+
+> **A revolutionary EdTech platform for extracting, managing, and searching mathematics curriculum content with enterprise-level precision and scalability.**
+
+## 🧠 Important Documentation
 
 > **⚠️ BEFORE PROCEEDING**: Read these essential documents for complete context:
 
 - **[AI_PROCESS_EXPLAINED.md](./AI_PROCESS_EXPLAINED.md)** - **🆕 NEW**: Complete guide to how GPT-5 AI generates comprehensive pacing guides
 - **[PROMPT_SIMPLIFICATION_GUIDE.md](./PROMPT_SIMPLIFICATION_GUIDE.md)** - **🔧 TECHNICAL**: Detailed documentation of AI prompt engineering changes for simplified curriculum generation
+- **[SESSION_EXTRACTION_ENHANCEMENT_PLAN.md](./SESSION_EXTRACTION_ENHANCEMENT_PLAN.md)** - **📋 ROADMAP**: 4-phase plan to extract session-level curriculum detail for enhanced pathway generation
 - **[SESSION_RECAP.md](./SESSION_RECAP.md)** - Latest development updates, bug fixes, and current platform status
 - **[virtualtutor/README.md](./virtualtutor/README.md)** - Virtual tutor system implementation guide and roadmap
 - **[docs/GRADE6_CURRICULUM_ANALYSIS.md](./docs/GRADE6_CURRICULUM_ANALYSIS.md)** - Complete Grade 6 curriculum scope & sequence with dynamic pacing guides
-- **Git commit history** - Recent changes and deployment noteslum Platform
+- **Git commit history** - Recent changes and deployment notes
 
-> **A revolutionary EdTech platform for extracting, managing, and searching mathematics curriculum content with enterprise-level precision and scalability.**
+**💡 Pro Tip**: Always check `SESSION_RECAP.md` first for the most recent updates and any critical changes that may affect your work.
 
 ## 🌟 Overview
 
