@@ -122,12 +122,14 @@ export class IntelligentTutorEngine {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           prompt, 
-          model: 'gpt-5' // Use GPT-5 for analysis
+          model: 'gpt-4o-mini' // Use GPT-4o-mini for analysis (gpt-5 doesn't exist)
         })
       });
 
       if (!response.ok) {
-        throw new Error('Failed to analyze lesson content');
+        const errorText = await response.text();
+        console.error('API response error:', response.status, errorText);
+        throw new Error(`Failed to analyze lesson content: ${response.status} - ${errorText}`);
       }
 
       const analysis = await response.json();
@@ -283,7 +285,7 @@ export class IntelligentTutorEngine {
         body: JSON.stringify({
           message: prompt,
           character,
-          model: 'gpt-5', // Use GPT-5 for response generation
+          model: 'gpt-4o', // Use GPT-4o for response generation (gpt-5 doesn't exist)
           lessonContext: {
             lessonTitle: lessonContext?.objectives?.[0] || 'Math Lesson',
             topics: lessonContext?.topics || [],

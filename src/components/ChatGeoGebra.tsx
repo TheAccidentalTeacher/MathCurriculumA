@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import GeoGebraWidget from './GeoGebraWidget';
+// DISABLED: GeoGebra integration removed by user request  
+// import GeoGebraWidget from './GeoGebraWidget';
 
 // Generate unique ID for each ChatGeoGebra instance (based on research)
 const generateChatGeoGebraId = () => `chat-ggb-${Math.random().toString(36).substr(2, 9)}-${Date.now()}`;
@@ -115,22 +116,14 @@ export default function ChatGeoGebra({
             style={{ minHeight: dimensions.height }}
           >
             <div style={{ width: dimensions.width, height: dimensions.height }}>
-              <GeoGebraWidget
-                id={widgetId}
-                appName={appName}
-                commands={commands}
-                width={dimensions.width}
-                height={dimensions.height}
-                showAlgebraInput={isExpanded}
-                showToolBar={isExpanded}
-                showMenuBar={false}
-                showResetIcon={true}
-                enableRightClick={isExpanded}
-                enableLabelDrags={true}
-                enableShiftDragZoom={isExpanded}
-                onReady={handleReady}
-                className="border-none"
-              />
+              {/* DISABLED: GeoGebra widget removed by user request */}
+              <div className="w-full h-full bg-gray-100 border rounded flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-3xl mb-2">🚫</div>
+                  <p className="text-gray-600 font-medium">GeoGebra Disabled</p>
+                  <p className="text-sm text-gray-500">{title}</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

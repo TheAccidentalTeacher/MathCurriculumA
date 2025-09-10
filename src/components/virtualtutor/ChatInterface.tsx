@@ -6,11 +6,11 @@ import MathGrapher, { createLinearGraph, createPointGraph } from '../MathGrapher
 import PlaceValueChart, { createPowersOf10Chart } from '../PlaceValueChart';
 import ScientificNotationBuilder, { createScientificNotationExample } from '../ScientificNotationBuilder';
 import PowersOf10NumberLine, { createPowersOf10NumberLine } from '../PowersOf10NumberLine';
-import GeoGebraWidget, { PowersOf10GeoGebra, GeometryExplorer, FunctionGrapher } from '../GeoGebraWidget';
-import PowersOf10Activity from '../PowersOf10GeoGebra';
-import GeometryVisualizer, { TriangleExplorer, CircleExplorer, CubeExplorer, SphereExplorer, CylinderExplorer } from '../GeometryVisualizer';
-import Cube3DVisualizer from '../Cube3DVisualizer';
-import SmartGeoGebraFrame from '../SmartGeoGebraFrame';
+// DISABLED: GeoGebra integration removed by user request
+// import GeoGebraWidget, { GeometryExplorer } from '../GeoGebraWidget';
+// import PowersOf10Activity from '../PowersOf10GeoGebra';
+// import GeometryVisualizer, { TriangleExplorer, CircleExplorer, CubeExplorer, SphereExplorer, CylinderExplorer } from '../GeometryVisualizer';
+// import SmartGeoGebraFrame from '../SmartGeoGebraFrame';
 import { intelligentTutor, type LessonAnalysis } from '@/lib/intelligent-tutor-engine';
 
 interface ChatMessage {
@@ -156,9 +156,9 @@ export default function ChatInterface({
     scrollToBottom();
   }, [messages]);
 
-  // Function to detect and render mathematical graphs in messages
+  // Function to detect and render mathematical content in messages
   const renderMessageWithGraphs = (content: string) => {
-    // Split content by graph markers including GeoGebra activities and 3D visualizers
+    // Split content by markers - GeoGebra features are disabled but patterns preserved for user feedback
     const parts = content.split(/(\[GRAPH:[^\]]+\]|\[PLACEVALUE:[^\]]+\]|\[SCIENTIFIC:[^\]]+\]|\[POWERLINE:[^\]]+\]|\[GEOGEBRA:[^\]]+\]|\[GEOMETRY:[^\]]+\]|\[SHAPE:[^\]]+\]|\[POWERS10:[^\]]+\]|\[CUBE:[^\]]+\]|\[3D:[^\]]+\])/g);
     
     return parts.map((part, index) => {
@@ -276,207 +276,94 @@ export default function ChatInterface({
         return <div key={index} className="text-gray-600 italic">{graphInstruction}</div>;
       }
 
-      // Check for GeoGebra activities
+      // DISABLED: GeoGebra activities removed by user request
+      // const geogebraMatch = part.match(/\[GEOGEBRA:([^\]]+)\]/);
+      // if (geogebraMatch) {
+      //   const activity = geogebraMatch[1];
+      //   const commands = activity.split(';').map(cmd => cmd.trim());
+      //   
+      //   return (
+      //     <div key={index} className="my-4">
+      //       <GeoGebraWidget 
+      //         appName="graphing"
+      //         commands={commands}
+      //         width={600}
+      //         height={400}
+      //         showAlgebraInput={true}
+      //         showToolBar={false}
+      //       />
+      //     </div>
+      //   );
+      // }
+
+      // GeoGebra features have been disabled
       const geogebraMatch = part.match(/\[GEOGEBRA:([^\]]+)\]/);
       if (geogebraMatch) {
-        const activity = geogebraMatch[1];
-        const commands = activity.split(';').map(cmd => cmd.trim());
-        
         return (
-          <div key={index} className="my-4">
-            <GeoGebraWidget 
-              appName="graphing"
-              commands={commands}
-              width={600}
-              height={400}
-              showAlgebraInput={true}
-              showToolBar={false}
-            />
+          <div key={index} className="my-4 p-4 bg-gray-100 border rounded">
+            <p className="text-gray-600">GeoGebra visualization disabled</p>
           </div>
         );
       }
 
-      // Check for Powers of 10 GeoGebra activity
+      // DISABLED: Powers of 10 GeoGebra activity removed by user request
       const powers10Match = part.match(/\[POWERS10:([^\]]+)\]/);
       if (powers10Match) {
-        const params = powers10Match[1].split(',');
-        const activityType = (params[0] || 'place-value') as 'place-value' | 'number-line' | 'scientific-notation' | 'decomposition';
-        const number = parseFloat(params[1]) || 3500;
-        
         return (
-          <div key={index} className="my-4">
-            <PowersOf10Activity 
-              activityType={activityType}
-              number={number}
-            />
+          <div key={index} className="my-4 p-4 bg-gray-100 border rounded">
+            <p className="text-gray-600">Powers of 10 GeoGebra visualization disabled</p>
           </div>
         );
       }
 
-      // Check for smart 3D visualizations
+      // DISABLED: Smart 3D GeoGebra visualization removed by user request
       const smart3DMatch = part.match(/\[SMART_3D:([^,]+),([^\]]+)\]/);
       if (smart3DMatch) {
-        const shape = smart3DMatch[1].toLowerCase().trim();
-        const concept = smart3DMatch[2].toLowerCase().trim();
-        
         return (
-          <div key={index} className="my-4">
-            <SmartGeoGebraFrame 
-              shape={shape}
-              lesson={lessonContext?.lessonTitle || ''}
-              concept={concept}
-            />
+          <div key={index} className="my-4 p-4 bg-gray-100 border rounded">
+            <p className="text-gray-600">Smart 3D GeoGebra visualization disabled</p>
           </div>
         );
       }
 
-      // Check for geometry activities
+      // DISABLED: Geometry GeoGebra activities removed by user request
       const geometryMatch = part.match(/\[GEOMETRY:([^\]]+)\]/);
       if (geometryMatch) {
-        const geometryType = geometryMatch[1];
-        
         return (
-          <div key={index} className="my-4">
-            <GeometryExplorer />
+          <div key={index} className="my-4 p-4 bg-gray-100 border rounded">
+            <p className="text-gray-600">Geometry GeoGebra visualization disabled</p>
           </div>
         );
       }
 
-      // Check for comprehensive shape visualizations
+      // DISABLED: Shape visualizations removed by user request (all were GeoGebra-based)
       const shapeMatch = part.match(/\[SHAPE:([^,\]]+),?([^\]]*)\]/);
       if (shapeMatch) {
         const shapeName = shapeMatch[1].toLowerCase().trim();
-        const dimensionsStr = shapeMatch[2];
-        const dimensions = dimensionsStr ? dimensionsStr.split(',').map(d => parseFloat(d.trim())).filter(d => !isNaN(d)) : [];
-        
-        // 2D Shapes
-        if (shapeName === 'triangle') {
-          return (
-            <div key={index} className="my-4">
-              <TriangleExplorer sides={dimensions.length >= 3 ? dimensions : undefined} />
-            </div>
-          );
-        }
-        
-        if (shapeName === 'circle') {
-          return (
-            <div key={index} className="my-4">
-              <CircleExplorer radius={dimensions[0]} />
-            </div>
-          );
-        }
-        
-        if (shapeName === 'square') {
-          return (
-            <div key={index} className="my-4">
-              <GeometryVisualizer shape="square" dimensions={dimensions} />
-            </div>
-          );
-        }
-        
-        if (shapeName === 'rectangle') {
-          return (
-            <div key={index} className="my-4">
-              <GeometryVisualizer shape="rectangle" dimensions={dimensions} />
-            </div>
-          );
-        }
-        
-        if (['pentagon', 'hexagon', 'octagon', 'parallelogram', 'trapezoid', 'rhombus'].includes(shapeName)) {
-          return (
-            <div key={index} className="my-4">
-              <GeometryVisualizer shape={shapeName} dimensions={dimensions} />
-            </div>
-          );
-        }
-        
-        // 3D Shapes
-        if (shapeName === 'cube') {
-          return (
-            <div key={index} className="my-4">
-              <CubeExplorer side={dimensions[0]} />
-            </div>
-          );
-        }
-        
-        if (shapeName === 'sphere') {
-          return (
-            <div key={index} className="my-4">
-              <SphereExplorer radius={dimensions[0]} />
-            </div>
-          );
-        }
-        
-        if (shapeName === 'cylinder') {
-          return (
-            <div key={index} className="my-4">
-              <CylinderExplorer radius={dimensions[0]} height={dimensions[1]} />
-            </div>
-          );
-        }
-        
-        if (['rectangular_prism', 'box', 'cone', 'pyramid', 'triangular_prism'].includes(shapeName)) {
-          return (
-            <div key={index} className="my-4">
-              <GeometryVisualizer shape={shapeName} dimensions={dimensions} />
-            </div>
-          );
-        }
-        
-        // Fallback for any unrecognized shape
         return (
-          <div key={index} className="my-4">
-            <GeometryVisualizer shape={shapeName} dimensions={dimensions} />
+          <div key={index} className="my-4 p-4 bg-gray-100 border rounded">
+            <p className="text-gray-600">Shape visualization disabled: {shapeName}</p>
           </div>
         );
       }
 
-      // Check for 3D cube visualizations
+      // DISABLED: 3D cube visualizations removed by user request (was GeoGebra-based)
       const cubeMatch = part.match(/\[CUBE:([^\]]+)\]/);
       if (cubeMatch) {
-        const sideLength = parseFloat(cubeMatch[1]) || 4;
-        
         return (
-          <div key={index} className="my-4">
-            <Cube3DVisualizer 
-              sideLength={sideLength}
-              showVolume={true}
-              showFormula={true}
-              interactive={true}
-            />
+          <div key={index} className="my-4 p-4 bg-gray-100 border rounded">
+            <p className="text-gray-600">Cube visualization disabled</p>
           </div>
         );
       }
 
-      // Check for general 3D visualizations
+      // DISABLED: General 3D visualizations removed by user request (was GeoGebra-based)
       const threeDMatch = part.match(/\[3D:([^\]]+)\]/);
       if (threeDMatch) {
         const shape = threeDMatch[1].toLowerCase();
-        
-        if (shape.includes('cube')) {
-          return (
-            <div key={index} className="my-4">
-              <Cube3DVisualizer 
-                sideLength={4}
-                showVolume={true}
-                showFormula={true}
-                interactive={true}
-              />
-            </div>
-          );
-        }
-        
-        // For other 3D shapes, use GeoGebra 3D
         return (
-          <div key={index} className="my-4">
-            <GeoGebraWidget 
-              appName="3d"
-              commands={[`${shape.charAt(0).toUpperCase() + shape.slice(1)}((0,0,0), 3)`]}
-              width={600}
-              height={500}
-              showToolBar={true}
-              showAlgebraInput={true}
-            />
+          <div key={index} className="my-4 p-4 bg-gray-100 border rounded">
+            <p className="text-gray-600">3D visualization disabled: {shape}</p>
           </div>
         );
       }

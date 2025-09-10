@@ -71,8 +71,12 @@ interface GeoGebraWidgetProps {
   id?: string;
 }
 
-// Generate unique ID for each widget instance
-const generateUniqueId = () => `ggb-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+// Generate unique ID for each widget instance with compatibility fix
+const generateUniqueId = () => {
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substr(2, 9);
+  return `ggbApplet-${timestamp}-${random}`;
+};
 
 // Global GeoGebra API interface
 declare global {
@@ -181,6 +185,14 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
         useBrowserForJS: true,
         showLogging: process.env.NODE_ENV === 'development',
         
+        // Special handling for 3D apps
+        ...(appName === '3d' && {
+          enable3d: true,
+          enableCAS: false,
+          algebraInputPosition: 'bottom',
+          capturingThreshold: 3
+        }),
+        
         // Content loading
         ...(ggbBase64 && { ggbBase64 }),
         ...(material_id && { material_id }),
@@ -285,11 +297,33 @@ const GeoGebraWidget = forwardRef<GeoGebraAPI, GeoGebraWidgetProps>(({
       // Create and inject applet
       const applet = new window.GGBApplet(parameters, true);
       
-      // Clear container and inject
+      // Clear container and ensure it's ready
       if (containerRef.current) {
+        // Clear any existing content
         containerRef.current.innerHTML = '';
-        applet.inject(widgetId);
-        addDebug('Applet injection initiated');
+        
+        // For 3D apps, add specific compatibility attributes
+        if (appName === '3d') {
+          containerRef.current.setAttribute('data-geogebra-3d', 'true');
+        }
+        
+        // Ensure the container has the correct ID attribute
+        containerRef.current.id = widgetId;
+        
+        // Inject with error handling
+        try {
+          applet.inject(widgetId);
+          addDebug('Applet injection initiated');
+        } catch (injectionError) {
+          addDebug(`Injection error: ${injectionError}`);
+          setError(`Injection failed: ${injectionError}`);
+          setIsLoading(false);
+          return;
+        }
+      } else {
+        setError('Container element not found');
+        setIsLoading(false);
+        return;
       }
 
       // Set timeout for initialization failure

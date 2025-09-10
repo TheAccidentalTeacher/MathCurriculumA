@@ -257,7 +257,7 @@ export class EnhancedAIService {
   private selectedModel: AIModel;
   private modelConfig: ModelConfiguration;
 
-  constructor(model: AIModel = 'gpt-4o') {
+  constructor(model: AIModel = 'gpt-5') {
     this.openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY
     });
@@ -426,15 +426,16 @@ export class EnhancedAIService {
       console.log(`🤖 [AI Service] Calling OpenAI API with ${this.selectedModel}...`);
       let completion;
       try {
-        completion = await this.openai.chat.completions.create({
+        // Create completion parameters, conditionally including temperature
+        const completionParams: any = {
           model: this.selectedModel,
           messages: [
             {
               role: "system",
               content: `You are a mathematics curriculum specialist using ${this.selectedModel}. Create practical, implementable pacing guides efficiently. Focus on clear structure and essential information. 
 
-${this.selectedModel === 'gpt-5' ? 
-  'CRITICAL FOR GPT-5: Your advanced reasoning should focus on sophisticated lesson sequencing and pedagogical insights. Avoid generating overly long responses.' : 
+${this.selectedModel === 'gpt-4o' ? 
+  'CRITICAL FOR GPT-4o: Your advanced reasoning should focus on sophisticated lesson sequencing and pedagogical insights. Avoid generating overly long responses.' : 
   'CRITICAL: Your response must be ONLY valid JSON - no markdown, no explanations, no code blocks, just pure JSON starting with { and ending with }.'
 }`
             },
@@ -443,9 +444,15 @@ ${this.selectedModel === 'gpt-5' ?
               content: detailedPrompt
             }
           ],
-          max_completion_tokens: this.modelConfig.maxTokens,
-          temperature: this.modelConfig.temperature
-        });
+          max_completion_tokens: this.modelConfig.maxTokens
+        };
+        
+        // Only add temperature for models that support it (GPT-5 doesn't support custom temperature)
+        if (this.modelConfig.temperature !== undefined) {
+          completionParams.temperature = this.modelConfig.temperature;
+        }
+        
+        completion = await this.openai.chat.completions.create(completionParams);
       } catch (apiError) {
         console.error('❌ [AI Service] OpenAI API Error:', apiError);
         throw new Error(`OpenAI API Error: ${apiError instanceof Error ? apiError.message : 'Unknown error'}`);
@@ -568,8 +575,9 @@ ${this.selectedModel === 'gpt-5' ?
       const startTime = Date.now();
       console.log('⏰ [AI Service] OpenAI API call started at:', new Date().toISOString());
       
-      const completion = await this.openai.chat.completions.create({
-        model: "gpt-4o",
+      // Create completion parameters, conditionally including temperature for models that support it
+      const completionParams: any = {
+        model: this.selectedModel,
         messages: [
           {
             role: "system",
@@ -580,9 +588,15 @@ ${this.selectedModel === 'gpt-5' ?
             content: prompt
           }
         ],
-        max_completion_tokens: 16000,   // Increased for 30-36 concise lessons
-        temperature: 0.1               // Lower temperature for faster, more focused responses
-      });
+        max_completion_tokens: 16000   // Increased for 30-36 concise lessons
+      };
+      
+      // Only add temperature for models that support it (GPT-5 doesn't support custom temperature)
+      if (this.selectedModel !== 'gpt-5') {
+        completionParams.temperature = 0.1; // Lower temperature for faster, more focused responses
+      }
+      
+      const completion = await this.openai.chat.completions.create(completionParams);
       
       const endTime = Date.now();
       const duration = endTime - startTime;
@@ -1154,7 +1168,7 @@ ${selectionStrategy}
       let completion;
       try {
         completion = await this.openai.chat.completions.create({
-          model: "gpt-4o",
+          model: this.selectedModel,
           messages: [
             {
               role: "system",

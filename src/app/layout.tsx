@@ -16,10 +16,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body className="min-h-dvh bg-slate-900 text-slate-100">
         {children}
+        {/* DISABLED: GeoGebra integration removed by user request
         <Script
           src="https://www.geogebra.org/apps/deployggb.js"
           strategy="afterInteractive"
         />
+        */}
       </body>
     </html>
   );

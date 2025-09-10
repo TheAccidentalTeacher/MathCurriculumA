@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import GeoGebraWidget from './GeoGebraWidget';
 
 interface Cube3DVisualizerProps {
   sideLength?: number;
@@ -21,122 +20,98 @@ export default function Cube3DVisualizer({
   
   const volume = Math.pow(sideLength, 3);
   
-  const commands = [
-    // Create the cube
-    `A = (0, 0, 0)`,
-    `B = (${sideLength}, 0, 0)`,
-    `C = (${sideLength}, ${sideLength}, 0)`,
-    `D = (0, ${sideLength}, 0)`,
-    `E = (0, 0, ${sideLength})`,
-    `F = (${sideLength}, 0, ${sideLength})`,
-    `G = (${sideLength}, ${sideLength}, ${sideLength})`,
-    `H = (0, ${sideLength}, ${sideLength})`,
-    
-    // Create the cube faces
-    `face1 = Polygon(A, B, C, D)`,
-    `face2 = Polygon(E, F, G, H)`,
-    `face3 = Polygon(A, B, F, E)`,
-    `face4 = Polygon(B, C, G, F)`,
-    `face5 = Polygon(C, D, H, G)`,
-    `face6 = Polygon(D, A, E, H)`,
-    
-    // Make faces semi-transparent
-    `SetColor(face1, "blue")`,
-    `SetColor(face2, "blue")`,
-    `SetColor(face3, "lightblue")`,
-    `SetColor(face4, "lightblue")`,
-    `SetColor(face5, "lightblue")`,
-    `SetColor(face6, "lightblue")`,
-    
-    // Add transparency
-    `SetFilling(face1, 0.3)`,
-    `SetFilling(face2, 0.3)`,
-    `SetFilling(face3, 0.3)`,
-    `SetFilling(face4, 0.3)`,
-    `SetFilling(face5, 0.3)`,
-    `SetFilling(face6, 0.3)`,
-    
-    // Add edge lines for better visualization
-    `Segment(A, B)`,
-    `Segment(B, C)`,
-    `Segment(C, D)`,
-    `Segment(D, A)`,
-    `Segment(E, F)`,
-    `Segment(F, G)`,
-    `Segment(G, H)`,
-    `Segment(H, E)`,
-    `Segment(A, E)`,
-    `Segment(B, F)`,
-    `Segment(C, G)`,
-    `Segment(D, H)`,
-    
-    // Add labels if interactive
-    ...(interactive ? [
-      `SetCaption(A, "A(0,0,0)")`,
-      `SetCaption(G, "G(${sideLength},${sideLength},${sideLength})")`,
-      `ShowLabel(A, true)`,
-      `ShowLabel(G, true)`
-    ] : []),
-    
-    // Add volume text
-    ...(showVolume ? [
-      `Text("Volume = ${sideLength}³ = ${volume} cubic units", (${sideLength/2}, ${sideLength + 1}, 0))`
-    ] : []),
-    
-    // Add formula text
-    ...(showFormula ? [
-      `Text("Formula: V = s³", (${sideLength/2}, ${sideLength + 2}, 0))`
-    ] : [])
-  ];
-
   return (
-    <div className={`bg-white border border-gray-200 rounded-lg p-4 ${className}`}>
-      <div className="mb-3">
-        <h3 className="text-lg font-semibold text-gray-800">3D Cube Visualizer</h3>
-        <p className="text-sm text-gray-600">
-          Interactive 3D cube with side length {sideLength} units (Volume = {volume} cubic units)
-        </p>
+    <div className={`bg-white border border-gray-200 rounded-lg p-6 ${className}`}>
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold text-gray-800 mb-2">3D Cube Visualizer</h3>
+        <p className="text-sm text-gray-600">Interactive 3D cube with side length {sideLength} units (Volume = {volume} cubic units)</p>
       </div>
       
-      <GeoGebraWidget
-        appName="3d"
-        commands={commands}
-        width={600}
-        height={500}
-        showAlgebraInput={interactive}
-        showToolBar={interactive}
-        showMenuBar={false}
-        enableRightClick={interactive}
-        onReady={() => console.log('3D Cube visualizer loaded')}
-      />
-      
+      {/* Simple CSS 3D Cube */}
+      <div className="flex items-center justify-center mb-6">
+        <div className="relative" style={{ 
+          width: '200px', 
+          height: '200px',
+          perspective: '800px'
+        }}>
+          <div 
+            className="absolute inset-0 transition-transform duration-1000 hover:rotate-y-12 hover:rotate-x-12"
+            style={{
+              transformStyle: 'preserve-3d',
+              transform: 'rotateX(-15deg) rotateY(15deg)'
+            }}
+          >
+            {/* Front face */}
+            <div className="absolute w-32 h-32 bg-blue-400 border-2 border-blue-600 flex items-center justify-center text-white font-bold"
+                 style={{ transform: 'translateZ(64px)' }}>
+              Front
+            </div>
+            
+            {/* Back face */}
+            <div className="absolute w-32 h-32 bg-blue-500 border-2 border-blue-700 flex items-center justify-center text-white font-bold"
+                 style={{ transform: 'translateZ(-64px) rotateY(180deg)' }}>
+              Back
+            </div>
+            
+            {/* Right face */}
+            <div className="absolute w-32 h-32 bg-blue-300 border-2 border-blue-500 flex items-center justify-center text-white font-bold"
+                 style={{ transform: 'rotateY(90deg) translateZ(64px)' }}>
+              Right
+            </div>
+            
+            {/* Left face */}
+            <div className="absolute w-32 h-32 bg-blue-600 border-2 border-blue-800 flex items-center justify-center text-white font-bold"
+                 style={{ transform: 'rotateY(-90deg) translateZ(64px)' }}>
+              Left
+            </div>
+            
+            {/* Top face */}
+            <div className="absolute w-32 h-32 bg-blue-200 border-2 border-blue-400 flex items-center justify-center text-white font-bold"
+                 style={{ transform: 'rotateX(90deg) translateZ(64px)' }}>
+              Top
+            </div>
+            
+            {/* Bottom face */}
+            <div className="absolute w-32 h-32 bg-blue-700 border-2 border-blue-900 flex items-center justify-center text-white font-bold"
+                 style={{ transform: 'rotateX(-90deg) translateZ(64px)' }}>
+              Bottom
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Volume Calculation */}
       {showVolume && (
-        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
-          <h4 className="font-semibold text-blue-800">Volume Calculation:</h4>
-          <p className="text-blue-700">
-            V = side × side × side = {sideLength} × {sideLength} × {sideLength} = <strong>{volume} cubic units</strong>
-          </p>
+        <div className="bg-blue-50 rounded-lg p-4 mb-4">
+          <h4 className="font-semibold text-blue-800 mb-2">Volume Calculation:</h4>
+          <p className="text-blue-700">V = side × side × side = {sideLength} × {sideLength} × {sideLength} = <span className="font-bold">{volume} cubic units</span></p>
         </div>
       )}
-      
+
+      {/* Formula */}
+      {showFormula && (
+        <div className="bg-gray-50 rounded-lg p-4 mb-4">
+          <h4 className="font-semibold text-gray-800 mb-2">💡 Tip:</h4>
+          <p className="text-gray-700">Use your mouse to hover over the cube and explore its 3D structure!</p>
+          {showFormula && <p className="text-sm text-gray-600 mt-2"><strong>Formula:</strong> V = s³</p>}
+        </div>
+      )}
+
+      {/* Interactive features */}
       {interactive && (
-        <div className="mt-3 text-sm text-gray-600">
-          <p>💡 <strong>Tip:</strong> Use your mouse to rotate and explore the 3D cube!</p>
+        <div className="text-center">
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="bg-green-50 p-3 rounded">
+              <div className="font-semibold text-green-800">Side Length</div>
+              <div className="text-green-600">{sideLength} units</div>
+            </div>
+            <div className="bg-purple-50 p-3 rounded">
+              <div className="font-semibold text-purple-800">Volume</div>
+              <div className="text-purple-600">{volume} cubic units</div>
+            </div>
+          </div>
         </div>
       )}
     </div>
   );
-}
-
-// Pre-configured cube visualizers for common use cases
-export function CubeVolumeExplorer() {
-  return <Cube3DVisualizer sideLength={4} showVolume={true} showFormula={true} interactive={true} />;
-}
-
-export function SimpleCubeModel(props: { sideLength?: number }) {
-  return <Cube3DVisualizer sideLength={props.sideLength || 3} showVolume={false} showFormula={false} interactive={false} />;
-}
-
-export function InteractiveCubeLab() {
-  return <Cube3DVisualizer sideLength={5} showVolume={true} showFormula={true} interactive={true} />;
 }

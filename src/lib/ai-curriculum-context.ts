@@ -8,7 +8,7 @@ export type AIModel = 'gpt-4o' | 'gpt-5' | 'gpt-4-turbo' | 'gpt-3.5-turbo';
 export interface ModelConfiguration {
   name: AIModel;
   maxTokens: number;
-  temperature: number;
+  temperature?: number; // Optional - GPT-5 doesn't support custom temperature
   description: string;
   recommended: boolean;
   costTier: 'low' | 'medium' | 'high' | 'premium';
@@ -49,8 +49,7 @@ export const AVAILABLE_MODELS: Record<AIModel, ModelConfiguration> = {
   'gpt-5': {
     name: 'gpt-5',
     maxTokens: 8000, // Controlled output to prevent massive responses
-    temperature: 0.05, // Very focused responses
-    description: 'Most advanced model with enhanced reasoning',
+    description: 'Most advanced model with enhanced reasoning (uses default temperature)',
     recommended: false, // Experimental
     costTier: 'premium'
   },

@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import GeoGebraWidget from './GeoGebraWidget';
+// DISABLED: GeoGebra integration removed by user request
+// import GeoGebraWidget from './GeoGebraWidget';
 
 interface PowersOf10ActivityProps {
   activityType: 'place-value' | 'number-line' | 'scientific-notation' | 'decomposition';
@@ -39,17 +40,16 @@ export default function PowersOf10Activity({
         <p className="text-sm text-gray-600">{config.description}</p>
       </div>
       
-      <GeoGebraWidget
-        appName="graphing"
-        commands={config.commands}
-        width={config.width || 600}
-        height={config.height || 400}
-        showAlgebraInput={false}
-        showToolBar={false}
-        showMenuBar={false}
-        enableRightClick={false}
-        onReady={() => console.log(`${activityType} activity loaded`)}
-      />
+      {/* DISABLED: GeoGebra integration removed by user request */}
+      <div 
+        className="w-full bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center"
+        style={{ width: config.width || 600, height: config.height || 400 }}
+      >
+        <div className="text-center text-gray-500">
+          <div className="text-lg font-medium">Powers of 10 Visualization Disabled</div>
+          <div className="text-sm mt-2">GeoGebra integration has been removed</div>
+        </div>
+      </div>
     </div>
   );
 }

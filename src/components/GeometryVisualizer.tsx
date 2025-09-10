@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import GeoGebraWidget from './GeoGebraWidget';
+// DISABLED: GeoGebra integration removed by user request
+// import GeoGebraWidget from './GeoGebraWidget';
 
 interface GeometryVisualizerProps {
   shape: string;
@@ -232,14 +233,14 @@ export default function GeometryVisualizer({
     
     const commands = [
       // Create vertices
-      'A = (0, 0, 0)',
-      'B = (' + side + ', 0, 0)',
-      'C = (' + side + ', ' + side + ', 0)',
-      'D = (0, ' + side + ', 0)',
-      'E = (0, 0, ' + side + ')',
-      'F = (' + side + ', 0, ' + side + ')',
-      'G = (' + side + ', ' + side + ', ' + side + ')',
-      'H = (0, ' + side + ', ' + side + ')',
+      'A = Point((0, 0, 0))',
+      'B = Point((' + side + ', 0, 0))',
+      'C = Point((' + side + ', ' + side + ', 0))',
+      'D = Point((0, ' + side + ', 0))',
+      'E = Point((0, 0, ' + side + '))',
+      'F = Point((' + side + ', 0, ' + side + '))',
+      'G = Point((' + side + ', ' + side + ', ' + side + '))',
+      'H = Point((0, ' + side + ', ' + side + '))',
       
       // Create faces
       'face1 = Polygon(A, B, C, D)',
@@ -345,7 +346,7 @@ export default function GeometryVisualizer({
     
     const commands = [
       'base = Circle((0, 0, 0), ' + radius + ')',
-      'apex = (0, 0, ' + height + ')',
+      'apex = Point((0, 0, ' + height + '))',
       'cone = Cone(base, apex)',
       'SetColor(cone, "orange")',
       'SetFilling(cone, 0.4)'
@@ -374,11 +375,11 @@ export default function GeometryVisualizer({
     
     const commands = [
       // Square base
-      'A = (-' + halfBase + ', -' + halfBase + ', 0)',
-      'B = (' + halfBase + ', -' + halfBase + ', 0)',
-      'C = (' + halfBase + ', ' + halfBase + ', 0)',
-      'D = (-' + halfBase + ', ' + halfBase + ', 0)',
-      'E = (0, 0, ' + height + ')', // Apex
+      'A = Point((-' + halfBase + ', -' + halfBase + ', 0))',
+      'B = Point((' + halfBase + ', -' + halfBase + ', 0))',
+      'C = Point((' + halfBase + ', ' + halfBase + ', 0))',
+      'D = Point((-' + halfBase + ', ' + halfBase + ', 0))',
+      'E = Point((0, 0, ' + height + '))', // Apex
       
       // Create faces
       'base = Polygon(A, B, C, D)',
@@ -592,17 +593,14 @@ export default function GeometryVisualizer({
         </p>
       </div>
       
-      <GeoGebraWidget
-        appName={is3D ? "3d" : "geometry"}
-        commands={commands}
-        width={600}
-        height={is3D ? 500 : 400}
-        showAlgebraInput={interactive}
-        showToolBar={interactive}
-        showMenuBar={false}
-        enableRightClick={interactive}
-        onReady={() => console.log(`${shape} visualizer loaded`)}
-      />
+      {/* DISABLED: GeoGebra widget removed by user request */}
+      <div className="w-full h-96 bg-gray-100 border rounded flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl mb-2">🚫</div>
+          <p className="text-gray-600 font-medium">GeoGebra Visualization Disabled</p>
+          <p className="text-sm text-gray-500">Shape: {shape.replace('_', ' ')}</p>
+        </div>
+      </div>
       
       {interactive && (
         <div className="mt-3 text-sm text-gray-600">
