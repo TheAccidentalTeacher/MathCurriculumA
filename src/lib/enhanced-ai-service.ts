@@ -40,6 +40,13 @@ export interface PacingGuideResponse {
   pacingGuide?: GeneratedPacingGuide;
   detailedLessonGuide?: DetailedLessonGuide;
   recommendations?: UnitPacingRecommendation[];
+  metadata?: {
+    model?: string;
+    prompt?: string;
+    response?: string;
+    tokens?: { input: number; output: number; total: number };
+    generationTime?: number;
+  };
   error?: string;
 }
 
@@ -2606,7 +2613,7 @@ Generate a comprehensive, implementable guide that teachers can use immediately 
       
       // Validate that sessionDetails are preserved
       if (parsedResponse.weeklySchedule && Array.isArray(parsedResponse.weeklySchedule)) {
-        const weeksWithSessionDetails = parsedResponse.weeklySchedule.filter(week => week.sessionDetails && Array.isArray(week.sessionDetails));
+        const weeksWithSessionDetails = parsedResponse.weeklySchedule.filter((week: any) => week.sessionDetails && Array.isArray(week.sessionDetails));
         console.log(`📊 [Condensed ${grade}] Session details analysis:`, {
           totalWeeks: parsedResponse.weeklySchedule.length,
           weeksWithSessionDetails: weeksWithSessionDetails.length,
@@ -2665,6 +2672,12 @@ ${this.getCurriculumData(grade)}
 - "Function Notation Extension" = ["Develop"] (1 day - notation practice)
 - "Quadratic Functions Discovery" = ["Explore", "Develop", "Develop", "Develop", "Refine"] (5 days - complex major concept)
 
+**LESSON NAMING CONVENTION:**
+- Use clear textbook identification: "Lesson X: Topic Name (Grade ${grade} Book, Page XX)"
+- Examples: "Lesson 16: Linear Functions (Grade 8 Book, Page 185)" or "Lesson 12: Quadratic Equations (Algebra 1 Book, Page 234)"
+- Always include page references when available
+- Make textbook source immediately clear for educators
+
 **OUTPUT REQUIREMENTS:**
 Generate EXACTLY ${targetWeeks} weeks of condensed curriculum.
 Each week should contain 1-2 high-impact lessons.
@@ -2718,77 +2731,81 @@ CRITICAL: Return ONLY the JSON object. No additional text.
     totalWeeks: number,
     gradeConfig: any
   ): any {
-    console.log('🔗 [Interweaving] Starting strategic interweaving of curricula');
+    console.log('🔗 [Interweaving] Starting strategic interweaving with overlap detection');
     
     const interweavedSchedule: any[] = [];
     const grade1Weeks = grade1Curriculum.weeklySchedule || [];
     const grade2Weeks = grade2Curriculum.weeklySchedule || [];
     
-    // Interweaving strategy: alternate between grades with logical progression
-    const interweavingPatterns = {
-      // Start with foundational grade 1 concepts, then introduce grade 2
-      foundationalFirst: [1, 1, 1, 2, 1, 2, 1, 2, 2, 1, 2, 2, 1, 2, 2, 2, 1, 2],
-      // More balanced throughout
-      balanced: [1, 2, 1, 1, 2, 1, 2, 2, 1, 2, 1, 2, 2, 1, 2, 1, 2, 2],
-      // Build up to advanced grade 2 concepts
-      advancedBuildup: [1, 1, 2, 1, 1, 2, 1, 2, 1, 2, 2, 1, 2, 2, 2, 1, 2, 2]
-    };
+    // PHASE 1: Intelligent Overlap Detection and Content Analysis
+    const analysisResult = this.analyzeContentOverlapAndBalance(grade1Weeks, grade2Weeks);
     
-    const pattern = interweavingPatterns.foundationalFirst;
-    let grade1Index = 0;
-    let grade2Index = 0;
+    console.log('🧠 [Content Analysis] Overlap analysis completed:', {
+      totalOverlaps: analysisResult.overlaps.length,
+      redundantGrade8: analysisResult.redundantGrade8Topics.length,
+      uniqueGrade8: analysisResult.uniqueGrade8Topics.length,
+      uniqueAlgebra1: analysisResult.uniqueAlgebra1Topics.length,
+      recommendedDistribution: analysisResult.recommendedDistribution
+    });
     
-    for (let week = 1; week <= totalWeeks; week++) {
-      const weekIndex = (week - 1) % pattern.length;
-      const useGrade = pattern[weekIndex];
-      
-      let weekData;
-      if (useGrade === 1 && grade1Index < grade1Weeks.length) {
-        weekData = { ...grade1Weeks[grade1Index] };
-        grade1Index++;
-      } else if (useGrade === 2 && grade2Index < grade2Weeks.length) {
-        weekData = { ...grade2Weeks[grade2Index] };
-        grade2Index++;
-      } else {
-        // Fallback: use whichever grade has remaining content
-        if (grade1Index < grade1Weeks.length) {
-          weekData = { ...grade1Weeks[grade1Index] };
-          grade1Index++;
-        } else if (grade2Index < grade2Weeks.length) {
-          weekData = { ...grade2Weeks[grade2Index] };
-          grade2Index++;
-        }
-      }
+    // PHASE 2: Create Balanced Content Selection
+    const balancedSelection = this.createBalancedContentSelection(
+      grade1Weeks, 
+      grade2Weeks, 
+      analysisResult, 
+      totalWeeks
+    );
+    
+    console.log('⚖️ [Balanced Selection] Content distribution created:', {
+      grade8WeeksSelected: balancedSelection.grade8Content.length,
+      algebra1WeeksSelected: balancedSelection.algebra1Content.length,
+      totalWeeks: balancedSelection.grade8Content.length + balancedSelection.algebra1Content.length,
+      expectedTotal: totalWeeks
+    });
+    
+    // PHASE 3: Strategic Pedagogical Sequencing
+    const pedagogicalSequence = this.createPedagogicalSequence(
+      balancedSelection.grade8Content,
+      balancedSelection.algebra1Content,
+      totalWeeks
+    );
+    
+    // PHASE 4: Format lessons with improved naming convention
+    for (let week = 1; week <= totalWeeks && week <= pedagogicalSequence.length; week++) {
+      const weekData = pedagogicalSequence[week - 1];
       
       if (weekData) {
-        // Ensure the week object has the proper structure that frontend expects
+        // Improved lesson formatting: Grade identifier comes first
+        const formattedLessons = this.formatLessonsWithGradePrefix(weekData.lessons, weekData.sourceGrade);
+        
         const standardizedWeek = {
           week: week,
-          unit: weekData.unit || weekData.lessons?.[0] || `Week ${week} Content`,
-          lessons: weekData.lessons || [],
+          unit: weekData.unit || formattedLessons[0] || `Week ${week} Content`,
+          lessons: formattedLessons,
           focusStandards: weekData.focusStandards || weekData.standards || [],
           assessmentType: weekData.assessmentType || null,
           sessionDetails: weekData.sessionDetails || [
             {
-              lesson: weekData.lessons?.[0] || "Default Lesson",
+              lesson: formattedLessons[0] || "Default Lesson",
               sessions: ["Develop", "Develop"],
               duration: "2 days",
               complexity: "medium"
             }
           ],
-          learningObjectives: weekData.learningObjectives || []
+          learningObjectives: weekData.learningObjectives || [],
+          sourceGrade: weekData.sourceGrade, // Track source for transparency
+          overlapStatus: weekData.overlapStatus || 'unique' // Track overlap analysis
         };
         
         interweavedSchedule.push(standardizedWeek);
       }
     }
     
-    console.log('📊 [Interweaving] Final distribution:', {
+    console.log('📊 [Interweaving] Final balanced distribution:', {
       totalWeeks: interweavedSchedule.length,
-      grade1WeeksUsed: grade1Index,
-      grade2WeeksUsed: grade2Index,
-      grade1Remaining: grade1Weeks.length - grade1Index,
-      grade2Remaining: grade2Weeks.length - grade2Index
+      grade8WeeksUsed: interweavedSchedule.filter(w => w.sourceGrade === '8').length,
+      algebra1WeeksUsed: interweavedSchedule.filter(w => w.sourceGrade === '9').length,
+      distributionRatio: `${Math.round((interweavedSchedule.filter(w => w.sourceGrade === '8').length / interweavedSchedule.length) * 100)}% Grade 8, ${Math.round((interweavedSchedule.filter(w => w.sourceGrade === '9').length / interweavedSchedule.length) * 100)}% Algebra 1`
     });
     
     return {
@@ -2797,14 +2814,322 @@ CRITICAL: Return ONLY the JSON object. No additional text.
         timeframe: 'year',
         totalWeeks: totalWeeks,
         lessonsPerWeek: 1.5,
-        description: `Strategically interweaved dual-grade accelerated curriculum`,
-        interweavingStrategy: 'foundationalFirst'
+        description: `Strategically interweaved dual-grade accelerated curriculum with intelligent overlap detection`,
+        interweavingStrategy: 'balancedPedagogicalSequence',
+        contentDistribution: {
+          grade8Percentage: Math.round((interweavedSchedule.filter(w => w.sourceGrade === '8').length / interweavedSchedule.length) * 100),
+          algebra1Percentage: Math.round((interweavedSchedule.filter(w => w.sourceGrade === '9').length / interweavedSchedule.length) * 100),
+          overlapOptimization: 'enabled'
+        }
       },
       weeklySchedule: interweavedSchedule,
-      assessmentPlan: this.generateDualGradeAssessmentPlan(totalWeeks),
-      differentiationStrategies: [],
-      flexibilityOptions: []
+      assessmentPlan: grade1Curriculum.assessmentPlan || grade2Curriculum.assessmentPlan || [],
+      differentiationStrategies: [
+        ...grade1Curriculum.differentiationStrategies || [],
+        ...grade2Curriculum.differentiationStrategies || []
+      ],
+      standardsAlignment: [
+        ...grade1Curriculum.standardsAlignment || [],
+        ...grade2Curriculum.standardsAlignment || []
+      ]
     };
+  }
+
+  /**
+   * Analyzes content overlap between Grade 8 and Algebra 1 curricula
+   * Identifies redundant topics and recommends balanced distribution
+   */
+  private analyzeContentOverlapAndBalance(grade8Weeks: any[], algebra1Weeks: any[]): {
+    overlaps: Array<{topic: string, grade8Index: number, algebra1Index: number, overlapScore: number}>,
+    redundantGrade8Topics: any[],
+    uniqueGrade8Topics: any[],
+    uniqueAlgebra1Topics: any[],
+    recommendedDistribution: {grade8: number, algebra1: number}
+  } {
+    console.log('🔍 [Overlap Analysis] Starting content overlap detection...');
+    
+    const overlaps: Array<{topic: string, grade8Index: number, algebra1Index: number, overlapScore: number}> = [];
+    const redundantGrade8Topics: any[] = [];
+    const uniqueGrade8Topics: any[] = [];
+    const uniqueAlgebra1Topics: any[] = [];
+    
+    // Define topic overlap patterns based on mathematical content progression
+    const overlapPatterns = [
+      // Topics that appear in both Grade 8 and Algebra 1
+      { keywords: ['linear', 'equation', 'graph', 'slope'], overlapThreshold: 0.8 },
+      { keywords: ['function', 'input', 'output', 'relationship'], overlapThreshold: 0.75 },
+      { keywords: ['system', 'solve', 'equation'], overlapThreshold: 0.7 },
+      { keywords: ['exponent', 'power', 'exponential'], overlapThreshold: 0.65 },
+      { keywords: ['expression', 'simplify', 'evaluate'], overlapThreshold: 0.6 },
+      { keywords: ['inequality', 'solution', 'range'], overlapThreshold: 0.7 },
+      { keywords: ['coordinate', 'plane', 'point'], overlapThreshold: 0.5 }
+    ];
+    
+    // Analyze each Grade 8 week for overlap with Algebra 1 content
+    grade8Weeks.forEach((grade8Week, g8Index) => {
+      let hasOverlap = false;
+      const grade8Text = this.extractTopicText(grade8Week);
+      
+      algebra1Weeks.forEach((algebra1Week, a1Index) => {
+        const algebra1Text = this.extractTopicText(algebra1Week);
+        const overlapScore = this.calculateTopicOverlap(grade8Text, algebra1Text, overlapPatterns);
+        
+        if (overlapScore > 0.6) { // Significant overlap threshold
+          overlaps.push({
+            topic: grade8Week.unit || grade8Week.lessons?.[0] || 'Unknown Topic',
+            grade8Index: g8Index,
+            algebra1Index: a1Index,
+            overlapScore: overlapScore
+          });
+          
+          if (overlapScore > 0.75) { // High overlap - consider redundant
+            hasOverlap = true;
+          }
+        }
+      });
+      
+      if (hasOverlap) {
+        redundantGrade8Topics.push({...grade8Week, originalIndex: g8Index});
+      } else {
+        uniqueGrade8Topics.push({...grade8Week, originalIndex: g8Index});
+      }
+    });
+    
+    // All Algebra 1 topics are considered unique (higher-level content)
+    algebra1Weeks.forEach((week, index) => {
+      uniqueAlgebra1Topics.push({...week, originalIndex: index});
+    });
+    
+    // Calculate recommended distribution
+    const totalNeeded = 36;
+    const minGrade8 = Math.floor(totalNeeded * 0.35); // At least 35% Grade 8
+    const maxGrade8 = Math.floor(totalNeeded * 0.65); // At most 65% Grade 8
+    const minAlgebra1 = Math.floor(totalNeeded * 0.35); // At least 35% Algebra 1
+    
+    const uniqueGrade8Count = uniqueGrade8Topics.length;
+    const uniqueAlgebra1Count = uniqueAlgebra1Topics.length;
+    const redundantGrade8Count = redundantGrade8Topics.length;
+    
+    // Calculate optimal distribution
+    let recommendedGrade8 = Math.min(maxGrade8, Math.max(minGrade8, uniqueGrade8Count + Math.floor(redundantGrade8Count * 0.3)));
+    let recommendedAlgebra1 = totalNeeded - recommendedGrade8;
+    
+    // Ensure minimum representation from both grades
+    if (recommendedAlgebra1 < minAlgebra1) {
+      recommendedAlgebra1 = minAlgebra1;
+      recommendedGrade8 = totalNeeded - recommendedAlgebra1;
+    }
+    
+    console.log('📊 [Overlap Analysis] Results:', {
+      totalOverlaps: overlaps.length,
+      redundantGrade8: redundantGrade8Topics.length,
+      uniqueGrade8: uniqueGrade8Topics.length,
+      uniqueAlgebra1: uniqueAlgebra1Topics.length,
+      recommendedGrade8,
+      recommendedAlgebra1
+    });
+    
+    return {
+      overlaps,
+      redundantGrade8Topics,
+      uniqueGrade8Topics,
+      uniqueAlgebra1Topics,
+      recommendedDistribution: {
+        grade8: recommendedGrade8,
+        algebra1: recommendedAlgebra1
+      }
+    };
+  }
+
+  /**
+   * Extracts meaningful text from a curriculum week for overlap analysis
+   */
+  private extractTopicText(week: any): string {
+    const texts = [
+      week.unit || '',
+      ...(week.lessons || []),
+      ...(week.learningObjectives || []),
+      ...(week.focusStandards || [])
+    ];
+    return texts.join(' ').toLowerCase();
+  }
+
+  /**
+   * Calculates overlap score between two topic texts
+   */
+  private calculateTopicOverlap(text1: string, text2: string, patterns: any[]): number {
+    let maxOverlap = 0;
+    
+    patterns.forEach(pattern => {
+      const matches1 = pattern.keywords.filter((keyword: string) => text1.includes(keyword)).length;
+      const matches2 = pattern.keywords.filter((keyword: string) => text2.includes(keyword)).length;
+      const overlap = Math.min(matches1, matches2) / pattern.keywords.length;
+      
+      if (overlap >= pattern.overlapThreshold / 100) {
+        maxOverlap = Math.max(maxOverlap, overlap * pattern.overlapThreshold);
+      }
+    });
+    
+    return maxOverlap;
+  }
+
+  /**
+   * Creates balanced content selection based on overlap analysis
+   */
+  private createBalancedContentSelection(
+    grade8Weeks: any[], 
+    algebra1Weeks: any[], 
+    analysis: any, 
+    totalWeeks: number
+  ): {
+    grade8Content: any[],
+    algebra1Content: any[]
+  } {
+    console.log('⚖️ [Balanced Selection] Creating optimized content selection...');
+    
+    const { recommendedDistribution } = analysis;
+    const selectedGrade8: any[] = [];
+    const selectedAlgebra1: any[] = [];
+    
+    // STEP 1: Include all unique Grade 8 content (foundational concepts)
+    analysis.uniqueGrade8Topics.forEach((topic: any) => {
+      if (selectedGrade8.length < recommendedDistribution.grade8) {
+        selectedGrade8.push({...topic, overlapStatus: 'unique', priority: 'high'});
+      }
+    });
+    
+    // STEP 2: Selectively include some redundant Grade 8 content for reinforcement
+    const remainingGrade8Slots = recommendedDistribution.grade8 - selectedGrade8.length;
+    const priorityRedundant = analysis.redundantGrade8Topics
+      .sort((a: any, b: any) => {
+        // Prioritize by topic importance (geometry, number systems, etc.)
+        const priorityTopics = ['geometric', 'number', 'ratio', 'proportion', 'transformation'];
+        const aScore = priorityTopics.some(topic => this.extractTopicText(a).includes(topic)) ? 1 : 0;
+        const bScore = priorityTopics.some(topic => this.extractTopicText(b).includes(topic)) ? 1 : 0;
+        return bScore - aScore;
+      })
+      .slice(0, remainingGrade8Slots);
+    
+    priorityRedundant.forEach((topic: any) => {
+      selectedGrade8.push({...topic, overlapStatus: 'reinforcement', priority: 'medium'});
+    });
+    
+    // STEP 3: Include all Algebra 1 content up to recommended limit
+    analysis.uniqueAlgebra1Topics.slice(0, recommendedDistribution.algebra1).forEach((topic: any) => {
+      selectedAlgebra1.push({...topic, overlapStatus: 'unique', priority: 'high'});
+    });
+    
+    console.log('✅ [Balanced Selection] Content selection completed:', {
+      grade8Selected: selectedGrade8.length,
+      algebra1Selected: selectedAlgebra1.length,
+      totalSelected: selectedGrade8.length + selectedAlgebra1.length
+    });
+    
+    return {
+      grade8Content: selectedGrade8,
+      algebra1Content: selectedAlgebra1
+    };
+  }
+
+  /**
+   * Creates pedagogically sound sequence from balanced content
+   */
+  private createPedagogicalSequence(grade8Content: any[], algebra1Content: any[], totalWeeks: number): any[] {
+    console.log('🎓 [Pedagogical Sequence] Creating optimized learning progression...');
+    
+    const sequence: any[] = [];
+    
+    // PHASE 1: Foundation Building (Weeks 1-12) - Mostly Grade 8 with some Algebra 1 intro
+    const foundationPhase = Math.floor(totalWeeks * 0.33); // First 33%
+    
+    // PHASE 2: Bridge Building (Weeks 13-24) - Balanced mix
+    const bridgePhase = Math.floor(totalWeeks * 0.33); // Middle 33%
+    
+    // PHASE 3: Advanced Concepts (Weeks 25-36) - Mostly Algebra 1 with Grade 8 reinforcement
+    const advancedPhase = totalWeeks - foundationPhase - bridgePhase; // Final 33%
+    
+    let g8Index = 0;
+    let a1Index = 0;
+    
+    // Foundation Phase: 70% Grade 8, 30% Algebra 1
+    for (let week = 0; week < foundationPhase; week++) {
+      if ((week % 10 < 7) && g8Index < grade8Content.length) {
+        sequence.push({...grade8Content[g8Index], sourceGrade: '8'});
+        g8Index++;
+      } else if (a1Index < algebra1Content.length) {
+        sequence.push({...algebra1Content[a1Index], sourceGrade: '9'});
+        a1Index++;
+      }
+    }
+    
+    // Bridge Phase: 50% Grade 8, 50% Algebra 1
+    for (let week = 0; week < bridgePhase; week++) {
+      if ((week % 2 === 0) && g8Index < grade8Content.length) {
+        sequence.push({...grade8Content[g8Index], sourceGrade: '8'});
+        g8Index++;
+      } else if (a1Index < algebra1Content.length) {
+        sequence.push({...algebra1Content[a1Index], sourceGrade: '9'});
+        a1Index++;
+      }
+    }
+    
+    // Advanced Phase: 30% Grade 8, 70% Algebra 1
+    for (let week = 0; week < advancedPhase; week++) {
+      if ((week % 10 < 3) && g8Index < grade8Content.length) {
+        sequence.push({...grade8Content[g8Index], sourceGrade: '8'});
+        g8Index++;
+      } else if (a1Index < algebra1Content.length) {
+        sequence.push({...algebra1Content[a1Index], sourceGrade: '9'});
+        a1Index++;
+      }
+    }
+    
+    // Fill remaining slots with any remaining content
+    while (sequence.length < totalWeeks && (g8Index < grade8Content.length || a1Index < algebra1Content.length)) {
+      if (g8Index < grade8Content.length) {
+        sequence.push({...grade8Content[g8Index], sourceGrade: '8'});
+        g8Index++;
+      } else if (a1Index < algebra1Content.length) {
+        sequence.push({...algebra1Content[a1Index], sourceGrade: '9'});
+        a1Index++;
+      }
+    }
+    
+    console.log('🎯 [Pedagogical Sequence] Sequence optimization completed:', {
+      totalWeeks: sequence.length,
+      foundationPhaseWeeks: foundationPhase,
+      bridgePhaseWeeks: bridgePhase,
+      advancedPhaseWeeks: advancedPhase
+    });
+    
+    return sequence;
+  }
+
+  /**
+   * Formats lesson names with grade prefix for better readability
+   */
+  private formatLessonsWithGradePrefix(lessons: string[], sourceGrade: string): string[] {
+    if (!lessons || lessons.length === 0) return [];
+    
+    const gradePrefix = sourceGrade === '8' ? 'Grade 8' : 'Algebra 1';
+    
+    return lessons.map(lesson => {
+      // Check if lesson already has a grade prefix
+      if (lesson.startsWith('Grade 8') || lesson.startsWith('Algebra 1') || lesson.startsWith('Gr 8') || lesson.startsWith('Alg 1')) {
+        return lesson;
+      }
+      
+      // Extract lesson number if present
+      const lessonNumberMatch = lesson.match(/Lesson (\d+):/);
+      if (lessonNumberMatch) {
+        const lessonNumber = lessonNumberMatch[1];
+        const restOfLesson = lesson.replace(/Lesson \d+:\s*/, '');
+        return `${gradePrefix} Lesson ${lessonNumber}: ${restOfLesson}`;
+      }
+      
+      // If no lesson number, just add grade prefix
+      return `${gradePrefix}: ${lesson}`;
+    });
   }
 
   /**
@@ -2848,7 +3173,7 @@ Return ONLY the explanation text - no additional formatting or labels.`;
 
     try {
       console.log('🤖 [Explanation] Generating curriculum logic explanation...');
-      const explanation = await this.callAI(explanationPrompt, this.selectedModel, 800);
+      const explanation = await this.callOpenAI(explanationPrompt);
       
       if (explanation && explanation.trim().length > 50) {
         console.log('✅ [Explanation] Generated comprehensive explanation:', explanation.length, 'characters');
@@ -2912,7 +3237,7 @@ Return ONLY the explanation text - no additional formatting or labels.`;
 
     try {
       console.log('🤖 [Explanation] Generating curriculum logic explanation...');
-      const explanation = await this.callAI(explanationPrompt, this.selectedModel, 800);
+      const explanation = await this.callOpenAI(explanationPrompt);
       
       if (explanation && explanation.trim().length > 50) {
         console.log('✅ [Explanation] Generated comprehensive explanation:', explanation.length, 'characters');
@@ -3107,8 +3432,8 @@ ALWAYS specify which textbook: "Grade 8 Book" or "Algebra 1 Book"`;
         }
         
         // Try alternative paths
-        const altPath1 = path.resolve(process.cwd(), 'MathCurriculumA', `${grade === '9' ? 'ALGEBRA1' : `GRADE${grade}`}_COMPLETE_CURRICULUM_STRUCTURE.json`);
-        const altPath2 = path.resolve(__dirname, '../..', `${grade === '9' ? 'ALGEBRA1' : `GRADE${grade}`}_COMPLETE_CURRICULUM_STRUCTURE.json`);
+        const altPath1 = path.resolve(process.cwd(), 'MathCurriculumA', `${(grade as string) === '9' ? 'ALGEBRA1' : `GRADE${grade}`}_COMPLETE_CURRICULUM_STRUCTURE.json`);
+        const altPath2 = path.resolve(__dirname, '../..', `${(grade as string) === '9' ? 'ALGEBRA1' : `GRADE${grade}`}_COMPLETE_CURRICULUM_STRUCTURE.json`);
         
         console.log(`📚 [Curriculum] Trying alternative path 1: ${altPath1}`);
         if (fs.existsSync(altPath1)) {
