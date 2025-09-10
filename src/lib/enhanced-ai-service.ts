@@ -1209,9 +1209,16 @@ ${selectionStrategy}
         differentiationCount: pacingGuide.differentiationStrategies?.length || 0
       });
 
+      // Generate explanation of curriculum logic
+      console.log('📝 [AI Service] Generating curriculum explanation...');
+      const explanation = await this.generateCurriculumExplanation(pacingGuide, gradeConfig, request);
+
       const result = {
         success: true,
-        pacingGuide
+        pacingGuide: {
+          ...pacingGuide,
+          explanation: explanation
+        }
       };
       
       console.log('🎉 [AI Service] Returning successful result');
@@ -2475,14 +2482,13 @@ Generate a comprehensive, implementable guide that teachers can use immediately 
       console.log('🔗 [Dual-Grade Accelerated] Curricula interweaved successfully');
       
       // Generate comprehensive explanation
-      const explanation = this.generateDualGradeExplanation(
-        grade1Curriculum, 
+      // Generate methodology explanation
+      const explanation = await this.generateDualGradeExplanation(
+        grade1Curriculum,
         grade2Curriculum, 
         interweavedCurriculum,
         gradeConfig
-      );
-      
-      const response: PacingGuideResponse = {
+      );      const response: PacingGuideResponse = {
         success: true,
         pacingGuide: {
           ...interweavedCurriculum,
@@ -2544,11 +2550,77 @@ Generate a comprehensive, implementable guide that teachers can use immediately 
     console.log(`🤖 [Condensed ${grade}] Calling AI for condensed Grade ${grade} curriculum...`);
     const aiResponse = await this.callOpenAI(prompt);
     
-    const parsedResponse = this.parseAIResponse(aiResponse);
+    const parsedResponse = this.parseCondensedGradeResponse(aiResponse, grade);
     
     console.log(`✅ [Condensed ${grade}] Generated ${parsedResponse.weeklySchedule?.length || 0} weeks for Grade ${grade}`);
     
     return parsedResponse;
+  }
+
+  /**
+   * Parse condensed grade AI response (simplified JSON parsing)
+   */
+  private parseCondensedGradeResponse(aiResponse: string, grade: string): any {
+    console.log(`🔍 [Condensed ${grade}] Parsing AI response for Grade ${grade}...`);
+    
+    try {
+      // Extract JSON from AI response using the same logic as the detailed parser
+      let jsonContent = aiResponse.trim();
+      
+      // Check if response is wrapped in markdown code blocks
+      if (jsonContent.includes('```json')) {
+        console.log(`🔍 [Condensed ${grade}] Extracting JSON from markdown code block`);
+        const jsonMatch = jsonContent.match(/```json\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonContent = jsonMatch[1];
+        }
+      } else if (jsonContent.includes('```')) {
+        console.log(`🔍 [Condensed ${grade}] Extracting JSON from generic code block`);
+        const jsonMatch = jsonContent.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonContent = jsonMatch[1];
+        }
+      }
+      
+      // Try to find JSON object in the response if it starts with text
+      if (!jsonContent.startsWith('{') && jsonContent.includes('{')) {
+        console.log(`🔍 [Condensed ${grade}] Extracting JSON object from mixed content`);
+        const jsonStart = jsonContent.indexOf('{');
+        const jsonEnd = jsonContent.lastIndexOf('}') + 1;
+        if (jsonStart !== -1 && jsonEnd > jsonStart) {
+          jsonContent = jsonContent.substring(jsonStart, jsonEnd);
+        }
+      }
+      
+      console.log(`🔍 [Condensed ${grade}] JSON content length:`, jsonContent.length);
+      console.log(`🔍 [Condensed ${grade}] JSON preview (first 200 chars):`, jsonContent.substring(0, 200));
+      
+      const parsedResponse = JSON.parse(jsonContent);
+      
+      console.log(`📊 [Condensed ${grade}] Successfully parsed Grade ${grade} curriculum:`, {
+        hasOverview: !!parsedResponse.overview,
+        hasWeeklySchedule: !!parsedResponse.weeklySchedule,
+        weeklyScheduleLength: parsedResponse.weeklySchedule?.length || 0,
+        firstWeekHasSessionDetails: !!parsedResponse.weeklySchedule?.[0]?.sessionDetails
+      });
+      
+      // Validate that sessionDetails are preserved
+      if (parsedResponse.weeklySchedule && Array.isArray(parsedResponse.weeklySchedule)) {
+        const weeksWithSessionDetails = parsedResponse.weeklySchedule.filter(week => week.sessionDetails && Array.isArray(week.sessionDetails));
+        console.log(`📊 [Condensed ${grade}] Session details analysis:`, {
+          totalWeeks: parsedResponse.weeklySchedule.length,
+          weeksWithSessionDetails: weeksWithSessionDetails.length,
+          sessionDetailsPreservationRate: `${Math.round((weeksWithSessionDetails.length / parsedResponse.weeklySchedule.length) * 100)}%`
+        });
+      }
+      
+      return parsedResponse;
+      
+    } catch (parseError) {
+      console.error(`❌ [Condensed ${grade}] Failed to parse AI response:`, parseError);
+      console.log(`🔍 [Condensed ${grade}] Raw response preview:`, aiResponse.substring(0, 1000));
+      throw new Error(`Failed to parse condensed Grade ${grade} curriculum response: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
+    }
   }
 
   /**
@@ -2565,22 +2637,33 @@ Generate a comprehensive, implementable guide that teachers can use immediately 
 
 **CRITICAL MISSION:** Create a ${targetWeeks}-week accelerated curriculum for Grade ${grade} that represents the ESSENTIAL high-impact lessons from a full-year curriculum.
 
-**CONDENSATION RULES:**
+**CONDENSATION RULES & DAILY STRUCTURE:**
 - Select ONLY the most critical, gateway lessons that unlock advanced concepts
 - Focus on major work standards and foundational concepts
 - Eliminate review, practice-only, and supporting standard lessons
-- Each lesson should take 2-3 days instead of 5 (use Develop-only sessions)
+- SMART SESSION ALLOCATION:
+  * Complex/New Concepts: Use 3-4 days (Develop → Develop → Develop → Refine)
+  * Review/Bridge Topics: Use 2-3 days (Develop → Develop only)
+  * Simple Extensions: Use 1-2 days (Develop only)
+- Skip Explore sessions for accelerated learners on familiar concepts
+- Skip Refine sessions for topics that don't require extensive practice
 - Prioritize lessons with strong connections to the next grade level
 
 **GRADE ${grade} CURRICULUM DATA:**
 ${this.getCurriculumData(grade)}
 
-**SELECTION CRITERIA:**
-- Major Work Standards: ALWAYS include
-- Foundational Concepts: Include if they bridge to advanced topics
-- Gateway Lessons: Include lessons that unlock multiple future concepts
-- Supporting Standards: Include ONLY if essential for major work
-- Review/Practice: EXCLUDE unless absolutely critical
+**SELECTION CRITERIA & SESSION ALLOCATION:**
+- Major Work Standards: ALWAYS include → Use 3-4 days (Develop-Develop-Develop-Refine)
+- Foundational Concepts: Include if they bridge to advanced topics → Use 2-3 days (Develop-Develop)
+- Gateway Lessons: Include lessons that unlock multiple future concepts → Use 4 days (Explore-Develop-Develop-Refine)
+- Supporting Standards: Include ONLY if essential for major work → Use 1-2 days (Develop only)
+- Review/Practice: EXCLUDE unless absolutely critical → Use 1 day (Develop only) if included
+
+**EXAMPLES OF SESSION ALLOCATION:**
+- "Linear Functions Introduction" = ["Explore", "Develop", "Develop", "Refine"] (4 days - major new concept)
+- "Slope Review from Grade 8" = ["Develop", "Develop"] (2 days - bridge concept)
+- "Function Notation Extension" = ["Develop"] (1 day - notation practice)
+- "Quadratic Functions Discovery" = ["Explore", "Develop", "Develop", "Develop", "Refine"] (5 days - complex major concept)
 
 **OUTPUT REQUIREMENTS:**
 Generate EXACTLY ${targetWeeks} weeks of condensed curriculum.
@@ -2602,12 +2685,25 @@ Return JSON format:
       "lessons": ["Lesson 1", "Lesson 2"],
       "focusStandards": ["Standard.Code"],
       "assessmentType": null,
-      "lessonDuration": "3-5 days per lesson",
+      "sessionDetails": [
+        {
+          "lesson": "Lesson 1",
+          "sessions": ["Develop", "Develop", "Refine"],
+          "duration": "3 days",
+          "complexity": "high"
+        }
+      ],
       "learningObjectives": ["Objective 1"]
     }
     // ... exactly ${targetWeeks} week objects with this structure
   ]
 }
+
+**SESSION ALLOCATION GUIDELINES:**
+- NEW COMPLEX CONCEPTS: ["Develop", "Develop", "Develop", "Refine"] = 4 days
+- FAMILIAR CONCEPTS: ["Develop", "Develop"] = 2 days  
+- BRIDGE/REVIEW: ["Develop"] = 1 day
+- MAJOR MILESTONES: ["Explore", "Develop", "Develop", "Refine"] = 4 days (keep Explore for true discovery)
 
 CRITICAL: Return ONLY the JSON object. No additional text.
     `.trim();
@@ -2672,7 +2768,14 @@ CRITICAL: Return ONLY the JSON object. No additional text.
           lessons: weekData.lessons || [],
           focusStandards: weekData.focusStandards || weekData.standards || [],
           assessmentType: weekData.assessmentType || null,
-          lessonDuration: weekData.lessonDuration || "3-5 days per lesson",
+          sessionDetails: weekData.sessionDetails || [
+            {
+              lesson: weekData.lessons?.[0] || "Default Lesson",
+              sessions: ["Develop", "Develop"],
+              duration: "2 days",
+              complexity: "medium"
+            }
+          ],
           learningObjectives: weekData.learningObjectives || []
         };
         
@@ -2707,21 +2810,133 @@ CRITICAL: Return ONLY the JSON object. No additional text.
   /**
    * Generate explanation for dual-grade approach
    */
-  private generateDualGradeExplanation(
+  private async generateDualGradeExplanation(
     grade1Curriculum: any,
     grade2Curriculum: any,
     finalCurriculum: any,
     gradeConfig: any
-  ): string {
+  ): Promise<string> {
     const grade1Count = grade1Curriculum.weeklySchedule?.length || 0;
     const grade2Count = grade2Curriculum.weeklySchedule?.length || 0;
     const finalWeeks = finalCurriculum.weeklySchedule?.length || 0;
-    
-    return `This dual-grade accelerated curriculum was derived by creating condensed 18-week curricula for both Grade ${gradeConfig.selectedGrades[0]} (${grade1Count} essential lessons) and Grade ${gradeConfig.selectedGrades[1]} (${grade2Count} essential lessons), then strategically interweaving them into a ${finalWeeks}-week progression.
 
-The AI employed "foundational-first" interweaving, beginning with core Grade ${gradeConfig.selectedGrades[0]} concepts before introducing Grade ${gradeConfig.selectedGrades[1]} content. Each grade's curriculum was condensed using "Develop-only" session structures, focusing exclusively on gateway lessons and major work standards. This approach ensures students experience essential concepts from both grade levels while maintaining mathematical coherence and proper prerequisite relationships.
+    // Generate AI-powered explanation of the logic
+    const explanationPrompt = `🎯 CURRICULUM DESIGN EXPLANATION
 
-The condensation process eliminated review sessions, practice-only lessons, and redundant supporting standards, retaining only high-impact content that bridges between grade levels and prepares students for advanced mathematical thinking.`;
+You are an expert curriculum designer who has just created a dual-grade accelerated pacing guide. Write a clear, professional explanation (100-400 words) of the pedagogical logic and decision-making process behind this curriculum design.
+
+**CURRICULUM DETAILS:**
+- Grade Levels: ${gradeConfig.selectedGrades[0]} and ${gradeConfig.selectedGrades[1]}
+- Total Weeks: ${finalWeeks}
+- Grade ${gradeConfig.selectedGrades[0]} Essential Lessons: ${grade1Count}
+- Grade ${gradeConfig.selectedGrades[1]} Essential Lessons: ${grade2Count}
+- Pathway Type: ${gradeConfig.pathwayType}
+- Emphasis: ${gradeConfig.emphasis}
+
+**WRITE AN EXPLANATION THAT COVERS:**
+1. **Rationale**: Why this dual-grade approach was chosen
+2. **Lesson Selection**: How you determined which lessons were essential vs. supporting
+3. **Sequencing Logic**: How you decided the order and timing of concepts
+4. **Session Structure**: Why you used specific session patterns (Explore/Develop/Refine)
+5. **Student Readiness**: How this supports accelerated learners
+
+**TONE:** Professional but accessible to teachers and administrators
+**LENGTH:** 100-400 words
+**FOCUS:** Clear reasoning behind educational decisions
+
+Return ONLY the explanation text - no additional formatting or labels.`;
+
+    try {
+      console.log('🤖 [Explanation] Generating curriculum logic explanation...');
+      const explanation = await this.callAI(explanationPrompt, this.selectedModel, 800);
+      
+      if (explanation && explanation.trim().length > 50) {
+        console.log('✅ [Explanation] Generated comprehensive explanation:', explanation.length, 'characters');
+        return explanation.trim();
+      } else {
+        console.log('⚠️ [Explanation] AI explanation too short, using fallback');
+        throw new Error('AI explanation insufficient');
+      }
+    } catch (error) {
+      console.log('🔄 [Explanation] Using structured fallback explanation');
+      
+      // Fallback to structured explanation if AI fails
+      return `This dual-grade accelerated curriculum was strategically designed to serve advanced learners by condensing and interweaving essential content from Grade ${gradeConfig.selectedGrades[0]} and Grade ${gradeConfig.selectedGrades[1]} over ${finalWeeks} weeks.
+
+**Lesson Selection Logic:** From comprehensive grade-level curricula, we identified ${grade1Count} essential Grade ${gradeConfig.selectedGrades[0]} lessons and ${grade2Count} essential Grade ${gradeConfig.selectedGrades[1]} lessons by focusing exclusively on major work standards and gateway concepts that unlock advanced mathematical thinking. Non-essential review sessions, practice-only lessons, and supporting standards were strategically removed.
+
+**Sequencing Approach:** The curriculum employs a "foundational-first" interweaving strategy, beginning with core Grade ${gradeConfig.selectedGrades[0]} concepts to establish mathematical foundations before introducing Grade ${gradeConfig.selectedGrades[1]} content. This ensures proper prerequisite relationships and maintains mathematical coherence throughout the acceleration.
+
+**Session Structure:** Each lesson utilizes intelligent daily session allocation (Explore, Develop, Refine) based on content complexity. High-complexity gateway concepts receive 4-day treatment with discovery phases, while familiar or bridge concepts use streamlined 2-3 day progressions, maximizing instructional efficiency.
+
+**Student Readiness:** This design specifically supports accelerated learners by eliminating redundancy, maintaining rigorous pacing, and preserving depth over breadth—ensuring students experience essential mathematical concepts from both grade levels while preparing them for advanced coursework.`;
+    }
+  }
+
+  /**
+   * Generate explanation for standard curriculum approach
+   */
+  private async generateCurriculumExplanation(
+    pacingGuide: any,
+    gradeConfig: any,
+    request: any
+  ): Promise<string> {
+    const totalWeeks = pacingGuide.weeklySchedule?.length || 0;
+    const totalLessons = pacingGuide.weeklySchedule?.reduce((sum: number, week: any) => sum + (week.lessons?.length || 0), 0) || 0;
+    const gradeLevel = Array.isArray(gradeConfig.selectedGrades) ? gradeConfig.selectedGrades.join('+') : gradeConfig.selectedGrades[0];
+
+    const explanationPrompt = `🎯 CURRICULUM DESIGN EXPLANATION
+
+You are an expert curriculum designer who has just created a mathematics pacing guide. Write a clear, professional explanation (100-400 words) of the pedagogical logic and decision-making process behind this curriculum design.
+
+**CURRICULUM DETAILS:**
+- Grade Level: ${gradeLevel}
+- Total Weeks: ${totalWeeks}
+- Total Lessons: ${totalLessons}
+- Timeframe: ${request.timeframe}
+- Student Population: ${request.studentPopulation}
+- Priorities: ${request.priorities?.join(', ') || 'Standards-based instruction'}
+
+**WRITE AN EXPLANATION THAT COVERS:**
+1. **Design Philosophy**: The overall approach and educational philosophy behind the pacing
+2. **Lesson Selection**: How you determined which content to include and prioritize
+3. **Sequencing Logic**: How you decided the order and timing of mathematical concepts
+4. **Pacing Rationale**: Why certain topics receive more or less instructional time
+5. **Student Needs**: How this design serves the specific student population
+
+**TONE:** Professional but accessible to teachers and administrators
+**LENGTH:** 100-400 words
+**FOCUS:** Clear reasoning behind educational decisions
+
+Return ONLY the explanation text - no additional formatting or labels.`;
+
+    try {
+      console.log('🤖 [Explanation] Generating curriculum logic explanation...');
+      const explanation = await this.callAI(explanationPrompt, this.selectedModel, 800);
+      
+      if (explanation && explanation.trim().length > 50) {
+        console.log('✅ [Explanation] Generated comprehensive explanation:', explanation.length, 'characters');
+        return explanation.trim();
+      } else {
+        console.log('⚠️ [Explanation] AI explanation too short, using fallback');
+        throw new Error('AI explanation insufficient');
+      }
+    } catch (error) {
+      console.log('🔄 [Explanation] Using structured fallback explanation');
+      
+      // Fallback to structured explanation if AI fails
+      return `This ${request.timeframe} mathematics curriculum for Grade ${gradeLevel} was designed using research-based principles of mathematical learning progressions and cognitive development theory.
+
+**Design Philosophy:** The pacing guide prioritizes conceptual understanding over procedural fluency alone, ensuring students develop deep mathematical thinking while maintaining appropriate rigor. Each of the ${totalWeeks} weeks builds systematically on prior knowledge, creating a coherent learning trajectory.
+
+**Content Selection:** The ${totalLessons} lessons were curated to focus on major work standards that form the foundation for advanced mathematical thinking. Supporting and additional standards are strategically integrated where they enhance rather than distract from core learning objectives.
+
+**Sequencing Logic:** Mathematical concepts are sequenced to honor the natural learning progression from concrete to abstract thinking. Gateway lessons that unlock future learning are positioned early, while application and extension activities are distributed throughout to reinforce and deepen understanding.
+
+**Pacing Considerations:** Instructional time allocation reflects the cognitive complexity of each topic, with more time devoted to conceptually challenging material and foundational concepts that require deep understanding. The pacing accommodates ${request.studentPopulation} learners while maintaining high expectations for all students.
+
+**Student-Centered Design:** This curriculum structure supports diverse learning needs through embedded opportunities for differentiation, ensuring all students can access grade-level content while providing appropriate challenge and support.`;
+    }
   }
 
   /**

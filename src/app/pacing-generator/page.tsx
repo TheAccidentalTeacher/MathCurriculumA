@@ -145,72 +145,270 @@ export default function PacingGeneratorPage() {
           break;
 
         case 'csv':
-          // Convert weekly schedule to CSV
-          const csvHeaders = ['Week', 'Unit', 'Lessons', 'Standards', 'Assessment Type'];
-          const csvRows = pacingGuide.weeklySchedule.map(week => [
-            week.week.toString(),
-            week.unit,
-            week.lessons.join('; '),
-            week.focusStandards.join('; '),
-            week.assessmentType || 'None'
-          ]);
+          // Convert weekly schedule to optimized CSV for Excel/Google Sheets
           
-          const csvContent = [csvHeaders, ...csvRows]
-            .map(row => row.map(cell => `"${cell}"`).join(','))
-            .join('\n');
+          // Helper function to escape CSV content
+          const escapeCSV = (text: string) => {
+            if (!text) return '';
+            return `"${text.replace(/"/g, '""')}"`;
+          };
+
+          // Create summary header rows
+          const summaryRows = [
+            ['PACING GUIDE SUMMARY', '', '', '', '', '', '', ''],
+            ['Grade Level:', pacingGuide.overview.gradeLevel, '', '', '', '', '', ''],
+            ['Timeframe:', pacingGuide.overview.timeframe, '', '', '', '', '', ''],
+            ['Total Weeks:', pacingGuide.overview.totalWeeks?.toString() || 'N/A', '', '', '', '', '', ''],
+            ['Generated:', new Date().toLocaleDateString(), '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''], // Empty row for spacing
+          ];
+
+          // Add explanation section if available
+          if (pacingGuide.explanation) {
+            summaryRows.push(
+              ['CURRICULUM DESIGN EXPLANATION', '', '', '', '', '', '', ''],
+              ['', '', '', '', '', '', '', '']
+            );
+            
+            // Split explanation into readable chunks for CSV
+            const explanationChunks = pacingGuide.explanation.match(/.{1,100}(\s|$)/g) || [pacingGuide.explanation];
+            explanationChunks.forEach(chunk => {
+              summaryRows.push([chunk.trim(), '', '', '', '', '', '', '']);
+            });
+            
+            summaryRows.push(['', '', '', '', '', '', '', '']); // Empty row for spacing
+          }
+
+          // Optimized headers for better spreadsheet layout
+          const csvHeaders = [
+            'Week', 
+            'Unit/Topic', 
+            'Lesson Title', 
+            'Session Flow', 
+            'Duration', 
+            'Complexity', 
+            'Key Standards', 
+            'Assessment'
+          ];
           
-          const csvBlob = new Blob([csvContent], { type: 'text/csv' });
+          // Transform data for better spreadsheet compatibility
+          const csvRows: string[][] = [];
+          
+          pacingGuide.weeklySchedule.forEach(week => {
+            if (week.sessionDetails && week.sessionDetails.length > 0) {
+              // If there are session details, create separate rows for each lesson
+              week.sessionDetails.forEach((session, index) => {
+                csvRows.push([
+                  index === 0 ? week.week.toString() : '', // Only show week number on first row
+                  index === 0 ? week.unit : '', // Only show unit on first row
+                  session.lesson || week.lessons[index] || 'N/A',
+                  session.sessions ? session.sessions.join(' → ') : 'N/A',
+                  session.duration || 'N/A',
+                  session.complexity || 'medium',
+                  index === 0 ? week.focusStandards.slice(0, 2).join('; ') : '', // Limit standards for readability
+                  index === 0 ? (week.assessmentType || 'None') : ''
+                ]);
+              });
+            } else {
+              // Fallback for weeks without session details
+              week.lessons.forEach((lesson, index) => {
+                csvRows.push([
+                  index === 0 ? week.week.toString() : '',
+                  index === 0 ? week.unit : '',
+                  lesson,
+                  'Standard lesson format',
+                  '1 day',
+                  'medium',
+                  index === 0 ? week.focusStandards.slice(0, 2).join('; ') : '',
+                  index === 0 ? (week.assessmentType || 'None') : ''
+                ]);
+              });
+            }
+          });
+
+          // Combine all content
+          const allRows = [
+            ...summaryRows,
+            csvHeaders,
+            ...csvRows
+          ];
+          
+          // Create properly formatted CSV content with BOM for Excel compatibility
+          const csvContent = '\uFEFF' + allRows
+            .map(row => row.map(cell => escapeCSV(cell?.toString() || '')).join(','))
+            .join('\r\n');
+          
+          // Create and download the file
+          const csvBlob = new Blob([csvContent], { 
+            type: 'text/csv;charset=utf-8;' 
+          });
           const csvUrl = URL.createObjectURL(csvBlob);
           const csvLink = document.createElement('a');
           csvLink.href = csvUrl;
-          csvLink.download = `pacing-guide-grade-${pacingGuide.overview.gradeLevel}.csv`;
+          csvLink.download = `pacing-guide-grade-${pacingGuide.overview.gradeLevel}-detailed.csv`;
           csvLink.click();
           URL.revokeObjectURL(csvUrl);
-          setAnnouncements('CSV file downloaded');
+          setAnnouncements('Enhanced CSV file downloaded - optimized for Excel and Google Sheets printing');
           break;
 
         case 'pdf':
-          // For PDF, we would typically use a service or library
-          // For now, we'll create a simple HTML print version
-          const printWindow = window.open('', '_blank');
-          if (printWindow) {
-            printWindow.document.write(`
-              <html>
-                <head>
-                  <title>Grade ${pacingGuide.overview.gradeLevel} Pacing Guide</title>
-                  <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; }
-                    .header { border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
-                    .week { border: 1px solid #ccc; margin-bottom: 10px; padding: 10px; }
-                    .week-title { font-weight: bold; margin-bottom: 5px; }
-                    ul { margin: 5px 0; padding-left: 20px; }
-                    @media print { 
-                      body { margin: 0; }
-                      .week { page-break-inside: avoid; }
+          // Create a blob-based HTML document for better compatibility
+          const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <title>Grade ${pacingGuide.overview.gradeLevel} Pacing Guide</title>
+                <meta charset="UTF-8">
+                <style>
+                  body { 
+                    font-family: Arial, sans-serif; 
+                    margin: 20px; 
+                    line-height: 1.4;
+                    color: #333;
+                  }
+                  .header { 
+                    border-bottom: 2px solid #000; 
+                    padding-bottom: 15px; 
+                    margin-bottom: 25px; 
+                    text-align: center;
+                  }
+                  .header h1 { margin: 0 0 10px 0; font-size: 24px; }
+                  .header p { margin: 0; color: #666; font-size: 14px; }
+                  .week { 
+                    border: 1px solid #ddd; 
+                    margin-bottom: 15px; 
+                    padding: 15px; 
+                    border-radius: 4px;
+                    background: #fafafa;
+                  }
+                  .week-title { 
+                    font-weight: bold; 
+                    margin-bottom: 10px; 
+                    font-size: 16px;
+                    color: #2563eb;
+                  }
+                  .section { margin-bottom: 8px; }
+                  .section strong { color: #374151; }
+                  ul { margin: 5px 0; padding-left: 20px; }
+                  li { margin-bottom: 3px; }
+                  .explanation { 
+                    background: #f8fafc; 
+                    border: 1px solid #e2e8f0;
+                    padding: 20px; 
+                    margin: 20px 0; 
+                    border-radius: 6px;
+                    line-height: 1.6;
+                  }
+                  .explanation h3 { 
+                    margin: 0 0 12px 0; 
+                    color: #1e40af; 
+                    font-size: 16px;
+                  }
+                  .explanation p { 
+                    margin: 0; 
+                    color: #475569; 
+                    font-size: 13px;
+                  }
+                  .session-detail { 
+                    background: #e0f2fe; 
+                    padding: 8px; 
+                    margin: 5px 0; 
+                    border-radius: 3px;
+                    font-size: 13px;
+                  }
+                  @media print { 
+                    body { margin: 15px; font-size: 12px; }
+                    .week { 
+                      page-break-inside: avoid; 
+                      border: 1px solid #333;
+                      background: #fff;
+                      margin-bottom: 10px;
                     }
-                  </style>
-                </head>
-                <body>
-                  <div class="header">
-                    <h1>Grade ${pacingGuide.overview.gradeLevel} Mathematics Pacing Guide</h1>
-                    <p>${pacingGuide.overview.timeframe} • ${pacingGuide.overview.totalWeeks} weeks • ${pacingGuide.overview.lessonsPerWeek} lessons/week</p>
+                    .header { page-break-after: avoid; }
+                    .session-detail { background: #f5f5f5; }
+                  }
+                </style>
+              </head>
+              <body>
+                <div class="header">
+                  <h1>Grade ${pacingGuide.overview.gradeLevel} Mathematics Pacing Guide</h1>
+                  <p>${pacingGuide.overview.timeframe} • ${pacingGuide.overview.totalWeeks} weeks • ${pacingGuide.overview.lessonsPerWeek} lessons/week</p>
+                  <p>Generated: ${new Date().toLocaleDateString()}</p>
+                </div>
+                
+                ${pacingGuide.explanation ? `
+                  <div class="explanation">
+                    <h3>Curriculum Design Rationale</h3>
+                    <p>${pacingGuide.explanation}</p>
                   </div>
-                  ${pacingGuide.weeklySchedule.map(week => `
-                    <div class="week">
-                      <div class="week-title">Week ${week.week}: ${week.unit}</div>
-                      <div><strong>Lessons:</strong></div>
+                ` : ''}
+                
+                ${pacingGuide.weeklySchedule.map(week => `
+                  <div class="week">
+                    <div class="week-title">Week ${week.week}: ${week.unit}</div>
+                    
+                    <div class="section">
+                      <strong>Lessons:</strong>
                       <ul>${week.lessons.map(lesson => `<li>${lesson}</li>`).join('')}</ul>
-                      <div><strong>Focus Standards:</strong> ${week.focusStandards.join(', ')}</div>
-                      ${week.assessmentType ? `<div><strong>Assessment:</strong> ${week.assessmentType}</div>` : ''}
                     </div>
-                  `).join('')}
-                </body>
-              </html>
-            `);
-            printWindow.document.close();
-            printWindow.print();
+                    
+                    ${week.sessionDetails && week.sessionDetails.length > 0 ? `
+                      <div class="section">
+                        <strong>Session Details:</strong>
+                        ${week.sessionDetails.map(session => `
+                          <div class="session-detail">
+                            <strong>${session.lesson}:</strong> 
+                            ${session.sessions ? session.sessions.join(' → ') : 'Sessions not specified'} 
+                            (${session.duration || 'Duration not specified'}, 
+                            ${session.complexity || 'medium'} complexity)
+                          </div>
+                        `).join('')}
+                      </div>
+                    ` : ''}
+                    
+                    <div class="section">
+                      <strong>Focus Standards:</strong> ${week.focusStandards.join(', ')}
+                    </div>
+                    
+                    ${week.assessmentType ? `
+                      <div class="section">
+                        <strong>Assessment:</strong> ${week.assessmentType}
+                      </div>
+                    ` : ''}
+                  </div>
+                `).join('')}
+              </body>
+            </html>
+          `;
+
+          // Create blob and open in new window for printing
+          const blob = new Blob([htmlContent], { type: 'text/html' });
+          const url = URL.createObjectURL(blob);
+          
+          try {
+            const printWindow = window.open(url, '_blank');
+            if (printWindow) {
+              // Wait for content to load then trigger print
+              printWindow.onload = () => {
+                setTimeout(() => {
+                  printWindow.print();
+                  // Clean up the URL after printing
+                  setTimeout(() => {
+                    printWindow.close();
+                    URL.revokeObjectURL(url);
+                  }, 1000);
+                }, 500);
+              };
+              setAnnouncements('PDF print dialog opened - content optimized for printing');
+            } else {
+              URL.revokeObjectURL(url);
+              setAnnouncements('Unable to open print window. Please check popup blockers.');
+            }
+          } catch (error) {
+            URL.revokeObjectURL(url);
+            console.error('Print error:', error);
+            setAnnouncements('Print failed. You can use CSV export as an alternative.');
           }
-          setAnnouncements('PDF print dialog opened');
           break;
       }
     } catch (error) {

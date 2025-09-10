@@ -103,6 +103,16 @@ export function PacingGuideResults({
               </svg>
               Export PDF
             </button>
+            <button
+              onClick={() => handleExport('csv')}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              aria-label="Export pacing guide as Excel/Google Sheets CSV"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Export CSV
+            </button>
             {onModify && (
               <button
                 onClick={onModify}
@@ -267,11 +277,35 @@ function WeeklyScheduleView({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <h5 className="font-medium text-gray-900 mb-2">Lessons</h5>
-                  <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-                    {(week.lessons || []).map((lesson, index) => (
-                      <li key={index}>{lesson}</li>
-                    ))}
-                  </ul>
+                  <div className="space-y-3">
+                    {(week.lessons || []).map((lesson, index) => {
+                      const sessionDetail = (week as any).sessionDetails?.[index];
+                      return (
+                        <div key={index} className="bg-gray-50 p-3 rounded-md">
+                          <div className="text-sm text-gray-900 font-medium">{lesson}</div>
+                          {sessionDetail && (
+                            <div className="mt-2 text-xs text-gray-600">
+                              <div className="flex items-center space-x-4">
+                                <span className="font-medium">
+                                  Sessions: {sessionDetail.sessions?.join(' → ') || 'N/A'}
+                                </span>
+                                <span>
+                                  Duration: {sessionDetail.duration || 'N/A'}
+                                </span>
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  sessionDetail.complexity === 'high' ? 'bg-red-100 text-red-800' :
+                                  sessionDetail.complexity === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                                  'bg-green-100 text-green-800'
+                                }`}>
+                                  {sessionDetail.complexity || 'medium'} complexity
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
                 <div>
                   <h5 className="font-medium text-gray-900 mb-2">Learning Objectives</h5>
