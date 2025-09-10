@@ -1,0 +1,169 @@
+{
+  "analysis_date": "2025-09-08",
+  "phase": "Phase 1: Pattern Recognition",
+  "objective": "Document session patterns across all curriculum grades",
+  
+  "session_identification_patterns": {
+    "primary_pattern": "LESSON {number} | SESSION {number}",
+    "examples": [
+      "LESSON 1 | SESSION 1 Explore Rigid Transformations",
+      "LESSON 2 | SESSION 2", 
+      "LESSON 9 | SESSION 5 Refine Deriving and Graphing Linear"
+    ],
+    "regex_patterns": {
+      "session_marker": "LESSON\\s+(\\d+)\\s*\\|\\s*SESSION\\s+(\\d+)",
+      "session_with_type": "LESSON\\s+(\\d+)\\s*\\|\\s*SESSION\\s+(\\d+)\\s+(Explore|Develop|Refine)",
+      "lesson_title": "LESSON\\s+(\\d+)\\s+([^|]+?)(?:\\s*LESSON\\s+\\d+\\s*\\|\\s*SESSION|$)"
+    },
+    "validation_rules": {
+      "session_numbers": "Should be 1-5 per lesson",
+      "session_sequence": "Must be sequential within lesson",
+      "lesson_numbers": "Sequential within units"
+    }
+  },
+
+  "session_types_analysis": {
+    "session_1": {
+      "typical_type": "Explore",
+      "purpose": "Connect prior knowledge, introduce new lesson content",
+      "patterns": [
+        "Explore [Topic]",
+        "SESSION 1 Explore"
+      ],
+      "examples": [
+        "LESSON 1 | SESSION 1 Explore Rigid Transformations",
+        "LESSON 4 | SESSION 1 Explore Dilations and Similarity"
+      ]
+    },
+    "sessions_2_4": {
+      "typical_type": "Develop", 
+      "purpose": "Build multi-dimensional understanding using rich tasks, practice skills",
+      "patterns": [
+        "Develop [Specific Skill]",
+        "SESSION 2-4 content varies"
+      ],
+      "examples": [
+        "LESSON 9 | SESSION 2 Develop Deriving y = mx + b",
+        "LESSON 8 | SESSION 3 Develop Finding the Slope"
+      ]
+    },
+    "session_5": {
+      "typical_type": "Refine",
+      "purpose": "Strengthen skills and fluency, extend learning",
+      "patterns": [
+        "Refine [Topic]",
+        "SESSION 5 Refine"
+      ],
+      "examples": [
+        "LESSON 9 | SESSION 5 Refine Deriving and Graphing Linear",
+        "LESSON 4 | SESSION 3 Refine Ideas About Dilations and Similarity"
+      ]
+    }
+  },
+
+  "grade_level_analysis": {
+    "grade_6": {
+      "volumes": ["RCM06_NA_SW_V1", "RCM06_NA_SW_V2"],
+      "session_pattern_consistency": "High",
+      "sample_sessions": [
+        "LESSON 20 | SESSION 2",
+        "LESSON 21 | SESSION 5",
+        "LESSON 26 | SESSION 1"
+      ],
+      "notes": "Clear session numbering, follows 5-session pattern"
+    },
+    "grade_7": {
+      "volumes": ["RCM07_NA_SW_V1", "RCM07_NA_SW_V2"],
+      "session_pattern_consistency": "High", 
+      "sample_sessions": [
+        "LESSON 2 | SESSION 1",
+        "LESSON 3 | SESSION 2", 
+        "LESSON 33 | SESSION 1"
+      ],
+      "notes": "Consistent with Grade 6 patterns"
+    },
+    "grade_8": {
+      "volumes": ["RCM08_NA_SW_V1", "RCM08_NA_SW_V2"],
+      "session_pattern_consistency": "High",
+      "sample_sessions": [
+        "LESSON 1 | SESSION 1 Explore Rigid Transformations",
+        "LESSON 9 | SESSION 2 Develop Deriving y = mx + b",
+        "LESSON 16 | SESSION 1"
+      ],
+      "notes": "Most detailed session type identification found"
+    },
+    "algebra_1": {
+      "volumes": ["ALG01_NA_SW_V1", "ALG01_NA_SW_V2"],
+      "session_pattern_consistency": "Assumed High",
+      "sample_sessions": [],
+      "notes": "Need to analyze - likely follows same pattern"
+    }
+  },
+
+  "page_range_patterns": {
+    "sessions_per_lesson": "Typically 5 sessions",
+    "pages_per_session": "Variable, typically 2-4 pages",
+    "session_boundaries": {
+      "identification": "Session markers in text_preview field",
+      "page_calculation": "Distance between session markers indicates session length",
+      "edge_cases": [
+        "Sessions spanning multiple pages",
+        "Sessions with sub-activities",
+        "Assessment pages within sessions"
+      ]
+    }
+  },
+
+  "content_structure_patterns": {
+    "session_content_types": [
+      "Learning objectives introduction",
+      "Guided practice activities", 
+      "Independent practice problems",
+      "Assessment checkpoints",
+      "Reflection activities"
+    ],
+    "session_flow": {
+      "explore": "Problem introduction, prior knowledge activation",
+      "develop": "Skill building, guided practice, independent work",
+      "refine": "Fluency practice, extension activities, assessment"
+    }
+  },
+
+  "edge_cases_identified": {
+    "non_standard_sessions": [
+      {
+        "pattern": "LESSON # | SESSION #",
+        "example": "LESSON 11 | SESSION 3",
+        "issue": "Generic placeholder pattern found"
+      }
+    ],
+    "math_in_action_lessons": {
+      "pattern": "Different structure for unit-ending lessons",
+      "notes": "May not follow standard 5-session pattern"
+    },
+    "assessment_sessions": {
+      "pattern": "Unit tests and checkpoints",
+      "notes": "May be embedded within regular sessions"
+    },
+    "missing_session_types": {
+      "issue": "Some sessions don't explicitly state Explore/Develop/Refine",
+      "solution": "Infer from session number and content patterns"
+    }
+  },
+
+  "extraction_challenges": {
+    "text_parsing": "Session information embedded in text_preview strings",
+    "page_range_calculation": "Must calculate from page numbers of adjacent sessions",
+    "session_type_inference": "Not all sessions explicitly state type",
+    "lesson_boundary_detection": "Must distinguish between lesson titles and session markers"
+  },
+
+  "recommended_extraction_strategy": {
+    "step_1": "Parse all text_preview fields for session markers",
+    "step_2": "Extract lesson numbers, session numbers, and optional session types", 
+    "step_3": "Calculate page ranges based on session marker positions",
+    "step_4": "Infer missing session types based on session number patterns",
+    "step_5": "Validate session completeness (1-5 per lesson)",
+    "step_6": "Handle edge cases and Math in Action lessons separately"
+  }
+}

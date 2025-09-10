@@ -204,6 +204,7 @@ export interface GeneratedPacingGuide {
   differentiationStrategies: DifferentiationStrategy[];
   flexibilityOptions: FlexibilityOption[];
   standardsAlignment: StandardsAlignment[];
+  explanation?: string; // Enhanced curriculum transparency
 }
 
 export interface WeeklySchedule {
@@ -2488,13 +2489,13 @@ Generate a comprehensive, implementable guide that teachers can use immediately 
       
       console.log('🔗 [Dual-Grade Accelerated] Curricula interweaved successfully');
       
-      // Generate comprehensive explanation
-      // Generate methodology explanation
+      // Generate comprehensive explanation with curriculum transparency
       const explanation = await this.generateDualGradeExplanation(
         grade1Curriculum,
         grade2Curriculum, 
         interweavedCurriculum,
-        gradeConfig
+        gradeConfig,
+        interweavedCurriculum.overlapAnalysis
       );      const response: PacingGuideResponse = {
         success: true,
         pacingGuide: {
@@ -2831,7 +2832,9 @@ CRITICAL: Return ONLY the JSON object. No additional text.
       standardsAlignment: [
         ...grade1Curriculum.standardsAlignment || [],
         ...grade2Curriculum.standardsAlignment || []
-      ]
+      ],
+      // Include overlap analysis for curriculum transparency
+      overlapAnalysis: analysisResult
     };
   }
 
@@ -3133,22 +3136,32 @@ CRITICAL: Return ONLY the JSON object. No additional text.
   }
 
   /**
-   * Generate explanation for dual-grade approach
+   * Generate explanation for dual-grade approach with enhanced curriculum transparency
    */
   private async generateDualGradeExplanation(
     grade1Curriculum: any,
     grade2Curriculum: any,
     finalCurriculum: any,
-    gradeConfig: any
+    gradeConfig: any,
+    overlapAnalysis?: any
   ): Promise<string> {
     const grade1Count = grade1Curriculum.weeklySchedule?.length || 0;
     const grade2Count = grade2Curriculum.weeklySchedule?.length || 0;
     const finalWeeks = finalCurriculum.weeklySchedule?.length || 0;
 
-    // Generate AI-powered explanation of the logic
-    const explanationPrompt = `🎯 CURRICULUM DESIGN EXPLANATION
+    // Enhanced curriculum transparency with decision tracking
+    const curriculumDecisions = this.generateCurriculumDecisionBreakdown(
+      grade1Curriculum,
+      grade2Curriculum, 
+      finalCurriculum,
+      gradeConfig,
+      overlapAnalysis
+    );
 
-You are an expert curriculum designer who has just created a dual-grade accelerated pacing guide. Write a clear, professional explanation (100-400 words) of the pedagogical logic and decision-making process behind this curriculum design.
+    // Generate AI-powered explanation of the logic
+    const explanationPrompt = `🎯 CURRICULUM EXPLANATION REQUEST
+
+You are an expert curriculum designer. Write a clear, readable explanation of the dual-grade accelerated curriculum you created.
 
 **CURRICULUM DETAILS:**
 - Grade Levels: ${gradeConfig.selectedGrades[0]} and ${gradeConfig.selectedGrades[1]}
@@ -3157,44 +3170,66 @@ You are an expert curriculum designer who has just created a dual-grade accelera
 - Grade ${gradeConfig.selectedGrades[1]} Essential Lessons: ${grade2Count}
 - Pathway Type: ${gradeConfig.pathwayType}
 - Emphasis: ${gradeConfig.emphasis}
+- Content Overlaps Detected: ${overlapAnalysis?.overlaps?.length || 0}
+- Redundant Content Removed: ${overlapAnalysis?.redundantGrade8Topics?.length || 0}
 
-**WRITE AN EXPLANATION THAT COVERS:**
-1. **Rationale**: Why this dual-grade approach was chosen
-2. **Lesson Selection**: How you determined which lessons were essential vs. supporting
-3. **Sequencing Logic**: How you decided the order and timing of concepts
-4. **Session Structure**: Why you used specific session patterns (Explore/Develop/Refine)
-5. **Student Readiness**: How this supports accelerated learners
+**INSTRUCTIONS:**
+Write a professional explanation that includes:
 
-**TONE:** Professional but accessible to teachers and administrators
-**LENGTH:** 100-400 words
-**FOCUS:** Clear reasoning behind educational decisions
+1. A paragraph explaining the overall design rationale
+2. Specific curriculum decisions in bullet format
 
-Return ONLY the explanation text - no additional formatting or labels.`;
+**IMPORTANT:** 
+- Write in plain text, NOT JSON
+- Use markdown formatting with bullet points
+- Be specific about which lessons were merged, skipped, or preserved
+- Include educational reasoning for each decision
+
+**FORMAT EXAMPLE:**
+This dual-grade curriculum was designed to...
+
+**Detailed Curriculum Decisions:**
+
+**• Merged Lessons:**
+- Combined Grade 8 "Linear Equations" with Algebra 1 "Solving Linear Systems" - Natural progression from basic to advanced
+- Integrated Grade 8 "Functions" with Algebra 1 "Function Analysis" - Builds conceptual depth
+
+**• Skipped Content:**
+- Omitted Grade 8 "Review Topics" - Redundant with advanced content
+- Removed basic arithmetic review - Students have mastered these skills
+
+**• Preserved Essential Content:**
+- Maintained Grade 8 "Transformations" (High Priority) - Foundation for geometry
+- Kept Algebra 1 "Quadratic Functions" (Critical) - Gateway concept
+
+Return ONLY the readable text explanation. Do NOT format as JSON or include any JSON syntax.`;
 
     try {
-      console.log('🤖 [Explanation] Generating curriculum logic explanation...');
-      const explanation = await this.callOpenAI(explanationPrompt);
+      console.log('🤖 [Enhanced Explanation] Generating comprehensive curriculum transparency...');
+      const rawExplanation = await this.callOpenAI(explanationPrompt);
       
-      if (explanation && explanation.trim().length > 50) {
-        console.log('✅ [Explanation] Generated comprehensive explanation:', explanation.length, 'characters');
-        return explanation.trim();
+      // Clean up any JSON formatting that might have sneaked in
+      const cleanedExplanation = this.cleanExplanationText(rawExplanation);
+      
+      if (cleanedExplanation && cleanedExplanation.trim().length > 100) {
+        console.log('✅ [Enhanced Explanation] Generated transparent explanation:', cleanedExplanation.length, 'characters');
+        return cleanedExplanation.trim();
       } else {
-        console.log('⚠️ [Explanation] AI explanation too short, using fallback');
+        console.log('⚠️ [Enhanced Explanation] AI explanation insufficient, using enhanced fallback');
         throw new Error('AI explanation insufficient');
       }
     } catch (error) {
-      console.log('🔄 [Explanation] Using structured fallback explanation');
+      console.log('🔄 [Enhanced Explanation] Using enhanced structured fallback with curriculum decisions');
       
-      // Fallback to structured explanation if AI fails
-      return `This dual-grade accelerated curriculum was strategically designed to serve advanced learners by condensing and interweaving essential content from Grade ${gradeConfig.selectedGrades[0]} and Grade ${gradeConfig.selectedGrades[1]} over ${finalWeeks} weeks.
-
-**Lesson Selection Logic:** From comprehensive grade-level curricula, we identified ${grade1Count} essential Grade ${gradeConfig.selectedGrades[0]} lessons and ${grade2Count} essential Grade ${gradeConfig.selectedGrades[1]} lessons by focusing exclusively on major work standards and gateway concepts that unlock advanced mathematical thinking. Non-essential review sessions, practice-only lessons, and supporting standards were strategically removed.
-
-**Sequencing Approach:** The curriculum employs a "foundational-first" interweaving strategy, beginning with core Grade ${gradeConfig.selectedGrades[0]} concepts to establish mathematical foundations before introducing Grade ${gradeConfig.selectedGrades[1]} content. This ensures proper prerequisite relationships and maintains mathematical coherence throughout the acceleration.
-
-**Session Structure:** Each lesson utilizes intelligent daily session allocation (Explore, Develop, Refine) based on content complexity. High-complexity gateway concepts receive 4-day treatment with discovery phases, while familiar or bridge concepts use streamlined 2-3 day progressions, maximizing instructional efficiency.
-
-**Student Readiness:** This design specifically supports accelerated learners by eliminating redundancy, maintaining rigorous pacing, and preserving depth over breadth—ensuring students experience essential mathematical concepts from both grade levels while preparing them for advanced coursework.`;
+      // Enhanced fallback with curriculum transparency
+      return this.generateEnhancedFallbackExplanation(
+        grade1Curriculum,
+        grade2Curriculum,
+        finalCurriculum,
+        gradeConfig,
+        overlapAnalysis,
+        curriculumDecisions
+      );
     }
   }
 
@@ -3512,5 +3547,231 @@ ALWAYS specify which textbook: "Grade 8 Book" or "Algebra 1 Book"`;
     if (grades.includes('9')) indicators.push('A1 (Algebra 1)');
     
     return indicators.join(', ');
+  }
+
+  /**
+   * Generate detailed curriculum decision breakdown for transparency
+   */
+  private generateCurriculumDecisionBreakdown(
+    grade1Curriculum: any,
+    grade2Curriculum: any,
+    finalCurriculum: any,
+    gradeConfig: any,
+    overlapAnalysis?: any
+  ): any {
+    console.log('📋 [Curriculum Decisions] Generating decision breakdown...');
+    
+    const decisions = {
+      mergedLessons: [] as any[],
+      skippedContent: [] as any[],
+      preservedEssential: [] as any[],
+      overlapResolutions: [] as any[]
+    };
+
+    // Analyze merged lessons based on overlap analysis
+    if (overlapAnalysis?.overlaps) {
+      overlapAnalysis.overlaps.forEach((overlap: any) => {
+        if (overlap.overlapScore > 0.75) {
+          decisions.mergedLessons.push({
+            topic: overlap.topic,
+            reason: `High content overlap (${Math.round(overlap.overlapScore * 100)}%) - Combined for efficiency`,
+            priority: 'High',
+            gradeOrigins: [gradeConfig.selectedGrades[0], gradeConfig.selectedGrades[1]]
+          });
+        }
+      });
+    }
+
+    // Analyze skipped content from redundant topics
+    if (overlapAnalysis?.redundantGrade8Topics) {
+      overlapAnalysis.redundantGrade8Topics.forEach((topic: any) => {
+        decisions.skippedContent.push({
+          lesson: topic.unit || topic.lessons?.[0] || 'Unknown Topic',
+          reason: 'Redundant with higher-level content in Algebra 1',
+          grade: gradeConfig.selectedGrades[0],
+          standards: topic.focusStandards || []
+        });
+      });
+    }
+
+    // Analyze preserved essential content
+    if (overlapAnalysis?.uniqueGrade8Topics) {
+      overlapAnalysis.uniqueGrade8Topics.forEach((topic: any) => {
+        if (topic.priority === 'high') {
+          decisions.preservedEssential.push({
+            lesson: topic.unit || topic.lessons?.[0] || 'Unknown Topic',
+            reason: 'Essential foundation for advanced mathematics',
+            priority: 'Critical',
+            grade: gradeConfig.selectedGrades[0],
+            standards: topic.focusStandards || []
+          });
+        }
+      });
+    }
+
+    if (overlapAnalysis?.uniqueAlgebra1Topics) {
+      overlapAnalysis.uniqueAlgebra1Topics.forEach((topic: any) => {
+        if (topic.priority === 'high') {
+          decisions.preservedEssential.push({
+            lesson: topic.unit || topic.lessons?.[0] || 'Unknown Topic',
+            reason: 'Gateway to advanced mathematics',
+            priority: 'Critical',
+            grade: gradeConfig.selectedGrades[1],
+            standards: topic.focusStandards || []
+          });
+        }
+      });
+    }
+
+    console.log('✅ [Curriculum Decisions] Generated decision breakdown:', {
+      mergedLessons: decisions.mergedLessons.length,
+      skippedContent: decisions.skippedContent.length,
+      preservedEssential: decisions.preservedEssential.length
+    });
+
+    return decisions;
+  }
+
+  /**
+   * Generate enhanced fallback explanation with curriculum transparency
+   */
+  private generateEnhancedFallbackExplanation(
+    grade1Curriculum: any,
+    grade2Curriculum: any,
+    finalCurriculum: any,
+    gradeConfig: any,
+    overlapAnalysis?: any,
+    curriculumDecisions?: any
+  ): string {
+    const grade1Count = grade1Curriculum.weeklySchedule?.length || 0;
+    const grade2Count = grade2Curriculum.weeklySchedule?.length || 0;
+    const finalWeeks = finalCurriculum.weeklySchedule?.length || 0;
+    
+    const overlapsDetected = overlapAnalysis?.overlaps?.length || 0;
+    const redundantRemoved = overlapAnalysis?.redundantGrade8Topics?.length || 0;
+
+    let explanation = `This dual-grade accelerated curriculum was strategically designed to serve advanced learners by condensing and interweaving essential content from Grade ${gradeConfig.selectedGrades[0]} and Grade ${gradeConfig.selectedGrades[1]} over ${finalWeeks} weeks.
+
+**Lesson Selection Logic:** From comprehensive grade-level curricula, we identified ${grade1Count} essential Grade ${gradeConfig.selectedGrades[0]} lessons and ${grade2Count} essential Grade ${gradeConfig.selectedGrades[1]} lessons by focusing exclusively on major work standards and gateway concepts that unlock advanced mathematical thinking. Content overlap analysis detected ${overlapsDetected} redundant topics, with ${redundantRemoved} lessons strategically removed to eliminate repetition while preserving essential mathematical understanding.
+
+**Detailed Curriculum Decisions:**
+
+**• Merged Lessons:`;
+
+    // Add specific merged lessons if available
+    if (curriculumDecisions?.mergedLessons?.length > 0) {
+      curriculumDecisions.mergedLessons.slice(0, 3).forEach((merge: any) => {
+        explanation += `\n- ${merge.topic} - ${merge.reason}`;
+      });
+    } else {
+      explanation += `\n- Grade ${gradeConfig.selectedGrades[0]} foundational concepts combined with Grade ${gradeConfig.selectedGrades[1]} applications for enhanced depth
+- Linear relationships lessons integrated across grade levels for comprehensive understanding
+- Equation solving concepts merged to build from basic to advanced techniques`;
+    }
+
+    explanation += `\n\n**• Skipped Content:`;
+    
+    // Add specific skipped content if available
+    if (curriculumDecisions?.skippedContent?.length > 0) {
+      curriculumDecisions.skippedContent.slice(0, 3).forEach((skip: any) => {
+        explanation += `\n- ${skip.lesson} (Grade ${skip.grade}) - ${skip.reason}`;
+      });
+    } else {
+      explanation += `\n- Review and practice-only lessons that don't introduce new concepts
+- Supporting work standards that don't directly support major work objectives
+- Redundant content covered more comprehensively in the higher grade level`;
+    }
+
+    explanation += `\n\n**• Preserved Essential Content:`;
+    
+    // Add specific preserved content if available
+    if (curriculumDecisions?.preservedEssential?.length > 0) {
+      curriculumDecisions.preservedEssential.slice(0, 3).forEach((preserve: any) => {
+        explanation += `\n- ${preserve.lesson} (${preserve.priority} Priority) - ${preserve.reason}`;
+      });
+    } else {
+      explanation += `\n- All major work standards that form the foundation for advanced mathematics
+- Gateway concepts that unlock future learning opportunities  
+- Critical thinking and problem-solving frameworks that transfer across mathematical domains`;
+    }
+
+    explanation += `\n\n**Sequencing Approach:** The curriculum employs a "foundational-first" interweaving strategy, beginning with core Grade ${gradeConfig.selectedGrades[0]} concepts to establish mathematical foundations before introducing Grade ${gradeConfig.selectedGrades[1]} content. This ensures proper prerequisite relationships and maintains mathematical coherence throughout the acceleration.
+
+**Student Readiness:** This design specifically supports accelerated learners by eliminating redundancy, maintaining rigorous pacing, and preserving depth over breadth—ensuring students experience essential mathematical concepts from both grade levels while preparing them for advanced coursework.`;
+
+    return explanation;
+  }
+
+  /**
+   * Clean explanation text to remove JSON formatting and extract readable content
+   */
+  private cleanExplanationText(rawText: string): string {
+    if (!rawText) return '';
+    
+    let cleanText = rawText.trim();
+    
+    // Remove JSON wrapper if present
+    if (cleanText.startsWith('{') && cleanText.endsWith('}')) {
+      try {
+        const jsonData = JSON.parse(cleanText);
+        
+        // Extract readable content from common JSON structures
+        if (jsonData.CurriculumDesignRationale) {
+          let extracted = jsonData.CurriculumDesignRationale + '\n\n';
+          
+          if (jsonData.DetailedCurriculumDecisions) {
+            extracted += '**Detailed Curriculum Decisions:**\n\n';
+            
+            const decisions = jsonData.DetailedCurriculumDecisions;
+            
+            if (decisions.MergedLessons) {
+              extracted += '**• Merged Lessons:**\n';
+              decisions.MergedLessons.forEach((lesson: string) => {
+                extracted += `- ${lesson}\n`;
+              });
+              extracted += '\n';
+            }
+            
+            if (decisions.SkippedContent) {
+              extracted += '**• Skipped Content:**\n';
+              decisions.SkippedContent.forEach((content: string) => {
+                extracted += `- ${content}\n`;
+              });
+              extracted += '\n';
+            }
+            
+            if (decisions.PreservedEssentialContent) {
+              extracted += '**• Preserved Essential Content:**\n';
+              decisions.PreservedEssentialContent.forEach((content: string) => {
+                extracted += `- ${content}\n`;
+              });
+              extracted += '\n';
+            }
+            
+            if (decisions.ContentOverlapResolutions) {
+              extracted += '**• Content Overlap Resolutions:**\n';
+              decisions.ContentOverlapResolutions.forEach((resolution: string) => {
+                extracted += `- ${resolution}\n`;
+              });
+            }
+          }
+          
+          return extracted.trim();
+        }
+      } catch (e) {
+        console.log('⚠️ [Clean Text] Failed to parse JSON, using raw text');
+      }
+    }
+    
+    // Remove any remaining JSON-like formatting
+    cleanText = cleanText
+      .replace(/^\{.*?"([^"]+)"\s*:\s*"/, '$1: ') // Remove JSON property syntax
+      .replace(/",\s*"([^"]+)"\s*:\s*"/g, '\n\n$1: ') // Convert JSON properties to readable format
+      .replace(/"\s*\}\s*$/, '') // Remove closing JSON
+      .replace(/\\"/g, '"') // Unescape quotes
+      .replace(/\\\//g, '/') // Unescape slashes
+      .trim();
+    
+    return cleanText;
   }
 }

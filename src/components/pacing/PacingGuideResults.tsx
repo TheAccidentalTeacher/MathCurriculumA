@@ -213,6 +213,48 @@ function OverviewView({
           </p>
         </div>
       </div>
+
+      {/* Enhanced Curriculum Transparency */}
+      {pacingGuide.explanation && (
+        <div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-4">
+            Curriculum Design & Decisions
+          </h3>
+          <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-400">
+            <div className="prose prose-gray max-w-none">
+              {pacingGuide.explanation.split('\n').map((line, index) => {
+                if (line.trim() === '') return <br key={index} />;
+                if (line.startsWith('**•') || line.startsWith('• ')) {
+                  return (
+                    <div key={index} className="ml-4 text-gray-700 mb-2">
+                      <span className="text-blue-600 font-medium">•</span> {line.replace(/^\*?\*?•?\s*/, '')}
+                    </div>
+                  );
+                }
+                if (line.startsWith('**') && line.endsWith('**')) {
+                  return (
+                    <h4 key={index} className="font-semibold text-gray-900 mt-4 mb-2">
+                      {line.replace(/\*\*/g, '')}
+                    </h4>
+                  );
+                }
+                if (line.startsWith('- ')) {
+                  return (
+                    <div key={index} className="ml-6 text-gray-600 mb-1">
+                      <span className="text-gray-400">−</span> {line.substring(2)}
+                    </div>
+                  );
+                }
+                return (
+                  <p key={index} className="text-gray-700 mb-3 leading-relaxed">
+                    {line}
+                  </p>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
