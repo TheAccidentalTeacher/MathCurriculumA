@@ -154,13 +154,10 @@ export default function VirtualTutorPage() {
           </div>
         </div>
 
-        {/* Footer Info */}
-        <div className="mt-6 text-center">
-          <div className="inline-flex items-center space-x-2 text-sm text-gray-500 bg-white px-4 py-2 rounded-lg shadow-sm border">
-            <span>🤖</span>
-            <span>Powered by OpenAI GPT-4o</span>
-            <span>•</span>
-            <span>Phase 3 AI Integration Active</span>
+        {/* Minimal AI Attribution - Bottom Right Corner */}
+        <div className="fixed bottom-2 right-2 z-10">
+          <div className="text-xs text-gray-400 opacity-50 hover:opacity-75 transition-opacity">
+            GPT
           </div>
         </div>
       </div>

@@ -73,11 +73,10 @@ export default function Home() {
     explosionContainer.style.background = 'radial-gradient(circle at center, rgba(147, 51, 234, 0.1) 0%, rgba(0, 0, 0, 0.3) 100%)';
     document.body.appendChild(explosionContainer);
     
-    // Generate multiple particle layers
+    // Generate multiple particle layers using new avatar images
     const particleImages = [
-      '/animations/download-17.png', '/animations/download-18.png', '/animations/download-19.png',
-      '/animations/download-20.png', '/animations/download-21.png', '/animations/download-22.png',
-      '/animations/download-23.png', '/animations/download-24.png'
+      '/animations/somers-1.png', '/animations/somers-2.png', '/animations/somers-3.png', '/animations/somers-4.png',
+      '/animations/gimli-1.png', '/animations/gimli-2.png', '/animations/gimli-3.png', '/animations/gimli-4.png', '/animations/gimli-5.png'
     ];
     
     // Create 50 particle elements
@@ -466,7 +465,7 @@ export default function Home() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
             {/* Grade 6 Volumes */}
             <Link href="/viewer/grade6-volume1" data-volume-card className="block p-4 bg-indigo-600 text-white rounded-xl shadow-lg hover:bg-indigo-700 transition-colors relative overflow-hidden group">
-              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/download-11.png)'}}></div>
+              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/somers-1.png)'}}></div>
               <div className="text-center relative z-10">
                 <div className="text-3xl mb-2 drop-shadow-lg">📚</div>
                 <div className="font-bold text-lg drop-shadow-md">Grade 6 Volume 1</div>
@@ -474,7 +473,7 @@ export default function Home() {
               </div>
             </Link>
             <Link href="/viewer/grade6-volume2" data-volume-card className="block p-4 bg-teal-600 text-white rounded-xl shadow-lg hover:bg-teal-700 transition-colors relative overflow-hidden group">
-              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/download-12.png)'}}></div>
+              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/somers-2.png)'}}></div>
               <div className="text-center relative z-10">
                 <div className="text-3xl mb-2 drop-shadow-lg">📖</div>
                 <div className="font-bold text-lg drop-shadow-md">Grade 6 Volume 2</div>
@@ -484,7 +483,7 @@ export default function Home() {
             
             {/* Grade 7 Volumes */}
             <Link href="/viewer/volume1" data-volume-card className="block p-4 bg-blue-600 text-white rounded-xl shadow-lg hover:bg-blue-700 transition-colors relative overflow-hidden group">
-              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/download-13.png)'}}></div>
+              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/somers-3.png)'}}></div>
               <div className="text-center relative z-10">
                 <div className="text-3xl mb-2 drop-shadow-lg">📘</div>
                 <div className="font-bold text-lg drop-shadow-md">Grade 7 Volume 1</div>
@@ -492,7 +491,7 @@ export default function Home() {
               </div>
             </Link>
             <Link href="/viewer/volume2" data-volume-card className="block p-4 bg-green-600 text-white rounded-xl shadow-lg hover:bg-green-700 transition-colors relative overflow-hidden group">
-              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/download-14.png)'}}></div>
+              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/somers-4.png)'}}></div>
               <div className="text-center relative z-10">
                 <div className="text-3xl mb-2 drop-shadow-lg">📗</div>
                 <div className="font-bold text-lg drop-shadow-md">Grade 7 Volume 2</div>
@@ -502,7 +501,7 @@ export default function Home() {
             
             {/* Grade 8 Volumes */}
             <Link href="/viewer/grade8-volume1" data-volume-card className="block p-4 bg-purple-600 text-white rounded-xl shadow-lg hover:bg-purple-700 transition-colors relative overflow-hidden group">
-              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/download-15.png)'}}></div>
+              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/gimli-1.png)'}}></div>
               <div className="text-center relative z-10">
                 <div className="text-3xl mb-2 drop-shadow-lg">📙</div>
                 <div className="font-bold text-lg drop-shadow-md">Grade 8 Volume 1</div>
@@ -510,7 +509,7 @@ export default function Home() {
               </div>
             </Link>
             <Link href="/viewer/grade8-volume2" data-volume-card className="block p-4 bg-orange-600 text-white rounded-xl shadow-lg hover:bg-orange-700 transition-colors relative overflow-hidden group">
-              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/download-16.png)'}}></div>
+              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/gimli-2.png)'}}></div>
               <div className="text-center relative z-10">
                 <div className="text-3xl mb-2 drop-shadow-lg">📕</div>
                 <div className="font-bold text-lg drop-shadow-md">Grade 8 Volume 2</div>
@@ -520,7 +519,7 @@ export default function Home() {
             
             {/* Algebra 1 Volumes */}
             <Link href="/viewer/algebra1-volume1" data-volume-card className="block p-4 bg-red-600 text-white rounded-xl shadow-lg hover:bg-red-700 transition-colors relative overflow-hidden group">
-              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/download-17.png)'}}></div>
+              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/gimli-3.png)'}}></div>
               <div className="text-center relative z-10">
                 <div className="text-3xl mb-2 drop-shadow-lg">📐</div>
                 <div className="font-bold text-lg drop-shadow-md">Algebra 1 Volume 1</div>
@@ -528,7 +527,7 @@ export default function Home() {
               </div>
             </Link>
             <Link href="/viewer/algebra1-volume2" data-volume-card className="block p-4 bg-pink-600 text-white rounded-xl shadow-lg hover:bg-pink-700 transition-colors relative overflow-hidden group">
-              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/download-18.png)'}}></div>
+              <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{backgroundImage: 'url(/animations/gimli-4.png)'}}></div>
               <div className="text-center relative z-10">
                 <div className="text-3xl mb-2 drop-shadow-lg">📏</div>
                 <div className="font-bold text-lg drop-shadow-md">Algebra 1 Volume 2</div>
@@ -584,7 +583,8 @@ export default function Home() {
           </div>
         )}
 
-        {/* Search Form */}
+        {/* Search Form - COMMENTED OUT */}
+        {/*
         <form className="space-y-4 mb-8 bg-slate-800 p-6 rounded-lg border border-slate-700" onSubmit={handleSearch}>
           <div className="flex gap-4">
             <input
@@ -603,7 +603,6 @@ export default function Home() {
             </button>
           </div>
           
-          {/* Filters */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <select 
               value={gradeFilter} 
@@ -622,125 +621,14 @@ export default function Home() {
             </select>
           </div>
         </form>
+        */}
 
-        {/* Search Results */}
-        {searchQuery && results.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-4">
-              Search Results for "{searchQuery}" ({results.length} found)
-            </h2>
-            <div className="space-y-4">
-              {results.map((result, idx) => (
-                <div key={idx} className="bg-slate-800 border border-slate-700 rounded-lg p-5">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h3 className="font-semibold text-lg text-blue-400">
-                        {result.topicTitle || result.sectionTitle || result.documentTitle}
-                      </h3>
-                      <div className="text-sm text-slate-400 space-x-2 mt-1">
-                        <span>Grade {result.documentGrade}</span>
-                        {result.sectionType && <span>• {result.sectionType}</span>}
-                        {result.topicType && <span>• {result.topicType}</span>}
-                        {result.difficulty && <span>• {result.difficulty}</span>}
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      {result.documentId && (
-                        <Link 
-                          href={`/document/${result.documentId}`}
-                          className="text-xs px-2 py-1 bg-slate-700 rounded text-slate-300 hover:bg-slate-600"
-                        >
-                          View Document
-                        </Link>
-                      )}
-                      {result.sectionId && (
-                        <Link 
-                          href={`/section/${result.sectionId}`}
-                          className="text-xs px-2 py-1 bg-slate-700 rounded text-slate-300 hover:bg-slate-600"
-                        >
-                          View Section
-                        </Link>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="text-slate-300 leading-relaxed">
-                    <div className="mb-2 text-sm font-medium text-slate-400">
-                      {result.documentTitle} → {result.sectionTitle}
-                    </div>
-                    <p className="line-clamp-3">
-                      {result.topicContent && result.topicContent.length > 300
-                        ? `${result.topicContent.substring(0, 300)}...`
-                        : result.topicContent || 'No content preview available'}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Search Results and Documents Overview sections removed for cleaner interface */}
 
-        {/* Documents Overview */}
-        {!searchQuery && data.documents && (
-          <div>
-            <h2 className="text-2xl font-semibold mb-6">Available Documents</h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              {data.documents.map((doc: any) => (
-                <Link key={doc.id} href={`/document/${doc.id}`}>
-                  <div className="bg-slate-800 border border-slate-700 rounded-lg p-6 hover:bg-slate-750 transition-colors">
-                    <h3 className="text-xl font-semibold mb-2 text-blue-400">{doc.title}</h3>
-                    <div className="text-slate-400 space-y-1 mb-4">
-                      <div>Grade {doc.grade} • {doc.subject}</div>
-                      <div>{doc.publisher} {doc.version} • {doc.totalPages} pages</div>
-                      <div className="text-xs">
-                        Extracted {new Date(doc.extractedAt).toLocaleDateString()}
-                      </div>
-                    </div>
-                    <div className="text-sm text-slate-300">
-                      {JSON.parse(doc.metadata || '{}').sectionsCount || 0} sections extracted
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-            
-            <div className="mt-8">
-              <Link 
-                href="/keywords" 
-                className="inline-block bg-green-600 hover:bg-green-700 px-6 py-3 rounded-md font-medium transition-colors"
-              >
-                Browse by Keywords →
-              </Link>
-            </div>
-          </div>
-        )}
-
-        {/* Admin Navigation */}
+        {/* Virtual Tutor Access */}
         <div className="mt-8 p-6 bg-slate-800/50 border border-slate-700 rounded-lg">
-          <h3 className="text-xl font-semibold mb-4 text-slate-200">🔧 Admin Tools</h3>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <Link 
-              href="/ocr" 
-              className="flex items-center gap-2 p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-            >
-              <span>📄</span>
-              <div>
-                <div className="font-medium">OCR Admin</div>
-                <div className="text-sm opacity-80">Phase 2: Document Processing</div>
-              </div>
-            </Link>
-            
-            <Link 
-              href="/ai" 
-              className="flex items-center gap-2 p-4 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
-            >
-              <span>🤖</span>
-              <div>
-                <div className="font-medium">AI Test Center</div>
-                <div className="text-sm opacity-80">Phase 3: OpenAI Integration</div>
-              </div>
-            </Link>
-            
+          <h3 className="text-xl font-semibold mb-4 text-slate-200">🎓 Math Learning</h3>
+          <div className="grid sm:grid-cols-1 lg:grid-cols-1 gap-4">
             <Link 
               href="/virtualtutor" 
               className="flex items-center gap-2 p-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
@@ -751,10 +639,6 @@ export default function Home() {
                 <div className="text-sm opacity-80">Interactive Math Tutoring</div>
               </div>
             </Link>
-          </div>
-          
-          <div className="mt-4 text-sm text-slate-400 bg-slate-900/30 p-3 rounded border border-slate-700">
-            <strong>Phase Status:</strong> Phase 1 ✅ Complete | Phase 2 ✅ OCR Ready | Phase 3 🚧 AI Integration
           </div>
         </div>
       </div>

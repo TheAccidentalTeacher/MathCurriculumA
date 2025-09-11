@@ -27,15 +27,15 @@ export default function CharacterDisplay({
   // Use controlled expression if provided, otherwise use internal state
   const currentExpression = controlledExpression ?? internalExpression;
 
-  // Character configuration with animation frames
+  // Character configuration with animation frames - Updated with new avatar photos
   const characterConfig = {
     somers: {
       name: 'Mr. Somers',
-      primaryImage: '/animations/download-13.png',
+      primaryImage: '/animations/somers-1.png',
       animations: {
-        idle: ['/animations/download-13.png', '/animations/download-14.png'],
-        speaking: ['/animations/download-15.png', '/animations/download-16.png', '/animations/download-17.png'],
-        thinking: ['/animations/download-18.png', '/animations/download-19.png']
+        idle: ['/animations/somers-1.png', '/animations/somers-2.png'],
+        speaking: ['/animations/somers-2.png', '/animations/somers-3.png', '/animations/somers-4.png'],
+        thinking: ['/animations/somers-1.png', '/animations/somers-4.png']
       },
       altText: 'Mr. Somers, your math teacher',
       bgColor: 'bg-blue-50',
@@ -44,11 +44,11 @@ export default function CharacterDisplay({
     },
     gimli: {
       name: 'Gimli',
-      primaryImage: '/animations/Gimbers.png',
+      primaryImage: '/animations/gimli-1.png',
       animations: {
-        idle: ['/animations/Gimbers.png'],
-        speaking: ['/animations/Gimbers.png'], // Can add more Gimli frames later
-        thinking: ['/animations/Gimbers.png']
+        idle: ['/animations/gimli-1.png', '/animations/gimli-2.png'],
+        speaking: ['/animations/gimli-3.png', '/animations/gimli-4.png', '/animations/gimli-5.png'],
+        thinking: ['/animations/gimli-2.png', '/animations/gimli-5.png']
       },
       altText: 'Gimli, your friendly learning companion',
       bgColor: 'bg-green-50',
