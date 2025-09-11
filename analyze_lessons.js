@@ -2,7 +2,7 @@ const Database = require('better-sqlite3');
 
 console.log('🔍 Analyzing Precision Database Structure\n');
 
-const db = new Database('/workspaces/MathCurriculumA/curriculum_precise.db');
+const db = new Database('./curriculum_precise.db');
 
 // Check document structure
 console.log('📚 Document Structure:');

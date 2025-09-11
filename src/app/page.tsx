@@ -100,14 +100,14 @@ export default function Home() {
       
       // Animate particles flying around
       setTimeout(() => {
-        particle.style.transition = 'all 4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        particle.style.transition = 'all 2s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
         particle.style.transform = `
           translateX(${(Math.random() - 0.5) * 800}px) 
           translateY(${(Math.random() - 0.5) * 600}px) 
           rotate(${Math.random() * 720}deg) 
           scale(${Math.random() * 2 + 0.5})
         `;
-      }, Math.random() * 500);
+      }, Math.random() * 250);
     }
     
     // Add pulsing energy rings
@@ -154,7 +154,7 @@ export default function Home() {
           rotate(${(Math.random() - 0.5) * 180}deg) 
           scale(${1.5 + Math.random() * 0.8})
         `;
-        (card as HTMLElement).style.transition = 'transform 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+        (card as HTMLElement).style.transition = 'transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
         (card as HTMLElement).style.zIndex = '20';
         (card as HTMLElement).style.filter = 'brightness(1.4) saturate(1.6) drop-shadow(0 0 30px rgba(147, 51, 234, 0.8))';
         
@@ -166,7 +166,7 @@ export default function Home() {
             rotate(${(Math.random() - 0.5) * 270}deg) 
             scale(${0.6 + Math.random() * 1.2})
           `;
-          (card as HTMLElement).style.transition = 'transform 0.8s ease-in-out';
+          (card as HTMLElement).style.transition = 'transform 0.4s ease-in-out';
           (card as HTMLElement).style.filter = 'brightness(1.8) hue-rotate(90deg) drop-shadow(0 0 40px rgba(59, 130, 246, 1))';
           
           // Phase 3: Vortex spiral effect
@@ -182,7 +182,7 @@ export default function Home() {
               rotate(${angle * 3}deg) 
               scale(${1.3 + Math.random() * 0.5})
             `;
-            (card as HTMLElement).style.transition = 'transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            (card as HTMLElement).style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             (card as HTMLElement).style.filter = 'brightness(2) hue-rotate(180deg) drop-shadow(0 0 50px rgba(16, 185, 129, 1))';
             
             // Phase 4: Matrix-style convergence
@@ -193,13 +193,13 @@ export default function Home() {
                 rotate(${720 + (Math.random() * 180)}deg) 
                 scale(${0.8 + Math.random() * 0.6})
               `;
-              (card as HTMLElement).style.transition = 'transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+              (card as HTMLElement).style.transition = 'transform 0.75s cubic-bezier(0.34, 1.56, 0.64, 1)';
               (card as HTMLElement).style.filter = 'brightness(1.2) hue-rotate(270deg) drop-shadow(0 0 60px rgba(245, 101, 101, 1))';
               
               // Phase 5: EPIC final slam down
               setTimeout(() => {
                 (card as HTMLElement).style.transform = 'translateX(0) translateY(0) rotate(0deg) scale(1)';
-                (card as HTMLElement).style.transition = 'transform 1.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                (card as HTMLElement).style.transition = 'transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1)';
                 (card as HTMLElement).style.zIndex = '1';
                 (card as HTMLElement).style.filter = 'brightness(1) saturate(1) hue-rotate(0deg) drop-shadow(0 4px 20px rgba(0, 0, 0, 0.3))';
                 
@@ -208,7 +208,7 @@ export default function Home() {
                   if (glow.parentNode) {
                     glow.remove();
                   }
-                }, 1800);
+                }, 900);
                 
                 completedAnimations++;
                 
@@ -217,17 +217,17 @@ export default function Home() {
                   setTimeout(() => {
                     // Remove particle explosion
                     explosionContainer.style.opacity = '0';
-                    explosionContainer.style.transition = 'opacity 1s ease-out';
-                    setTimeout(() => explosionContainer.remove(), 1000);
+                    explosionContainer.style.transition = 'opacity 0.5s ease-out';
+                    setTimeout(() => explosionContainer.remove(), 500);
                     
                     // Show the accelerated viewer with dramatic entrance
                     setShowAcceleratedViewer(true);
-                  }, 1000);
+                  }, 500);
                 }
-              }, 1500);
-            }, 1000);
-          }, 800);
-        }, 1200);
+              }, 750);
+            }, 500);
+          }, 400);
+        }, 600);
       }, i * 200); // Stagger each card's epic journey
     });
   };

@@ -6,6 +6,10 @@ import MathGrapher, { createLinearGraph, createPointGraph } from '../MathGrapher
 import PlaceValueChart, { createPowersOf10Chart } from '../PlaceValueChart';
 import ScientificNotationBuilder, { createScientificNotationExample } from '../ScientificNotationBuilder';
 import PowersOf10NumberLine, { createPowersOf10NumberLine } from '../PowersOf10NumberLine';
+// PROFESSIONAL VISUALIZATION TOOLS (replacing GeoGebra)
+import ProfessionalMathVisualizer, { createMathVisualization } from '../ProfessionalMathVisualizer';
+import PlotlyGrapher, { LinearFunctionGrapher, QuadraticFunctionGrapher } from '../PlotlyGrapher';
+import ThreeGeometryVisualizer, { CubeExplorer, SphereExplorer, CylinderExplorer } from '../ThreeGeometryVisualizer';
 // DISABLED: GeoGebra integration removed by user request
 // import GeoGebraWidget, { GeometryExplorer } from '../GeoGebraWidget';
 // import PowersOf10Activity from '../PowersOf10GeoGebra';
@@ -158,8 +162,17 @@ export default function ChatInterface({
 
   // Function to detect and render mathematical content in messages
   const renderMessageWithGraphs = (content: string) => {
+    // 🐛 DEBUG: Log the full content to analyze
+    console.log('📝 Processing message content:', {
+      content,
+      hasShapePattern: /\[SHAPE:[^\]]+\]/.test(content),
+      allPatterns: content.match(/\[[A-Z]+:[^\]]+\]/g) || []
+    });
+    
     // Split content by markers - GeoGebra features are disabled but patterns preserved for user feedback
     const parts = content.split(/(\[GRAPH:[^\]]+\]|\[PLACEVALUE:[^\]]+\]|\[SCIENTIFIC:[^\]]+\]|\[POWERLINE:[^\]]+\]|\[GEOGEBRA:[^\]]+\]|\[GEOMETRY:[^\]]+\]|\[SHAPE:[^\]]+\]|\[POWERS10:[^\]]+\]|\[CUBE:[^\]]+\]|\[3D:[^\]]+\])/g);
+    
+    console.log('🔪 Content split into parts:', parts);
     
     return parts.map((part, index) => {
       // Check for Place Value Chart instruction
@@ -191,6 +204,35 @@ export default function ChatInterface({
               showSteps={true}
               width={700}
               height={400}
+            />
+          </div>
+        );
+      }
+
+      // PROFESSIONAL: Interactive function graphing with Plotly.js
+      const plotlyGraphMatch = part.match(/\[GRAPH:([^\]]+)\]/);
+      if (plotlyGraphMatch) {
+        let functions = plotlyGraphMatch[1].split(',').map(f => f.trim());
+        
+        // Clean up function expressions - remove "y =" and "f(x) =" prefixes
+        functions = functions.map(func => {
+          return func
+            .replace(/^y\s*=\s*/, '')      // Remove "y = " prefix
+            .replace(/^f\(x\)\s*=\s*/, '') // Remove "f(x) = " prefix
+            .trim();
+        });
+        
+        return (
+          <div key={index} className="my-4">
+            <PlotlyGrapher
+              functions={functions}
+              title="Interactive Function Graph"
+              width={700}
+              height={450}
+              interactive={true}
+              showGrid={true}
+              xRange={[-10, 10]}
+              yRange={[-10, 10]}
             />
           </div>
         );
@@ -297,11 +339,19 @@ export default function ChatInterface({
       // }
 
       // GeoGebra features have been disabled
+      // PROFESSIONAL: Function and general graphing with Plotly.js (replacing GEOGEBRA)
       const geogebraMatch = part.match(/\[GEOGEBRA:([^\]]+)\]/);
       if (geogebraMatch) {
+        const content = geogebraMatch[1];
+        const visualization = createMathVisualization(content);
+        
         return (
-          <div key={index} className="my-4 p-4 bg-gray-100 border rounded">
-            <p className="text-gray-600">GeoGebra visualization disabled</p>
+          <div key={index} className="my-4">
+            <ProfessionalMathVisualizer
+              type={visualization.type}
+              content={visualization.content}
+              config={visualization.config}
+            />
           </div>
         );
       }
@@ -316,33 +366,164 @@ export default function ChatInterface({
         );
       }
 
-      // DISABLED: Smart 3D GeoGebra visualization removed by user request
-      const smart3DMatch = part.match(/\[SMART_3D:([^,]+),([^\]]+)\]/);
+      // PROFESSIONAL: 3D geometry with Three.js (replacing SMART_3D)
+      const smart3DMatch = part.match(/\[SMART_3D:([^,]+),?([^\]]*)\]/);
       if (smart3DMatch) {
+        const shape = smart3DMatch[1].toLowerCase().trim();
+        const dimensionStr = smart3DMatch[2] || '';
+        
+        // 🐛 DEBUG: Log SMART_3D pattern detection
+        console.log('🎲 SMART_3D Pattern Detected:', {
+          fullMatch: smart3DMatch[0],
+          shape,
+          dimensionStr,
+          originalPart: part
+        });
+        
+        // Parse dimensions if provided
+        let dimensions = { width: 2, height: 2, depth: 2, radius: 1 };
+        if (dimensionStr) {
+          const dimMatch = dimensionStr.match(/(\d+\.?\d*)/g);
+          console.log('🔢 SMART_3D Parameter parsing:', {
+            dimensionStr,
+            extractedNumbers: dimMatch
+          });
+          
+          if (dimMatch) {
+            if (shape === 'sphere') {
+              dimensions.radius = parseFloat(dimMatch[0]) || 1;
+              console.log('⚽ SMART_3D Sphere dimensions set:', dimensions);
+            } else if (shape === 'cylinder') {
+              dimensions.radius = parseFloat(dimMatch[0]) || 1;
+              dimensions.height = parseFloat(dimMatch[1]) || 2;
+              console.log('🛢️ SMART_3D Cylinder dimensions set:', dimensions);
+            } else if (shape === 'cube') {
+              // 🧊 CUBE FIX: For cubes, use the same dimension for all sides
+              const sideLength = parseFloat(dimMatch[0]) || 2;
+              dimensions.width = sideLength;
+              dimensions.height = sideLength;
+              dimensions.depth = sideLength;
+              console.log('🧊 SMART_3D Cube dimensions set (equal sides):', dimensions);
+            } else {
+              dimensions.width = parseFloat(dimMatch[0]) || 2;
+              dimensions.height = parseFloat(dimMatch[1]) || 2;
+              dimensions.depth = parseFloat(dimMatch[2]) || 2;
+              console.log('📦 SMART_3D Generic box dimensions set:', dimensions);
+            }
+          }
+        }
+
+        console.log('🎯 SMART_3D Sending to ThreeGeometryVisualizer:', {
+          shape,
+          dimensions,
+          showMeasurements: true,
+          showAxes: true,
+          interactive: true,
+          animation: "none",  // 🛑 Stop spinning for educational clarity
+          color: "#93c5fd"    // 🎨 Light blue for better grid contrast
+        });
+
         return (
-          <div key={index} className="my-4 p-4 bg-gray-100 border rounded">
-            <p className="text-gray-600">Smart 3D GeoGebra visualization disabled</p>
+          <div key={index} className="my-4">
+            <ThreeGeometryVisualizer
+              shape={shape as any}
+              dimensions={dimensions}
+              showMeasurements={true}
+              showAxes={true}
+              interactive={true}
+              animation="none"
+              color="#93c5fd"
+            />
           </div>
         );
       }
 
-      // DISABLED: Geometry GeoGebra activities removed by user request
+      // PROFESSIONAL: Geometry visualization with smart tool selection (replacing GEOMETRY)
       const geometryMatch = part.match(/\[GEOMETRY:([^\]]+)\]/);
       if (geometryMatch) {
+        const content = geometryMatch[1];
+        const visualization = createMathVisualization(content);
+        
         return (
-          <div key={index} className="my-4 p-4 bg-gray-100 border rounded">
-            <p className="text-gray-600">Geometry GeoGebra visualization disabled</p>
+          <div key={index} className="my-4">
+            <ProfessionalMathVisualizer
+              type={visualization.type}
+              content={visualization.content}
+              config={visualization.config}
+            />
           </div>
         );
       }
 
-      // DISABLED: Shape visualizations removed by user request (all were GeoGebra-based)
+      // PROFESSIONAL: Shape visualization with Three.js (replacing SHAPE)
       const shapeMatch = part.match(/\[SHAPE:([^,\]]+),?([^\]]*)\]/);
       if (shapeMatch) {
         const shapeName = shapeMatch[1].toLowerCase().trim();
+        const parameters = shapeMatch[2] || '';
+        
+        // 🐛 DEBUG: Log the matched pattern
+        console.log('🎲 SHAPE Pattern Detected:', {
+          fullMatch: shapeMatch[0],
+          shapeName,
+          parameters,
+          originalPart: part
+        });
+        
+        let dimensions = { width: 2, height: 2, depth: 2, radius: 1 };
+        if (parameters) {
+          const paramMatch = parameters.match(/(\d+\.?\d*)/g);
+          console.log('🔢 Parameter parsing:', {
+            parametersString: parameters,
+            extractedNumbers: paramMatch
+          });
+          
+          if (paramMatch) {
+            if (shapeName.includes('sphere') || shapeName.includes('ball')) {
+              dimensions.radius = parseFloat(paramMatch[0]) || 1;
+              console.log('⚽ Sphere dimensions set:', dimensions);
+            } else if (shapeName.includes('cylinder')) {
+              dimensions.radius = parseFloat(paramMatch[0]) || 1;
+              dimensions.height = parseFloat(paramMatch[1]) || 2;
+              console.log('🛢️ Cylinder dimensions set:', dimensions);
+            } else if (shapeName.includes('cube')) {
+              // For cubes, use the same dimension for all sides
+              const sideLength = parseFloat(paramMatch[0]) || 2;
+              dimensions.width = sideLength;
+              dimensions.height = sideLength;
+              dimensions.depth = sideLength;
+              console.log('🧊 Cube dimensions set (equal sides):', dimensions);
+            } else {
+              dimensions.width = parseFloat(paramMatch[0]) || 2;
+              dimensions.height = parseFloat(paramMatch[1]) || 2;
+              dimensions.depth = parseFloat(paramMatch[2]) || 2;
+              console.log('📦 Generic box dimensions set:', dimensions);
+            }
+          }
+        }
+
+        // Map shape names to our supported shapes
+        let mappedShape = 'cube';
+        if (shapeName.includes('sphere') || shapeName.includes('ball')) mappedShape = 'sphere';
+        else if (shapeName.includes('cylinder')) mappedShape = 'cylinder';
+        else if (shapeName.includes('cone')) mappedShape = 'cone';
+        else if (shapeName.includes('cube') || shapeName.includes('box')) mappedShape = 'cube';
+
+        console.log('🎯 Shape mapping result:', {
+          originalShapeName: shapeName,
+          mappedShape,
+          finalDimensions: dimensions
+        });
+
         return (
-          <div key={index} className="my-4 p-4 bg-gray-100 border rounded">
-            <p className="text-gray-600">Shape visualization disabled: {shapeName}</p>
+          <div key={index} className="my-4">
+            <ThreeGeometryVisualizer
+              shape={mappedShape as any}
+              dimensions={dimensions}
+              showMeasurements={true}
+              showAxes={true}
+              interactive={true}
+              color="#4f46e5"
+            />
           </div>
         );
       }
