@@ -1,7 +1,10 @@
 // src/lib/lesson-content-service.ts
-// Service for preparing lesson-specific content for Virtual Tutor
+// Service for preparing lesson-specific content for Virtual Tutor with OpenAI Vision Analysis
 
 import { LessonService } from './lesson-service';
+import OpenAI from 'openai';
+import fs from 'fs';
+import path from 'path';
 
 interface LessonContent {
   lessonId: string;
@@ -28,6 +31,39 @@ interface ExtractedContent {
   formulas: string[];
   pages: any[];
   confidence: number;
+  // Enhanced with vision analysis
+  visualElements?: {
+    diagrams: string[];
+    mathematicalNotation: string[];
+    visualModels: string[];
+    problemTypes: string[];
+  };
+  comprehensiveAnalysis?: {
+    pageAnalyses: PageAnalysis[];
+    overallSummary: string;
+    keyInsights: string[];
+    teachingOpportunities: string[];
+  };
+}
+
+interface PageAnalysis {
+  pageNumber: number;
+  content: string;
+  mathematicalElements: string[];
+  visualElements: string[];
+  concepts: string[];
+  problemTypes: string[];
+  confidence: number;
+}
+
+interface VisionAnalysisResult {
+  success: boolean;
+  content: string;
+  mathematicalElements: string[];
+  visualElements: string[];
+  concepts: string[];
+  confidence: number;
+  error?: string;
 }
 
 interface MathAnalysis {
@@ -52,15 +88,679 @@ interface LessonAnalysis {
   tutorPrompt: string;
   teachingStrategies: string[];
   timestamp: string;
+  analysisType?: 'vision-analysis' | 'standard-analysis';
 }
 
 export class LessonContentService {
   private static cache = new Map<string, LessonAnalysis>();
+  private static openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+  });
 
   /**
-   * Prepare lesson content for Virtual Tutor
-   * This runs automatically when a lesson is accessed
+   * UNIVERSAL LESSON VISION ANALYSIS
+   * Comprehensive analysis of ALL lesson pages using OpenAI Vision API
+   * Works for any lesson regardless of page count (22, 40, 15, etc.)
    */
+  static async analyzeCompleteVisualLesson(
+    documentId: string, 
+    lessonNumber: number
+  ): Promise<LessonAnalysis> {
+    const cacheKey = `lesson_vision_analysis_${documentId}_${lessonNumber}`;
+    console.log(`🔍 [LessonContentService] Starting COMPLETE VISION ANALYSIS for ${documentId} - Lesson ${lessonNumber}`);
+    
+    // Check cache first
+    const cached = this.cache.get(cacheKey);
+    if (cached) {
+      console.log(`⚡ [LessonContentService] Returning cached vision analysis for ${cacheKey}`);
+      return cached;
+    }
+    
+    try {
+      // Step 1: Get lesson page range dynamically
+      console.log(`📖 [LessonContentService] Step 1: Getting lesson page range...`);
+      const lessonData = await this.getLessonPageRange(documentId, lessonNumber);
+      
+      if (!lessonData) {
+        console.error(`❌ [LessonContentService] Lesson ${lessonNumber} not found in ${documentId}`);
+        throw new Error(`Lesson ${lessonNumber} not found in ${documentId}`);
+      }
+
+      const pageCount = lessonData.pageRange.end - lessonData.pageRange.start + 1;
+      console.log(`✅ [LessonContentService] Found lesson: ${pageCount} pages (${lessonData.pageRange.start}-${lessonData.pageRange.end})`);
+
+      // Step 2: Process ALL lesson pages with OpenAI Vision
+      console.log(`🖼️ [LessonContentService] Step 2: Processing ${pageCount} pages with OpenAI Vision API...`);
+      const visionAnalysis = await this.processLessonPagesWithVision(
+        documentId, 
+        lessonData.pageRange
+      );
+
+      if (!visionAnalysis.success) {
+        console.warn(`⚠️ [LessonContentService] Vision analysis failed, falling back to text extraction`);
+        return await this.prepareLessonContent(documentId, lessonNumber);
+      }
+
+      // Step 3: Generate comprehensive lesson analysis
+      console.log(`🧠 [LessonContentService] Step 3: Generating comprehensive analysis...`);
+      const analysis = await this.generateComprehensiveAnalysis(visionAnalysis);
+
+      // Step 4: Build enhanced tutor prompt
+      console.log(`🎭 [LessonContentService] Step 4: Building enhanced AI tutor prompt...`);
+      const tutorPrompt = this.buildEnhancedTutorPrompt(lessonData, visionAnalysis, analysis);
+
+      // Step 5: Generate advanced teaching strategies
+      console.log(`📚 [LessonContentService] Step 5: Generating advanced teaching strategies...`);
+      const teachingStrategies = await this.generateAdvancedStrategies(visionAnalysis, analysis);
+
+      const result: LessonAnalysis = {
+        lessonId: `${documentId}-lesson-${lessonNumber}`,
+        documentId,
+        lessonNumber,
+        title: lessonData.lessonTitle || `Lesson ${lessonNumber}`,
+        pageRange: lessonData.pageRange,
+        extractedContent: {
+          fullText: visionAnalysis.content,
+          formulas: visionAnalysis.mathematicalElements,
+          pages: visionAnalysis.pageAnalyses || [],
+          confidence: visionAnalysis.confidence,
+          comprehensiveAnalysis: visionAnalysis.comprehensiveAnalysis
+        },
+        analysis,
+        tutorPrompt,
+        teachingStrategies,
+        timestamp: new Date().toISOString(),
+        analysisType: 'vision-analysis'
+      };
+
+      // Cache the result
+      this.cache.set(cacheKey, result);
+      console.log(`💾 [LessonContentService] Vision analysis cached with key: ${cacheKey}`);
+      console.log(`🎉 [LessonContentService] COMPLETE VISION ANALYSIS finished! {
+  lessonId: '${result.lessonId}',
+  title: '${result.title}',
+  pages: ${pageCount},
+  confidence: ${visionAnalysis.confidence}
+}`);
+
+      return result;
+    } catch (error) {
+      console.error(`❌ [LessonContentService] Vision analysis failed:`, error);
+      // Fallback to original method
+      return await this.prepareLessonContent(documentId, lessonNumber);
+    }
+  }
+
+  /**
+   * Process all lesson pages using OpenAI Vision API
+   * Handles lessons of any size with efficient batching
+   */
+  private static async processLessonPagesWithVision(
+    documentId: string,
+    pageRange: { start: number; end: number }
+  ): Promise<VisionAnalysisResult & { pageAnalyses?: PageAnalysis[]; comprehensiveAnalysis?: any }> {
+    try {
+      console.log(`🔍 [LessonContentService] Processing pages ${pageRange.start}-${pageRange.end} with Vision API`);
+      
+      const pageAnalyses: PageAnalysis[] = [];
+      let allContent = '';
+      let allMathElements: string[] = [];
+      let allVisualElements: string[] = [];
+      let allConcepts: string[] = [];
+      let totalConfidence = 0;
+      let processedPages = 0;
+
+      // Process pages in batches to manage API limits
+      const batchSize = 5; // Adjust based on API limits
+      for (let i = pageRange.start; i <= pageRange.end; i += batchSize) {
+        const batchEnd = Math.min(i + batchSize - 1, pageRange.end);
+        console.log(`📄 [LessonContentService] Processing batch: pages ${i}-${batchEnd}`);
+        
+        const batchPromises: Promise<PageAnalysis | null>[] = [];
+        for (let pageNum = i; pageNum <= batchEnd; pageNum++) {
+          batchPromises.push(this.analyzePageWithVision(documentId, pageNum));
+        }
+        
+        const batchResults = await Promise.all(batchPromises);
+        
+        for (const result of batchResults) {
+          if (result) {
+            pageAnalyses.push(result);
+            allContent += result.content + '\n\n';
+            allMathElements.push(...result.mathematicalElements);
+            allVisualElements.push(...result.visualElements);
+            allConcepts.push(...result.concepts);
+            totalConfidence += result.confidence;
+            processedPages++;
+          }
+        }
+        
+        // Small delay between batches to respect rate limits
+        if (batchEnd < pageRange.end) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+
+      // Generate comprehensive analysis from all pages
+      const comprehensiveAnalysis = await this.generateLessonSummary(pageAnalyses, allContent);
+
+      const avgConfidence = processedPages > 0 ? totalConfidence / processedPages : 0;
+      
+      console.log(`✅ [LessonContentService] Vision processing complete: ${processedPages} pages analyzed`);
+      
+      return {
+        success: true,
+        content: allContent,
+        mathematicalElements: [...new Set(allMathElements)],
+        visualElements: [...new Set(allVisualElements)],
+        concepts: [...new Set(allConcepts)],
+        confidence: avgConfidence,
+        pageAnalyses,
+        comprehensiveAnalysis
+      };
+    } catch (error) {
+      console.error(`❌ [LessonContentService] Vision processing failed:`, error);
+      return {
+        success: false,
+        content: '',
+        mathematicalElements: [],
+        visualElements: [],
+        concepts: [],
+        confidence: 0,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  /**
+   * Analyze a single page using OpenAI Vision API
+   */
+  private static async analyzePageWithVision(
+    documentId: string,
+    pageNumber: number
+  ): Promise<PageAnalysis | null> {
+    try {
+      console.log(`🔍 [LessonContentService] Analyzing page ${pageNumber} with Vision API`);
+      
+      // Step 1: Get the image path/URL for the page
+      console.log(`📁 [LessonContentService] Step 1: Getting image path for ${documentId} page ${pageNumber}`);
+      const imagePath = this.getPageImagePath(documentId, pageNumber);
+      
+      if (!imagePath) {
+        console.warn(`⚠️ [LessonContentService] ISSUE: No image found for page ${pageNumber} - falling back to minimal analysis`);
+        console.warn(`🔍 [LessonContentService] This could be why 0 concepts are found - images are required for vision analysis`);
+        return this.getFallbackPageAnalysis(pageNumber);
+      }
+
+      console.log(`✅ [LessonContentService] Image found: ${imagePath}`);
+
+      // Step 2: Convert image to base64 if it's a local file
+      console.log(`🖼️ [LessonContentService] Step 2: Preparing image for Vision API`);
+      const imageData = await this.prepareImageForVision(imagePath);
+      
+      if (!imageData) {
+        console.warn(`⚠️ [LessonContentService] ISSUE: Could not prepare image for page ${pageNumber} - image loading failed`);
+        console.warn(`🔍 [LessonContentService] This could be why 0 concepts are found - image preparation failed`);
+        return this.getFallbackPageAnalysis(pageNumber);
+      }
+
+      console.log(`✅ [LessonContentService] Image prepared successfully (${imageData.length} chars)`);
+
+      // Step 3: Check OpenAI API key
+      if (!process.env.OPENAI_API_KEY) {
+        console.error(`❌ [LessonContentService] CRITICAL: OpenAI API key not found in environment`);
+        console.error(`🔍 [LessonContentService] This is definitely why 0 concepts are found - no API key`);
+        return this.getFallbackPageAnalysis(pageNumber);
+      }
+
+      console.log(`🔑 [LessonContentService] OpenAI API key available: ${process.env.OPENAI_API_KEY.substring(0, 7)}...`);
+
+      // Step 4: Call OpenAI Vision API
+      console.log(`🤖 [LessonContentService] Step 3: Calling OpenAI Vision API...`);
+      const response = await this.openai.chat.completions.create({
+        model: "gpt-4o", // GPT-4o has vision capabilities
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: `Analyze this mathematics lesson page. Extract:
+1. All text content (problems, explanations, instructions)
+2. Mathematical elements (equations, formulas, expressions)
+3. Visual elements (diagrams, charts, models, illustrations)
+4. Mathematical concepts being taught
+5. Problem types and examples
+
+IMPORTANT: Respond with ONLY valid JSON, no markdown formatting or code blocks.
+
+Return this exact JSON structure:
+{
+  "content": "full text content",
+  "mathematicalElements": ["equation1", "formula1", ...],
+  "visualElements": ["diagram type", "chart description", ...],
+  "concepts": ["concept1", "concept2", ...],
+  "problemTypes": ["type1", "type2", ...],
+  "confidence": 0.95
+}`
+              },
+              {
+                type: "image_url",
+                image_url: {
+                  url: imageData
+                }
+              }
+            ]
+          }
+        ],
+        max_tokens: 1000,
+        temperature: 0.1
+      });
+
+      console.log(`✅ [LessonContentService] OpenAI API call successful`);
+
+      const responseText = response.choices[0]?.message?.content;
+      if (!responseText) {
+        console.error(`❌ [LessonContentService] ISSUE: No response content from Vision API`);
+        console.error(`🔍 [LessonContentService] API call succeeded but no content returned`);
+        throw new Error('No response from Vision API');
+      }
+
+      console.log(`📝 [LessonContentService] Response received (${responseText.length} chars): ${responseText.substring(0, 100)}...`);
+
+      // Step 5: Parse the JSON response (handle markdown-wrapped JSON)
+      console.log(`🔄 [LessonContentService] Step 4: Parsing JSON response...`);
+      
+      // Clean the response - remove markdown code block wrappers if present
+      let cleanedResponse = responseText.trim();
+      if (cleanedResponse.startsWith('```json')) {
+        console.log(`🧹 [LessonContentService] Removing markdown code block wrapper...`);
+        cleanedResponse = cleanedResponse.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+      } else if (cleanedResponse.startsWith('```')) {
+        console.log(`🧹 [LessonContentService] Removing generic code block wrapper...`);
+        cleanedResponse = cleanedResponse.replace(/^```\s*/, '').replace(/\s*```$/, '');
+      }
+      
+      console.log(`🔍 [LessonContentService] Cleaned response (${cleanedResponse.length} chars): ${cleanedResponse.substring(0, 100)}...`);
+      
+      let analysis;
+      try {
+        analysis = JSON.parse(cleanedResponse);
+      } catch (parseError) {
+        console.warn(`⚠️ [LessonContentService] JSON parse failed, attempting to extract JSON from response...`);
+        console.warn(`🔍 [LessonContentService] Parse error: ${parseError.message}`);
+        
+        // Try to find JSON content within the response
+        const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          console.log(`🔍 [LessonContentService] Found JSON pattern, attempting to parse...`);
+          analysis = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error(`Could not extract valid JSON from response: ${cleanedResponse.substring(0, 200)}...`);
+        }
+      }
+      
+      console.log(`✅ [LessonContentService] Page ${pageNumber} analyzed successfully`);
+      console.log(`📊 [LessonContentService] Found ${analysis.concepts?.length || 0} concepts: ${(analysis.concepts || []).slice(0, 3).join(', ')}`);
+      
+      return {
+        pageNumber,
+        content: analysis.content || '',
+        mathematicalElements: analysis.mathematicalElements || [],
+        visualElements: analysis.visualElements || [],
+        concepts: analysis.concepts || [],
+        problemTypes: analysis.problemTypes || [],
+        confidence: analysis.confidence || 0.8
+      };
+    } catch (error) {
+      console.error(`❌ [LessonContentService] Vision analysis failed for page ${pageNumber}:`, error);
+      console.error(`🔍 [LessonContentService] Error details:`, {
+        name: error.name,
+        message: error.message,
+        code: error.code,
+        type: error.type
+      });
+      console.warn(`⚠️ [LessonContentService] FALLING BACK to minimal analysis - this is why you see 0 concepts and 0.5 confidence`);
+      return this.getFallbackPageAnalysis(pageNumber);
+    }
+  }
+
+  /**
+   * Get the image path for a specific page
+   */
+  private static getPageImagePath(documentId: string, pageNumber: number): string | null {
+    // Check common image paths
+    const pageNumberStr = pageNumber.toString().padStart(3, '0'); // Ensure 3-digit format
+    const possiblePaths = [
+      // Primary path: webapp_pages structure
+      path.join(process.cwd(), 'webapp_pages', documentId, 'pages', `page_${pageNumberStr}.png`),
+      // Fallback paths for legacy support
+      path.join(process.cwd(), 'public', 'documents', documentId, 'pages', `${pageNumber}.png`),
+      path.join(process.cwd(), 'public', 'documents', documentId, 'pages', `page_${pageNumber}.png`),
+      path.join(process.cwd(), 'public', 'images', documentId, `${pageNumber}.png`),
+    ];
+
+    for (const imagePath of possiblePaths) {
+      if (fs.existsSync(imagePath)) {
+        console.log(`📁 [LessonContentService] Found image: ${imagePath}`);
+        return imagePath;
+      }
+    }
+
+    console.warn(`⚠️ [LessonContentService] No image found for ${documentId} page ${pageNumber}`);
+    return null;
+  }
+
+  /**
+   * Prepare image for Vision API (convert to base64 data URL)
+   */
+  private static async prepareImageForVision(imagePath: string): Promise<string | null> {
+    try {
+      const imageBuffer = fs.readFileSync(imagePath);
+      const base64Image = imageBuffer.toString('base64');
+      const mimeType = path.extname(imagePath).toLowerCase() === '.png' ? 'image/png' : 'image/jpeg';
+      return `data:${mimeType};base64,${base64Image}`;
+    } catch (error) {
+      console.error(`❌ [LessonContentService] Error preparing image:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Generate a comprehensive lesson summary from all page analyses
+   */
+  private static async generateLessonSummary(
+    pageAnalyses: PageAnalysis[],
+    allContent: string
+  ): Promise<any> {
+    try {
+      console.log(`🧠 [LessonContentService] Generating comprehensive lesson summary...`);
+      
+      const response = await this.openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "user",
+            content: `Analyze this complete mathematics lesson containing ${pageAnalyses.length} pages. 
+
+LESSON CONTENT:
+${allContent.substring(0, 8000)} ${allContent.length > 8000 ? '...(truncated)' : ''}
+
+PAGE ANALYSES:
+${pageAnalyses.map(p => `Page ${p.pageNumber}: ${p.concepts.join(', ')}`).join('\n')}
+
+Generate a comprehensive analysis including:
+1. Overall lesson summary
+2. Key mathematical concepts taught
+3. Learning progression through the lesson
+4. Main teaching opportunities
+5. Assessment possibilities
+
+Respond in JSON format:
+{
+  "overallSummary": "comprehensive lesson overview",
+  "keyInsights": ["insight1", "insight2", ...],
+  "teachingOpportunities": ["opportunity1", "opportunity2", ...],
+  "learningProgression": ["step1", "step2", ...],
+  "assessmentSuggestions": ["assessment1", "assessment2", ...]
+}`
+          }
+        ],
+        max_tokens: 1500,
+        temperature: 0.1
+      });
+
+      const responseText = response.choices[0]?.message?.content;
+      if (responseText) {
+        return JSON.parse(responseText);
+      }
+    } catch (error) {
+      console.error(`❌ [LessonContentService] Error generating lesson summary:`, error);
+    }
+
+    // Fallback summary
+    return {
+      overallSummary: `Comprehensive lesson covering ${pageAnalyses.length} pages of mathematical content`,
+      keyInsights: ["Mathematical content identified across all pages"],
+      teachingOpportunities: ["Use visual elements to enhance understanding"],
+      learningProgression: ["Introduction", "Development", "Practice", "Assessment"],
+      assessmentSuggestions: ["Formative assessment", "Practice problems", "Concept checks"]
+    };
+  }
+
+  /**
+   * Fallback page analysis when vision fails
+   * This is why you see 0 concepts found and 0.5 confidence
+   */
+  private static getFallbackPageAnalysis(pageNumber: number): PageAnalysis {
+    console.warn(`⚠️ [LessonContentService] Using FALLBACK analysis for page ${pageNumber}`);
+    console.warn(`📊 [LessonContentService] This will contribute 0 concepts and 0.5 confidence to the final result`);
+    console.warn(`🔍 [LessonContentService] Check above logs for the specific failure reason`);
+    
+    return {
+      pageNumber,
+      content: `Mathematical content from page ${pageNumber} (fallback - vision analysis failed)`,
+      mathematicalElements: [],
+      visualElements: [],
+      concepts: [], // This is why you get 0 concepts!
+      problemTypes: [],
+      confidence: 0.5 // This is why you get 0.5 confidence!
+    };
+  }
+
+  /**
+   * Generate comprehensive analysis from vision results
+   */
+  private static async generateComprehensiveAnalysis(visionAnalysis: VisionAnalysisResult): Promise<MathAnalysis> {
+    try {
+      console.log(`🧠 [LessonContentService] Generating comprehensive analysis from vision results...`);
+      
+      const text = visionAnalysis.content.toLowerCase();
+      
+      // Enhanced concept detection using vision results
+      const allConcepts = [...new Set([
+        ...visionAnalysis.concepts,
+        ...this.detectConceptsFromText(text)
+      ])];
+      
+      // Determine difficulty from mathematical elements
+      const difficulty = this.assessDifficultyFromElements(visionAnalysis.mathematicalElements);
+      
+      // Extract vocabulary from content
+      const vocabulary = this.extractMathVocabulary(text);
+      
+      // Determine prerequisites
+      const prerequisites = this.determinePrerequisites(allConcepts);
+      
+      const analysis: MathAnalysis = {
+        concepts: allConcepts,
+        difficulty,
+        formulas: visionAnalysis.mathematicalElements,
+        vocabulary,
+        prerequisites
+      };
+      
+      console.log(`✅ [LessonContentService] Comprehensive analysis complete:`, {
+        conceptCount: allConcepts.length,
+        difficulty,
+        formulaCount: visionAnalysis.mathematicalElements.length
+      });
+      
+      return analysis;
+    } catch (error) {
+      console.error(`❌ [LessonContentService] Error generating comprehensive analysis:`, error);
+      
+      // Fallback analysis
+      return {
+        concepts: visionAnalysis.concepts,
+        difficulty: 'intermediate',
+        formulas: visionAnalysis.mathematicalElements,
+        vocabulary: [],
+        prerequisites: ['basic arithmetic']
+      };
+    }
+  }
+
+  /**
+   * Detect mathematical concepts from text content
+   */
+  private static detectConceptsFromText(text: string): string[] {
+    const conceptPatterns = {
+      'algebra': /algebra|equation|variable|expression|solve|linear|quadratic/g,
+      'geometry': /geometry|triangle|circle|angle|area|perimeter|volume|polygon/g,
+      'fractions': /fraction|numerator|denominator|\/|proper|improper|mixed number/g,
+      'decimals': /decimal|point|tenths|hundredths|place value/g,
+      'ratios': /ratio|proportion|rate|compare|equivalent/g,
+      'percentages': /percent|%|percentage|out of 100/g,
+      'statistics': /mean|median|mode|average|data|graph|chart|survey/g,
+      'probability': /probability|chance|likely|outcome|event|random/g,
+      'measurement': /measure|length|width|height|weight|capacity|temperature/g,
+      'number_operations': /addition|subtraction|multiplication|division|factor|multiple/g
+    };
+    
+    const detectedConcepts: string[] = [];
+    for (const [concept, pattern] of Object.entries(conceptPatterns)) {
+      if (pattern.test(text)) {
+        detectedConcepts.push(concept);
+      }
+    }
+    
+    return detectedConcepts;
+  }
+
+  /**
+   * Assess difficulty level from mathematical elements
+   */
+  private static assessDifficultyFromElements(mathematicalElements: string[]): 'beginner' | 'intermediate' | 'advanced' {
+    const elementsText = mathematicalElements.join(' ').toLowerCase();
+    
+    const advancedIndicators = [
+      'quadratic', 'polynomial', 'logarithm', 'trigonometry', 'calculus',
+      'derivative', 'integral', 'function', 'inequality system', 'matrix'
+    ];
+    
+    const intermediateIndicators = [
+      'equation', 'variable', 'expression', 'graph', 'coordinate',
+      'slope', 'intercept', 'system', 'inequality'
+    ];
+    
+    if (advancedIndicators.some(indicator => elementsText.includes(indicator))) {
+      return 'advanced';
+    } else if (intermediateIndicators.some(indicator => elementsText.includes(indicator))) {
+      return 'intermediate';
+    }
+    
+    return 'beginner';
+  }
+
+  /**
+   * Build enhanced tutor prompt from vision analysis
+   */
+  private static buildEnhancedTutorPrompt(
+    lessonData: any,
+    visionAnalysis: VisionAnalysisResult,
+    analysis: MathAnalysis
+  ): string {
+    const pageCount = lessonData.pageRange.end - lessonData.pageRange.start + 1;
+    const conceptsText = analysis.concepts.join(', ');
+    const visualElements = visionAnalysis.visualElements.slice(0, 10).join(', ');
+    
+    const prompt = `You are an expert AI math tutor with comprehensive knowledge of "${lessonData.lessonTitle || `Lesson ${lessonData.lessonNumber}`}" - a ${pageCount}-page mathematics lesson.
+
+LESSON OVERVIEW:
+- Title: ${lessonData.lessonTitle || `Lesson ${lessonData.lessonNumber}`}
+- Pages: ${pageCount} (${lessonData.pageRange.start}-${lessonData.pageRange.end})
+- Concepts: ${conceptsText}
+- Difficulty Level: ${analysis.difficulty}
+- Visual Elements: ${visualElements}
+
+MATHEMATICAL CONTENT ANALYZED:
+- Key formulas and equations: ${visionAnalysis.mathematicalElements.slice(0, 8).join('; ')}
+- Mathematical vocabulary: ${analysis.vocabulary.join(', ')}
+- Prerequisites needed: ${analysis.prerequisites.join(', ')}
+
+COMPREHENSIVE LESSON INSIGHTS:
+${visionAnalysis.comprehensiveAnalysis?.overallSummary || 'Complete visual analysis of all lesson pages performed'}
+
+Your role as an AI tutor:
+1. Help students master the SPECIFIC concepts from this ${pageCount}-page lesson
+2. Reference the actual visual elements and diagrams from the lesson pages
+3. Use the exact mathematical formulas and terminology from the lesson
+4. Provide step-by-step guidance appropriate for ${analysis.difficulty}-level students
+5. Connect new concepts to the identified prerequisites
+6. Encourage exploration and understanding, not just memorization
+7. Use the comprehensive lesson analysis to provide contextual help
+
+Be patient, encouraging, and leverage the complete lesson content to provide the most helpful tutoring experience possible.`;
+
+    console.log(`🎭 [LessonContentService] Built enhanced tutor prompt (${prompt.length} characters)`);
+    return prompt;
+  }
+
+  /**
+   * Generate advanced teaching strategies from vision analysis
+   */
+  private static async generateAdvancedStrategies(
+    visionAnalysis: VisionAnalysisResult,
+    analysis: MathAnalysis
+  ): Promise<string[]> {
+    const strategies: string[] = [];
+    
+    // Base strategies enhanced with vision insights
+    strategies.push("Leverage the visual diagrams and illustrations from the lesson pages");
+    strategies.push("Reference specific examples and problems shown in the lesson");
+    strategies.push("Use the mathematical formulas exactly as presented in the lesson");
+    
+    // Vision-specific strategies
+    if (visionAnalysis.visualElements.length > 0) {
+      strategies.push(`Utilize the ${visionAnalysis.visualElements.length} visual elements identified: ${visionAnalysis.visualElements.slice(0, 3).join(', ')}`);
+      strategies.push("Connect visual representations to abstract mathematical concepts");
+    }
+    
+    // Mathematical element strategies
+    if (visionAnalysis.mathematicalElements.length > 5) {
+      strategies.push("Practice with the variety of mathematical expressions and formulas in the lesson");
+      strategies.push("Build connections between different mathematical representations");
+    }
+    
+    // Concept-specific enhanced strategies
+    if (analysis.concepts.includes('algebra')) {
+      strategies.push("Use the lesson's variable examples to build algebraic thinking");
+      strategies.push("Connect algebraic expressions to the real-world contexts shown");
+    }
+    
+    if (analysis.concepts.includes('geometry')) {
+      strategies.push("Measure and analyze the geometric figures shown in the lesson");
+      strategies.push("Create similar problems using the lesson's geometric examples");
+    }
+    
+    // Difficulty-based strategies
+    if (analysis.difficulty === 'advanced') {
+      strategies.push("Break the complex mathematical processes into the steps shown in the lesson");
+      strategies.push("Provide multiple solution approaches as demonstrated in the lesson");
+    }
+    
+    if (analysis.difficulty === 'beginner') {
+      strategies.push("Use the lesson's step-by-step examples for guided practice");
+      strategies.push("Reinforce basic concepts with the lesson's foundational examples");
+    }
+    
+    // Comprehensive analysis strategies
+    if (visionAnalysis.comprehensiveAnalysis) {
+      const insights = visionAnalysis.comprehensiveAnalysis.keyInsights || [];
+      if (insights.length > 0) {
+        strategies.push(`Focus on key insights: ${insights.slice(0, 2).join(' and ')}`);
+      }
+      
+      const opportunities = visionAnalysis.comprehensiveAnalysis.teachingOpportunities || [];
+      if (opportunities.length > 0) {
+        strategies.push(`Leverage teaching opportunities: ${opportunities.slice(0, 2).join(' and ')}`);
+      }
+    }
+    
+    console.log(`📚 [LessonContentService] Generated ${strategies.length} advanced teaching strategies`);
+    return strategies;
+  }
   static async prepareLessonContent(
     documentId: string, 
     lessonNumber: number
@@ -134,7 +834,8 @@ export class LessonContentService {
         analysis: analysisResult,
         tutorPrompt,
         teachingStrategies,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        analysisType: 'standard-analysis'
       };
 
       console.log(`🎉 [LessonContentService] Lesson preparation complete!`, {

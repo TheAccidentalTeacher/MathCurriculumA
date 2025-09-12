@@ -60,6 +60,7 @@ export default function ChatInterface({
   // CHILD-FRIENDLY STATE
   const [sessionActive, setSessionActive] = useState(false);
   const [showQuickSelect, setShowQuickSelect] = useState(childFriendlyMode);
+  const [isExpanded, setIsExpanded] = useState(false); // New state for expandable chat
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Analyze lesson content when it loads
@@ -659,24 +660,30 @@ export default function ChatInterface({
     onExpressionChange?.('thinking');
 
     try {
-      // Use intelligent tutor engine for smarter responses
-      if (lessonAnalysis) {
-        console.log(`🧠 [ChatInterface] Using intelligent tutor engine`);
-        
-        // Analyze user query to determine intent and tools needed
-        const queryAnalysis = await intelligentTutor.analyzeUserQuery(
-          userMessage.content, 
-          lessonAnalysis
-        );
-        
-        console.log(`🔍 [ChatInterface] Query analysis:`, queryAnalysis);
-        
-        // Generate smart response using GPT-4o with child-friendly modifications
-        const aiResponse = await intelligentTutor.generateResponse(
-          queryAnalysis,
-          lessonAnalysis,
-          character
-        );
+    // Use intelligent tutor engine for smarter responses
+    if (lessonAnalysis) {
+      // Check if this is vision-based analysis
+      const isVisionAnalysis = lessonContext.analysis?.analysisType === 'vision-analysis';
+      
+      console.log(`🧠 [ChatInterface] Using intelligent tutor engine with ${isVisionAnalysis ? 'VISION' : 'standard'} analysis`);
+      if (isVisionAnalysis) {
+        console.log(`🔬 [ChatInterface] 🎯 ENHANCED VISION ANALYSIS ACTIVE - AI has full visual understanding of all lesson pages!`);
+      }
+      
+      // Analyze user query to determine intent and tools needed
+      const queryAnalysis = await intelligentTutor.analyzeUserQuery(
+        userMessage.content, 
+        lessonAnalysis
+      );
+      
+      console.log(`🔍 [ChatInterface] Query analysis:`, queryAnalysis);
+      
+      // Generate smart response using GPT-4o with child-friendly modifications
+      const aiResponse = await intelligentTutor.generateResponse(
+        queryAnalysis,
+        lessonAnalysis,
+        character
+      );
         
         const assistantMessage: ChatMessage = {
           id: `assistant-${Date.now()}`,
@@ -775,245 +782,299 @@ export default function ChatInterface({
   };
 
   return (
-    <div className="flex flex-col h-full" role="region" aria-label={`Chat with ${config.name}`}>
-      {/* Messages Area */}
+    <div className={`flex flex-col transition-all duration-300 ${
+      isExpanded ? 'fixed inset-0 z-50 bg-white' : 'h-full'
+    }`} role="region" aria-label={`Chat with ${config.name}`}>
+      
+      {/* Modern Header with Expand/Collapse */}
+      <div className={`flex items-center justify-between p-6 ${
+        config.color === 'blue' 
+          ? 'bg-gradient-to-r from-blue-500 to-blue-600' 
+          : 'bg-gradient-to-r from-green-500 to-green-600'
+      } text-white shadow-lg`}>
+        <div className="flex items-center space-x-4">
+          <div className={`w-12 h-12 rounded-full ${
+            config.color === 'blue' ? 'bg-blue-400' : 'bg-green-400'
+          } flex items-center justify-center text-2xl`}>
+            {character === 'gimli' ? '🐕' : '👨‍🏫'}
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold">{config.name}</h2>
+            <p className="text-sm opacity-90">
+              {isTyping ? 'Typing...' : `Ready to help with ${lessonContext.lessonTitle}`}
+            </p>
+          </div>
+        </div>
+        
+        <div className="flex items-center space-x-3">
+          {/* Vision Analysis Status */}
+          {lessonContext.analysis?.analysisType === 'vision-analysis' ? (
+            <div className="flex items-center space-x-2 bg-purple-500 bg-opacity-30 px-3 py-1 rounded-full">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <span className="text-sm font-medium">Vision AI</span>
+            </div>
+          ) : lessonAnalysis ? (
+            <div className="flex items-center space-x-2 bg-white bg-opacity-20 px-3 py-1 rounded-full">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span className="text-sm">Text AI</span>
+            </div>
+          ) : null}
+          
+          {/* Expand/Collapse Button */}
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition-all"
+            aria-label={isExpanded ? 'Minimize chat' : 'Expand chat to fullscreen'}
+          >
+            {isExpanded ? (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+              </svg>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Spacious Messages Area */}
       <div 
-        className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50" 
+        className={`flex-1 overflow-y-auto bg-gray-50 ${
+          isExpanded ? 'p-8' : 'p-6'
+        }`}
         role="log" 
         aria-live="polite" 
         aria-label="Chat messages"
       >
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
-            role="article"
-            aria-label={`${message.type === 'user' ? 'Your' : config.name + "'s"} message`}
-          >
+        <div className={`max-w-4xl mx-auto space-y-6`}>
+          {messages.map((message) => (
             <div
-              className={`max-w-[85%] rounded-lg px-3 py-2 ${
-                message.type === 'user'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : config.color === 'blue'
-                  ? 'bg-blue-50 text-blue-900 border border-blue-200'
-                  : 'bg-green-50 text-green-900 border border-green-200'
-              }`}
+              key={message.id}
+              className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+              role="article"
+              aria-label={`${message.type === 'user' ? 'Your' : config.name + "'s"} message`}
             >
-              <div className="text-sm" aria-label="Message content">
-                {message.type === 'user' ? (
-                  <MathRenderer content={message.content} />
-                ) : (
-                  renderMessageWithGraphs(message.content)
-                )}
-              </div>
-              <div className="text-xs opacity-70 mt-1" aria-label="Message time">
-                {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </div>
-            </div>
-          </div>
-        ))}
-        
-        {/* Typing Indicator */}
-        {isTyping && (
-          <div className="flex justify-start" aria-live="polite" aria-label={`${config.name} is typing`}>
-            <div className={`rounded-lg px-3 py-2 ${
-              config.color === 'blue' ? 'bg-blue-50' : 'bg-green-50'
-            }`}>
-              <div className="flex space-x-1" aria-hidden="true">
-                <div className={`w-2 h-2 rounded-full animate-bounce ${
-                  config.color === 'blue' ? 'bg-blue-400' : 'bg-green-400'
-                }`} style={{ animationDelay: '0ms' }}></div>
-                <div className={`w-2 h-2 rounded-full animate-bounce ${
-                  config.color === 'blue' ? 'bg-blue-400' : 'bg-green-400'
-                }`} style={{ animationDelay: '150ms' }}></div>
-                <div className={`w-2 h-2 rounded-full animate-bounce ${
-                  config.color === 'blue' ? 'bg-blue-400' : 'bg-green-400'
-                }`} style={{ animationDelay: '300ms' }}></div>
-              </div>
-              <span className="sr-only">{config.name} is typing a response</span>
-            </div>
-          </div>
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Enhanced Input Area - Child-Friendly with Toggle */}
-      <div className="border-t border-gray-200 bg-gray-50" style={{ 
-        padding: childFriendlyMode ? '24px' : '1rem'
-      }}>
-        {/* Child-Friendly Mode Toggle */}
-        {!childFriendlyMode && (
-          <div className="mb-3 flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-600">Interface Mode:</span>
-              <button
-                onClick={() => setShowQuickSelect(!showQuickSelect)}
-                className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                  showQuickSelect 
-                    ? 'bg-green-100 text-green-800 border border-green-200' 
-                    : 'bg-gray-100 text-gray-600 border border-gray-200'
+              <div
+                className={`max-w-[80%] rounded-2xl px-6 py-4 shadow-sm ${
+                  message.type === 'user'
+                    ? 'bg-blue-600 text-white'
+                    : config.color === 'blue'
+                    ? 'bg-white text-gray-800 border border-blue-100'
+                    : 'bg-white text-gray-800 border border-green-100'
                 }`}
               >
-                {showQuickSelect ? '🧒 Kid-Friendly' : '⌨️ Advanced'}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Session Manager for Child-Friendly Mode */}
-        {(childFriendlyMode || showQuickSelect) && (
-          <SessionManager
-            userAge={userAge}
-            lessonTitle={lessonContext.lessonTitle}
-            isActive={sessionActive}
-            onSessionStart={() => setSessionActive(true)}
-            onSessionEnd={() => setSessionActive(false)}
-            onBreakSuggested={() => {
-              addMessage({
-                type: 'assistant',
-                content: `Hey! You've been working hard! 🌟 Let's take a quick break. Stand up, stretch, or grab some water. I'll be here when you're ready to continue! 💪`,
-                character
-              });
-            }}
-          />
-        )}
-
-        {/* Quick Select Interface for Child-Friendly Mode */}
-        {(childFriendlyMode || showQuickSelect) && (
-          <QuickSelectInterface
-            lessonTitle={lessonContext.lessonTitle}
-            lessonNumber={lessonContext.lessonNumber}
-            onQuestionSelect={(question) => {
-              setInputValue(question);
-              handleSendMessage(question);
-            }}
-            disabled={isTyping}
-            userAge={userAge}
-          />
-        )}
-
-        {/* Interface Toggle (in Child-Friendly Mode) */}
-        {childFriendlyMode && (
-          <div className="flex justify-center mb-4">
-            <div className="bg-gray-100 rounded-lg p-1 flex">
-              <button
-                onClick={() => setShowQuickSelect(true)}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                  showQuickSelect
-                    ? 'bg-blue-500 text-white shadow-md'
-                    : 'text-gray-600 hover:text-gray-800'
-                }`}
-                style={{ minHeight: '44px' }}
-              >
-                🧒 Kid-Friendly
-              </button>
-              <button
-                onClick={() => setShowQuickSelect(false)}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                  !showQuickSelect
-                    ? 'bg-blue-500 text-white shadow-md'
-                    : 'text-gray-600 hover:text-gray-800'
-                }`}
-                style={{ minHeight: '44px' }}
-              >
-                ⌨️ Advanced
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Traditional Text Input (Available in Advanced Mode or always when not child-friendly) */}
-        {(!childFriendlyMode || !showQuickSelect) && (
-          <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} role="form" aria-label="Send message to virtual tutor">
-            <div className="flex space-x-2 items-end">
-              <div className="flex-1">
-                <label htmlFor="chat-input" className="sr-only">
-                  Type your message to {config.name}
-                </label>
-                <textarea
-                  id="chat-input"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder={config.placeholderText}
-                  className={`w-full resize-none border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 disabled:bg-gray-100 disabled:text-gray-500 ${
-                    childFriendlyMode ? 'text-base' : ''
-                  }`}
-                  rows={Math.min(4, Math.max(2, inputValue.split('\n').length))}
-                  disabled={isTyping}
-                  aria-describedby="input-help"
-                  aria-invalid={false}
-                  maxLength={2000}
-                  style={childFriendlyMode ? { 
-                    fontSize: CHILD_FRIENDLY_DESIGN.TYPOGRAPHY.bodyText,
-                    minHeight: '48px'
-                  } : {}}
-                />
-                <div id="input-help" className="flex items-center justify-between mt-2 px-1">
-                  <span className="text-xs text-gray-500" aria-live="polite">
-                    {inputValue.length > 0 && `${inputValue.length}/2000 characters`}
-                  </span>
-                  <span className="text-xs text-gray-400">
-                    Press Enter to send, Shift+Enter for new line
-                  </span>
+                <div className="text-base leading-relaxed" aria-label="Message content">
+                  {message.type === 'user' ? (
+                    <MathRenderer content={message.content} />
+                  ) : (
+                    renderMessageWithGraphs(message.content)
+                  )}
+                </div>
+                <div className="text-xs opacity-60 mt-3 flex items-center space-x-2" aria-label="Message time">
+                  {message.type === 'assistant' && (
+                    <span className="text-lg">{character === 'gimli' ? '🐕' : '👨‍🏫'}</span>
+                  )}
+                  <span>{message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                 </div>
               </div>
-              <button
-                type="submit"
-                disabled={!inputValue.trim() || isTyping}
-                className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                  inputValue.trim() && !isTyping
-                    ? config.color === 'blue'
-                      ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl focus:ring-blue-500'
-                      : 'bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-xl focus:ring-green-500'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed focus:ring-gray-300'
-                }`}
-                aria-label={isTyping ? `${config.name} is responding, please wait` : 'Send message'}
-                title={isTyping ? 'AI is responding...' : 'Send message'}
-                style={childFriendlyMode ? { minHeight: CHILD_FRIENDLY_DESIGN.TOUCH_TARGETS.preferredSize } : {}}
-              >
-                {isTyping ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" aria-hidden="true"></div>
-                    <span>...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center space-x-1">
-                    <span>Send</span>
-                    <span aria-hidden="true">📤</span>
-                  </div>
-                )}
-              </button>
             </div>
-          </form>
-        )}
-        
-        {/* Quick Actions - Available in Advanced Mode */}
-        {(!childFriendlyMode || !showQuickSelect) && (
-          <div className="mt-2 flex flex-wrap gap-2">
-            <button
-              onClick={() => setInputValue("Can you explain this lesson's main concept?")}
-              className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
-              disabled={isTyping}
-            >
-              💡 Main Concept
-            </button>
-            <button
-              onClick={() => setInputValue("I need help with a practice problem")}
-              className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
-              disabled={isTyping}
-            >
-              🔢 Practice Problem
-            </button>
-            <button
-              onClick={() => setInputValue("Can you give me a hint?")}
-              className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
-              disabled={isTyping}
-            >
-              💭 Hint Please
-            </button>
-          </div>
-        )}
+          ))}
+          
+          {/* Enhanced Typing Indicator */}
+          {isTyping && (
+            <div className="flex justify-start" aria-live="polite" aria-label={`${config.name} is typing`}>
+              <div className="bg-white rounded-2xl px-6 py-4 shadow-sm border border-gray-100">
+                <div className="flex items-center space-x-3">
+                  <div className="text-lg">{character === 'gimli' ? '🐕' : '👨‍🏫'}</div>
+                  <div className="flex space-x-1" aria-hidden="true">
+                    <div className={`w-3 h-3 rounded-full animate-bounce ${
+                      config.color === 'blue' ? 'bg-blue-400' : 'bg-green-400'
+                    }`} style={{ animationDelay: '0ms' }}></div>
+                    <div className={`w-3 h-3 rounded-full animate-bounce ${
+                      config.color === 'blue' ? 'bg-blue-400' : 'bg-green-400'
+                    }`} style={{ animationDelay: '150ms' }}></div>
+                    <div className={`w-3 h-3 rounded-full animate-bounce ${
+                      config.color === 'blue' ? 'bg-blue-400' : 'bg-green-400'
+                    }`} style={{ animationDelay: '300ms' }}></div>
+                  </div>
+                  <span className="text-gray-500 text-sm">{config.name} is thinking...</span>
+                </div>
+                <span className="sr-only">{config.name} is typing a response</span>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+      </div>
+
+      {/* Modern Input Area */}
+      <div className={`bg-white border-t border-gray-200 ${
+        isExpanded ? 'p-8' : 'p-6'
+      }`}>
+        <div className="max-w-4xl mx-auto">
+          
+          {/* Child-Friendly Mode Toggle */}
+          {!childFriendlyMode && (
+            <div className="mb-6 flex items-center justify-center">
+              <div className="bg-gray-100 rounded-xl p-1 flex">
+                <button
+                  onClick={() => setShowQuickSelect(false)}
+                  className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    !showQuickSelect
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  ⌨️ Advanced Mode
+                </button>
+                <button
+                  onClick={() => setShowQuickSelect(true)}
+                  className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    showQuickSelect
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  🧒 Kid-Friendly Mode
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Session Manager for Child-Friendly Mode */}
+          {(childFriendlyMode || showQuickSelect) && (
+            <div className="mb-6">
+              <SessionManager
+                userAge={userAge}
+                lessonTitle={lessonContext.lessonTitle}
+                isActive={sessionActive}
+                onSessionStart={() => setSessionActive(true)}
+                onSessionEnd={() => setSessionActive(false)}
+                onBreakSuggested={() => {
+                  addMessage({
+                    type: 'assistant',
+                    content: `Hey! You've been working hard! 🌟 Let's take a quick break. Stand up, stretch, or grab some water. I'll be here when you're ready to continue! 💪`,
+                    character
+                  });
+                }}
+              />
+            </div>
+          )}
+
+          {/* Quick Select Interface for Child-Friendly Mode */}
+          {(childFriendlyMode || showQuickSelect) && (
+            <div className="mb-6">
+              <QuickSelectInterface
+                lessonTitle={lessonContext.lessonTitle}
+                lessonNumber={lessonContext.lessonNumber}
+                onQuestionSelect={(question) => {
+                  setInputValue(question);
+                  handleSendMessage(question);
+                }}
+                disabled={isTyping}
+                userAge={userAge}
+              />
+            </div>
+          )}
+
+          {/* Enhanced Text Input (Available in Advanced Mode or always when not child-friendly) */}
+          {(!childFriendlyMode || !showQuickSelect) && (
+            <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} role="form" aria-label="Send message to virtual tutor">
+              <div className="flex space-x-4 items-end">
+                <div className="flex-1">
+                  <label htmlFor="chat-input" className="sr-only">
+                    Type your message to {config.name}
+                  </label>
+                  <textarea
+                    id="chat-input"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder={config.placeholderText}
+                    className="w-full resize-none border-2 border-gray-200 rounded-2xl px-6 py-4 text-base bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-300 disabled:bg-gray-50 disabled:text-gray-500"
+                    rows={Math.min(6, Math.max(3, inputValue.split('\n').length + 1))}
+                    disabled={isTyping}
+                    aria-describedby="input-help"
+                    aria-invalid={false}
+                    maxLength={2000}
+                  />
+                  <div id="input-help" className="flex items-center justify-between mt-3 px-2">
+                    <span className="text-sm text-gray-500" aria-live="polite">
+                      {inputValue.length > 0 && `${inputValue.length}/2000 characters`}
+                    </span>
+                    <span className="text-sm text-gray-400">
+                      Press Enter to send, Shift+Enter for new line
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  disabled={!inputValue.trim() || isTyping}
+                  className={`px-8 py-4 rounded-2xl text-base font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 min-w-[120px] ${
+                    inputValue.trim() && !isTyping
+                      ? config.color === 'blue'
+                        ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl focus:ring-blue-500'
+                        : 'bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-xl focus:ring-green-500'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed focus:ring-gray-300'
+                  }`}
+                  aria-label={isTyping ? `${config.name} is responding, please wait` : 'Send message'}
+                  title={isTyping ? 'AI is responding...' : 'Send message'}
+                >
+                  {isTyping ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" aria-hidden="true"></div>
+                      <span>...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center space-x-2">
+                      <span>Send</span>
+                      <span aria-hidden="true">📤</span>
+                    </div>
+                  )}
+                </button>
+              </div>
+              
+              {/* Quick Actions */}
+              <div className="mt-4 flex flex-wrap gap-3 justify-center">
+                <button
+                  onClick={() => setInputValue("Can you explain this lesson's main concept?")}
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 text-sm font-medium transition-all duration-200"
+                  disabled={isTyping}
+                >
+                  💡 Explain Main Concept
+                </button>
+                <button
+                  onClick={() => setInputValue("I need help with a practice problem")}
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 text-sm font-medium transition-all duration-200"
+                  disabled={isTyping}
+                >
+                  🔢 Practice Problem Help
+                </button>
+                <button
+                  onClick={() => setInputValue("Can you give me a hint?")}
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 text-sm font-medium transition-all duration-200"
+                  disabled={isTyping}
+                >
+                  💭 Give Me a Hint
+                </button>
+                <button
+                  onClick={() => setInputValue("Can you show me an example?")}
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 text-sm font-medium transition-all duration-200"
+                  disabled={isTyping}
+                >
+                  � Show Example
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   );

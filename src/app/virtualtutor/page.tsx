@@ -182,6 +182,8 @@ export default function VirtualTutorPage() {
                   character={selectedCharacter}
                   onExpressionChange={setCharacterExpression}
                   lessonContext={lessonContext}
+                  childFriendlyMode={true}
+                  userAge={12}
                 />
               </div>
             </div>

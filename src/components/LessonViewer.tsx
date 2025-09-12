@@ -5,6 +5,80 @@ import Image from 'next/image';
 import { LessonData, LessonSession } from '../lib/lesson-service';
 import KhanAcademyVideos from './KhanAcademyVideos';
 import VirtualTutorPanel from './virtualtutor/VirtualTutorPanel';
+import { LessonAnalysis } from '../lib/intelligent-tutor-engine';
+
+// Transform vision analysis data to format expected by ChatInterface
+function transformVisionAnalysisForTutor(visionAnalysis: any): LessonAnalysis | null {
+  if (!visionAnalysis) return null;
+  
+  console.log(`🔄 [LessonViewer] Transforming vision analysis to tutor format:`, visionAnalysis);
+  
+  try {
+    // Extract concepts from the analysis object
+    const analysisData = visionAnalysis.analysis || {};
+    const extractedContent = visionAnalysis.extractedContent || {};
+    
+    // Get mathematical concepts from various sources in the vision analysis
+    const conceptSources = [
+      analysisData.concepts || [],
+      analysisData.mathematicalConcepts || [],
+      extractedContent.mathematicalConcepts || [],
+      visionAnalysis.content?.mathematicalConcepts || []
+    ].flat().filter(Boolean);
+    
+    // Get key terms from various sources
+    const termSources = [
+      analysisData.keyTerms || [],
+      analysisData.vocabularyTerms || [],
+      extractedContent.vocabularyTerms || [],
+      visionAnalysis.content?.vocabularyTerms || []
+    ].flat().filter(Boolean);
+    
+    // Get learning objectives
+    const objectiveSources = [
+      analysisData.learningObjectives || [],
+      analysisData.objectives || [],
+      extractedContent.learningObjectives || [],
+      visionAnalysis.content?.learningObjectives || []
+    ].flat().filter(Boolean);
+    
+    // Determine difficulty level
+    const difficultyMapping: { [key: string]: 'elementary' | 'middle' | 'high' } = {
+      'beginner': 'elementary',
+      'elementary': 'elementary',
+      'intermediate': 'middle',
+      'middle': 'middle',
+      'advanced': 'high',
+      'high': 'high'
+    };
+    
+    const rawDifficulty = analysisData.difficultyLevel || extractedContent.difficultyLevel || 'middle';
+    const difficulty = difficultyMapping[rawDifficulty] || 'middle';
+    
+    const transformed: LessonAnalysis = {
+      topics: conceptSources.slice(0, 5), // Use top concepts as topics
+      mathConcepts: conceptSources,
+      visualizationNeeds: ['graphs', 'diagrams', 'mathematical notation'], // Default visualization needs
+      difficulty,
+      suggestedTools: [], // Will be populated by intelligent tutor
+      keyTerms: termSources,
+      objectives: objectiveSources.length > 0 ? objectiveSources : [`Understand ${visionAnalysis.title || 'lesson concepts'}`]
+    };
+    
+    console.log(`✅ [LessonViewer] Transformed analysis:`, {
+      topics: transformed.topics.length,
+      mathConcepts: transformed.mathConcepts.length,
+      keyTerms: transformed.keyTerms.length,
+      objectives: transformed.objectives.length,
+      difficulty: transformed.difficulty
+    });
+    
+    return transformed;
+  } catch (error) {
+    console.error(`❌ [LessonViewer] Error transforming vision analysis:`, error);
+    return null;
+  }
+}
 
 interface LessonViewerProps {
   documentId: string;
@@ -21,7 +95,7 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
   const [imageError, setImageError] = useState(false);
   const [contentPreparationStatus, setContentPreparationStatus] = useState<string>('Initializing...');
   const [lessonAnalysis, setLessonAnalysis] = useState<any>(null);
-  const [tutorHeight, setTutorHeight] = useState<number>(800); // Much larger default - minimum 500px
+  const [tutorHeight, setTutorHeight] = useState<number>(2000); // Default 2000px - minimum 500px
   const [isResizing, setIsResizing] = useState(false);
   const [startY, setStartY] = useState(0);
   const [startHeight, setStartHeight] = useState(0);
@@ -31,7 +105,7 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
     if (!isResizing) return;
     
     const deltaY = e.clientY - startY;
-    const newHeight = Math.max(500, Math.min(1200, startHeight + deltaY)); // Minimum 500px
+    const newHeight = Math.max(500, startHeight + deltaY); // Minimum 500px, no maximum limit
     setTutorHeight(newHeight);
     console.log(`🖱️ [LessonViewer] Dragging: new height ${newHeight}px`);
   }, [isResizing, startY, startHeight]);
@@ -67,6 +141,45 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
     }
   }, [isResizing, handleMouseMove, handleMouseUp]);
 
+  // Keyboard shortcuts for resizing
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl + Alt + Arrow keys for resizing
+      if (e.ctrlKey && e.altKey) {
+        switch (e.key) {
+          case 'ArrowUp':
+            e.preventDefault();
+            setTutorHeight(prev => Math.max(500, prev - 100));
+            console.log('🔧 [LessonViewer] Keyboard resize: decreased height by 100px');
+            break;
+          case 'ArrowDown':
+            e.preventDefault();
+            setTutorHeight(prev => prev + 100);
+            console.log('🔧 [LessonViewer] Keyboard resize: increased height by 100px');
+            break;
+          case '1':
+            e.preventDefault();
+            setTutorHeight(800);
+            console.log('🔧 [LessonViewer] Keyboard preset: set to 800px');
+            break;
+          case '2':
+            e.preventDefault();
+            setTutorHeight(1200);
+            console.log('🔧 [LessonViewer] Keyboard preset: set to 1200px');
+            break;
+          case '3':
+            e.preventDefault();
+            setTutorHeight(2000);
+            console.log('🔧 [LessonViewer] Keyboard preset: set to 2000px');
+            break;
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   // Debug logging for tutor height changes and ensure minimum
   useEffect(() => {
     console.log(`📏 [LessonViewer] Tutor height changed to: ${tutorHeight}px`);
@@ -81,8 +194,15 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
   useEffect(() => {
     console.log(`🚀 [LessonViewer] Component mounted for ${documentId} - Lesson ${lessonNumber}`);
     loadLessonData();
-    prepareLessonContent();
   }, [documentId, lessonNumber]);
+
+  // Perform vision analysis after lesson data loads
+  useEffect(() => {
+    if (lessonData && !lessonAnalysis) {
+      console.log(`📊 [LessonViewer] Lesson data loaded, starting vision analysis...`);
+      performVisionAnalysis();
+    }
+  }, [lessonData, lessonAnalysis]);
 
   // Set initial session when lesson data loads
   useEffect(() => {
@@ -141,7 +261,8 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
       
       if (checkResult.success) {
         console.log(`✅ [LessonViewer] Found cached lesson analysis:`, checkResult.analysis);
-        setLessonAnalysis(checkResult.analysis);
+        const transformedAnalysis = transformVisionAnalysisForTutor(checkResult.analysis);
+        setLessonAnalysis(transformedAnalysis);
         setContentPreparationStatus('✅ Lesson analysis ready (cached)');
         return;
       }
@@ -169,7 +290,9 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
           processingTime: prepareResult.processingTimeMs
         });
         
-        setLessonAnalysis(prepareResult.analysis);
+        // Transform standard analysis to ChatInterface format
+        const transformedAnalysis = transformVisionAnalysisForTutor(prepareResult.analysis);
+        setLessonAnalysis(transformedAnalysis);
         setContentPreparationStatus(`✅ Virtual Tutor ready with specialized knowledge (${prepareResult.processingTimeMs}ms)`);
       } else {
         console.error(`❌ [LessonViewer] Content preparation failed:`, prepareResult.error);
@@ -181,6 +304,79 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
       console.log(`🔄 [LessonViewer] Falling back to general tutoring mode`);
       setContentPreparationStatus('⚠️ Using general tutoring mode');
       setLessonAnalysis(null);
+    }
+  };
+
+  /**
+   * COMPREHENSIVE VISION ANALYSIS using OpenAI Vision API
+   * Analyzes ALL lesson pages for enhanced AI understanding
+   */
+  const performVisionAnalysis = async () => {
+    console.log(`🔍 [LessonViewer] Starting COMPREHENSIVE VISION ANALYSIS for ${documentId}/${lessonNumber}`);
+    setContentPreparationStatus('🖼️ Performing OpenAI Vision analysis...');
+    
+    try {
+      // Check if vision analysis is already cached
+      const visionCheckUrl = `/api/lessons/${documentId}/${lessonNumber}/vision-analysis`;
+      console.log(`🔎 [LessonViewer] Checking for existing vision analysis: ${visionCheckUrl}`);
+      
+      const checkResponse = await fetch(visionCheckUrl);
+      const checkResult = await checkResponse.json();
+      
+      if (checkResult.success && checkResult.type === 'vision-analysis') {
+        console.log(`✅ [LessonViewer] Found cached VISION analysis!`);
+        const transformedAnalysis = transformVisionAnalysisForTutor(checkResult.analysis);
+        setLessonAnalysis(transformedAnalysis);
+        setContentPreparationStatus('🎯 Advanced Vision Analysis ready (cached)');
+        return;
+      }
+
+      // Perform new vision analysis
+      console.log(`🆕 [LessonViewer] No cached vision analysis found, performing new analysis...`);
+      setContentPreparationStatus('🔬 Analyzing ALL lesson pages with OpenAI Vision...');
+      
+      const pageCount = lessonData ? (lessonData.endPage - lessonData.startPage + 1) : 'unknown';
+      setContentPreparationStatus(`🖼️ Processing ${pageCount} pages with OpenAI Vision API...`);
+      
+      const visionResponse = await fetch(visionCheckUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      console.log(`🔧 [LessonViewer] Vision analysis response status: ${visionResponse.status}`);
+      const visionResult = await visionResponse.json();
+      console.log(`🎯 [LessonViewer] Vision analysis response:`, visionResult);
+      
+      if (visionResult.success) {
+        console.log(`🎉 [LessonViewer] VISION ANALYSIS COMPLETED SUCCESSFULLY!`);
+        console.log(`📊 [LessonViewer] Vision analysis summary:`, {
+          pageCount: visionResult.pageCount,
+          concepts: visionResult.analysis?.analysis?.concepts,
+          confidence: visionResult.analysis?.extractedContent?.confidence,
+          processingTime: visionResult.processingTimeMs,
+          features: visionResult.features
+        });
+        
+        // Transform vision analysis to ChatInterface format
+        const transformedAnalysis = transformVisionAnalysisForTutor(visionResult.analysis);
+        setLessonAnalysis(transformedAnalysis);
+        setContentPreparationStatus(`🎯 Enhanced Vision Analysis complete! (${visionResult.pageCount} pages, ${visionResult.processingTimeMs}ms)`);
+      } else {
+        console.error(`❌ [LessonViewer] Vision analysis failed:`, visionResult.error);
+        console.log(`🔄 [LessonViewer] Falling back to standard analysis...`);
+        setContentPreparationStatus('⚠️ Vision analysis failed, using standard analysis');
+        // Fall back to standard analysis
+        await prepareLessonContent();
+      }
+      
+    } catch (error) {
+      console.error(`💥 [LessonViewer] Vision analysis error:`, error);
+      console.log(`🔄 [LessonViewer] Falling back to standard analysis...`);
+      setContentPreparationStatus('⚠️ Vision analysis error, using standard analysis');
+      // Fall back to standard analysis
+      await prepareLessonContent();
     }
   };
 
@@ -271,13 +467,66 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
         <div className="flex items-center justify-between">
-          <div>
+          <div className="flex-1">
             <h1 className="text-2xl font-bold text-gray-900">
               Lesson {lessonData.lessonNumber}: {lessonData.lessonTitle}
             </h1>
             <p className="text-sm text-gray-600 mt-1">
               {lessonData.volumeName} • {lessonData.totalPages} pages • {lessonData.sessions.length} sessions
             </p>
+            {/* Content Preparation Status */}
+            <div className="mt-2 text-sm">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                {contentPreparationStatus}
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3">
+            {/* Vision Analysis Button */}
+            <button
+              onClick={performVisionAnalysis}
+              disabled={contentPreparationStatus.includes('Performing') || contentPreparationStatus.includes('Processing')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-2 ${
+                contentPreparationStatus.includes('Vision Analysis') 
+                  ? 'bg-green-500 text-white hover:bg-green-600' 
+                  : contentPreparationStatus.includes('Performing') || contentPreparationStatus.includes('Processing')
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-purple-500 text-white hover:bg-purple-600'
+              }`}
+              title={`Perform comprehensive OpenAI Vision analysis of all ${lessonData.totalPages} lesson pages`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <span>
+                {contentPreparationStatus.includes('Vision Analysis') ? 'Vision Complete' : 
+                 contentPreparationStatus.includes('Performing') || contentPreparationStatus.includes('Processing') ? 'Analyzing...' : 
+                 'AI Vision Analysis'}
+              </span>
+            </button>
+            {/* Standard Analysis Button */}
+            <button
+              onClick={prepareLessonContent}
+              disabled={contentPreparationStatus.includes('Performing') || contentPreparationStatus.includes('Processing')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-2 ${
+                contentPreparationStatus.includes('ready') && !contentPreparationStatus.includes('Vision') 
+                  ? 'bg-green-500 text-white hover:bg-green-600' 
+                  : contentPreparationStatus.includes('Performing') || contentPreparationStatus.includes('Processing')
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-blue-500 text-white hover:bg-blue-600'
+              }`}
+              title="Perform standard OCR-based lesson analysis"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span>
+                {contentPreparationStatus.includes('ready') && !contentPreparationStatus.includes('Vision') ? 'Standard Ready' : 
+                 contentPreparationStatus.includes('Performing') || contentPreparationStatus.includes('Processing') ? 'Analyzing...' : 
+                 'Standard Analysis'}
+              </span>
+            </button>
           </div>
           {onClose && (
             <button
@@ -462,26 +711,33 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
             </div>
           </div>
           
-          {/* Enhanced Resize Bar - More Visible */}
+          {/* Enhanced Resize Handle - Modern and Intuitive */}
           <div 
-            className="group cursor-row-resize py-3 px-4 flex items-center justify-center hover:bg-blue-100 transition-colors duration-200 border-2 border-gray-200 hover:border-blue-300 bg-gray-50"
+            className="group cursor-row-resize py-4 px-6 flex items-center justify-center hover:bg-blue-50 transition-all duration-200 border-y-2 border-gray-200 hover:border-blue-400 bg-gray-50 hover:shadow-md"
             onMouseDown={handleMouseDown}
-            title={`Drag to resize tutor panel height (currently ${tutorHeight}px)`}
+            title={`Drag to resize tutor panel (currently ${tutorHeight}px)\nKeyboard shortcuts: Ctrl+Alt+↑/↓ to adjust height, Ctrl+Alt+1/2/3 for presets (800px/1200px/2000px)`}
             style={{ 
-              minHeight: '40px',
+              minHeight: '48px',
               userSelect: 'none'
             }}
           >
-            <div className="flex items-center space-x-2">
-              <div className="w-12 h-1 bg-gray-400 group-hover:bg-blue-500 transition-colors duration-200 rounded-full"></div>
-              <div className="text-sm text-gray-600 group-hover:text-blue-700 font-medium transition-colors duration-200">
-                ↕ DRAG TO RESIZE
+            <div className="flex flex-col items-center space-y-2">
+              {/* Three horizontal resize bars for better visual indication */}
+              <div className="flex space-x-1">
+                <div className="w-8 h-1 bg-gray-400 group-hover:bg-blue-500 transition-colors duration-200 rounded-full"></div>
+                <div className="w-8 h-1 bg-gray-400 group-hover:bg-blue-500 transition-colors duration-200 rounded-full"></div>
+                <div className="w-8 h-1 bg-gray-400 group-hover:bg-blue-500 transition-colors duration-200 rounded-full"></div>
               </div>
-              <div className="w-12 h-1 bg-gray-400 group-hover:bg-blue-500 transition-colors duration-200 rounded-full"></div>
+              <div className="text-sm text-gray-600 group-hover:text-blue-700 font-medium transition-colors duration-200 flex items-center space-x-2">
+                <span>↕ DRAG TO RESIZE</span>
+                <span className="text-xs bg-gray-200 group-hover:bg-blue-200 px-2 py-1 rounded-md transition-colors duration-200">
+                  {tutorHeight}px
+                </span>
+                <span className="text-xs text-gray-500 group-hover:text-blue-600 transition-colors duration-200 hidden sm:inline">
+                  • Ctrl+Alt+↑↓ to adjust
+                </span>
+              </div>
             </div>
-            <span className="ml-3 text-sm text-gray-500 group-hover:text-blue-600 transition-colors duration-200 font-medium">
-              {tutorHeight}px
-            </span>
           </div>
           
           <div className="bg-white rounded-b-lg shadow-lg overflow-hidden">

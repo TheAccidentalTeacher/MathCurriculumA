@@ -22,6 +22,7 @@ export default function VirtualTutorPanel({
   const [selectedCharacter, setSelectedCharacter] = useState<'somers' | 'gimli'>('somers');
   const [isInitialized, setIsInitialized] = useState(false);
   const [characterExpression, setCharacterExpression] = useState<'idle' | 'speaking' | 'thinking'>('idle');
+  const [childFriendlyMode, setChildFriendlyMode] = useState(true); // Allow toggling between modes
 
   useEffect(() => {
     // Initialize virtual tutor for this specific lesson
@@ -87,7 +88,7 @@ export default function VirtualTutorPanel({
         </div>
         
         {/* Character Selection Buttons */}
-        <div className="flex space-x-2" role="group" aria-label="Choose your virtual tutor">
+        <div className="flex space-x-2 mb-4" role="group" aria-label="Choose your virtual tutor">
           <button
             onClick={() => handleCharacterSwitch('somers')}
             className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 ${
@@ -117,6 +118,32 @@ export default function VirtualTutorPanel({
             🐕 Gimli
           </button>
         </div>
+
+        {/* Mode Selection Toggle */}
+        <div className="flex items-center justify-center">
+          <div className="bg-gray-100 rounded-xl p-1 flex">
+            <button
+              onClick={() => setChildFriendlyMode(true)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                childFriendlyMode
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              🧒 Kid-Friendly Mode
+            </button>
+            <button
+              onClick={() => setChildFriendlyMode(false)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                !childFriendlyMode
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              ⌨️ Expert Mode
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Compact Character Display Area - Updated for larger avatars */}
@@ -145,15 +172,24 @@ export default function VirtualTutorPanel({
             content: lessonContent, // Pass full content for intelligent analysis
             analysis: lessonAnalysis // Keep legacy analysis for backward compatibility
           }}
-          childFriendlyMode={true} // Enable child-friendly mode by default
+          childFriendlyMode={childFriendlyMode} // Use dynamic mode
           userAge={11} // Default to 11 years old (6th grade)
         />
       </div>
 
-      {/* Footer with lesson context */}
-      <div className="border-t border-gray-200 p-3 bg-gray-50 flex-shrink-0">
+      {/* Footer with lesson context and resize handle */}
+      <div className="border-t border-gray-200 p-3 bg-gray-50 flex-shrink-0 relative">
         <div className="text-xs text-gray-500 text-center">
           🎯 Ready to help with <span className="font-medium">{lessonTitle}</span>
+        </div>
+        
+        {/* Corner Resize Handle - Visual indicator only since parent handles the actual resizing */}
+        <div className="absolute bottom-0 right-0 w-6 h-6 bg-gray-300 hover:bg-blue-400 transition-colors duration-200 cursor-nw-resize opacity-70 hover:opacity-100" 
+             style={{
+               background: 'linear-gradient(-45deg, transparent 30%, #9CA3AF 30%, #9CA3AF 40%, transparent 40%, transparent 60%, #9CA3AF 60%, #9CA3AF 70%, transparent 70%)',
+               borderTopLeftRadius: '4px'
+             }}
+             title="Use the horizontal resize bar above to resize the panel">
         </div>
       </div>
     </div>

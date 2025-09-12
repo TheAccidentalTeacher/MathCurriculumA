@@ -243,6 +243,19 @@ export class IntelligentTutorEngine {
       `${tool.name}: ${tool.syntax} - for ${(tool.applicableTopics || []).join(', ')}`
     ).join('\n');
 
+    // Check if this is vision-based analysis
+    const isVisionAnalysis = (lessonContext as any)?.analysisType === 'vision-analysis';
+
+    const visionContext = isVisionAnalysis ? `
+    
+    🎯 ENHANCED VISION ANALYSIS: I can see and understand all the visual content from the lesson pages, including:
+    - Diagrams, charts, and mathematical illustrations
+    - Worked examples and step-by-step solutions  
+    - Visual representations of concepts
+    - Mathematical notation and formulas as they appear in the lesson
+    - Context from headers, captions, and explanations around images
+    ` : '';
+
     const prompt = `
     You are ${character}, an engaging math tutor. The student asked: "${userQuery.text}"
 
@@ -250,7 +263,7 @@ export class IntelligentTutorEngine {
     - Current topics: ${(lessonContext?.topics || []).join(', ')}
     - Key concepts: ${(lessonContext?.mathConcepts || []).join(', ')}
     - Learning objectives: ${(lessonContext?.objectives || []).join(', ')}
-    - Difficulty level: ${lessonContext?.difficulty || 'middle'}
+    - Difficulty level: ${lessonContext?.difficulty || 'middle'}${visionContext}
 
     ANALYSIS RESULTS:
     - Student intent: ${userQuery.intent}
@@ -266,6 +279,7 @@ export class IntelligentTutorEngine {
     3. Connect your answer to the current lesson topics when relevant
     4. If the question is off-topic, still help but gently connect back to lesson concepts
     5. Be encouraging and match the ${character} character personality
+    ${isVisionAnalysis ? '6. Reference specific visual elements from the lesson when relevant (since you can see the actual lesson pages)' : ''}
 
     TOOL SYNTAX RULES:
     - Use [3D:shape_name] for 3D visualizations (cube, sphere, cylinder, cone, etc.)
