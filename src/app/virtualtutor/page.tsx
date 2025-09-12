@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
@@ -16,7 +16,8 @@ const ChatInterface = dynamic(() => import('@/components/virtualtutor/ChatInterf
   ssr: false
 });
 
-export default function VirtualTutorPage() {
+// Component that uses useSearchParams - must be wrapped in Suspense
+function VirtualTutorContent() {
   const [selectedCharacter, setSelectedCharacter] = useState<'somers' | 'gimli'>('somers');
   const [characterExpression, setCharacterExpression] = useState<'idle' | 'speaking' | 'thinking'>('idle');
   const searchParams = useSearchParams();
@@ -198,5 +199,21 @@ export default function VirtualTutorPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Main component with Suspense wrapper for useSearchParams
+export default function VirtualTutorPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading Virtual Tutor...</p>
+        </div>
+      </div>
+    }>
+      <VirtualTutorContent />
+    </Suspense>
   );
 }

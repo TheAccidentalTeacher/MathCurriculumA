@@ -1,0 +1,42 @@
+// Enhanced Vision Analysis Test
+// With detailed logging now added to the service, run a test to see what's failing
+
+console.log('🔍 ENHANCED VISION ANALYSIS TEST for RCM08_NA_SW_V1 - Lesson 2');
+console.log('===============================================================');
+console.log('');
+console.log('After adding enhanced logging to the LessonContentService,');
+console.log('the next vision analysis should show detailed information about:');
+console.log('');
+console.log('✅ What to look for in the logs:');
+console.log('- Step 1: Getting image path for RCM08_NA_SW_V1 page X');
+console.log('- Step 2: Preparing image for Vision API');
+console.log('- Step 3: Calling OpenAI Vision API...');
+console.log('- Step 4: Parsing JSON response...');
+console.log('');
+console.log('❌ What indicates failure:');
+console.log('- "ISSUE: No image found" = image path problem');
+console.log('- "ISSUE: Could not prepare image" = image loading problem');
+console.log('- "CRITICAL: OpenAI API key not found" = environment problem');
+console.log('- "ISSUE: No response content from Vision API" = API problem');
+console.log('- "Using FALLBACK analysis" = any step failed');
+console.log('');
+console.log('🚀 To test, run this in browser console:');
+console.log('');
+console.log('fetch("http://localhost:3000/api/lessons/RCM08_NA_SW_V1/2/vision-analysis", {');
+console.log('  method: "POST",');
+console.log('  headers: {"Content-Type": "application/json"},');
+console.log('  body: JSON.stringify({})');
+console.log('})');
+console.log('.then(res => res.json())');
+console.log('.then(data => {');
+console.log('  console.log("Result:", data);');
+console.log('  console.log("Concepts found:", data.analysis?.concepts?.length || 0);');
+console.log('  console.log("Confidence:", data.analysis?.extractedContent?.confidence);');
+console.log('})');
+console.log('.catch(err => console.error("Error:", err));');
+console.log('');
+console.log('📊 Expected results:');
+console.log('- If working: concepts > 0, confidence > 0.8');
+console.log('- If failing: concepts = 0, confidence = 0.5');
+console.log('');
+console.log('📝 Check the server terminal for detailed logs!');
