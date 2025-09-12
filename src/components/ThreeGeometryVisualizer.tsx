@@ -1,9 +1,42 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, Component, ErrorInfo, ReactNode } from 'react';
 import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber';
 import { OrbitControls, Text, Box, Sphere, Cylinder, Cone, Line, Html } from '@react-three/drei';
 import * as THREE from 'three';
+
+// Error Boundary for Canvas
+interface ErrorBoundaryProps {
+  children: ReactNode;
+  fallback: ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+}
+
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(_: Error): ErrorBoundaryState {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('❌ ErrorBoundary caught an error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+
+    return this.props.children;
+  }
+}
 
 interface ThreeGeometryProps {
   shape: 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'custom';
@@ -434,6 +467,12 @@ export default function ThreeGeometryVisualizer({
   className = ''
 }: ThreeGeometryProps) {
   const [error, setError] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  // Ensure we're on the client side before rendering Canvas
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // 🐛 DEBUG: Log received props
   console.log('🎯 ThreeGeometryVisualizer received props:', {
@@ -447,31 +486,42 @@ export default function ThreeGeometryVisualizer({
     animation
   });
 
+  // Error boundary for Canvas
+  const handleCanvasError = (error: Error) => {
+    console.error('❌ ThreeGeometryVisualizer Canvas Error:', error);
+    setError(`3D rendering failed: ${error.message}`);
+  };
+
   // Calculate volume and surface area
   const calculateProperties = () => {
-    switch (shape) {
-      case 'cube':
-        const volume = (dimensions.width || 2) * (dimensions.height || 2) * (dimensions.depth || 2);
-        const surfaceArea = 2 * ((dimensions.width || 2) * (dimensions.height || 2) + 
-                                 (dimensions.width || 2) * (dimensions.depth || 2) + 
-                                 (dimensions.height || 2) * (dimensions.depth || 2));
-        return { volume: volume.toFixed(2), surfaceArea: surfaceArea.toFixed(2) };
-      
-      case 'sphere':
-        const r = dimensions.radius || 1;
-        const sphereVolume = (4/3) * Math.PI * Math.pow(r, 3);
-        const sphereSurfaceArea = 4 * Math.PI * Math.pow(r, 2);
-        return { volume: sphereVolume.toFixed(2), surfaceArea: sphereSurfaceArea.toFixed(2) };
-      
-      case 'cylinder':
-        const cR = dimensions.radius || 1;
-        const h = dimensions.height || 2;
-        const cylinderVolume = Math.PI * Math.pow(cR, 2) * h;
-        const cylinderSurfaceArea = 2 * Math.PI * cR * (cR + h);
-        return { volume: cylinderVolume.toFixed(2), surfaceArea: cylinderSurfaceArea.toFixed(2) };
-      
-      default:
-        return { volume: '0', surfaceArea: '0' };
+    try {
+      switch (shape) {
+        case 'cube':
+          const volume = (dimensions.width || 2) * (dimensions.height || 2) * (dimensions.depth || 2);
+          const surfaceArea = 2 * ((dimensions.width || 2) * (dimensions.height || 2) + 
+                                   (dimensions.width || 2) * (dimensions.depth || 2) + 
+                                   (dimensions.height || 2) * (dimensions.depth || 2));
+          return { volume: volume.toFixed(2), surfaceArea: surfaceArea.toFixed(2) };
+        
+        case 'sphere':
+          const r = dimensions.radius || 1;
+          const sphereVolume = (4/3) * Math.PI * Math.pow(r, 3);
+          const sphereSurfaceArea = 4 * Math.PI * Math.pow(r, 2);
+          return { volume: sphereVolume.toFixed(2), surfaceArea: sphereSurfaceArea.toFixed(2) };
+        
+        case 'cylinder':
+          const cR = dimensions.radius || 1;
+          const h = dimensions.height || 2;
+          const cylinderVolume = Math.PI * Math.pow(cR, 2) * h;
+          const cylinderSurfaceArea = 2 * Math.PI * cR * (cR + h);
+          return { volume: cylinderVolume.toFixed(2), surfaceArea: cylinderSurfaceArea.toFixed(2) };
+        
+        default:
+          return { volume: '0', surfaceArea: '0' };
+      }
+    } catch (err) {
+      console.error('❌ Error calculating properties:', err);
+      return { volume: '0', surfaceArea: '0' };
     }
   };
 
@@ -480,8 +530,32 @@ export default function ThreeGeometryVisualizer({
   if (error) {
     return (
       <div className={`border border-red-300 rounded-lg p-4 ${className}`}>
-        <div className="text-red-600 font-medium">3D Visualization Error</div>
+        <div className="text-red-600 font-medium">🚫 3D Visualization Unavailable</div>
         <div className="text-sm text-red-500 mt-1">{error}</div>
+        <div className="text-xs text-gray-500 mt-2">
+          Showing {shape} properties instead:
+          <br />Volume: {properties.volume} cubic units
+          <br />Surface Area: {properties.surfaceArea} square units
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render Canvas on server side
+  if (!isClient) {
+    return (
+      <div className={`border rounded-lg overflow-hidden ${className}`}>
+        <div className="bg-gray-50 px-4 py-2 border-b">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-medium text-gray-800">
+              🎲 3D {shape.charAt(0).toUpperCase() + shape.slice(1)} Explorer
+            </h3>
+            <div className="text-xs text-blue-600 font-medium">Loading...</div>
+          </div>
+        </div>
+        <div className="flex items-center justify-center h-96 bg-gray-100">
+          <div className="text-gray-500">Preparing 3D visualization...</div>
+        </div>
       </div>
     );
   }
@@ -507,55 +581,74 @@ export default function ThreeGeometryVisualizer({
         </div>
       </div>
 
-      {/* 3D Canvas */}
+      {/* 3D Canvas with Error Boundary */}
       <div style={{ width: '100%', height: '400px' }}>
-        <Canvas
-          camera={{ position: [5, 5, 5], fov: 50 }}
-          style={{ background: 'linear-gradient(to bottom, #f0f9ff, #e0f2fe)' }}
+        <ErrorBoundary
+          fallback={
+            <div className="flex items-center justify-center h-full bg-red-50">
+              <div className="text-center">
+                <div className="text-red-600 font-medium">❌ 3D Rendering Error</div>
+                <div className="text-sm text-red-500 mt-1">
+                  WebGL or browser compatibility issue
+                </div>
+                <div className="text-xs text-gray-500 mt-2">
+                  Shape: {shape} | Volume: {properties.volume} | Surface Area: {properties.surfaceArea}
+                </div>
+              </div>
+            </div>
+          }
         >
-          {/* Enhanced lighting for better 3D appearance */}
-          <ambientLight intensity={0.4} />
-          <directionalLight position={[10, 10, 5]} intensity={1} castShadow />
-          <pointLight position={[10, 10, 10]} intensity={0.8} />
-          <pointLight position={[-10, -10, -10]} intensity={0.3} />
-          {/* Additional light specifically for sphere shading */}
-          <directionalLight position={[-5, 5, 5]} intensity={0.5} color="#ffffff" />
+          <Canvas
+            camera={{ position: [5, 5, 5], fov: 50 }}
+            style={{ background: 'linear-gradient(to bottom, #f0f9ff, #e0f2fe)' }}
+            onError={handleCanvasError}
+            gl={{ preserveDrawingBuffer: true }}
+            dpr={[1, 2]}
+          >
+            {/* Enhanced lighting for better 3D appearance */}
+            <ambientLight intensity={0.4} />
+            <directionalLight position={[10, 10, 5]} intensity={1} castShadow />
+            <pointLight position={[10, 10, 10]} intensity={0.8} />
+            <pointLight position={[-10, -10, -10]} intensity={0.3} />
+            {/* Additional light specifically for sphere shading */}
+            <directionalLight position={[-5, 5, 5]} intensity={0.5} color="#ffffff" />
 
-          {/* Coordinate axes */}
-          {showAxes && <CoordinateAxes />}
+            {/* Coordinate axes */}
+            {showAxes && <CoordinateAxes />}
 
-          {/* Main shape */}
-          <AnimatedShape
-            shape={shape}
-            dimensions={dimensions}
-            color={color}
-            wireframe={wireframe}
-            animation={animation}
-            onShapeClick={onShapeClick}
-          />
-
-          {/* Measurement labels */}
-          {showMeasurements && (
-            <MeasurementLabels shape={shape} dimensions={dimensions} />
-          )}
-
-          {/* Camera controls */}
-          {interactive && (
-            <OrbitControls
-              enableZoom={true}
-              enablePan={true}
-              enableRotate={true}
-              autoRotate={false}
-              autoRotateSpeed={1}
-              enableDamping={true}
-              dampingFactor={0.05}
-              screenSpacePanning={false}
-              minDistance={3}
-              maxDistance={20}
-              maxPolarAngle={Math.PI / 1.5}
+            {/* Main shape */}
+            <AnimatedShape
+              shape={shape}
+              dimensions={dimensions}
+              color={color}
+              wireframe={wireframe}
+              animation={animation}
+              onShapeClick={onShapeClick}
             />
-          )}
-        </Canvas>
+
+            {/* Measurement labels */}
+            {showMeasurements && (
+              <MeasurementLabels shape={shape} dimensions={dimensions} />
+            )}
+
+            {/* Camera controls */}
+            {interactive && (
+              <OrbitControls
+                enableZoom={true}
+                enablePan={true}
+                enableRotate={true}
+                autoRotate={false}
+                autoRotateSpeed={1}
+                enableDamping={true}
+                dampingFactor={0.05}
+                screenSpacePanning={false}
+                minDistance={3}
+                maxDistance={20}
+                maxPolarAngle={Math.PI / 1.5}
+              />
+            )}
+          </Canvas>
+        </ErrorBoundary>
       </div>
 
       {/* Controls */}

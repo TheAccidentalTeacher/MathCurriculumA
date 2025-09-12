@@ -32,14 +32,17 @@ const InlineMath: React.FC<{ math: string }> = ({ math }) => {
 };
 
 const BlockMath: React.FC<{ math: string }> = ({ math }) => {
+  console.log('🧮 BlockMath rendering:', { math });
   try {
     const html = katex.renderToString(math, {
       displayMode: true,
       throwOnError: false,
       strict: false
     });
+    console.log('✅ BlockMath rendered successfully:', { math, htmlLength: html.length });
     return <div dangerouslySetInnerHTML={{ __html: html }} className="text-center my-4" />;
   } catch (error) {
+    console.error('❌ BlockMath rendering error:', { math, error });
     return (
       <div className="my-4 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
         <strong>Math Rendering Error:</strong> {math}
@@ -64,9 +67,18 @@ interface MathRendererProps {
  */
 export default function MathRenderer({ content, className = '' }: MathRendererProps) {
   const renderMathContent = (text: string) => {
+    // 🐛 DEBUG: Let's see what we're receiving
+    console.log('🧮 MathRenderer received content:', {
+      content: text,
+      hasBlockMath: /(\\\[.*?\\\]|\$\$.*?\$\$)/.test(text),
+      hasInlineMath: /(\\\(.*?\\\)|\$.*?\$)/.test(text),
+      blockMatches: text.match(/(\\\[.*?\\\]|\$\$.*?\$\$)/g),
+      inlineMatches: text.match(/(\\\(.*?\\\)|\$.*?\$)/g)
+    });
+
     // Split content by different math delimiters
-    // Handle block math first (higher precedence)
-    const blockMathRegex = /(\\\[(.*?)\\\]|\$\$(.*?)\$\$)/g;
+    // Handle block math first (higher precedence) - with multiline support
+    const blockMathRegex = /(\\\[(.*?)\\\]|\$\$(.*?)\$\$)/gs; // Added 's' flag for dotall
     const inlineMathRegex = /(\\\((.*?)\\\)|\$(.*?)\$)/g;
     
     const parts: React.ReactNode[] = [];
@@ -178,7 +190,7 @@ export default function MathRenderer({ content, className = '' }: MathRendererPr
   };
 
   // If no math expressions found, return plain text
-  if (!content.match(/(\\\[.*?\\\]|\$\$.*?\$\$|\\\(.*?\\\)|\$.*?\$)/)) {
+  if (!content.match(/(\\\[.*?\\\]|\$\$.*?\$\$|\\\(.*?\\\)|\$.*?\$)/s)) {
     return <span className={className}>{content}</span>;
   }
 
@@ -191,7 +203,7 @@ export default function MathRenderer({ content, className = '' }: MathRendererPr
 
 // Utility function to check if text contains math
 export function containsMath(text: string): boolean {
-  return /(\\\[.*?\\\]|\$\$.*?\$\$|\\\(.*?\\\)|\$.*?\$)/.test(text);
+  return /(\\\[.*?\\\]|\$\$.*?\$\$|\\\(.*?\\\)|\$.*?\$)/s.test(text);
 }
 
 // Utility function to clean LaTeX for display

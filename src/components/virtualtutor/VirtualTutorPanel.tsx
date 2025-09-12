@@ -119,8 +119,8 @@ export default function VirtualTutorPanel({
         </div>
       </div>
 
-      {/* Compact Character Display Area */}
-      <div className="flex-shrink-0" style={{ maxHeight: '120px' }}>
+      {/* Compact Character Display Area - Updated for larger avatars */}
+      <div className="flex-shrink-0" style={{ maxHeight: '200px' }}>
         <CharacterDisplay 
           character={selectedCharacter}
           expression={characterExpression}
@@ -145,6 +145,8 @@ export default function VirtualTutorPanel({
             content: lessonContent, // Pass full content for intelligent analysis
             analysis: lessonAnalysis // Keep legacy analysis for backward compatibility
           }}
+          childFriendlyMode={true} // Enable child-friendly mode by default
+          userAge={11} // Default to 11 years old (6th grade)
         />
       </div>
 

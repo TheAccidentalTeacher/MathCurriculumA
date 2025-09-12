@@ -16,6 +16,10 @@ import ThreeGeometryVisualizer, { CubeExplorer, SphereExplorer, CylinderExplorer
 // import GeometryVisualizer, { TriangleExplorer, CircleExplorer, CubeExplorer, SphereExplorer, CylinderExplorer } from '../GeometryVisualizer';
 // import SmartGeoGebraFrame from '../SmartGeoGebraFrame';
 import { intelligentTutor, type LessonAnalysis } from '@/lib/intelligent-tutor-engine';
+// CHILD-FRIENDLY COMPONENTS
+import QuickSelectInterface from './QuickSelectInterface';
+import SessionManager from './SessionManager';
+import { CHILD_FRIENDLY_DESIGN } from '@/lib/child-friendly-design';
 
 interface ChatMessage {
   id: string;
@@ -35,12 +39,17 @@ interface ChatInterfaceProps {
     content?: any; // Full lesson content for analysis
     analysis?: LessonAnalysis; // Optional pre-analyzed lesson content
   };
+  // CHILD-FRIENDLY OPTIONS
+  childFriendlyMode?: boolean; // Enable child-friendly interface
+  userAge?: number; // User age for safety and interface customization
 }
 
 export default function ChatInterface({ 
   character, 
   onExpressionChange, 
-  lessonContext 
+  lessonContext,
+  childFriendlyMode = false,
+  userAge = 11
 }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -48,6 +57,9 @@ export default function ChatInterface({
   const [isInitialized, setIsInitialized] = useState(false);
   const [lessonAnalysis, setLessonAnalysis] = useState<LessonAnalysis | null>(lessonContext.analysis || null);
   const [isAnalyzingLesson, setIsAnalyzingLesson] = useState(false);
+  // CHILD-FRIENDLY STATE
+  const [sessionActive, setSessionActive] = useState(false);
+  const [showQuickSelect, setShowQuickSelect] = useState(childFriendlyMode);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Analyze lesson content when it loads
@@ -425,6 +437,9 @@ export default function ChatInterface({
 
         return (
           <div key={index} className="my-4">
+            <div className="mb-2 text-sm text-gray-600">
+              🎲 3D Visualization: {shape.charAt(0).toUpperCase() + shape.slice(1)}
+            </div>
             <ThreeGeometryVisualizer
               shape={shape as any}
               dimensions={dimensions}
@@ -516,6 +531,9 @@ export default function ChatInterface({
 
         return (
           <div key={index} className="my-4">
+            <div className="mb-2 text-sm text-gray-600">
+              🎲 3D Visualization: {mappedShape.charAt(0).toUpperCase() + mappedShape.slice(1)}
+            </div>
             <ThreeGeometryVisualizer
               shape={mappedShape as any}
               dimensions={dimensions}
@@ -586,10 +604,40 @@ export default function ChatInterface({
     return formattedContent;
   };
 
-  const handleSendMessage = async () => {
-    if (!inputValue.trim() || isTyping) return;
+  // Helper function to add messages
+  const addMessage = (message: Omit<ChatMessage, 'id' | 'timestamp'>) => {
+    const newMessage: ChatMessage = {
+      ...message,
+      id: `${message.type}-${Date.now()}`,
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, newMessage]);
+  };
 
-    console.log(`💬 [ChatInterface] User sending message: "${inputValue.trim()}"`);
+  const handleSendMessage = async (customMessage?: string) => {
+    const messageToSend = customMessage || inputValue.trim();
+    if (!messageToSend || isTyping) return;
+
+    // Child-friendly safety check
+    if ((childFriendlyMode || showQuickSelect) && userAge <= 13) {
+      // Content safety filter for young users
+      const sensitiveTopics = CHILD_FRIENDLY_DESIGN.SAFETY.blockedTopics;
+      const lowerMessage = messageToSend.toLowerCase();
+      
+      for (const topic of sensitiveTopics) {
+        if (lowerMessage.includes(topic.toLowerCase())) {
+          addMessage({
+            type: 'assistant',
+            content: `Hey! Let's keep our chat focused on ${lessonContext.lessonTitle}! 📚 I'm here to help you with math. What would you like to learn about this lesson? 🤔`,
+            character
+          });
+          setInputValue('');
+          return;
+        }
+      }
+    }
+
+    console.log(`💬 [ChatInterface] User sending message: "${messageToSend}"`);
     console.log(`🎭 [ChatInterface] Current character: ${character}`);
     console.log(`📚 [ChatInterface] Lesson context:`, {
       lessonId: lessonContext.documentId + '-' + lessonContext.lessonNumber,
@@ -599,12 +647,12 @@ export default function ChatInterface({
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
       type: 'user',
-      content: inputValue.trim(),
+      content: messageToSend,
       timestamp: new Date()
     };
 
     setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
+    if (!customMessage) setInputValue(''); // Only clear input if using text input
     setIsTyping(true);
     
     // Set character to thinking while processing
@@ -623,7 +671,7 @@ export default function ChatInterface({
         
         console.log(`🔍 [ChatInterface] Query analysis:`, queryAnalysis);
         
-        // Generate smart response using GPT-4o
+        // Generate smart response using GPT-4o with child-friendly modifications
         const aiResponse = await intelligentTutor.generateResponse(
           queryAnalysis,
           lessonAnalysis,
@@ -789,88 +837,183 @@ export default function ChatInterface({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Enhanced Input Area */}
-      <div className="border-t border-gray-200 p-4 bg-gray-50">
-        <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} role="form" aria-label="Send message to virtual tutor">
-          <div className="flex space-x-2 items-end">
-            <div className="flex-1">
-              <label htmlFor="chat-input" className="sr-only">
-                Type your message to {config.name}
-              </label>
-              <textarea
-                id="chat-input"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder={config.placeholderText}
-                className="w-full resize-none border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 disabled:bg-gray-100 disabled:text-gray-500"
-                rows={Math.min(4, Math.max(2, inputValue.split('\n').length))}
-                disabled={isTyping}
-                aria-describedby="input-help"
-                aria-invalid={false}
-                maxLength={2000}
-              />
-              <div id="input-help" className="flex items-center justify-between mt-2 px-1">
-                <span className="text-xs text-gray-500" aria-live="polite">
-                  {inputValue.length > 0 && `${inputValue.length}/2000 characters`}
-                </span>
-                <span className="text-xs text-gray-400">
-                  Press Enter to send, Shift+Enter for new line
-                </span>
-              </div>
+      {/* Enhanced Input Area - Child-Friendly with Toggle */}
+      <div className="border-t border-gray-200 bg-gray-50" style={{ 
+        padding: childFriendlyMode ? '24px' : '1rem'
+      }}>
+        {/* Child-Friendly Mode Toggle */}
+        {!childFriendlyMode && (
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600">Interface Mode:</span>
+              <button
+                onClick={() => setShowQuickSelect(!showQuickSelect)}
+                className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                  showQuickSelect 
+                    ? 'bg-green-100 text-green-800 border border-green-200' 
+                    : 'bg-gray-100 text-gray-600 border border-gray-200'
+                }`}
+              >
+                {showQuickSelect ? '🧒 Kid-Friendly' : '⌨️ Advanced'}
+              </button>
             </div>
+          </div>
+        )}
+
+        {/* Session Manager for Child-Friendly Mode */}
+        {(childFriendlyMode || showQuickSelect) && (
+          <SessionManager
+            userAge={userAge}
+            lessonTitle={lessonContext.lessonTitle}
+            isActive={sessionActive}
+            onSessionStart={() => setSessionActive(true)}
+            onSessionEnd={() => setSessionActive(false)}
+            onBreakSuggested={() => {
+              addMessage({
+                type: 'assistant',
+                content: `Hey! You've been working hard! 🌟 Let's take a quick break. Stand up, stretch, or grab some water. I'll be here when you're ready to continue! 💪`,
+                character
+              });
+            }}
+          />
+        )}
+
+        {/* Quick Select Interface for Child-Friendly Mode */}
+        {(childFriendlyMode || showQuickSelect) && (
+          <QuickSelectInterface
+            lessonTitle={lessonContext.lessonTitle}
+            lessonNumber={lessonContext.lessonNumber}
+            onQuestionSelect={(question) => {
+              setInputValue(question);
+              handleSendMessage(question);
+            }}
+            disabled={isTyping}
+            userAge={userAge}
+          />
+        )}
+
+        {/* Interface Toggle (in Child-Friendly Mode) */}
+        {childFriendlyMode && (
+          <div className="flex justify-center mb-4">
+            <div className="bg-gray-100 rounded-lg p-1 flex">
+              <button
+                onClick={() => setShowQuickSelect(true)}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  showQuickSelect
+                    ? 'bg-blue-500 text-white shadow-md'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+                style={{ minHeight: '44px' }}
+              >
+                🧒 Kid-Friendly
+              </button>
+              <button
+                onClick={() => setShowQuickSelect(false)}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  !showQuickSelect
+                    ? 'bg-blue-500 text-white shadow-md'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+                style={{ minHeight: '44px' }}
+              >
+                ⌨️ Advanced
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Traditional Text Input (Available in Advanced Mode or always when not child-friendly) */}
+        {(!childFriendlyMode || !showQuickSelect) && (
+          <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} role="form" aria-label="Send message to virtual tutor">
+            <div className="flex space-x-2 items-end">
+              <div className="flex-1">
+                <label htmlFor="chat-input" className="sr-only">
+                  Type your message to {config.name}
+                </label>
+                <textarea
+                  id="chat-input"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder={config.placeholderText}
+                  className={`w-full resize-none border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 disabled:bg-gray-100 disabled:text-gray-500 ${
+                    childFriendlyMode ? 'text-base' : ''
+                  }`}
+                  rows={Math.min(4, Math.max(2, inputValue.split('\n').length))}
+                  disabled={isTyping}
+                  aria-describedby="input-help"
+                  aria-invalid={false}
+                  maxLength={2000}
+                  style={childFriendlyMode ? { 
+                    fontSize: CHILD_FRIENDLY_DESIGN.TYPOGRAPHY.bodyText,
+                    minHeight: '48px'
+                  } : {}}
+                />
+                <div id="input-help" className="flex items-center justify-between mt-2 px-1">
+                  <span className="text-xs text-gray-500" aria-live="polite">
+                    {inputValue.length > 0 && `${inputValue.length}/2000 characters`}
+                  </span>
+                  <span className="text-xs text-gray-400">
+                    Press Enter to send, Shift+Enter for new line
+                  </span>
+                </div>
+              </div>
+              <button
+                type="submit"
+                disabled={!inputValue.trim() || isTyping}
+                className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                  inputValue.trim() && !isTyping
+                    ? config.color === 'blue'
+                      ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl focus:ring-blue-500'
+                      : 'bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-xl focus:ring-green-500'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed focus:ring-gray-300'
+                }`}
+                aria-label={isTyping ? `${config.name} is responding, please wait` : 'Send message'}
+                title={isTyping ? 'AI is responding...' : 'Send message'}
+                style={childFriendlyMode ? { minHeight: CHILD_FRIENDLY_DESIGN.TOUCH_TARGETS.preferredSize } : {}}
+              >
+                {isTyping ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" aria-hidden="true"></div>
+                    <span>...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-1">
+                    <span>Send</span>
+                    <span aria-hidden="true">📤</span>
+                  </div>
+                )}
+              </button>
+            </div>
+          </form>
+        )}
+        
+        {/* Quick Actions - Available in Advanced Mode */}
+        {(!childFriendlyMode || !showQuickSelect) && (
+          <div className="mt-2 flex flex-wrap gap-2">
             <button
-              type="submit"
-              disabled={!inputValue.trim() || isTyping}
-              className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                inputValue.trim() && !isTyping
-                  ? config.color === 'blue'
-                    ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl focus:ring-blue-500'
-                    : 'bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-xl focus:ring-green-500'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed focus:ring-gray-300'
-              }`}
-              aria-label={isTyping ? `${config.name} is responding, please wait` : 'Send message'}
-              title={isTyping ? 'AI is responding...' : 'Send message'}
+              onClick={() => setInputValue("Can you explain this lesson's main concept?")}
+              className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
+              disabled={isTyping}
             >
-              {isTyping ? (
-                <div className="flex items-center space-x-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" aria-hidden="true"></div>
-                  <span>...</span>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-1">
-                  <span>Send</span>
-                  <span aria-hidden="true">📤</span>
-                </div>
-              )}
+              💡 Main Concept
+            </button>
+            <button
+              onClick={() => setInputValue("I need help with a practice problem")}
+              className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
+              disabled={isTyping}
+            >
+              🔢 Practice Problem
+            </button>
+            <button
+              onClick={() => setInputValue("Can you give me a hint?")}
+              className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
+              disabled={isTyping}
+            >
+              💭 Hint Please
             </button>
           </div>
-        </form>
-        
-        {/* Quick Actions */}
-        <div className="mt-2 flex flex-wrap gap-2">
-          <button
-            onClick={() => setInputValue("Can you explain this lesson's main concept?")}
-            className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
-            disabled={isTyping}
-          >
-            💡 Main Concept
-          </button>
-          <button
-            onClick={() => setInputValue("I need help with a practice problem")}
-            className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
-            disabled={isTyping}
-          >
-            🔢 Practice Problem
-          </button>
-          <button
-            onClick={() => setInputValue("Can you give me a hint?")}
-            className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
-            disabled={isTyping}
-          >
-            💭 Hint Please
-          </button>
-        </div>
+        )}
       </div>
     </div>
   );

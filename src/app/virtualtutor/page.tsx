@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
@@ -18,13 +19,32 @@ const ChatInterface = dynamic(() => import('@/components/virtualtutor/ChatInterf
 export default function VirtualTutorPage() {
   const [selectedCharacter, setSelectedCharacter] = useState<'somers' | 'gimli'>('somers');
   const [characterExpression, setCharacterExpression] = useState<'idle' | 'speaking' | 'thinking'>('idle');
-
-  // Sample lesson context - in a real app, this would come from route params or props
-  const lessonContext = {
-    documentId: 'sample-lesson',
-    lessonNumber: 8,
-    lessonTitle: 'Graph Proportional Relationships and Define Slope'
+  const searchParams = useSearchParams();
+  
+  // Get lesson context from URL parameters or use default for standalone mode
+  const getLessonContext = () => {
+    const docId = searchParams.get('docId');
+    const lessonNum = searchParams.get('lessonNumber');
+    const lessonTitle = searchParams.get('lessonTitle');
+    
+    if (docId && lessonNum && lessonTitle) {
+      return {
+        documentId: docId,
+        lessonNumber: parseInt(lessonNum),
+        lessonTitle: decodeURIComponent(lessonTitle)
+      };
+    }
+    
+    // Default standalone mode - no specific lesson
+    return {
+      documentId: 'standalone',
+      lessonNumber: 0,
+      lessonTitle: 'General Math Help'
+    };
   };
+
+  const lessonContext = getLessonContext();
+  const isStandalone = lessonContext.documentId === 'standalone';
 
   const characterConfigs = {
     somers: {
@@ -84,19 +104,37 @@ export default function VirtualTutorPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Lesson Context Banner */}
+        {/* Context Banner */}
         <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
           <div className="flex items-center space-x-3">
             <div className="flex-shrink-0">
-              <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                <span className="text-indigo-600 font-medium">L{lessonContext.lessonNumber}</span>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                isStandalone 
+                  ? 'bg-green-100' 
+                  : 'bg-indigo-100'
+              }`}>
+                <span className={`font-medium ${
+                  isStandalone 
+                    ? 'text-green-600' 
+                    : 'text-indigo-600'
+                }`}>
+                  {isStandalone ? '🎯' : `L${lessonContext.lessonNumber}`}
+                </span>
               </div>
             </div>
             <div>
               <h2 className="text-lg font-semibold text-gray-900">
-                Currently helping with:
+                {isStandalone 
+                  ? 'Ready to help with any math topic!'
+                  : 'Currently helping with:'
+                }
               </h2>
-              <p className="text-gray-600">{lessonContext.lessonTitle}</p>
+              <p className="text-gray-600">
+                {isStandalone 
+                  ? 'Ask me about any math concept, problem, or lesson you need help with.'
+                  : lessonContext.lessonTitle
+                }
+              </p>
             </div>
           </div>
         </div>
@@ -124,11 +162,7 @@ export default function VirtualTutorPage() {
                   character={selectedCharacter}
                   expression={characterExpression}
                   onExpressionChange={setCharacterExpression}
-                  lessonContext={{
-                    documentId: "demo",
-                    lessonNumber: 1,
-                    lessonTitle: "Virtual Tutor Demo"
-                  }}
+                  lessonContext={lessonContext}
                 />
               </div>
 
