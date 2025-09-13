@@ -16,6 +16,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body className="min-h-dvh bg-slate-900 text-slate-100">
         {children}
+        {/* ENHANCED: Desmos API integration for reliable math visualization */}
+        <Script
+          src="https://www.desmos.com/api/v1.11/calculator.js?apiKey=64d043ddff96468aaa2ec81d8a151b71"
+          strategy="afterInteractive"
+        />
         {/* DISABLED: GeoGebra integration removed by user request
         <Script
           src="https://www.geogebra.org/apps/deployggb.js"

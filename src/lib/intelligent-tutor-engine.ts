@@ -284,10 +284,13 @@ export class IntelligentTutorEngine {
     TOOL SYNTAX RULES:
     - Use [3D:shape_name] for 3D visualizations (cube, sphere, cylinder, cone, etc.)
     - Use [SHAPE:name,dimensions] for 2D shapes and basic geometry
-    - Use [GRAPH:function] for algebraic graphing
+    - Use [NUMBERLINE:1/4,3/8,5/6] for fraction number lines (NOT [GRAPH:] for number lines)
+    - Use [GRAPH:function] for algebraic graphing and function plotting
     - Use [POWERS10:type,number] for scientific notation and place value
     - Use [CALC:expression] for calculations
     - Multiple tools can be used in one response
+    
+    CRITICAL: For number line visualizations with fractions, ALWAYS use [NUMBERLINE:fraction1,fraction2,fraction3] format, NOT [GRAPH:]
 
     Generate a helpful response that uses the appropriate tools for this specific question.
     `;

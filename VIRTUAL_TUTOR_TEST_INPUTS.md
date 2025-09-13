@@ -26,7 +26,7 @@ Display a cylinder with height 8 and radius 2
 ```
 Can you graph the linear function y = 2x + 3?
 Show me how to plot y = -0.5x + 4
-Graph the line that passes through points (0, 2) and (3, 8) and show the slope calculation: m = (8-2)/(3-0) = 6/3 = 2, so y = 2x + 2
+Graph the line that passes through points (0, 2) and (3, 8)
 What does the slope of y = 3x - 1 represent?
 Graph y = 4x - 2 and explain the slope and y-intercept
 Show me the line y = -x + 5
@@ -140,6 +140,17 @@ Create a visual for area of rectangles with dimensions 5×7
 Display coordinate points for a treasure map activity
 Graph simple patterns: 2, 4, 6, 8, ...
 Show me how to plot points (2, 3) and (4, 7)
+```
+
+### Number Line Specific Tests (NEW)
+```
+Show fractions on a number line: 1/4, 3/8, 5/6
+Put these decimals on a number line: 0.25, 0.5, 0.75
+Number line with: 1/2, 2/3, 3/4
+Show me 0.1, 0.3, 0.7 on a number line
+Compare fractions: 1/3, 2/5, 3/7 on a line
+Display these on a number line: 1.5, 2.25, 2.75
+Mixed numbers on a line: 1 1/2, 2 1/4, 2 3/4
 ```
 
 ### Grade 7 Topics
@@ -313,6 +324,130 @@ If a visualization doesn't appear:
 2. Try refreshing the page
 3. Make sure the development server is running
 4. Check browser console for any errors
+
+---
+
+## **CHILD-FRIENDLY TRIGGER TESTS (New)**
+
+### Testing Natural Child Language for Auto-Visualizations
+
+These prompts test the enhanced AI system that automatically provides visualizations when children use natural, confused language (without requiring specific "graph" or "Desmos" keywords).
+
+#### Confusion-Based Triggers
+```
+I don't understand random sampling
+I'm confused about this math problem
+This is hard, can you help me?
+I don't get what a function is
+I need help with this
+This doesn't make sense to me
+I'm lost with these coordinates
+What does this mean?
+I don't understand how to do this
+This is confusing
+```
+
+#### Visual Request Triggers  
+```
+I need pictures to understand this
+Can you show me what this looks like?
+Help me see how this works
+I need to see this visually
+Show me how to do this
+Can you draw this for me?
+I learn better with pictures
+Make this easier to see
+Can you show me an example?
+Help me visualize this problem
+```
+
+#### Topic-Specific Child Questions
+```
+I don't understand how graphs work
+What does slope mean? I'm confused
+I don't get how to plot points
+Random sampling is hard to understand
+I need help seeing what a parabola looks like
+I'm confused about volume and shapes
+What does y = 2x + 3 actually mean?
+I don't understand coordinate planes
+How do you find the area of weird shapes?
+What's the difference between a cube and a sphere?
+```
+
+#### Elementary/Middle School Natural Questions
+```
+Why do we need to graph things?
+I don't get why math has letters in it
+How do you know where to put the dots on a graph?
+What's the point of all these equations?
+I'm confused about fractions on number lines
+Why does this line go up and that one goes down?
+What happens when you multiply by a negative number?
+I don't understand why we need the y-axis
+How do you figure out if lines will cross?
+What makes a shape 3D instead of flat?
+```
+
+#### Expected AI Behavior Tests
+*These should ALL trigger automatic visualizations:*
+```
+Random sampling seems really hard
+I need help understanding linear functions
+Quadratic functions don't make sense  
+I'm confused about coordinate geometry
+Volume calculations are difficult for me
+I don't get how to read graphs
+This algebra stuff is confusing
+I need help with geometric shapes
+Slope is hard to understand
+I'm lost with these math problems
+```
+
+---
+
+## **CHARACTER-SPECIFIC TESTS**
+
+### Mr. Somers Tests (Professional Teacher)
+```
+Mr. Somers, I don't understand this problem
+Can you help me see what random sampling means?
+I'm confused about graphing functions
+This quadratic equation doesn't make sense
+I need help understanding slope
+```
+
+### Gimli Tests (Enthusiastic Dog)
+```
+Gimli, I'm confused about these math shapes
+Help me understand what a parabola looks like
+I don't get how coordinate planes work
+Can you show me what volume means?
+This is too hard for me to understand
+```
+
+---
+
+## **INTEGRATION TESTS**
+
+### Vision Analysis + Child Language
+*Test these on actual curriculum pages:*
+```
+I don't understand what's on page 22
+This page is confusing, can you help?
+I need pictures to understand page 15
+What does this page mean?
+I'm lost on this lesson
+```
+
+### Real Curriculum Content Tests
+```
+I don't understand this Random Sampling lesson
+The volume lesson is confusing me
+I need help with the coordinate geometry section  
+This algebra chapter doesn't make sense
+Can you explain this geometry lesson better?
+```
 
 ---
 

@@ -1,15 +1,21 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import MathRenderer from '../MathRenderer';
 import MathGrapher, { createLinearGraph, createPointGraph } from '../MathGrapher';
 import PlaceValueChart, { createPowersOf10Chart } from '../PlaceValueChart';
 import ScientificNotationBuilder, { createScientificNotationExample } from '../ScientificNotationBuilder';
 import PowersOf10NumberLine, { createPowersOf10NumberLine } from '../PowersOf10NumberLine';
+import NumberLineVisualizer from '../math-tools/NumberLineVisualizer';
+import VisualizationContainer, { MultiVisualizationContainer } from './VisualizationContainer';
 // PROFESSIONAL VISUALIZATION TOOLS (replacing GeoGebra)
 import ProfessionalMathVisualizer, { createMathVisualization } from '../ProfessionalMathVisualizer';
 import PlotlyGrapher, { LinearFunctionGrapher, QuadraticFunctionGrapher } from '../PlotlyGrapher';
 import ThreeGeometryVisualizer, { CubeExplorer, SphereExplorer, CylinderExplorer } from '../ThreeGeometryVisualizer';
+import TransformationVisualizer, { ReflectionExplorer, RotationExplorer, TranslationExplorer } from '../TransformationVisualizer';
+// ENHANCED: Desmos integration for reliable math visualization
+import DesmosCalculator, { QuickGraph, parseMathExpression } from '../DesmosCalculator';
 // DISABLED: GeoGebra integration removed by user request
 // import GeoGebraWidget, { GeometryExplorer } from '../GeoGebraWidget';
 // import PowersOf10Activity from '../PowersOf10GeoGebra';
@@ -100,6 +106,7 @@ export default function ChatInterface({
     somers: {
       name: 'Mr. Somers',
       color: 'blue',
+      avatar: '/animations/somers-1.png',
       initialMessage: lessonAnalysis 
         ? `Hello! I'm Mr. Somers, your math teacher. I've analyzed "${lessonContext.lessonTitle}" and I'm ready to help you with ${(lessonAnalysis.mathConcepts || []).slice(0, 2).join(' and ')}. Based on my analysis, we'll be working on ${(lessonAnalysis.topics || []).join(', ')} concepts. I have ${(lessonAnalysis.suggestedTools || []).length} interactive tools ready to help visualize and understand these topics!`
         : `Hello! I'm Mr. Somers, your math teacher. I'm here to help you understand "${lessonContext.lessonTitle}". ${isAnalyzingLesson ? 'I\'m currently analyzing the lesson content to provide you with the best possible help...' : 'Feel free to ask me anything about this lesson!'}`,
@@ -108,6 +115,7 @@ export default function ChatInterface({
     gimli: {
       name: 'Gimli',
       color: 'green',
+      avatar: '/animations/gimli-1.png',
       initialMessage: lessonAnalysis
         ? `Woof woof! Hi there! I'm Gimli, and I've been studying "${lessonContext.lessonTitle}" just for you! We're going to explore ${(lessonAnalysis.topics || []).slice(0, 2).join(' and ')}, and I've got ${(lessonAnalysis.suggestedTools || []).length} cool interactive tools to make learning fun! ${lessonAnalysis.difficulty === 'elementary' ? 'This looks like fun stuff!' : lessonAnalysis.difficulty === 'middle' ? 'This is perfect for us to tackle together!' : 'This might be challenging, but we\'ve got this!'} 🎾`
         : `Woof woof! Hi there! I'm Gimli, and I'm super excited to learn "${lessonContext.lessonTitle}" with you! ${isAnalyzingLesson ? 'I\'m sniffing around the lesson content to understand it better...' : 'Don\'t worry if it seems tough - we\'ll figure it out together!'} 🎾`,
@@ -183,7 +191,7 @@ export default function ChatInterface({
     });
     
     // Split content by markers - GeoGebra features are disabled but patterns preserved for user feedback
-    const parts = content.split(/(\[GRAPH:[^\]]+\]|\[PLACEVALUE:[^\]]+\]|\[SCIENTIFIC:[^\]]+\]|\[POWERLINE:[^\]]+\]|\[GEOGEBRA:[^\]]+\]|\[GEOMETRY:[^\]]+\]|\[SHAPE:[^\]]+\]|\[POWERS10:[^\]]+\]|\[CUBE:[^\]]+\]|\[3D:[^\]]+\])/g);
+    const parts = content.split(/(\[GRAPH:[^\]]+\]|\[PLACEVALUE:[^\]]+\]|\[SCIENTIFIC:[^\]]+\]|\[POWERLINE:[^\]]+\]|\[NUMBERLINE:[^\]]+\]|\[GEOGEBRA:[^\]]+\]|\[GEOMETRY:[^\]]+\]|\[TRANSFORM:[^\]]+\]|\[SHAPE:[^\]]+\]|\[SMART_3D:[^\]]+\]|\[POWERS10:[^\]]+\]|\[CUBE:[^\]]+\]|\[3D:[^\]]+\])/g);
     
     console.log('🔪 Content split into parts:', parts);
     
@@ -227,13 +235,42 @@ export default function ChatInterface({
       if (plotlyGraphMatch) {
         let functions = plotlyGraphMatch[1].split(',').map(f => f.trim());
         
-        // Clean up function expressions - remove "y =" and "f(x) =" prefixes
+        // Clean up function expressions - remove "y =" and "f(x) =" prefixes and escape characters
         functions = functions.map(func => {
           return func
             .replace(/^y\s*=\s*/, '')      // Remove "y = " prefix
             .replace(/^f\(x\)\s*=\s*/, '') // Remove "f(x) = " prefix
+            .replace(/\\/g, '')            // Remove escape characters like \sin -> sin
             .trim();
         });
+        
+        // Determine appropriate ranges based on function types
+        const hasTrig = functions.some(func => /sin|cos|tan/.test(func));
+        const hasLog = functions.some(func => /log|ln/.test(func));
+        const hasExp = functions.some(func => /\^|exp/.test(func) && !/\^2/.test(func)); // exponential but not quadratic
+        const hasQuadratic = functions.some(func => /\^2|x\*x|x²/.test(func));
+        
+        let xRange: [number, number] = [-10, 10];
+        let yRange: [number, number] = [-10, 10];
+        
+        // Set optimal ranges for different function types
+        if (hasTrig) {
+          // For trigonometric functions, show 2 complete cycles
+          xRange = [-2 * Math.PI, 2 * Math.PI]; // About [-6.28, 6.28]
+          yRange = [-3, 3]; // sin/cos range with some padding
+        } else if (hasLog) {
+          // For logarithmic functions, start from positive domain
+          xRange = [0.1, 20];
+          yRange = [-3, 3];
+        } else if (hasExp) {
+          // For exponential functions
+          xRange = [-5, 5];
+          yRange = [0, 20];
+        } else if (hasQuadratic) {
+          // For quadratic functions
+          xRange = [-8, 8];
+          yRange = [-10, 15];
+        }
         
         return (
           <div key={index} className="my-4">
@@ -244,8 +281,8 @@ export default function ChatInterface({
               height={450}
               interactive={true}
               showGrid={true}
-              xRange={[-10, 10]}
-              yRange={[-10, 10]}
+              xRange={xRange}
+              yRange={yRange}
             />
           </div>
         );
@@ -268,6 +305,55 @@ export default function ChatInterface({
         );
       }
 
+      // Check for General Number Line instruction (for fractions, decimals, etc.)
+      const numberLineMatch = part.match(/\[NUMBERLINE:([^\]]+)\]/);
+      if (numberLineMatch) {
+        const instruction = numberLineMatch[1];
+        // Parse fractions like "1/4,3/8,5/6" or range like "0,1,0.25"
+        const fractionStrings = instruction.split(',').map(str => str.trim());
+        const numbers = fractionStrings.map(str => {
+          if (str.includes('/')) {
+            // Parse fraction
+            const [num, den] = str.split('/').map(s => parseFloat(s.trim()));
+            return num / den;
+          }
+          return parseFloat(str);
+        }).filter(n => !isNaN(n));
+
+        // Create fraction labels for display
+        const fractionLabels = fractionStrings.reduce((acc, str, idx) => {
+          if (!isNaN(numbers[idx])) {
+            acc[numbers[idx]] = str;
+          }
+          return acc;
+        }, {} as Record<number, string>);
+
+        // Determine range for the number line
+        const min = Math.min(0, ...numbers);
+        const max = Math.max(1, ...numbers);
+        const range = max - min;
+        const padding = range * 0.1;
+        
+        return (
+          <VisualizationContainer 
+            key={index}
+            title="Interactive Number Line"
+            description={`Exploring fractions: ${fractionStrings.join(', ')}`}
+            className="number-line-visualization"
+          >
+            <NumberLineVisualizer
+              min={min - padding}
+              max={max + padding}
+              step={0.25}
+              highlightNumbers={numbers}
+              fractionLabels={fractionLabels}
+              showFractions={true}
+              title="Fraction Number Line"
+            />
+          </VisualizationContainer>
+        );
+      }
+
       // Check if this part is a graph instruction
       const graphMatch = part.match(/\[GRAPH:([^\]]+)\]/);
       if (graphMatch) {
@@ -280,7 +366,11 @@ export default function ChatInterface({
           const yIntercept = parseFloat((linearMatch[2] || '0').replace(/\s/g, ''));
           
           return (
-            <div key={index} className="my-4">
+            <VisualizationContainer 
+              key={index}
+              title={`Linear Function: ${graphInstruction}`}
+              description="Interactive graph with gridlines and point plotting"
+            >
               <MathGrapher 
                 slope={slope}
                 yIntercept={yIntercept}
@@ -292,7 +382,7 @@ export default function ChatInterface({
                 width={400}
                 height={300}
               />
-            </div>
+            </VisualizationContainer>
           );
         }
         
@@ -312,7 +402,11 @@ export default function ChatInterface({
           }).filter(Boolean) as { x: number; y: number; label: string }[];
           
           return (
-            <div key={index} className="my-4">
+            <VisualizationContainer 
+              key={index}
+              title="Coordinate Points"
+              description={`Plotting ${points.length} point${points.length > 1 ? 's' : ''} on the coordinate plane`}
+            >
               <MathGrapher 
                 points={points}
                 config={{ 
@@ -323,7 +417,7 @@ export default function ChatInterface({
                 width={400}
                 height={300}
               />
-            </div>
+            </VisualizationContainer>
           );
         }
         
@@ -351,20 +445,62 @@ export default function ChatInterface({
       //   );
       // }
 
-      // GeoGebra features have been disabled
-      // PROFESSIONAL: Function and general graphing with Plotly.js (replacing GEOGEBRA)
-      const geogebraMatch = part.match(/\[GEOGEBRA:([^\]]+)\]/);
-      if (geogebraMatch) {
-        const content = geogebraMatch[1];
-        const visualization = createMathVisualization(content);
+      // ENHANCED: Desmos integration for reliable educational math visualization
+      const desmosMatch = part.match(/\[DESMOS:([^\]]+)\]/);
+      if (desmosMatch) {
+        const expressionsStr = desmosMatch[1];
+        const expressions = expressionsStr.split(',').map(expr => parseMathExpression(expr.trim()));
         
         return (
           <div key={index} className="my-4">
-            <ProfessionalMathVisualizer
-              type={visualization.type}
-              content={visualization.content}
-              config={visualization.config}
-            />
+            <div className="bg-white p-4 rounded-lg shadow-sm">
+              <h4 className="text-sm font-medium text-gray-700 mb-3">Interactive Graph</h4>
+              <DesmosCalculator
+                expressions={expressions}
+                width="100%"
+                height={350}
+                options={{
+                  expressions: expressions.length > 1, // Show expressions list if multiple functions
+                  settingsMenu: false,
+                  zoomButtons: true,
+                  pointsOfInterest: true,
+                  trace: true
+                }}
+              />
+            </div>
+          </div>
+        );
+      }
+
+      // LEGACY: GeoGebra pattern now redirects to Desmos for better reliability
+      const geogebraMatch = part.match(/\[GEOGEBRA:([^\]]+)\]/);
+      if (geogebraMatch) {
+        const content = geogebraMatch[1];
+        // Convert common GeoGebra-style content to Desmos expressions
+        const expressions = content.includes(',') 
+          ? content.split(',').map(expr => parseMathExpression(expr.trim()))
+          : [parseMathExpression(content)];
+        
+        return (
+          <div key={index} className="my-4">
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <div className="flex items-center mb-3">
+                <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                <h4 className="text-sm font-medium text-blue-800">Enhanced with Desmos</h4>
+              </div>
+              <DesmosCalculator
+                expressions={expressions}
+                width="100%"
+                height={350}
+                options={{
+                  expressions: expressions.length > 1,
+                  settingsMenu: false,
+                  zoomButtons: true,
+                  pointsOfInterest: true,
+                  trace: true
+                }}
+              />
+            </div>
           </div>
         );
       }
@@ -410,6 +546,21 @@ export default function ChatInterface({
               dimensions.radius = parseFloat(dimMatch[0]) || 1;
               dimensions.height = parseFloat(dimMatch[1]) || 2;
               console.log('🛢️ SMART_3D Cylinder dimensions set:', dimensions);
+            } else if (shape === 'cone') {
+              dimensions.radius = parseFloat(dimMatch[0]) || 1;
+              dimensions.height = parseFloat(dimMatch[1]) || 2;
+              console.log('🔺 SMART_3D Cone dimensions set:', dimensions);
+            } else if (shape === 'pyramid') {
+              // For pyramids: first param is base size, second is height
+              dimensions.width = parseFloat(dimMatch[0]) || 2;  // Base size
+              dimensions.height = parseFloat(dimMatch[1]) || 2; // Height
+              console.log('🔺 SMART_3D Pyramid dimensions set (base, height):', dimensions);
+            } else if (shape === 'triangular_prism') {
+              // For triangular prisms: width, height, depth
+              dimensions.width = parseFloat(dimMatch[0]) || 3;  // Base width
+              dimensions.height = parseFloat(dimMatch[1]) || 4; // Height
+              dimensions.depth = parseFloat(dimMatch[2]) || 2;  // Depth
+              console.log('🔺 SMART_3D Triangular Prism dimensions set (width, height, depth):', dimensions);
             } else if (shape === 'cube') {
               // 🧊 CUBE FIX: For cubes, use the same dimension for all sides
               const sideLength = parseFloat(dimMatch[0]) || 2;
@@ -471,6 +622,68 @@ export default function ChatInterface({
         );
       }
 
+      // PROFESSIONAL: Geometric Transformations with Three.js (NEW)
+      const transformMatch = part.match(/\[TRANSFORM:([^,\]]+),?([^\]]*)\]/);
+      if (transformMatch) {
+        const transformType = transformMatch[1].toLowerCase().trim();
+        const parameters = transformMatch[2] || '';
+        
+        console.log('🔄 TRANSFORM Pattern Detected:', {
+          fullMatch: transformMatch[0],
+          transformType,
+          parameters,
+          originalPart: part
+        });
+        
+        // Parse transformation parameters
+        let type: 'reflection' | 'rotation' | 'translation' = 'reflection';
+        let axis: 'x' | 'y' | 'vertical' | 'horizontal' = 'vertical';
+        let shape: 'triangle' | 'square' | 'polygon' = 'triangle';
+        let angle = 90;
+        
+        // Map transformation types
+        if (transformType.includes('reflect') || transformType.includes('mirror')) {
+          type = 'reflection';
+        } else if (transformType.includes('rotate') || transformType.includes('turn')) {
+          type = 'rotation';
+        } else if (transformType.includes('translate') || transformType.includes('move') || transformType.includes('slide')) {
+          type = 'translation';
+        }
+        
+        // Parse axis for reflection
+        if (parameters) {
+          if (parameters.includes('horizontal') || parameters.includes('x')) {
+            axis = 'horizontal';
+          } else if (parameters.includes('vertical') || parameters.includes('y')) {
+            axis = 'vertical';
+          }
+          
+          // Parse angle for rotation
+          const angleMatch = parameters.match(/(\d+)/);
+          if (angleMatch) {
+            angle = parseInt(angleMatch[1]);
+          }
+        }
+        
+        console.log('🔄 Transformation visualization:', { type, axis, shape, angle });
+        
+        return (
+          <div key={index} className="my-4">
+            <div className="mb-2 text-sm text-gray-600">
+              🔄 3D Transformation: {type.charAt(0).toUpperCase() + type.slice(1)}
+            </div>
+            <TransformationVisualizer
+              type={type}
+              shape={shape}
+              axis={axis}
+              angle={angle}
+              showAnimation={true}
+              className="professional-grade"
+            />
+          </div>
+        );
+      }
+
       // PROFESSIONAL: Shape visualization with Three.js (replacing SHAPE)
       const shapeMatch = part.match(/\[SHAPE:([^,\]]+),?([^\]]*)\]/);
       if (shapeMatch) {
@@ -501,6 +714,21 @@ export default function ChatInterface({
               dimensions.radius = parseFloat(paramMatch[0]) || 1;
               dimensions.height = parseFloat(paramMatch[1]) || 2;
               console.log('🛢️ Cylinder dimensions set:', dimensions);
+            } else if (shapeName.includes('cone')) {
+              dimensions.radius = parseFloat(paramMatch[0]) || 1;
+              dimensions.height = parseFloat(paramMatch[1]) || 2;
+              console.log('🔺 Cone dimensions set:', dimensions);
+            } else if (shapeName.includes('pyramid')) {
+              // For pyramids: first param is base size, second is height
+              dimensions.width = parseFloat(paramMatch[0]) || 2;  // Base size
+              dimensions.height = parseFloat(paramMatch[1]) || 2; // Height
+              console.log('🔺 Pyramid dimensions set (base, height):', dimensions);
+            } else if (shapeName.includes('triangular') && shapeName.includes('prism')) {
+              // For triangular prisms: width, height, depth
+              dimensions.width = parseFloat(paramMatch[0]) || 3;  // Base width
+              dimensions.height = parseFloat(paramMatch[1]) || 4; // Height
+              dimensions.depth = parseFloat(paramMatch[2]) || 2;  // Depth
+              console.log('🔺 Triangular Prism dimensions set (width, height, depth):', dimensions);
             } else if (shapeName.includes('cube')) {
               // For cubes, use the same dimension for all sides
               const sideLength = parseFloat(paramMatch[0]) || 2;
@@ -522,6 +750,8 @@ export default function ChatInterface({
         if (shapeName.includes('sphere') || shapeName.includes('ball')) mappedShape = 'sphere';
         else if (shapeName.includes('cylinder')) mappedShape = 'cylinder';
         else if (shapeName.includes('cone')) mappedShape = 'cone';
+        else if (shapeName.includes('pyramid')) mappedShape = 'pyramid';
+        else if (shapeName.includes('triangular') && shapeName.includes('prism')) mappedShape = 'triangular_prism';
         else if (shapeName.includes('cube') || shapeName.includes('box')) mappedShape = 'cube';
 
         console.log('🎯 Shape mapping result:', {
@@ -668,12 +898,31 @@ export default function ChatInterface({
       console.log(`🧠 [ChatInterface] Using intelligent tutor engine with ${isVisionAnalysis ? 'VISION' : 'standard'} analysis`);
       if (isVisionAnalysis) {
         console.log(`🔬 [ChatInterface] 🎯 ENHANCED VISION ANALYSIS ACTIVE - AI has full visual understanding of all lesson pages!`);
+        console.log(`📊 [ChatInterface] Raw vision analysis structure:`, lessonContext.analysis);
+      }
+      
+      // Transform vision analysis data to intelligent tutor format if needed
+      let transformedAnalysis = lessonAnalysis;
+      if (isVisionAnalysis && lessonContext.analysis?.analysis) {
+        const visionData = lessonContext.analysis.analysis;
+        transformedAnalysis = {
+          topics: visionData.concepts || [],
+          mathConcepts: visionData.concepts || [],
+          visualizationNeeds: [],
+          difficulty: visionData.difficulty === 'beginner' ? 'elementary' : 
+                     visionData.difficulty === 'advanced' ? 'high' : 'middle',
+          suggestedTools: [],
+          keyTerms: visionData.vocabulary || [],
+          objectives: visionData.prerequisites || [],
+          analysisType: 'vision-analysis'
+        };
+        console.log(`🔄 [ChatInterface] Transformed vision analysis for tutor engine:`, transformedAnalysis);
       }
       
       // Analyze user query to determine intent and tools needed
       const queryAnalysis = await intelligentTutor.analyzeUserQuery(
         userMessage.content, 
-        lessonAnalysis
+        transformedAnalysis
       );
       
       console.log(`🔍 [ChatInterface] Query analysis:`, queryAnalysis);
@@ -681,7 +930,7 @@ export default function ChatInterface({
       // Generate smart response using GPT-4o with child-friendly modifications
       const aiResponse = await intelligentTutor.generateResponse(
         queryAnalysis,
-        lessonAnalysis,
+        transformedAnalysis,
         character
       );
         
@@ -810,18 +1059,18 @@ export default function ChatInterface({
           {/* Vision Analysis Status */}
           {lessonContext.analysis?.analysisType === 'vision-analysis' ? (
             <div className="flex items-center space-x-2 bg-purple-500 bg-opacity-30 px-3 py-1 rounded-full">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-purple-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
               </svg>
-              <span className="text-sm font-medium">Vision AI</span>
+              <span className="text-sm font-medium text-purple-200">Vision AI</span>
             </div>
           ) : lessonAnalysis ? (
             <div className="flex items-center space-x-2 bg-white bg-opacity-20 px-3 py-1 rounded-full">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              <span className="text-sm">Text AI</span>
+              <span className="text-sm font-medium text-gray-200">Text AI</span>
             </div>
           ) : null}
           
@@ -879,7 +1128,16 @@ export default function ChatInterface({
                 </div>
                 <div className="text-xs opacity-60 mt-3 flex items-center space-x-2" aria-label="Message time">
                   {message.type === 'assistant' && (
-                    <span className="text-lg">{character === 'gimli' ? '🐕' : '👨‍🏫'}</span>
+                    <div className="flex items-center space-x-2">
+                      <Image 
+                        src={config.avatar} 
+                        alt={config.name}
+                        width={20}
+                        height={20}
+                        className="rounded-full"
+                      />
+                      <span className="font-medium">{config.name}</span>
+                    </div>
                   )}
                   <span>{message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                 </div>
@@ -892,7 +1150,16 @@ export default function ChatInterface({
             <div className="flex justify-start" aria-live="polite" aria-label={`${config.name} is typing`}>
               <div className="bg-white rounded-2xl px-6 py-4 shadow-sm border border-gray-100">
                 <div className="flex items-center space-x-3">
-                  <div className="text-lg">{character === 'gimli' ? '🐕' : '👨‍🏫'}</div>
+                  <div className="flex items-center space-x-2">
+                    <Image 
+                      src={config.avatar} 
+                      alt={config.name}
+                      width={24}
+                      height={24}
+                      className="rounded-full"
+                    />
+                    <span className="text-sm font-medium text-gray-600">{config.name} is typing...</span>
+                  </div>
                   <div className="flex space-x-1" aria-hidden="true">
                     <div className={`w-3 h-3 rounded-full animate-bounce ${
                       config.color === 'blue' ? 'bg-blue-400' : 'bg-green-400'

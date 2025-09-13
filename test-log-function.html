@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Logarithmic Function Plotting</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-input { background: #f0f9ff; padding: 15px; margin: 15px 0; border-radius: 8px; }
+        .expected { background: #dcfce7; padding: 15px; margin: 15px 0; border-radius: 8px; }
+        .debug { background: #fff7ed; padding: 15px; margin: 15px 0; border-radius: 8px; }
+        .syntax { font-family: monospace; background: #e5e7eb; padding: 4px 8px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Logarithmic Function Plotting Test</h1>
+    
+    <div class="test-input">
+        <h2>❌ FAILING TEST INPUT</h2>
+        <p><strong>User Input:</strong> <span class="syntax">"Can you plot y = log(x) and explain its properties?"</span></p>
+        <p><strong>Problem:</strong> No line was plotted in the virtual tutor interface</p>
+        <p><strong>From Test File:</strong> VIRTUAL_TUTOR_TEST_INPUTS.md line 51-52</p>
+    </div>
+
+    <div class="expected">
+        <h2>✅ WHAT SHOULD HAPPEN</h2>
+        <p><strong>AI Should Generate:</strong> <span class="syntax">[GRAPH:log(x)]</span></p>
+        <p><strong>PlotlyGrapher Should Display:</strong> Interactive logarithmic curve</p>
+        <p><strong>Domain:</strong> x > 0 (logarithm undefined for x ≤ 0)</p>
+        <p><strong>Key Properties:</strong></p>
+        <ul>
+            <li>Passes through (1, 0) since log(1) = 0</li>
+            <li>Passes through (10, 1) since log(10) = 1</li>
+            <li>Vertical asymptote at x = 0</li>
+            <li>Increasing function (always going up)</li>
+            <li>Concave down (curve bends downward)</li>
+        </ul>
+    </div>
+
+    <div class="debug">
+        <h2>🔧 DEBUGGING STEPS</h2>
+        <ol>
+            <li><strong>Check AI Response:</strong> Does the AI generate <span class="syntax">[GRAPH:log(x)]</span>?</li>
+            <li><strong>Check Pattern Matching:</strong> Does ChatInterface detect the [GRAPH:] pattern?</li>
+            <li><strong>Check PlotlyGrapher:</strong> Can it evaluate log(x) properly?</li>
+            <li><strong>Check Function Parser:</strong> Does it convert "log" to "Math.log10"?</li>
+            <li><strong>Check Console:</strong> Any JavaScript errors in browser console?</li>
+        </ol>
+        
+        <h3>🎯 Enhanced AI Prompts Added:</h3>
+        <ul>
+            <li>Added comprehensive function examples to AI service</li>
+            <li>Added specific logarithmic function triggers</li>
+            <li>Added: "plot y = log(x)" → ALWAYS use [GRAPH:log(x)]</li>
+            <li>Added: "graph logarithm" → ALWAYS use [GRAPH:log(x)]</li>
+        </ul>
+
+        <h3>🧪 PlotlyGrapher Function Support:</h3>
+        <ul>
+            <li>✅ log(x) → Math.log10 (base 10 logarithm)</li>
+            <li>✅ ln(x) → Math.log (natural logarithm)</li>
+            <li>✅ sin(x), cos(x), tan(x)</li>
+            <li>✅ x^2, x^3, sqrt(x)</li>
+            <li>✅ abs(x), 1/x</li>
+            <li>✅ 2^x (exponential functions)</li>
+        </ul>
+    </div>
+
+    <div class="debug">
+        <h2>🚀 TESTING INSTRUCTIONS</h2>
+        <ol>
+            <li>Open Virtual Tutor: <a href="http://localhost:3000/virtualtutor" target="_blank">http://localhost:3000/virtualtutor</a></li>
+            <li>Input exactly: <strong>"Can you plot y = log(x) and explain its properties?"</strong></li>
+            <li>Check browser console (F12) for any errors</li>
+            <li>Verify AI response contains <span class="syntax">[GRAPH:log(x)]</span></li>
+            <li>Verify interactive logarithmic graph appears</li>
+            <li>Verify graph shows proper logarithmic curve with domain x > 0</li>
+        </ol>
+
+        <h3>🎯 Success Criteria:</h3>
+        <p><strong>✅ PASS:</strong> Interactive logarithmic graph displays with proper curve, domain restriction, and educational explanations</p>
+        <p><strong>❌ FAIL:</strong> No graph appears, wrong graph type, or AI doesn't generate [GRAPH:] syntax</p>
+    </div>
+
+    <div class="expected">
+        <h2>📊 Expected Graph Characteristics</h2>
+        <ul>
+            <li><strong>Shape:</strong> Logarithmic curve starting from near x = 0, passing through (1,0), going to (10,1)</li>
+            <li><strong>Domain:</strong> x > 0 (no points for x ≤ 0)</li>
+            <li><strong>Range:</strong> All real numbers</li>
+            <li><strong>Asymptote:</strong> Vertical line at x = 0</li>
+            <li><strong>Intercepts:</strong> x-intercept at (1, 0), no y-intercept</li>
+            <li><strong>Behavior:</strong> Increases slowly, concave down</li>
+        </ul>
+    </div>
+
+    <div class="debug">
+        <h2>🔍 If Still Not Working:</h2>
+        <ul>
+            <li>Check if AI service is using the enhanced prompts with logarithmic examples</li>
+            <li>Verify PlotlyGrapher.tsx evaluateFunction handles log(x) correctly</li>
+            <li>Check ChatInterface.tsx pattern matching includes GRAPH patterns</li>
+            <li>Verify no syntax errors in recent changes</li>
+            <li>Test with simpler input: "graph log(x)" or "show me logarithm"</li>
+        </ul>
+    </div>
+</body>
+</html>

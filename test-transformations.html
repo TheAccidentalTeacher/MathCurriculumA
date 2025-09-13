@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geometric Transformation Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { background: #f0f9ff; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        .expected { background: #dcfce7; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .test-input { background: #fef3c7; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .wrong { background: #fecaca; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .syntax { font-family: monospace; background: #e5e7eb; padding: 4px 8px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>🔄 Geometric Transformation Visualization Test</h1>
+    
+    <div class="test-section">
+        <h2>❌ PREVIOUS PROBLEM</h2>
+        <div class="wrong">
+            <h3>What was happening before:</h3>
+            <p><strong>Input:</strong> "Show reflection of a shape across a plane"</p>
+            <p><strong>Wrong Result:</strong> System created a 3D rectangular prism (cube)</p>
+            <p><strong>Issue:</strong> AI misunderstood "reflection across a plane" as a request for a 3D shape instead of a geometric transformation</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>✅ EXPECTED SOLUTION</h2>
+        <div class="expected">
+            <h3>What should happen now:</h3>
+            <p><strong>Input:</strong> "Show reflection of a shape across a plane"</p>
+            <p><strong>Correct Result:</strong> Interactive transformation visualization showing:</p>
+            <ul>
+                <li>Original triangle on the left (blue)</li>
+                <li>Vertical line of reflection in the center (red)</li>
+                <li>Reflected triangle on the right (green)</li>
+                <li>Interactive 3D controls to understand the concept</li>
+                <li>Clear labels explaining the transformation</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Inputs from VIRTUAL_TUTOR_TEST_INPUTS.md</h2>
+        <div class="test-input">
+            <h3>Primary Test (the one that was failing):</h3>
+            <p><span class="syntax">"Show reflection of a shape across a plane"</span></p>
+            
+            <h3>Additional Transformation Tests:</h3>
+            <ul>
+                <li><span class="syntax">"Show a cube being rotated around the y-axis"</span></li>
+                <li><span class="syntax">"Demonstrate scaling transformation on a sphere"</span></li>
+                <li><span class="syntax">"Create an animation showing translation of a cylinder"</span></li>
+                <li><span class="syntax">"Show me rotation of a rectangular prism"</span></li>
+                <li><span class="syntax">"Show transformations: translations, rotations, reflections"</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Expected AI Behavior</h2>
+        <div class="expected">
+            <h3>The AI should now generate syntax like:</h3>
+            <ul>
+                <li><span class="syntax">[TRANSFORM:reflection,vertical]</span> - for "reflection across a plane"</li>
+                <li><span class="syntax">[TRANSFORM:rotation,90]</span> - for "rotation around axis"</li>
+                <li><span class="syntax">[TRANSFORM:translation]</span> - for "translation of a shape"</li>
+            </ul>
+            
+            <h3>AI Understanding Improvements:</h3>
+            <ul>
+                <li>✅ "reflection across a plane" = transformation (NOT a 3D shape)</li>
+                <li>✅ "rotation around axis" = transformation (NOT creating a rotating object)</li>
+                <li>✅ "translation" = movement transformation (NOT creating a cylinder)</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Component Features to Verify</h2>
+        <div class="expected">
+            <h3>✅ TransformationVisualizer Component:</h3>
+            <ul>
+                <li>Supports reflection, rotation, and translation</li>
+                <li>Interactive 3D controls (orbit, zoom, pan)</li>
+                <li>Original shape vs transformed shape visualization</li>
+                <li>Clear visual indicators (lines of reflection, axes)</li>
+                <li>Professional-grade Three.js rendering</li>
+                <li>Educational labels and information panel</li>
+            </ul>
+            
+            <h3>✅ Pattern Recognition:</h3>
+            <ul>
+                <li><span class="syntax">[TRANSFORM:]</span> pattern added to ChatInterface</li>
+                <li>Automatic parsing of transformation type and parameters</li>
+                <li>Routes to TransformationVisualizer instead of ThreeGeometryVisualizer</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Debug Information</h2>
+        <div class="expected">
+            <h3>Console logs should show:</h3>
+            <ul>
+                <li><span class="syntax">🔄 TRANSFORM Pattern Detected: { transformType: 'reflection', parameters: 'vertical' }</span></li>
+                <li><span class="syntax">🔄 Transformation visualization: { type: 'reflection', axis: 'vertical', shape: 'triangle' }</span></li>
+                <li>NO MORE: <span class="syntax">🎯 SMART_3D Sending to ThreeGeometryVisualizer</span> for transformation requests</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Success Criteria</h2>
+        <div class="expected">
+            <p><strong>✅ PASS:</strong> "Show reflection of a shape across a plane" creates a transformation visualization with original + reflected shapes</p>
+            <p><strong>❌ FAIL:</strong> Still creates a 3D rectangular prism or any other 3D shape instead of showing the reflection transformation</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Technical Implementation</h2>
+        <div class="expected">
+            <h3>Files Modified:</h3>
+            <ul>
+                <li>✅ <span class="syntax">TransformationVisualizer.tsx</span> - New component for transformations</li>
+                <li>✅ <span class="syntax">ChatInterface.tsx</span> - Added [TRANSFORM:] pattern recognition</li>
+                <li>✅ <span class="syntax">ai-tutor-service.ts</span> - Added transformation examples and guidance</li>
+            </ul>
+            
+            <h3>AI Training:</h3>
+            <ul>
+                <li>✅ Added explicit guidance: "reflection across a plane" = transformation, NOT 3D shape</li>
+                <li>✅ Added [TRANSFORM:] syntax examples to both Mr. Somers and Gimli prompts</li>
+                <li>✅ Emphasized difference between shapes and transformations</li>
+            </ul>
+        </div>
+    </div>
+
+    <p style="text-align: center; margin-top: 40px;">
+        <strong>Test URL:</strong> <a href="http://localhost:3001/virtualtutor">http://localhost:3001/virtualtutor</a><br>
+        <strong>Input:</strong> "Show reflection of a shape across a plane"
+    </p>
+</body>
+</html>

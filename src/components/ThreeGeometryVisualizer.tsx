@@ -39,7 +39,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 }
 
 interface ThreeGeometryProps {
-  shape: 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'custom';
+  shape: 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'triangular_prism' | 'custom';
   dimensions?: { width?: number; height?: number; depth?: number; radius?: number; };
   color?: string;
   wireframe?: boolean;
@@ -320,6 +320,192 @@ function AnimatedShape({
           </group>
         );
       
+      case 'pyramid':
+        console.log('🔺 Rendering pyramid with dimensions:', {
+          baseSize: dimensions.width || dimensions.baseSize || 2,
+          height: dimensions.height || 2,
+          args: 'Creating square pyramid with triangular faces'
+        });
+        
+        // Create a square pyramid using custom geometry
+        const baseSize = dimensions.width || dimensions.baseSize || 2;
+        const pyramidHeight = dimensions.height || 2;
+        const halfBase = baseSize / 2;
+        
+        // Define vertices for a square pyramid
+        const vertices = new Float32Array([
+          // Base vertices (square)
+          -halfBase, 0, -halfBase,  // 0: back-left
+          halfBase, 0, -halfBase,   // 1: back-right
+          halfBase, 0, halfBase,    // 2: front-right
+          -halfBase, 0, halfBase,   // 3: front-left
+          
+          // Apex vertex
+          0, pyramidHeight, 0       // 4: top
+        ]);
+        
+        // Define faces (triangles)
+        const indices = new Uint16Array([
+          // Base (square) - two triangles
+          0, 1, 2,  // First triangle
+          0, 2, 3,  // Second triangle
+          
+          // Side faces (triangular)
+          0, 4, 1,  // Back face
+          1, 4, 2,  // Right face
+          2, 4, 3,  // Front face
+          3, 4, 0   // Left face
+        ]);
+        
+        return (
+          <group ref={meshRef}>
+            <mesh
+              onPointerOver={() => setHovered(true)}
+              onPointerOut={() => setHovered(false)}
+              onClick={onShapeClick}
+            >
+              <bufferGeometry>
+                <bufferAttribute
+                  attach="attributes-position"
+                  count={vertices.length / 3}
+                  array={vertices}
+                  itemSize={3}
+                />
+                <bufferAttribute
+                  attach="index"
+                  count={indices.length}
+                  array={indices}
+                  itemSize={1}
+                />
+              </bufferGeometry>
+              {baseMaterial}
+            </mesh>
+            
+            {/* Add wireframe outline for better visualization */}
+            <mesh>
+              <bufferGeometry>
+                <bufferAttribute
+                  attach="attributes-position"
+                  count={vertices.length / 3}
+                  array={vertices}
+                  itemSize={3}
+                />
+                <bufferAttribute
+                  attach="index"
+                  count={indices.length}
+                  array={indices}
+                  itemSize={1}
+                />
+              </bufferGeometry>
+              <meshBasicMaterial 
+                color="#1e40af" 
+                wireframe={true} 
+                transparent={true} 
+                opacity={0.4}
+              />
+            </mesh>
+          </group>
+        );
+      
+      case 'triangular_prism':
+        console.log('🔺 Rendering triangular prism with dimensions:', {
+          baseWidth: dimensions.width || 2,
+          height: dimensions.height || 3,
+          depth: dimensions.depth || 1,
+          args: 'Creating triangular prism with triangular cross-section'
+        });
+        
+        // Create a triangular prism using custom geometry
+        const prismBaseWidth = dimensions.width || 2;
+        const prismHeight = dimensions.height || 3;
+        const prismDepth = dimensions.depth || 1;
+        const halfWidth = prismBaseWidth / 2;
+        const halfDepth = prismDepth / 2;
+        
+        // Define vertices for a triangular prism
+        const prismVertices = new Float32Array([
+          // Front triangle (Z = halfDepth)
+          -halfWidth, 0, halfDepth,        // 0: bottom-left front
+          halfWidth, 0, halfDepth,         // 1: bottom-right front
+          0, prismHeight, halfDepth,       // 2: top front
+          
+          // Back triangle (Z = -halfDepth)
+          -halfWidth, 0, -halfDepth,       // 3: bottom-left back
+          halfWidth, 0, -halfDepth,        // 4: bottom-right back
+          0, prismHeight, -halfDepth       // 5: top back
+        ]);
+        
+        // Define faces (triangles)
+        const prismIndices = new Uint16Array([
+          // Front triangle
+          0, 1, 2,
+          
+          // Back triangle
+          3, 5, 4,
+          
+          // Bottom rectangle (two triangles)
+          0, 4, 1,  // First triangle
+          0, 3, 4,  // Second triangle
+          
+          // Left side rectangle (two triangles)
+          0, 2, 5,  // First triangle
+          0, 5, 3,  // Second triangle
+          
+          // Right side rectangle (two triangles)
+          1, 4, 5,  // First triangle
+          1, 5, 2   // Second triangle
+        ]);
+        
+        return (
+          <group ref={meshRef}>
+            <mesh
+              onPointerOver={() => setHovered(true)}
+              onPointerOut={() => setHovered(false)}
+              onClick={onShapeClick}
+            >
+              <bufferGeometry>
+                <bufferAttribute
+                  attach="attributes-position"
+                  count={prismVertices.length / 3}
+                  array={prismVertices}
+                  itemSize={3}
+                />
+                <bufferAttribute
+                  attach="index"
+                  count={prismIndices.length}
+                  array={prismIndices}
+                  itemSize={1}
+                />
+              </bufferGeometry>
+              {baseMaterial}
+            </mesh>
+            
+            {/* Add wireframe outline for better visualization */}
+            <mesh>
+              <bufferGeometry>
+                <bufferAttribute
+                  attach="attributes-position"
+                  count={prismVertices.length / 3}
+                  array={prismVertices}
+                  itemSize={3}
+                />
+                <bufferAttribute
+                  attach="index"
+                  count={prismIndices.length}
+                  array={prismIndices}
+                  itemSize={1}
+                />
+              </bufferGeometry>
+              <meshBasicMaterial 
+                color="#059669" 
+                wireframe={true} 
+                transparent={true} 
+                opacity={0.4}
+              />
+            </mesh>
+          </group>
+        );
+      
       default:
         return (
           <group ref={meshRef}>
@@ -446,6 +632,40 @@ function MeasurementLabels({ shape, dimensions }: { shape: string; dimensions: a
           </group>
         );
       
+      case 'cone':
+        return (
+          <group>
+            <Html position={[dimensions.radius + 0.5, 0, 0]}>
+              <div className="bg-white px-2 py-1 text-xs border rounded shadow">
+                R: {dimensions.radius || 1}
+              </div>
+            </Html>
+            <Html position={[0, dimensions.height/2 + 0.5, 0]}>
+              <div className="bg-white px-2 py-1 text-xs border rounded shadow">
+                H: {dimensions.height || 2}
+              </div>
+            </Html>
+          </group>
+        );
+      
+      case 'pyramid':
+        const baseSize = dimensions.width || dimensions.baseSize || 2;
+        const pyramidHeight = dimensions.height || 2;
+        return (
+          <group>
+            <Html position={[baseSize/2 + 0.5, 0, 0]}>
+              <div className="bg-white px-2 py-1 text-xs border rounded shadow">
+                Base: {baseSize}×{baseSize}
+              </div>
+            </Html>
+            <Html position={[0, pyramidHeight/2 + 0.5, 0]}>
+              <div className="bg-white px-2 py-1 text-xs border rounded shadow">
+                H: {pyramidHeight}
+              </div>
+            </Html>
+          </group>
+        );
+      
       default:
         return null;
     }
@@ -515,6 +735,43 @@ export default function ThreeGeometryVisualizer({
           const cylinderVolume = Math.PI * Math.pow(cR, 2) * h;
           const cylinderSurfaceArea = 2 * Math.PI * cR * (cR + h);
           return { volume: cylinderVolume.toFixed(2), surfaceArea: cylinderSurfaceArea.toFixed(2) };
+        
+        case 'cone':
+          const coneR = dimensions.radius || 1;
+          const coneH = dimensions.height || 2;
+          const coneVolume = (1/3) * Math.PI * Math.pow(coneR, 2) * coneH;
+          const slantHeight = Math.sqrt(Math.pow(coneR, 2) + Math.pow(coneH, 2));
+          const coneSurfaceArea = Math.PI * coneR * (coneR + slantHeight);
+          return { volume: coneVolume.toFixed(2), surfaceArea: coneSurfaceArea.toFixed(2) };
+        
+        case 'pyramid':
+          const baseSize = dimensions.width || dimensions.baseSize || 2;
+          const pyramidH = dimensions.height || 2;
+          // Square pyramid formulas
+          const pyramidVolume = (1/3) * Math.pow(baseSize, 2) * pyramidH;
+          // Surface area = base area + 4 triangular faces
+          const baseArea = Math.pow(baseSize, 2);
+          const slantHeight2 = Math.sqrt(Math.pow(pyramidH, 2) + Math.pow(baseSize/2, 2));
+          const triangularFaceArea = (1/2) * baseSize * slantHeight2;
+          const pyramidSurfaceArea = baseArea + (4 * triangularFaceArea);
+          return { volume: pyramidVolume.toFixed(2), surfaceArea: pyramidSurfaceArea.toFixed(2) };
+        
+        case 'triangular_prism':
+          const prismBaseWidth = dimensions.width || 2;
+          const prismHeight = dimensions.height || 3;
+          const prismDepth = dimensions.depth || 1;
+          // Triangular prism formulas
+          // Volume = (1/2 * base * height) * depth
+          const triangularBaseArea = (1/2) * prismBaseWidth * prismHeight;
+          const prismVolume = triangularBaseArea * prismDepth;
+          // Surface area = 2 triangular faces + 3 rectangular faces
+          const triangularFaces = 2 * triangularBaseArea;
+          const bottomRect = prismBaseWidth * prismDepth;
+          const sideHeight = Math.sqrt(Math.pow(prismHeight, 2) + Math.pow(prismBaseWidth/2, 2));
+          const leftRect = sideHeight * prismDepth;
+          const rightRect = sideHeight * prismDepth;
+          const prismSurfaceArea = triangularFaces + bottomRect + leftRect + rightRect;
+          return { volume: prismVolume.toFixed(2), surfaceArea: prismSurfaceArea.toFixed(2) };
         
         default:
           return { volume: '0', surfaceArea: '0' };
@@ -703,12 +960,37 @@ export function CylinderExplorer(props: Partial<ThreeGeometryProps>) {
   );
 }
 
+export function PyramidExplorer(props: Partial<ThreeGeometryProps>) {
+  return (
+    <ThreeGeometryVisualizer
+      shape="pyramid"
+      dimensions={{ width: 4, height: 6 }} // Square base side 4, height 6
+      color="#8b5cf6"
+      animation="none"
+      {...props}
+    />
+  );
+}
+
+export function TriangularPrismExplorer(props: Partial<ThreeGeometryProps>) {
+  return (
+    <ThreeGeometryVisualizer
+      shape="triangular_prism"
+      dimensions={{ width: 3, height: 4, depth: 2 }} // Base width 3, height 4, depth 2
+      color="#059669"
+      animation="none"
+      {...props}
+    />
+  );
+}
+
 export function GeometryComparison() {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
       <CubeExplorer />
       <SphereExplorer />
       <CylinderExplorer />
+      <PyramidExplorer />
     </div>
   );
 }

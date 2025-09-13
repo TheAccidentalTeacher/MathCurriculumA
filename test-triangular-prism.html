@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triangular Prism Visualization Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { background: #f0f9ff; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        .expected { background: #dcfce7; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .test-input { background: #fef3c7; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .formula { font-family: monospace; background: #e5e7eb; padding: 4px 8px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>🔺 Triangular Prism Visualization Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Input (from VIRTUAL_TUTOR_TEST_INPUTS.md)</h2>
+        <div class="test-input">
+            <strong>Test this in the Virtual Tutor:</strong><br>
+            "Show me how to calculate the surface area of a triangular prism"
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Expected Triangular Prism Visualization</h2>
+        <div class="expected">
+            <h3>3D Geometry:</h3>
+            <ul>
+                <li><strong>Shape:</strong> Triangular prism with triangular cross-section</li>
+                <li><strong>Base:</strong> Triangle with width 3 units, height 4 units</li>
+                <li><strong>Depth:</strong> 2 units (extrusion length)</li>
+                <li><strong>Faces:</strong> 2 triangular faces (front/back) + 3 rectangular faces</li>
+                <li><strong>Color:</strong> Green (#059669) with wireframe outline</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Expected Mathematical Calculations</h2>
+        <div class="expected">
+            <h3>Volume Calculation:</h3>
+            <p>Formula: <span class="formula">Volume = (1/2 × base × height) × depth</span></p>
+            <p>Calculation: <span class="formula">(1/2 × 3 × 4) × 2 = 6 × 2 = 12.00 cubic units</span></p>
+            
+            <h3>Surface Area Calculation:</h3>
+            <p>Formula: <span class="formula">Surface Area = 2 × triangular faces + 3 × rectangular faces</span></p>
+            <ul>
+                <li>Triangular faces: <span class="formula">2 × (1/2 × 3 × 4) = 2 × 6 = 12 square units</span></li>
+                <li>Bottom rectangle: <span class="formula">3 × 2 = 6 square units</span></li>
+                <li>Left side rectangle: <span class="formula">√(4² + 1.5²) × 2 ≈ 4.3 × 2 = 8.6 square units</span></li>
+                <li>Right side rectangle: <span class="formula">√(4² + 1.5²) × 2 ≈ 4.3 × 2 = 8.6 square units</span></li>
+                <li><strong>Total:</strong> <span class="formula">12 + 6 + 8.6 + 8.6 ≈ 35.20 square units</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Component Features to Verify</h2>
+        <div class="expected">
+            <h3>✅ Interactive Controls:</h3>
+            <ul>
+                <li>Mouse rotation and zoom controls</li>
+                <li>Hover highlighting effects</li>
+                <li>Professional material rendering</li>
+            </ul>
+            
+            <h3>✅ Mathematical Display:</h3>
+            <ul>
+                <li>Volume: 12.00 cubic units</li>
+                <li>Surface Area: ~35.20 square units</li>
+                <li>Real-time calculation updates</li>
+            </ul>
+            
+            <h3>✅ Visual Quality:</h3>
+            <ul>
+                <li>Custom BufferGeometry with 6 vertices</li>
+                <li>Proper triangular prism shape (not a cube!)</li>
+                <li>Green material with wireframe outline</li>
+                <li>Professional-grade 3D rendering</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>AI Integration Test</h2>
+        <div class="expected">
+            <h3>The AI should generate syntax like:</h3>
+            <ul>
+                <li><span class="formula">[SHAPE:triangular_prism,3,4,2]</span></li>
+                <li><span class="formula">[SMART_3D:triangular_prism,3,4,2]</span></li>
+            </ul>
+            
+            <h3>The ChatInterface should:</h3>
+            <ul>
+                <li>Recognize "triangular prism" keywords</li>
+                <li>Parse dimensions correctly (width, height, depth)</li>
+                <li>Map to 'triangular_prism' shape type</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Debug Information</h2>
+        <div class="expected">
+            <h3>Console logs should show:</h3>
+            <ul>
+                <li><span class="formula">🔺 Rendering triangular prism with dimensions: { baseWidth: 3, height: 4, depth: 2 }</span></li>
+                <li><span class="formula">🔺 Triangular Prism dimensions set (width, height, depth): { width: 3, height: 4, depth: 2 }</span></li>
+                <li><span class="formula">🎯 Shape mapping result: { mappedShape: 'triangular_prism' }</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Success Criteria</h2>
+        <div class="expected">
+            <p><strong>✅ PASS:</strong> If you see a triangular prism (NOT a cube) with proper calculations</p>
+            <p><strong>❌ FAIL:</strong> If you see a cube or any other shape instead of a triangular prism</p>
+        </div>
+    </div>
+
+    <p style="text-align: center; margin-top: 40px;">
+        <strong>Test URL:</strong> <a href="http://localhost:3001/virtualtutor">http://localhost:3001/virtualtutor</a>
+    </p>
+</body>
+</html>

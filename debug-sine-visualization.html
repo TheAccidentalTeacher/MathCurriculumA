@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sine Function Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .test-box { background: white; padding: 20px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .success { border-left: 4px solid #4CAF50; }
+        .error { border-left: 4px solid #f44336; }
+        .warning { border-left: 4px solid #ff9800; }
+        .code { background: #f1f1f1; padding: 10px; border-radius: 4px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>🌊 Sine Function Debug Analysis</h1>
+    
+    <div class="test-box warning">
+        <h2>🔍 Issue: Sine Function Not Displaying</h2>
+        <p><strong>Observed:</strong> Graph shows correct trigonometric range but no sine wave</p>
+        <p><strong>Expected:</strong> Smooth sine wave from -2π to 2π</p>
+    </div>
+
+    <div class="test-box">
+        <h2>📋 Debugging Checklist</h2>
+        <h3>1. Check AI Response</h3>
+        <p>When you input: <code>"Graph the sine function y = sin(x)"</code></p>
+        <p>AI should generate: <code>[GRAPH:sin(x)]</code></p>
+        
+        <h3>2. Check Browser Console</h3>
+        <p>Open DevTools (F12) → Console tab</p>
+        <p>Look for errors related to:</p>
+        <ul>
+            <li>Function evaluation errors</li>
+            <li>Plotly rendering errors</li>
+            <li>Math expression parsing errors</li>
+        </ul>
+        
+        <h3>3. Check Function Expression</h3>
+        <p>The PlotlyGrapher should receive: <code>functions: ["sin(x)"]</code></p>
+        <p>Not: <code>functions: ["y = sin(x)"]</code> or <code>functions: ["\\sin(x)"]</code></p>
+    </div>
+
+    <div class="test-box">
+        <h2>🧪 Manual Test</h2>
+        <p>Try these exact inputs to isolate the issue:</p>
+        
+        <div class="code">
+Test 1: "Graph sin(x)"
+Expected AI Output: [GRAPH:sin(x)]
+
+Test 2: "Show me y = sin(x)" 
+Expected AI Output: [GRAPH:sin(x)]
+
+Test 3: "Plot the sine function"
+Expected AI Output: [GRAPH:sin(x)]
+        </div>
+    </div>
+
+    <div class="test-box">
+        <h2>🔧 Likely Issues & Solutions</h2>
+        
+        <h3>Issue 1: AI Not Generating GRAPH Syntax</h3>
+        <p><strong>Problem:</strong> AI responds with text but no [GRAPH:sin(x)]</p>
+        <p><strong>Fix:</strong> Enhanced AI prompts should force graph generation</p>
+        
+        <h3>Issue 2: Function Expression Format</h3>
+        <p><strong>Problem:</strong> AI might generate [GRAPH:y = sin(x)] instead of [GRAPH:sin(x)]</p>
+        <p><strong>Fix:</strong> ChatInterface strips "y = " prefix</p>
+        
+        <h3>Issue 3: Math Evaluation Error</h3>
+        <p><strong>Problem:</strong> sin(x) not properly converting to Math.sin(x)</p>
+        <p><strong>Fix:</strong> Check evaluateFunction replacements</p>
+        
+        <h3>Issue 4: Data Generation Failure</h3>
+        <p><strong>Problem:</strong> NaN or infinite values causing empty plot</p>
+        <p><strong>Fix:</strong> isFinite() check should filter bad values</p>
+    </div>
+
+    <div class="test-box error">
+        <h2>🚨 Critical Test</h2>
+        <p><strong>Direct Browser Test:</strong></p>
+        <ol>
+            <li>Go to Virtual Tutor</li>
+            <li>Type exactly: <code>Graph the sine function y = sin(x)</code></li>
+            <li>Press Enter</li>
+            <li>Open DevTools (F12) immediately</li>
+            <li>Look at Console for any red errors</li>
+            <li>Check Network tab for any failed requests</li>
+        </ol>
+        <p>If you see errors, copy them for debugging!</p>
+    </div>
+
+    <div class="test-box success">
+        <h2>✅ Success Criteria</h2>
+        <p>When working correctly, you should see:</p>
+        <ul>
+            <li>✓ Smooth sine wave curve</li>
+            <li>✓ X-axis from approximately -6.28 to 6.28</li>
+            <li>✓ Y-axis from -3 to 3</li>
+            <li>✓ Wave amplitude of 1 (peaks at ±1)</li>
+            <li>✓ 2 complete wave cycles visible</li>
+            <li>✓ Function label showing "y = sin(x)"</li>
+        </ul>
+    </div>
+
+    <p style="text-align: center; margin-top: 40px;">
+        <strong>Virtual Tutor URL:</strong> <a href="http://localhost:3001/virtualtutor" target="_blank">http://localhost:3001/virtualtutor</a>
+    </p>
+</body>
+</html>

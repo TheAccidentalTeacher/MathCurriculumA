@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pyramid Visualization Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success {
+            color: #22c55e;
+            font-weight: bold;
+        }
+        .failure {
+            color: #ef4444;
+            font-weight: bold;
+        }
+        .test-input {
+            background: #f3f4f6;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            border-left: 4px solid #3b82f6;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔺 Pyramid Visualization Test Results</h1>
+    
+    <div class="test-section">
+        <h2>✅ Implemented Fixes</h2>
+        <ul>
+            <li><span class="success">✓</span> Added pyramid geometry to <code>ThreeGeometryVisualizer.tsx</code></li>
+            <li><span class="success">✓</span> Added pyramid volume and surface area calculations</li>
+            <li><span class="success">✓</span> Added pyramid measurement labels</li>
+            <li><span class="success">✓</span> Added <code>PyramidExplorer</code> component</li>
+            <li><span class="success">✓</span> Updated ChatInterface to recognize pyramid in SHAPE patterns</li>
+            <li><span class="success">✓</span> Updated ChatInterface to recognize pyramid in SMART_3D patterns</li>
+            <li><span class="success">✓</span> Added SMART_3D pattern to content splitting regex</li>
+            <li><span class="success">✓</span> Updated AI tutor prompts with pyramid examples</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🧪 Test Cases</h2>
+        
+        <h3>Test Input from VIRTUAL_TUTOR_TEST_INPUTS.md:</h3>
+        <div class="test-input">
+            Display a pyramid with square base side 4 and height 6
+        </div>
+        
+        <p><strong>Expected AI Response Patterns:</strong></p>
+        <ul>
+            <li><code>[SHAPE:pyramid,4,6]</code> - Should show pyramid with base 4×4, height 6</li>
+            <li><code>[SMART_3D:pyramid,4,6]</code> - Should show interactive 3D pyramid</li>
+        </ul>
+
+        <h3>Volume & Surface Area Calculations:</h3>
+        <ul>
+            <li><strong>Volume:</strong> (1/3) × base² × height = (1/3) × 4² × 6 = (1/3) × 16 × 6 = 32 cubic units</li>
+            <li><strong>Surface Area:</strong> base² + 4 × triangular faces</li>
+            <li>Base area = 4² = 16 square units</li>
+            <li>Slant height = √(height² + (base/2)²) = √(6² + 2²) = √(36 + 4) = √40 ≈ 6.32</li>
+            <li>Each triangular face = (1/2) × base × slant = (1/2) × 4 × 6.32 ≈ 12.65</li>
+            <li>Total surface area = 16 + (4 × 12.65) = 16 + 50.6 = 66.6 square units</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 Testing Instructions</h2>
+        <ol>
+            <li>Open the Virtual Tutor at <a href="http://localhost:3001/virtualtutor" target="_blank">http://localhost:3001/virtualtutor</a></li>
+            <li>Select either Mr. Somers or Gimli</li>
+            <li>Type: <strong>"Display a pyramid with square base side 4 and height 6"</strong></li>
+            <li>Verify the AI generates a response with pyramid visualization syntax</li>
+            <li>Confirm the 3D pyramid appears with correct dimensions and measurements</li>
+            <li>Check that the volume shows as 32.00 cubic units</li>
+            <li>Check that the surface area shows as 66.60 square units</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>🔍 Debugging Information</h2>
+        <p>If the pyramid doesn't appear correctly, check the browser console for debug logs:</p>
+        <ul>
+            <li><code>🔺 Rendering pyramid with dimensions</code> - ThreeGeometryVisualizer should log this</li>
+            <li><code>🎲 SHAPE Pattern Detected</code> - ChatInterface should recognize pyramid syntax</li>
+            <li><code>🔺 Pyramid dimensions set</code> - Dimension parsing should work</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>📝 Additional Test Cases</h2>
+        <p>Try these variations to ensure robust pyramid support:</p>
+        <ul>
+            <li>"Show me a pyramid with base 3 and height 5"</li>
+            <li>"Create a square pyramid with side 2 and height 4"</li>
+            <li>"I need help visualizing a pyramid"</li>
+            <li>"Compare a pyramid and a cube"</li>
+        </ul>
+    </div>
+
+    <script>
+        // Simple test to verify the server is running
+        fetch('http://localhost:3001/api/health')
+            .then(response => {
+                if (response.ok) {
+                    console.log('✅ Server is running and accessible');
+                } else {
+                    console.log('⚠️ Server responded but may have issues');
+                }
+            })
+            .catch(error => {
+                console.log('❌ Cannot reach server:', error);
+            });
+    </script>
+</body>
+</html>
