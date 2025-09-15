@@ -10,6 +10,8 @@ interface QuickSelectProps {
   disabled: boolean;
   userAge: number;
   className?: string;
+  lessonSpecificQuestions?: string[]; // Add lesson-specific questions
+  isGeneratingQuestions?: boolean; // Add loading state
 }
 
 export default function QuickSelectInterface({ 
@@ -18,7 +20,9 @@ export default function QuickSelectInterface({
   onQuestionSelect, 
   disabled,
   userAge,
-  className = '' 
+  className = '',
+  lessonSpecificQuestions = [], // Add lesson-specific questions with default
+  isGeneratingQuestions = false // Add loading state with default
 }: QuickSelectProps) {
   const [selectedCategory, setSelectedCategory] = useState<'questions' | 'topics' | null>(null);
 
@@ -133,7 +137,20 @@ export default function QuickSelectInterface({
           </div>
           
           <div className="grid grid-cols-1 gap-3">
-            {QUICK_QUESTIONS.map((question, index) => (
+            {/* Show loading state while generating lesson-specific questions */}
+            {isGeneratingQuestions && (
+              <div className="text-center p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center justify-center space-x-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
+                  <span className="text-blue-700 text-sm font-medium">
+                    🧠 Thinking of questions you might ask about this lesson...
+                  </span>
+                </div>
+              </div>
+            )}
+            
+            {/* Use lesson-specific questions if available, otherwise fall back to generic ones */}
+            {!isGeneratingQuestions && (lessonSpecificQuestions.length > 0 ? lessonSpecificQuestions : QUICK_QUESTIONS).map((question, index) => (
               <button
                 key={index}
                 onClick={() => handleQuestionClick(question)}
@@ -149,6 +166,15 @@ export default function QuickSelectInterface({
                 {question}
               </button>
             ))}
+            
+            {/* Show a special indicator when we have lesson-specific questions */}
+            {!isGeneratingQuestions && lessonSpecificQuestions.length > 0 && (
+              <div className="text-center mt-2">
+                <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded">
+                  ✨ These questions are smart and made just for this lesson!
+                </span>
+              </div>
+            )}
           </div>
         </div>
       )}

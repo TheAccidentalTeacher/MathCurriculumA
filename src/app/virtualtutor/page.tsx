@@ -20,13 +20,14 @@ const ChatInterface = dynamic(() => import('@/components/virtualtutor/ChatInterf
 function VirtualTutorContent() {
   const [selectedCharacter, setSelectedCharacter] = useState<'somers' | 'gimli'>('somers');
   const [characterExpression, setCharacterExpression] = useState<'idle' | 'speaking' | 'thinking'>('idle');
+  const [childFriendlyMode, setChildFriendlyMode] = useState(false); // Default to Expert Mode
   const searchParams = useSearchParams();
   
   // Get lesson context from URL parameters or use default for standalone mode
   const getLessonContext = () => {
-    const docId = searchParams.get('docId');
-    const lessonNum = searchParams.get('lessonNumber');
-    const lessonTitle = searchParams.get('lessonTitle');
+    const docId = searchParams?.get('docId');
+    const lessonNum = searchParams?.get('lessonNumber');
+    const lessonTitle = searchParams?.get('lessonTitle');
     
     if (docId && lessonNum && lessonTitle) {
       return {
@@ -145,6 +146,32 @@ function VirtualTutorContent() {
           {/* Character Display */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-lg border h-full p-6">
+              {/* Mode Selection Toggle */}
+              <div className="flex items-center justify-center mb-4">
+                <div className="bg-gray-100 rounded-xl p-1 flex">
+                  <button
+                    onClick={() => setChildFriendlyMode(true)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      childFriendlyMode
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-800'
+                    }`}
+                  >
+                    🧒 Kid-Friendly Mode
+                  </button>
+                  <button
+                    onClick={() => setChildFriendlyMode(false)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      !childFriendlyMode
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-800'
+                    }`}
+                  >
+                    ⌨️ Expert Mode
+                  </button>
+                </div>
+              </div>
+
               <div className="text-center mb-4">
                 <h3 className="text-xl font-semibold text-gray-900 mb-1">
                   {characterConfigs[selectedCharacter].name}
@@ -183,7 +210,7 @@ function VirtualTutorContent() {
                   character={selectedCharacter}
                   onExpressionChange={setCharacterExpression}
                   lessonContext={lessonContext}
-                  childFriendlyMode={true}
+                  childFriendlyMode={childFriendlyMode}
                   userAge={12}
                 />
               </div>

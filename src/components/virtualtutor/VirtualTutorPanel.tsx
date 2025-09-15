@@ -24,7 +24,7 @@ export default function VirtualTutorPanel({
   const [selectedCharacter, setSelectedCharacter] = useState<'somers' | 'gimli'>('somers');
   const [isInitialized, setIsInitialized] = useState(false);
   const [characterExpression, setCharacterExpression] = useState<'idle' | 'speaking' | 'thinking'>('idle');
-  const [childFriendlyMode, setChildFriendlyMode] = useState(true); // Allow toggling between modes
+  const [childFriendlyMode, setChildFriendlyMode] = useState(false); // Default to Expert Mode
 
   useEffect(() => {
     // Initialize virtual tutor for this specific lesson

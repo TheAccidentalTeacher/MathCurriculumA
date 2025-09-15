@@ -1782,6 +1782,110 @@ Be patient, encouraging, and adapt your explanations to the student's understand
   }
 
   /**
+   * Generate lesson-specific questions that 11-year-olds would naturally ask
+   * Based on the lesson summary and anticipating student confusion points
+   */
+  static async generateKidFriendlyQuestions(lessonSummary: any): Promise<string[]> {
+    console.log(`🧒 [LessonContentService] Generating kid-friendly questions from lesson summary`);
+    
+    if (!lessonSummary || !this.openai) {
+      console.log(`⚠️ [LessonContentService] No lesson summary or OpenAI not available, using fallback questions`);
+      return [
+        "What does this mean?",
+        "How do I solve this?", 
+        "Can you explain this step?",
+        "I don't understand this part",
+        "Can you show me an example?",
+        "Is this the right answer?"
+      ];
+    }
+
+    try {
+      // Extract key concepts and vocabulary from the summary
+      const concepts = lessonSummary.conceptBreakdown?.map((c: any) => c.concept) || [];
+      const vocabulary = lessonSummary.vocabulary?.map((v: any) => v.term) || [];
+      const overallSummary = lessonSummary.overallSummary || '';
+
+      const response = await this.openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: `You are an expert in child psychology and elementary mathematics education. You understand exactly what confuses 11-year-old students and what questions they naturally ask when learning new math concepts. 
+
+CRITICAL: You must respond with ONLY a JSON array of exactly 6 questions. No explanations, no markdown, no other text. Just the JSON array.
+
+The questions should:
+- Be written exactly as an 11-year-old would ask them
+- Use simple, kid-friendly language
+- Focus on the specific confusion points in this lesson
+- Anticipate where kids get stuck
+- Sound natural and authentic to how kids actually speak`
+          },
+          {
+            role: "user",
+            content: `Create exactly 6 questions that 11-year-old students would naturally ask about this math lesson:
+
+LESSON SUMMARY: ${overallSummary.substring(0, 500)}
+
+KEY CONCEPTS: ${concepts.slice(0, 5).join(', ')}
+
+VOCABULARY TERMS: ${vocabulary.slice(0, 8).join(', ')}
+
+Examples of how 11-year-olds ask questions:
+- "Wait, what does [term] mean again?"
+- "I'm confused about the [concept] part"
+- "How do you know when to [action]?"
+- "What if I get a different answer?"
+- "Is there an easier way to do this?"
+- "Why do we have to do it this way?"
+
+Return exactly 6 questions as a JSON array that sound like real questions 11-year-olds would ask about THIS specific lesson.`
+          }
+        ],
+        max_tokens: 300,
+        temperature: 0.3
+      });
+
+      const responseText = response.choices[0]?.message?.content;
+      if (responseText) {
+        // Clean the response
+        let cleanedResponse = responseText.trim();
+        if (cleanedResponse.startsWith('```json')) {
+          cleanedResponse = cleanedResponse.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+        } else if (cleanedResponse.startsWith('```')) {
+          cleanedResponse = cleanedResponse.replace(/^```\s*/, '').replace(/\s*```$/, '');
+        }
+
+        try {
+          const questions = JSON.parse(cleanedResponse);
+          if (Array.isArray(questions) && questions.length >= 6) {
+            console.log(`✅ [LessonContentService] Generated ${questions.length} kid-friendly questions`);
+            return questions.slice(0, 6); // Ensure exactly 6 questions
+          } else {
+            console.warn(`⚠️ [LessonContentService] Invalid questions format, using fallback`);
+          }
+        } catch (parseError) {
+          console.error('❌ [LessonContentService] Error parsing AI response:', parseError);
+          console.error('Response was:', cleanedResponse.substring(0, 200));
+        }
+      }
+    } catch (error) {
+      console.error(`❌ [LessonContentService] Error generating kid-friendly questions:`, error);
+    }
+
+    // Fallback questions if AI generation fails
+    return [
+      "What does this mean?",
+      "How do I solve this?", 
+      "Can you explain this step?",
+      "I don't understand this part",
+      "Can you show me an example?",
+      "Is this the right answer?"
+    ];
+  }
+
+  /**
    * Clear all cache entries (use with caution)
    */
   static async clearAllCache(): Promise<void> {

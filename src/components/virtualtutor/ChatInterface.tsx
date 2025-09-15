@@ -68,6 +68,8 @@ export default function ChatInterface({
   const [sessionActive, setSessionActive] = useState(false);
   const [showQuickSelect, setShowQuickSelect] = useState(childFriendlyMode);
   const [isExpanded, setIsExpanded] = useState(false); // New state for expandable chat
+  const [lessonSpecificQuestions, setLessonSpecificQuestions] = useState<string[]>([]); // Kid-friendly questions
+  const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Analyze lesson content when it loads
@@ -195,6 +197,39 @@ export default function ChatInterface({
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Generate lesson-specific questions when summary becomes available
+  useEffect(() => {
+    const generateKidQuestions = async () => {
+      if (!lessonContext.summary || isGeneratingQuestions || lessonSpecificQuestions.length > 0) {
+        return; // Don't generate if already generated or in progress
+      }
+
+      console.log(`🧒 [ChatInterface] Generating kid-friendly questions for: ${lessonContext.lessonTitle}`);
+      setIsGeneratingQuestions(true);
+
+      try {
+        const response = await fetch(`/api/lessons/${lessonContext.documentId}/${lessonContext.lessonNumber}/kid-friendly-questions`);
+        if (response.ok) {
+          const data = await response.json();
+          const questions = data.questions || [];
+          console.log(`✅ [ChatInterface] Generated ${questions.length} kid-friendly questions:`, questions);
+          setLessonSpecificQuestions(questions);
+        } else {
+          console.error('❌ [ChatInterface] Failed to generate questions:', response.status);
+        }
+      } catch (error) {
+        console.error('❌ [ChatInterface] Error generating kid-friendly questions:', error);
+        // Keep empty array to use fallback questions
+      } finally {
+        setIsGeneratingQuestions(false);
+      }
+    };
+
+    if (lessonContext.summary) {
+      generateKidQuestions();
+    }
+  }, [lessonContext.summary, lessonSpecificQuestions.length, isGeneratingQuestions]);
 
   // Function to detect and render mathematical content in messages
   const renderMessageWithGraphs = (content: string) => {
@@ -1264,100 +1299,100 @@ export default function ChatInterface({
                 }}
                 disabled={isTyping}
                 userAge={userAge}
+                lessonSpecificQuestions={lessonSpecificQuestions}
+                isGeneratingQuestions={isGeneratingQuestions}
               />
             </div>
           )}
 
-          {/* Enhanced Text Input (Available in Advanced Mode or always when not child-friendly) */}
-          {(!childFriendlyMode || !showQuickSelect) && (
-            <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} role="form" aria-label="Send message to virtual tutor">
-              <div className="flex space-x-4 items-end">
-                <div className="flex-1">
-                  <label htmlFor="chat-input" className="sr-only">
-                    Type your message to {config.name}
-                  </label>
-                  <textarea
-                    id="chat-input"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder={config.placeholderText}
-                    className="w-full resize-none border-2 border-gray-200 rounded-2xl px-6 py-4 text-base bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-300 disabled:bg-gray-50 disabled:text-gray-500"
-                    rows={Math.min(6, Math.max(3, inputValue.split('\n').length + 1))}
-                    disabled={isTyping}
-                    aria-describedby="input-help"
-                    aria-invalid={false}
-                    maxLength={2000}
-                  />
-                  <div id="input-help" className="flex items-center justify-between mt-3 px-2">
-                    <span className="text-sm text-gray-500" aria-live="polite">
-                      {inputValue.length > 0 && `${inputValue.length}/2000 characters`}
-                    </span>
-                    <span className="text-sm text-gray-400">
-                      Press Enter to send, Shift+Enter for new line
-                    </span>
-                  </div>
+          {/* Enhanced Text Input (Always available) */}
+          <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} role="form" aria-label="Send message to virtual tutor">
+            <div className="flex space-x-4 items-end">
+              <div className="flex-1">
+                <label htmlFor="chat-input" className="sr-only">
+                  Type your message to {config.name}
+                </label>
+                <textarea
+                  id="chat-input"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder={config.placeholderText}
+                  className="w-full resize-none border-2 border-gray-200 rounded-2xl px-6 py-4 text-base bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-300 disabled:bg-gray-50 disabled:text-gray-500"
+                  rows={Math.min(6, Math.max(3, inputValue.split('\n').length + 1))}
+                  disabled={isTyping}
+                  aria-describedby="input-help"
+                  aria-invalid={false}
+                  maxLength={2000}
+                />
+                <div id="input-help" className="flex items-center justify-between mt-3 px-2">
+                  <span className="text-sm text-gray-500" aria-live="polite">
+                    {inputValue.length > 0 && `${inputValue.length}/2000 characters`}
+                  </span>
+                  <span className="text-sm text-gray-400">
+                    Press Enter to send, Shift+Enter for new line
+                  </span>
                 </div>
-                <button
-                  type="submit"
-                  disabled={!inputValue.trim() || isTyping}
-                  className={`px-8 py-4 rounded-2xl text-base font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 min-w-[120px] ${
-                    inputValue.trim() && !isTyping
-                      ? config.color === 'blue'
-                        ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl focus:ring-blue-500'
-                        : 'bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-xl focus:ring-green-500'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed focus:ring-gray-300'
-                  }`}
-                  aria-label={isTyping ? `${config.name} is responding, please wait` : 'Send message'}
-                  title={isTyping ? 'AI is responding...' : 'Send message'}
-                >
-                  {isTyping ? (
-                    <div className="flex items-center justify-center space-x-2">
-                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" aria-hidden="true"></div>
-                      <span>...</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center space-x-2">
-                      <span>Send</span>
-                      <span aria-hidden="true">📤</span>
-                    </div>
-                  )}
-                </button>
               </div>
-              
-              {/* Quick Actions */}
-              <div className="mt-4 flex flex-wrap gap-3 justify-center">
-                <button
-                  onClick={() => setInputValue("Can you explain this lesson's main concept?")}
-                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 text-sm font-medium transition-all duration-200"
-                  disabled={isTyping}
-                >
-                  💡 Explain Main Concept
-                </button>
-                <button
-                  onClick={() => setInputValue("I need help with a practice problem")}
-                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 text-sm font-medium transition-all duration-200"
-                  disabled={isTyping}
-                >
-                  🔢 Practice Problem Help
-                </button>
-                <button
-                  onClick={() => setInputValue("Can you give me a hint?")}
-                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 text-sm font-medium transition-all duration-200"
-                  disabled={isTyping}
-                >
-                  💭 Give Me a Hint
-                </button>
-                <button
-                  onClick={() => setInputValue("Can you show me an example?")}
-                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 text-sm font-medium transition-all duration-200"
-                  disabled={isTyping}
-                >
-                  � Show Example
-                </button>
-              </div>
-            </form>
-          )}
+              <button
+                type="submit"
+                disabled={!inputValue.trim() || isTyping}
+                className={`px-8 py-4 rounded-2xl text-base font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 min-w-[120px] ${
+                  inputValue.trim() && !isTyping
+                    ? config.color === 'blue'
+                      ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl focus:ring-blue-500'
+                      : 'bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-xl focus:ring-green-500'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed focus:ring-gray-300'
+                }`}
+                aria-label={isTyping ? `${config.name} is responding, please wait` : 'Send message'}
+                title={isTyping ? 'AI is responding...' : 'Send message'}
+              >
+                {isTyping ? (
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" aria-hidden="true"></div>
+                    <span>...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center space-x-2">
+                    <span>Send</span>
+                    <span aria-hidden="true">📤</span>
+                  </div>
+                )}
+              </button>
+            </div>
+            
+            {/* Quick Actions */}
+            <div className="mt-4 flex flex-wrap gap-3 justify-center">
+              <button
+                onClick={() => setInputValue("Can you explain this lesson's main concept?")}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 text-sm font-medium transition-all duration-200"
+                disabled={isTyping}
+              >
+                💡 Explain Main Concept
+              </button>
+              <button
+                onClick={() => setInputValue("I need help with a practice problem")}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 text-sm font-medium transition-all duration-200"
+                disabled={isTyping}
+              >
+                🔢 Practice Problem Help
+              </button>
+              <button
+                onClick={() => setInputValue("Can you give me a hint?")}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 text-sm font-medium transition-all duration-200"
+                disabled={isTyping}
+              >
+                💭 Give Me a Hint
+              </button>
+              <button
+                onClick={() => setInputValue("Can you show me an example?")}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 text-sm font-medium transition-all duration-200"
+                disabled={isTyping}
+              >
+                📝 Show Example
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
