@@ -16,7 +16,9 @@
     "typecheck": "tsc -p . --noEmit",
     "process-pdfs": "npx tsc scripts/advanced-pdf-extractor.ts --outDir dist --moduleResolution node --target es2020 --module commonjs --esModuleInterop && node scripts/process-all-pdfs.js",
     "test-youtube": "tsx scripts/test-youtube-api.ts",
-    "batch-videos": "tsx scripts/batch-video-search.ts"
+    "batch-videos": "tsx scripts/batch-video-search.ts",
+    "warm-cache": "node scripts/warm-cache.js",
+    "morning-prep": "npm run warm-cache"
   },
   "dependencies": {
     "@azure/ai-form-recognizer": "^5.1.0",
@@ -34,6 +36,7 @@
     "framer-motion": "^12.23.12",
     "katex": "^0.16.22",
     "next": "15.5.2",
+    "node-fetch": "^3.3.2",
     "openai": "^5.16.0",
     "pdf-parse": "^1.1.1",
     "pg": "^8.13.1",
