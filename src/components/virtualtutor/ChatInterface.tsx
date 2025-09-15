@@ -44,6 +44,7 @@ interface ChatInterfaceProps {
     lessonTitle: string;
     content?: any; // Full lesson content for analysis
     analysis?: LessonAnalysis; // Optional pre-analyzed lesson content
+    summary?: any; // Comprehensive AI-generated lesson summary with vocabulary, examples, etc.
   };
   // CHILD-FRIENDLY OPTIONS
   childFriendlyMode?: boolean; // Enable child-friendly interface
@@ -107,7 +108,9 @@ export default function ChatInterface({
       name: 'Mr. Somers',
       color: 'blue',
       avatar: '/animations/somers-1.png',
-      initialMessage: lessonAnalysis 
+      initialMessage: lessonContext.summary
+        ? `Hello! I'm Mr. Somers, your math teacher. I've thoroughly analyzed "${lessonContext.lessonTitle}" and I'm fully connected to this lesson! 📚 I have access to ${(lessonContext.summary.vocabulary || []).length} key vocabulary terms, ${(lessonContext.summary.problemExamples || []).length} problem examples, and comprehensive teaching strategies. ${lessonContext.summary.overallSummary ? `Here's what we're covering: ${lessonContext.summary.overallSummary.slice(0, 150)}...` : ''} I'm ready to help you understand every concept!`
+        : lessonAnalysis 
         ? `Hello! I'm Mr. Somers, your math teacher. I've analyzed "${lessonContext.lessonTitle}" and I'm ready to help you with ${(lessonAnalysis.mathConcepts || []).slice(0, 2).join(' and ')}. Based on my analysis, we'll be working on ${(lessonAnalysis.topics || []).join(', ')} concepts. I have ${(lessonAnalysis.suggestedTools || []).length} interactive tools ready to help visualize and understand these topics!`
         : `Hello! I'm Mr. Somers, your math teacher. I'm here to help you understand "${lessonContext.lessonTitle}". ${isAnalyzingLesson ? 'I\'m currently analyzing the lesson content to provide you with the best possible help...' : 'Feel free to ask me anything about this lesson!'}`,
       placeholderText: 'Ask Mr. Somers about this lesson...'
@@ -116,7 +119,9 @@ export default function ChatInterface({
       name: 'Gimli',
       color: 'green',
       avatar: '/animations/gimli-1.png',
-      initialMessage: lessonAnalysis
+      initialMessage: lessonContext.summary
+        ? `Woof woof! Hi there! I'm Gimli, and I'm super connected to "${lessonContext.lessonTitle}"! 🎾 I've studied all the vocabulary words (${(lessonContext.summary.vocabulary || []).length} of them!), looked at the problem examples, and I even know about the real-world connections! ${lessonContext.summary.realWorldConnections && lessonContext.summary.realWorldConnections.length > 0 ? `Like how this math connects to ${lessonContext.summary.realWorldConnections[0].context || 'real life'}!` : ''} Let's explore this lesson together!`
+        : lessonAnalysis
         ? `Woof woof! Hi there! I'm Gimli, and I've been studying "${lessonContext.lessonTitle}" just for you! We're going to explore ${(lessonAnalysis.topics || []).slice(0, 2).join(' and ')}, and I've got ${(lessonAnalysis.suggestedTools || []).length} cool interactive tools to make learning fun! ${lessonAnalysis.difficulty === 'elementary' ? 'This looks like fun stuff!' : lessonAnalysis.difficulty === 'middle' ? 'This is perfect for us to tackle together!' : 'This might be challenging, but we\'ve got this!'} 🎾`
         : `Woof woof! Hi there! I'm Gimli, and I'm super excited to learn "${lessonContext.lessonTitle}" with you! ${isAnalyzingLesson ? 'I\'m sniffing around the lesson content to understand it better...' : 'Don\'t worry if it seems tough - we\'ll figure it out together!'} 🎾`,
       placeholderText: 'Chat with Gimli about this lesson...'
@@ -130,6 +135,16 @@ export default function ChatInterface({
     console.log(`💬 [ChatInterface] Initializing chat for character: ${character}`);
     console.log(`📖 [ChatInterface] Lesson context:`, lessonContext);
     console.log(`🧠 [ChatInterface] Analysis available:`, !!lessonContext.analysis);
+    console.log(`📋 [ChatInterface] Summary available:`, !!lessonContext.summary);
+    
+    if (lessonContext.summary) {
+      console.log(`🎯 [ChatInterface] Using comprehensive lesson summary for ${character}:`, {
+        vocabularyCount: (lessonContext.summary.vocabulary || []).length,
+        problemExamplesCount: (lessonContext.summary.problemExamples || []).length,
+        realWorldConnections: (lessonContext.summary.realWorldConnections || []).length,
+        hasOverallSummary: !!lessonContext.summary.overallSummary
+      });
+    }
     
     if (lessonContext.analysis) {
       console.log(`🎯 [ChatInterface] Using specialized content for ${character}:`, {
@@ -592,6 +607,7 @@ export default function ChatInterface({
             <div className="mb-2 text-sm text-gray-600">
               🎲 3D Visualization: {shape.charAt(0).toUpperCase() + shape.slice(1)}
             </div>
+            {console.log('🔥 ABOUT TO RENDER ThreeGeometryVisualizer')}
             <ThreeGeometryVisualizer
               shape={shape as any}
               dimensions={dimensions}
@@ -601,6 +617,7 @@ export default function ChatInterface({
               animation="none"
               color="#93c5fd"
             />
+            {console.log('🔥 ThreeGeometryVisualizer JSX RENDERED')}
           </div>
         );
       }

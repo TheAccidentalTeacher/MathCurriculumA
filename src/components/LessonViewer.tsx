@@ -99,6 +99,16 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
   const [isResizing, setIsResizing] = useState(false);
   const [startY, setStartY] = useState(0);
   const [startHeight, setStartHeight] = useState(0);
+  
+  // Lesson Summary State
+  const [lessonSummary, setLessonSummary] = useState<any>(null);
+  const [showSummary, setShowSummary] = useState(false);
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  
+  // Student Questions State
+  const [studentQuestions, setStudentQuestions] = useState<any[]>([]);
+  const [showStudentQuestions, setShowStudentQuestions] = useState(false);
+  const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
 
   // Mouse drag resize handlers with useCallback to prevent recreation
   const handleMouseMove = useCallback((e: MouseEvent) => {
@@ -190,11 +200,126 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
     }
   }, [tutorHeight]);
 
+  // Regenerate lesson analysis handler
+  const handleRegenerateAnalysis = async () => {
+    if (isRegenerating) return;
+    
+    setIsRegenerating(true);
+    console.log(`🔄 [LessonViewer] Starting regeneration for ${documentId} - Lesson ${lessonNumber}`);
+    
+    try {
+      const response = await fetch(`/api/lessons/${documentId}/${lessonNumber}/regenerate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log(`✅ [LessonViewer] Successfully regenerated analysis`);
+        
+        // Update the lesson summary with the new analysis
+        if (result.analysis?.lessonSummary) {
+          setLessonSummary(result.analysis.lessonSummary);
+          console.log(`📋 [LessonViewer] Updated lesson summary with regenerated content`);
+        }
+        
+        // Clear existing student questions since analysis changed
+        setStudentQuestions([]);
+        console.log(`🗑️ [LessonViewer] Cleared cached questions due to analysis regeneration`);
+        
+        // Show a success message
+        alert('✅ Lesson analysis regenerated successfully! Fresh AI analysis has been generated. Previous student questions cleared.');
+        
+      } else {
+        throw new Error(result.details || 'Regeneration failed');
+      }
+      
+    } catch (error) {
+      console.error('❌ [LessonViewer] Error regenerating analysis:', error);
+      alert(`❌ Error regenerating analysis: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
+
+  // Generate student practice questions based on lesson summary
+  const generateStudentQuestions = async () => {
+    if (isGeneratingQuestions || !lessonSummary) return;
+    
+    setIsGeneratingQuestions(true);
+    console.log(`🎯 [LessonViewer] Generating student questions for ${documentId} - Lesson ${lessonNumber}`);
+    
+    try {
+      const response = await fetch(`/api/lessons/${documentId}/${lessonNumber}/generate-questions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          lessonSummary: lessonSummary,
+          lessonTitle: lessonData?.title || `Lesson ${lessonNumber}`,
+          documentId: documentId
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.success && result.questions) {
+        console.log(`✅ [LessonViewer] Successfully generated ${result.questions.length} student questions`);
+        setStudentQuestions(result.questions);
+        
+        // Show a success message
+        alert(`✅ Generated ${result.questions.length} practice questions for students!`);
+        
+      } else {
+        throw new Error(result.details || 'Question generation failed');
+      }
+      
+    } catch (error) {
+      console.error('❌ [LessonViewer] Error generating questions:', error);
+      alert(`❌ Error generating questions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsGeneratingQuestions(false);
+    }
+  };
+
   // Load lesson data and prepare content on component mount
   useEffect(() => {
     console.log(`🚀 [LessonViewer] Component mounted for ${documentId} - Lesson ${lessonNumber}`);
     loadLessonData();
+    checkForCachedQuestions(); // Check for cached questions on load
   }, [documentId, lessonNumber]);
+
+  // Function to check for cached student questions
+  const checkForCachedQuestions = async () => {
+    try {
+      const response = await fetch(`/api/lessons/${documentId}/${lessonNumber}/generate-questions`);
+      
+      if (response.ok) {
+        const result = await response.json();
+        
+        if (result.success && result.questions) {
+          console.log(`✅ [LessonViewer] Found ${result.questions.length} cached questions`);
+          setStudentQuestions(result.questions);
+        }
+      } else if (response.status === 404) {
+        console.log(`📝 [LessonViewer] No cached questions found - user can generate new ones`);
+      }
+    } catch (error) {
+      console.warn('⚠️ [LessonViewer] Error checking for cached questions:', error);
+    }
+  };
 
   // Perform vision analysis after lesson data loads
   useEffect(() => {
@@ -321,14 +446,32 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
       console.log(`🔎 [LessonViewer] Checking for existing vision analysis: ${visionCheckUrl}`);
       
       const checkResponse = await fetch(visionCheckUrl);
-      const checkResult = await checkResponse.json();
       
-      if (checkResult.success && checkResult.type === 'vision-analysis') {
-        console.log(`✅ [LessonViewer] Found cached VISION analysis!`);
-        const transformedAnalysis = transformVisionAnalysisForTutor(checkResult.analysis);
-        setLessonAnalysis(transformedAnalysis);
-        setContentPreparationStatus('🎯 Advanced Vision Analysis ready (cached)');
-        return;
+      // Handle response based on status code
+      if (checkResponse.ok) {
+        const checkResult = await checkResponse.json();
+        
+        if (checkResult.success && checkResult.type === 'vision-analysis') {
+          console.log(`✅ [LessonViewer] Found cached VISION analysis!`);
+          const transformedAnalysis = transformVisionAnalysisForTutor(checkResult.analysis);
+          setLessonAnalysis(transformedAnalysis);
+          
+          // Extract and set lesson summary
+          if (checkResult.analysis?.extractedContent?.comprehensiveAnalysis) {
+            setLessonSummary(checkResult.analysis.extractedContent.comprehensiveAnalysis);
+            console.log(`📋 [LessonViewer] Lesson summary loaded from cache`);
+          }
+          
+          setContentPreparationStatus('🎯 Advanced Vision Analysis ready (cached)');
+          return;
+        }
+      } else if (checkResponse.status === 404) {
+        // 404 means no cached analysis available - this is expected
+        const checkResult = await checkResponse.json();
+        console.log(`📝 [LessonViewer] No cached vision analysis found (404): ${checkResult.message || 'No cache available'}`);
+      } else {
+        // Other error statuses
+        console.warn(`⚠️ [LessonViewer] Unexpected response status: ${checkResponse.status}`);
       }
 
       // Perform new vision analysis
@@ -362,6 +505,13 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
         // Transform vision analysis to ChatInterface format
         const transformedAnalysis = transformVisionAnalysisForTutor(visionResult.analysis);
         setLessonAnalysis(transformedAnalysis);
+        
+        // Extract and set lesson summary
+        if (visionResult.analysis?.extractedContent?.comprehensiveAnalysis) {
+          setLessonSummary(visionResult.analysis.extractedContent.comprehensiveAnalysis);
+          console.log(`📋 [LessonViewer] Lesson summary extracted from new analysis`);
+        }
+        
         setContentPreparationStatus(`🎯 Enhanced Vision Analysis complete! (${visionResult.pageCount} pages, ${visionResult.processingTimeMs}ms)`);
       } else {
         console.error(`❌ [LessonViewer] Vision analysis failed:`, visionResult.error);
@@ -679,6 +829,567 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
           </div>
         </div>
         
+        {/* Lesson Summary Section - AI Vision Analysis Results */}
+        {lessonSummary && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-4">
+            <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg overflow-hidden">
+              <button
+                onClick={() => setShowSummary(!showSummary)}
+                className="w-full px-6 py-4 text-left hover:bg-purple-100 transition-colors flex items-center justify-between"
+              >
+                <div className="flex items-center space-x-3">
+                  <span className="text-2xl">📋</span>
+                  <div>
+                    <h3 className="text-lg font-bold text-purple-800">
+                      AI Lesson Analysis Summary
+                    </h3>
+                    <p className="text-sm text-purple-600">
+                      Comprehensive insights from OpenAI Vision analysis of all lesson pages
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRegenerateAnalysis();
+                    }}
+                    className={`text-xs px-3 py-1 rounded-full border transition-colors cursor-pointer ${
+                      isRegenerating 
+                        ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' 
+                        : 'bg-white text-purple-700 border-purple-300 hover:bg-purple-50 hover:border-purple-400'
+                    }`}
+                    title="Regenerate AI analysis with fresh OpenAI Vision analysis"
+                  >
+                    {isRegenerating ? '🔄 Regenerating...' : '🔄 Regenerate'}
+                  </div>
+                  <span className="text-xs bg-purple-200 text-purple-800 px-2 py-1 rounded-full">
+                    AI Generated
+                  </span>
+                  <svg 
+                    className={`w-5 h-5 text-purple-600 transition-transform ${showSummary ? 'rotate-180' : ''}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </button>
+              
+              {showSummary && (
+                <div className="px-6 pb-6 space-y-6">
+                  {/* Overall Summary */}
+                  {lessonSummary.overallSummary && (
+                    <div className="bg-white rounded-lg p-4 border border-purple-100">
+                      <h4 className="font-semibold text-purple-800 mb-2 flex items-center">
+                        <span className="mr-2">📖</span>
+                        Lesson Overview
+                      </h4>
+                      <p className="text-gray-700 leading-relaxed">
+                        {lessonSummary.overallSummary}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {/* Key Insights */}
+                  {lessonSummary.keyInsights && lessonSummary.keyInsights.length > 0 && (
+                    <div className="bg-white rounded-lg p-4 border border-purple-100">
+                      <h4 className="font-semibold text-purple-800 mb-3 flex items-center">
+                        <span className="mr-2">💡</span>
+                        Key Mathematical Insights
+                      </h4>
+                      <ul className="space-y-2">
+                        {lessonSummary.keyInsights.map((insight: string, index: number) => (
+                          <li key={index} className="flex items-start">
+                            <span className="flex-shrink-0 w-2 h-2 bg-purple-400 rounded-full mt-2 mr-3"></span>
+                            <span className="text-gray-700">{insight}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {/* Learning Progression */}
+                  {lessonSummary.learningProgression && lessonSummary.learningProgression.length > 0 && (
+                    <div className="bg-white rounded-lg p-4 border border-purple-100">
+                      <h4 className="font-semibold text-purple-800 mb-3 flex items-center">
+                        <span className="mr-2">🎯</span>
+                        Learning Progression
+                      </h4>
+                      <div className="space-y-2">
+                        {lessonSummary.learningProgression.map((step: string, index: number) => (
+                          <div key={index} className="flex items-center">
+                            <span className="flex-shrink-0 w-6 h-6 bg-purple-500 text-white text-xs rounded-full flex items-center justify-center mr-3">
+                              {index + 1}
+                            </span>
+                            <span className="text-gray-700">{step}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Teaching Opportunities */}
+                  {lessonSummary.teachingOpportunities && lessonSummary.teachingOpportunities.length > 0 && (
+                    <div className="bg-white rounded-lg p-4 border border-purple-100">
+                      <h4 className="font-semibold text-purple-800 mb-3 flex items-center">
+                        <span className="mr-2">🎓</span>
+                        Teaching Opportunities
+                      </h4>
+                      <ul className="space-y-2">
+                        {lessonSummary.teachingOpportunities.map((opportunity: string, index: number) => (
+                          <li key={index} className="flex items-start">
+                            <span className="flex-shrink-0 w-2 h-2 bg-green-400 rounded-full mt-2 mr-3"></span>
+                            <span className="text-gray-700">{opportunity}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {/* Assessment Suggestions */}
+                  {lessonSummary.assessmentSuggestions && lessonSummary.assessmentSuggestions.length > 0 && (
+                    <div className="bg-white rounded-lg p-4 border border-purple-100">
+                      <h4 className="font-semibold text-purple-800 mb-3 flex items-center">
+                        <span className="mr-2">📊</span>
+                        Assessment Suggestions
+                      </h4>
+                      <ul className="space-y-2">
+                        {lessonSummary.assessmentSuggestions.map((suggestion: string, index: number) => (
+                          <li key={index} className="flex items-start">
+                            <span className="flex-shrink-0 w-2 h-2 bg-blue-400 rounded-full mt-2 mr-3"></span>
+                            <span className="text-gray-700">{suggestion}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {/* Vocabulary Section */}
+                  {lessonSummary.vocabulary && lessonSummary.vocabulary.length > 0 && (
+                    <div className="bg-white rounded-lg p-4 border border-purple-100">
+                      <h4 className="font-semibold text-purple-800 mb-3 flex items-center">
+                        <span className="mr-2">📚</span>
+                        Key Vocabulary
+                      </h4>
+                      <div className="space-y-3">
+                        {lessonSummary.vocabulary.map((vocab: any, index: number) => (
+                          <div key={index} className="border-l-4 border-purple-300 pl-4 bg-purple-50 p-3 rounded-r-lg">
+                            <div className="font-medium text-purple-700 text-lg">{vocab.term}</div>
+                            <div className="text-sm text-gray-700 mt-1 font-medium">{vocab.definition}</div>
+                            {vocab.gradeLevel && (
+                              <div className="text-sm text-blue-600 mt-1 bg-blue-50 p-2 rounded">
+                                <strong>For Students:</strong> {vocab.gradeLevel}
+                              </div>
+                            )}
+                            {vocab.usage && (
+                              <div className="text-xs text-gray-600 mt-1 italic">
+                                <strong>Usage:</strong> {vocab.usage}
+                              </div>
+                            )}
+                            {vocab.synonyms && vocab.synonyms.length > 0 && (
+                              <div className="text-xs text-green-600 mt-1">
+                                <strong>Also known as:</strong> {vocab.synonyms.join(', ')}
+                              </div>
+                            )}
+                            {vocab.visualCue && (
+                              <div className="text-xs text-orange-600 mt-1 bg-orange-50 p-1 rounded">
+                                <strong>Remember:</strong> {vocab.visualCue}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Student Practice Problems */}
+                  {lessonSummary.studentPracticeProblems && lessonSummary.studentPracticeProblems.length > 0 && (
+                    <div className="bg-white rounded-lg p-4 border border-blue-100">
+                      <h4 className="font-semibold text-blue-800 mb-3 flex items-center">
+                        <span className="mr-2">📝</span>
+                        Student Practice Problems ({lessonSummary.studentPracticeProblems.length} Problems)
+                      </h4>
+                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        {lessonSummary.studentPracticeProblems.map((problem: any, index: number) => (
+                          <div key={index} className={`border rounded-lg p-3 ${
+                            problem.difficulty === 'beginner' ? 'bg-green-50 border-green-200' :
+                            problem.difficulty === 'intermediate' ? 'bg-yellow-50 border-yellow-200' :
+                            'bg-red-50 border-red-200'
+                          }`}>
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="font-medium text-sm">Problem #{problem.problemNumber}</span>
+                              <span className={`text-xs px-2 py-1 rounded-full ${
+                                problem.difficulty === 'beginner' ? 'bg-green-100 text-green-700' :
+                                problem.difficulty === 'intermediate' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-red-100 text-red-700'
+                              }`}>
+                                {problem.difficulty}
+                              </span>
+                            </div>
+                            <div className="text-xs text-gray-600 mb-2">
+                              <span className="font-medium">{problem.type}</span> • {problem.estimatedTimeMinutes} min
+                            </div>
+                            <div className="text-sm text-gray-800 mb-3">{problem.question}</div>
+                            {problem.conceptsFocused && problem.conceptsFocused.length > 0 && (
+                              <div className="text-xs text-gray-600 mb-2">
+                                <strong>Concepts:</strong> {problem.conceptsFocused.join(', ')}
+                              </div>
+                            )}
+                            {problem.vocabularyReinforced && problem.vocabularyReinforced.length > 0 && (
+                              <div className="text-xs text-purple-600">
+                                <strong>Vocabulary:</strong> {problem.vocabularyReinforced.join(', ')}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                        <div className="text-sm text-blue-800 font-medium mb-1">Practice Problem Summary:</div>
+                        <div className="text-xs text-blue-700 flex flex-wrap gap-4">
+                          <span>• Beginner: {lessonSummary.studentPracticeProblems.filter((p: any) => p.difficulty === 'beginner').length} problems</span>
+                          <span>• Intermediate: {lessonSummary.studentPracticeProblems.filter((p: any) => p.difficulty === 'intermediate').length} problems</span>
+                          <span>• Advanced: {lessonSummary.studentPracticeProblems.filter((p: any) => p.difficulty === 'advanced').length} problems</span>
+                          <span>• Total Time: {lessonSummary.studentPracticeProblems.reduce((sum: number, p: any) => sum + (p.estimatedTimeMinutes || 0), 0)} minutes</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Problem Examples */}
+                  {lessonSummary.problemExamples && lessonSummary.problemExamples.length > 0 && (
+                    <div className="bg-white rounded-lg p-4 border border-purple-100">
+                      <h4 className="font-semibold text-purple-800 mb-3 flex items-center">
+                        <span className="mr-2">🧮</span>
+                        Example Problems
+                      </h4>
+                      <div className="space-y-4">
+                        {lessonSummary.problemExamples.map((problem: any, index: number) => (
+                          <div key={index} className="bg-gray-50 p-3 rounded-lg">
+                            <div className="font-medium text-gray-800 mb-2">{problem.type} - {problem.difficulty}</div>
+                            <div className="text-sm text-gray-700 mb-2">
+                              <strong>Problem:</strong> {problem.problem}
+                            </div>
+                            <div className="text-sm text-gray-600">
+                              <strong>Solution:</strong> {problem.solution}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Problem Generation Templates */}
+                  {lessonSummary.problemGenerationTemplates && lessonSummary.problemGenerationTemplates.length > 0 && (
+                    <div className="bg-white rounded-lg p-4 border border-purple-100">
+                      <h4 className="font-semibold text-purple-800 mb-3 flex items-center">
+                        <span className="mr-2">🎲</span>
+                        Problem Creation Templates
+                      </h4>
+                      <div className="space-y-3">
+                        {lessonSummary.problemGenerationTemplates.map((template: any, index: number) => (
+                          <div key={index} className="bg-green-50 p-3 rounded-lg border border-green-200">
+                            <div className="text-sm text-gray-700 mb-2">{template.template}</div>
+                            {template.variables && Array.isArray(template.variables) && (
+                              <div className="text-xs text-green-700">
+                                <strong>Variables:</strong> {template.variables.join(', ')}
+                              </div>
+                            )}
+                            {template.scaffolding && (
+                              <div className="text-xs text-green-600 mt-1">
+                                <strong>Scaffolding:</strong> {template.scaffolding}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Common Misconceptions */}
+                  {lessonSummary.commonMisconceptions && lessonSummary.commonMisconceptions.length > 0 && (
+                    <div className="bg-white rounded-lg p-4 border border-purple-100">
+                      <h4 className="font-semibold text-purple-800 mb-3 flex items-center">
+                        <span className="mr-2">⚠️</span>
+                        Common Misconceptions
+                      </h4>
+                      <div className="space-y-4">
+                        {lessonSummary.commonMisconceptions.map((misconception: any, index: number) => (
+                          <div key={index} className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                            <div className="font-medium text-yellow-800 mb-2">{misconception.misconception}</div>
+                            <div className="text-sm text-yellow-700 mb-2">
+                              <strong>Why it happens:</strong> {misconception.whyItHappens}
+                            </div>
+                            <div className="text-sm text-yellow-700 mb-2">
+                              <strong>How to correct:</strong> {misconception.howToCorrect}
+                            </div>
+                            <div className="text-sm text-yellow-600">
+                              <strong>Check understanding:</strong> {misconception.checkForUnderstanding}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Differentiation Strategies */}
+                  {lessonSummary.differentiationStrategies && (
+                    <div className="bg-white rounded-lg p-4 border border-purple-100">
+                      <h4 className="font-semibold text-purple-800 mb-3 flex items-center">
+                        <span className="mr-2">🎯</span>
+                        Differentiation Strategies
+                      </h4>
+                      <div className="grid md:grid-cols-3 gap-4">
+                        {lessonSummary.differentiationStrategies.strugglingStudents && (
+                          <div className="bg-red-50 p-3 rounded-lg border border-red-200">
+                            <h5 className="font-medium text-red-800 mb-2">Struggling Students</h5>
+                            <ul className="text-sm space-y-1">
+                              {lessonSummary.differentiationStrategies.strugglingStudents.map((strategy: string, index: number) => (
+                                <li key={index} className="text-red-700">• {strategy}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {lessonSummary.differentiationStrategies.onLevelStudents && (
+                          <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                            <h5 className="font-medium text-blue-800 mb-2">On-Level Students</h5>
+                            <ul className="text-sm space-y-1">
+                              {lessonSummary.differentiationStrategies.onLevelStudents.map((strategy: string, index: number) => (
+                                <li key={index} className="text-blue-700">• {strategy}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {lessonSummary.differentiationStrategies.advancedStudents && (
+                          <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                            <h5 className="font-medium text-green-800 mb-2">Advanced Students</h5>
+                            <ul className="text-sm space-y-1">
+                              {lessonSummary.differentiationStrategies.advancedStudents.map((strategy: string, index: number) => (
+                                <li key={index} className="text-green-700">• {strategy}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Real World Connections */}
+                  {lessonSummary.realWorldConnections && lessonSummary.realWorldConnections.length > 0 && (
+                    <div className="bg-white rounded-lg p-4 border border-purple-100">
+                      <h4 className="font-semibold text-purple-800 mb-3 flex items-center">
+                        <span className="mr-2">🌍</span>
+                        Real-World Connections
+                      </h4>
+                      <div className="space-y-3">
+                        {lessonSummary.realWorldConnections.map((connection: any, index: number) => (
+                          <div key={index} className="bg-orange-50 p-3 rounded-lg border border-orange-200">
+                            {typeof connection === 'string' ? (
+                              <div className="text-gray-700">{connection}</div>
+                            ) : (
+                              <>
+                                <div className="font-medium text-orange-800 mb-2">{connection.context}</div>
+                                <div className="text-sm text-orange-700 mb-2">{connection.explanation}</div>
+                                {connection.studentActivity && (
+                                  <div className="text-sm text-orange-600">
+                                    <strong>Student Activity:</strong> {connection.studentActivity}
+                                  </div>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Teaching Tips */}
+                  {lessonSummary.teachingTips && lessonSummary.teachingTips.length > 0 && (
+                    <div className="bg-white rounded-lg p-4 border border-purple-100">
+                      <h4 className="font-semibold text-purple-800 mb-3 flex items-center">
+                        <span className="mr-2">💡</span>
+                        Teaching Tips
+                      </h4>
+                      <ul className="space-y-2">
+                        {lessonSummary.teachingTips.map((tip: string, index: number) => (
+                          <li key={index} className="flex items-start">
+                            <span className="flex-shrink-0 w-2 h-2 bg-indigo-400 rounded-full mt-2 mr-3"></span>
+                            <span className="text-gray-700">{tip}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {/* Footer Info */}
+                  <div className="text-xs text-purple-600 bg-purple-50 p-3 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <span>📡 Generated by OpenAI Vision API analysis of all lesson pages</span>
+                      <span>⚡ Cached for instant loading</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Generated Student Questions Section */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-6">
+          <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
+            <button
+              onClick={() => setShowStudentQuestions(!showStudentQuestions)}
+              className="w-full px-6 py-4 text-left hover:bg-green-100 transition-colors flex items-center justify-between"
+            >
+              <div className="flex items-center space-x-3">
+                <span className="text-2xl">📝</span>
+                <div>
+                  <h3 className="text-lg font-bold text-green-800">
+                    Student Practice Questions
+                  </h3>
+                  <p className="text-sm text-green-600">
+                    AI-generated practice questions based on lesson analysis
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    generateStudentQuestions();
+                  }}
+                  className={`text-xs px-3 py-1 rounded-full border transition-colors cursor-pointer ${
+                    isGeneratingQuestions 
+                      ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' 
+                      : 'bg-white text-green-700 border-green-300 hover:bg-green-50 hover:border-green-400'
+                  }`}
+                  title="Generate new practice questions based on lesson analysis"
+                >
+                  {isGeneratingQuestions ? '⚡ Generating...' : '⚡ Generate Questions'}
+                </div>
+                {studentQuestions.length > 0 && (
+                  <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded-full">
+                    {studentQuestions.length} Questions
+                  </span>
+                )}
+                <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded-full">
+                  AI Generated
+                </span>
+                <span className={`transform transition-transform ${showStudentQuestions ? 'rotate-180' : ''}`}>
+                  ▼
+                </span>
+              </div>
+            </button>
+            
+            {showStudentQuestions && (
+              <div className="px-6 pb-6">
+                {studentQuestions.length === 0 ? (
+                  <div className="text-center py-8">
+                    <span className="text-4xl mb-4 block">📝</span>
+                    <h4 className="text-lg font-semibold text-gray-700 mb-2">
+                      No Practice Questions Generated Yet
+                    </h4>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Click "Generate Questions" to create personalized practice questions based on the lesson analysis.
+                    </p>
+                    <button
+                      onClick={generateStudentQuestions}
+                      disabled={isGeneratingQuestions || !lessonSummary}
+                      className={`px-4 py-2 rounded-lg transition-colors ${
+                        isGeneratingQuestions || !lessonSummary
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          : 'bg-green-600 text-white hover:bg-green-700'
+                      }`}
+                    >
+                      {isGeneratingQuestions ? '⚡ Generating Questions...' : '⚡ Generate Practice Questions'}
+                    </button>
+                    {!lessonSummary && (
+                      <p className="text-xs text-orange-600 mt-2">
+                        📋 Lesson analysis required first - expand the AI Lesson Analysis Summary above
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      {studentQuestions.map((question: any, index: number) => (
+                        <div key={index} className={`border rounded-lg p-4 ${
+                          question.difficulty === 'beginner' ? 'bg-green-50 border-green-200' :
+                          question.difficulty === 'intermediate' ? 'bg-yellow-50 border-yellow-200' :
+                          'bg-red-50 border-red-200'
+                        }`}>
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="font-medium text-sm">Question #{question.questionNumber}</span>
+                            <span className={`text-xs px-2 py-1 rounded-full ${
+                              question.difficulty === 'beginner' ? 'bg-green-100 text-green-700' :
+                              question.difficulty === 'intermediate' ? 'bg-yellow-100 text-yellow-700' :
+                              'bg-red-100 text-red-700'
+                            }`}>
+                              {question.difficulty}
+                            </span>
+                          </div>
+                          
+                          <div className="text-xs text-gray-600 mb-2 flex items-center justify-between">
+                            <span className="font-medium">{question.type}</span>
+                            <span>{question.estimatedTimeMinutes} min</span>
+                          </div>
+                          
+                          <div className="text-sm text-gray-800 mb-3 font-medium">
+                            {question.question}
+                          </div>
+                          
+                          {question.learningObjective && (
+                            <div className="text-xs text-blue-700 mb-2 bg-blue-50 p-2 rounded">
+                              <strong>Goal:</strong> {question.learningObjective}
+                            </div>
+                          )}
+                          
+                          {question.hint && (
+                            <div className="text-xs text-purple-700 mb-2 bg-purple-50 p-2 rounded">
+                              <strong>Hint:</strong> {question.hint}
+                            </div>
+                          )}
+                          
+                          {question.extension && (
+                            <div className="text-xs text-orange-700 mb-2 bg-orange-50 p-2 rounded">
+                              <strong>Challenge:</strong> {question.extension}
+                            </div>
+                          )}
+                          
+                          {question.conceptsFocused && question.conceptsFocused.length > 0 && (
+                            <div className="text-xs text-gray-600 mb-2">
+                              <strong>Concepts:</strong> {question.conceptsFocused.join(', ')}
+                            </div>
+                          )}
+                          
+                          {question.vocabularyReinforced && question.vocabularyReinforced.length > 0 && (
+                            <div className="text-xs text-green-600">
+                              <strong>Vocabulary:</strong> {question.vocabularyReinforced.join(', ')}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Summary Stats */}
+                    <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
+                      <div className="text-sm text-green-800 font-medium mb-1">Question Summary:</div>
+                      <div className="text-xs text-green-700 flex flex-wrap gap-4">
+                        <span>• Beginner: {studentQuestions.filter((q: any) => q.difficulty === 'beginner').length} questions</span>
+                        <span>• Intermediate: {studentQuestions.filter((q: any) => q.difficulty === 'intermediate').length} questions</span>
+                        <span>• Advanced: {studentQuestions.filter((q: any) => q.difficulty === 'advanced').length} questions</span>
+                        <span>• Total Time: {studentQuestions.reduce((sum: number, q: any) => sum + (q.estimatedTimeMinutes || 0), 0)} minutes</span>
+                        <span>• Total Questions: {studentQuestions.length}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+        
         {/* Virtual Tutor Section - Below Main Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-6">
           <div className="mb-4">
@@ -702,7 +1413,7 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
               
               {lessonAnalysis && (
                 <div className="mt-2 text-xs text-blue-600">
-                  <span className="font-medium">Specialized in:</span> {lessonAnalysis.content?.mathematicalConcepts?.join(', ') || 'General Mathematics'}
+                  <span className="font-medium">Specialized in:</span> {(lessonAnalysis.content?.mathematicalConcepts && Array.isArray(lessonAnalysis.content.mathematicalConcepts)) ? lessonAnalysis.content.mathematicalConcepts.join(', ') : 'General Mathematics'}
                   {lessonAnalysis.content?.confidence && (
                     <span className="ml-2">• Confidence: {Math.round(lessonAnalysis.content.confidence * 100)}%</span>
                   )}
@@ -748,6 +1459,7 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
                 lessonTitle={lessonData?.lessonTitle || `Lesson ${lessonNumber}`}
                 lessonAnalysis={lessonAnalysis}
                 lessonContent={lessonData}
+                lessonSummary={lessonSummary}
               />
             </div>
           </div>

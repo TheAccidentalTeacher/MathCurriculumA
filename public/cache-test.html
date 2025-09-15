@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cache Implementation Test</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #00ff00; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #333; }
+        .success { color: #00ff00; }
+        .error { color: #ff6b6b; }
+        .info { color: #74c0fc; }
+        pre { background: #2a2a2a; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Persistent Cache Implementation Test</h1>
+    
+    <div class="test-section">
+        <h2>📊 Cache Status</h2>
+        <button onclick="testCacheStatus()">Check Cache Status</button>
+        <pre id="cache-status-result">Click button to test...</pre>
+    </div>
+
+    <div class="test-section">
+        <h2>🔥 Vision Analysis (Creates Cache Entry)</h2>
+        <button onclick="testVisionAnalysis()">Run Vision Analysis</button>
+        <pre id="vision-analysis-result">Click button to test...</pre>
+    </div>
+
+    <div class="test-section">
+        <h2>⚡ Cache Hit Test (Should be Instant)</h2>
+        <button onclick="testCacheHit()">Test Cache Hit</button>
+        <pre id="cache-hit-result">Click button to test...</pre>
+    </div>
+
+    <script>
+        async function testCacheStatus() {
+            const resultEl = document.getElementById('cache-status-result');
+            resultEl.innerHTML = '<span class="info">Testing cache status...</span>';
+            
+            try {
+                const response = await fetch('/api/cache/status');
+                const data = await response.json();
+                resultEl.innerHTML = `<span class="success">✅ Cache Status Retrieved:</span>\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                resultEl.innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+            }
+        }
+
+        async function testVisionAnalysis() {
+            const resultEl = document.getElementById('vision-analysis-result');
+            resultEl.innerHTML = '<span class="info">Running vision analysis (this may take 10-30 seconds)...</span>';
+            
+            try {
+                const startTime = Date.now();
+                const response = await fetch('/api/lessons/RCM08_NA_SW_V1/2/vision-analysis', {
+                    method: 'POST'
+                });
+                const endTime = Date.now();
+                const data = await response.json();
+                
+                const result = `<span class="success">✅ Vision Analysis Complete:</span>
+⏱️  Processing Time: ${endTime - startTime}ms
+📊 Success: ${data.success}
+📄 Page Count: ${data.pageCount || 'N/A'}
+🎯 Features: ${JSON.stringify(data.features || {}, null, 2)}`;
+                
+                resultEl.innerHTML = result;
+            } catch (error) {
+                resultEl.innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+            }
+        }
+
+        async function testCacheHit() {
+            const resultEl = document.getElementById('cache-hit-result');
+            resultEl.innerHTML = '<span class="info">Testing cache hit (should be instant)...</span>';
+            
+            try {
+                const startTime = Date.now();
+                const response = await fetch('/api/lessons/RCM08_NA_SW_V1/2/vision-analysis', {
+                    method: 'GET'
+                });
+                const endTime = Date.now();
+                const data = await response.json();
+                
+                const responseTime = endTime - startTime;
+                const isCacheHit = responseTime < 100; // Under 100ms indicates cache hit
+                
+                const result = `<span class="${isCacheHit ? 'success' : 'error'}">${isCacheHit ? '⚡' : '🐌'} Cache ${isCacheHit ? 'HIT' : 'MISS'}:</span>
+⏱️  Response Time: ${responseTime}ms ${isCacheHit ? '(FAST! Cache working!)' : '(SLOW - may be API call)'}
+📊 Success: ${data.success}
+💾 Cached: ${data.cached || 'unknown'}
+🎯 Features: ${JSON.stringify(data.features || {}, null, 2)}`;
+                
+                resultEl.innerHTML = result;
+            } catch (error) {
+                resultEl.innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+            }
+        }
+
+        // Auto-load cache status on page load
+        window.onload = () => {
+            testCacheStatus();
+        };
+    </script>
+</body>
+</html>

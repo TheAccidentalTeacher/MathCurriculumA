@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useRef, useState, useEffect, Component, ErrorInfo, ReactNode } from 'react';
-import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Text, Box, Sphere, Cylinder, Cone, Line, Html } from '@react-three/drei';
 import * as THREE from 'three';
+import dynamic from 'next/dynamic';
+import Simple3DFallback from './Simple3DFallback';
 
 // Error Boundary for Canvas
 interface ErrorBoundaryProps {
@@ -195,22 +197,31 @@ function AnimatedShape({
   const [hovered, setHovered] = useState(false);
 
   useFrame((state) => {
-    if (!meshRef.current) return;
+    // Safety checks to prevent null reference errors
+    if (!meshRef.current || !state) return;
 
-    switch (animation) {
-      case 'rotate':
-        meshRef.current.rotation.y += 0.01;
-        break;
-      case 'bounce':
-        meshRef.current.position.y = Math.sin(state.clock.elapsedTime * 2) * 0.5;
-        break;
-    }
+    try {
+      switch (animation) {
+        case 'rotate':
+          // Disable automatic rotation - let user control rotation with OrbitControls
+          // meshRef.current.rotation.y += 0.01;
+          break;
+        case 'bounce':
+          if (state.clock) {
+            meshRef.current.position.y = Math.sin(state.clock.elapsedTime * 2) * 0.5;
+          }
+          break;
+      }
 
-    // Hover effect
-    if (hovered) {
-      meshRef.current.scale.setScalar(1.1);
-    } else {
-      meshRef.current.scale.setScalar(1);
+      // Hover effect with safety check
+      if (hovered) {
+        meshRef.current.scale.setScalar(1.1);
+      } else {
+        meshRef.current.scale.setScalar(1);
+      }
+    } catch (error) {
+      console.warn('⚠️ Animation frame error:', error);
+      // Continue gracefully without breaking the component
     }
   });
 
@@ -266,12 +277,12 @@ function AnimatedShape({
       case 'sphere':
         console.log('⚽ Rendering sphere with enhanced 3D appearance:', {
           radius: dimensions.radius || 1,
-          segments: 64 // Higher detail for smoother sphere
+          segments: 32 // Reduced for better performance
         });
         return (
           <group ref={meshRef}>
             <Sphere 
-              args={[dimensions.radius || 1, 64, 64]} // Higher segments for smoother appearance
+              args={[dimensions.radius || 1, 32, 16]} // Reduced segments for performance
               onPointerOver={() => setHovered(true)}
               onPointerOut={() => setHovered(false)}
               onClick={onShapeClick}
@@ -280,7 +291,7 @@ function AnimatedShape({
             </Sphere>
             {/* Add subtle wireframe overlay for better 3D perception */}
             <Sphere 
-              args={[dimensions.radius || 1, 16, 16]}
+              args={[dimensions.radius || 1, 16, 8]} // Reduced wireframe segments
             >
               <meshBasicMaterial 
                 color="#1e40af" 
@@ -686,12 +697,62 @@ export default function ThreeGeometryVisualizer({
   onShapeClick,
   className = ''
 }: ThreeGeometryProps) {
+  // SIMPLIFIED: Single state for client-side readiness (WORKING VERSION)
+  const [mounted, setMounted] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);
 
-  // Ensure we're on the client side before rendering Canvas
+  // Simple client-side detection with WebGL context loss handling
   useEffect(() => {
-    setIsClient(true);
+    setMounted(true);
+    
+    // Handle WebGL context loss/restore
+    const handleContextLoss = (event: Event) => {
+      console.log('🔄 WebGL context lost, preventing default behavior');
+      event.preventDefault();
+      setError('WebGL context lost - refresh page to restore 3D rendering');
+    };
+    
+    const handleContextRestore = () => {
+      console.log('✅ WebGL context restored');
+      setError(null);
+      // Force re-render by toggling mounted state
+      setMounted(false);
+      setTimeout(() => setMounted(true), 100);
+    };
+    
+    // Listen for WebGL context events on canvas elements
+    const handleCanvasContextLoss = (canvas: HTMLCanvasElement) => {
+      canvas.addEventListener('webglcontextlost', handleContextLoss);
+      canvas.addEventListener('webglcontextrestored', handleContextRestore);
+      
+      return () => {
+        canvas.removeEventListener('webglcontextlost', handleContextLoss);
+        canvas.removeEventListener('webglcontextrestored', handleContextRestore);
+      };
+    };
+    
+    // Monitor for canvas elements being added to the DOM
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node instanceof HTMLCanvasElement) {
+            handleCanvasContextLoss(node);
+          } else if (node instanceof Element) {
+            const canvases = node.querySelectorAll('canvas');
+            canvases.forEach(handleCanvasContextLoss);
+          }
+        });
+      });
+    });
+    
+    observer.observe(document.body, { childList: true, subtree: true });
+    
+    // Handle existing canvases
+    document.querySelectorAll('canvas').forEach(handleCanvasContextLoss);
+    
+    return () => {
+      observer.disconnect();
+    };
   }, []);
 
   // 🐛 DEBUG: Log received props
@@ -706,10 +767,24 @@ export default function ThreeGeometryVisualizer({
     animation
   });
 
-  // Error boundary for Canvas
+  // Error boundary for Canvas with context loss recovery
   const handleCanvasError = (error: Error) => {
     console.error('❌ ThreeGeometryVisualizer Canvas Error:', error);
-    setError(`3D rendering failed: ${error.message}`);
+    
+    // Check if this is a WebGL context loss error
+    if (error.message.includes('context') || error.message.includes('WebGL')) {
+      console.log('🔄 Detected WebGL context error - attempting recovery');
+      setError('WebGL context issue - attempting automatic recovery...');
+      
+      // Attempt recovery after a short delay
+      setTimeout(() => {
+        setError(null);
+        setMounted(false);
+        setTimeout(() => setMounted(true), 200);
+      }, 1000);
+    } else {
+      setError(`3D rendering failed: ${error.message}`);
+    }
   };
 
   // Calculate volume and surface area
@@ -785,21 +860,50 @@ export default function ThreeGeometryVisualizer({
   const properties = calculateProperties();
 
   if (error) {
+    const isContextError = error.includes('WebGL') || error.includes('context');
+    
     return (
-      <div className={`border border-red-300 rounded-lg p-4 ${className}`}>
-        <div className="text-red-600 font-medium">🚫 3D Visualization Unavailable</div>
-        <div className="text-sm text-red-500 mt-1">{error}</div>
-        <div className="text-xs text-gray-500 mt-2">
-          Showing {shape} properties instead:
-          <br />Volume: {properties.volume} cubic units
-          <br />Surface Area: {properties.surfaceArea} square units
+      <div className={`border rounded-lg overflow-hidden ${className}`}>
+        <div className="bg-red-50 px-4 py-2 border-b">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-medium text-red-800">
+              🚫 3D Visualization Error
+            </h3>
+            {isContextError && (
+              <button
+                onClick={() => {
+                  setError(null);
+                  setMounted(false);
+                  setTimeout(() => setMounted(true), 100);
+                }}
+                className="text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+              >
+                🔄 Retry
+              </button>
+            )}
+          </div>
+          <div className="text-sm text-red-600 mb-2">{error}</div>
+          {isContextError && (
+            <div className="text-xs text-red-500">
+              WebGL context lost - this can happen when switching tabs or with GPU driver issues.
+            </div>
+          )}
+        </div>
+        <div className="flex items-center justify-center h-96 bg-red-50">
+          <Simple3DFallback
+            shape={shape}
+            dimensions={dimensions}
+            color={color}
+            volume={properties.volume}
+            surfaceArea={properties.surfaceArea}
+          />
         </div>
       </div>
     );
   }
 
   // Don't render Canvas on server side
-  if (!isClient) {
+  if (!mounted) {
     return (
       <div className={`border rounded-lg overflow-hidden ${className}`}>
         <div className="bg-gray-50 px-4 py-2 border-b">
@@ -842,25 +946,73 @@ export default function ThreeGeometryVisualizer({
       <div style={{ width: '100%', height: '400px' }}>
         <ErrorBoundary
           fallback={
-            <div className="flex items-center justify-center h-full bg-red-50">
-              <div className="text-center">
-                <div className="text-red-600 font-medium">❌ 3D Rendering Error</div>
-                <div className="text-sm text-red-500 mt-1">
-                  WebGL or browser compatibility issue
-                </div>
-                <div className="text-xs text-gray-500 mt-2">
-                  Shape: {shape} | Volume: {properties.volume} | Surface Area: {properties.surfaceArea}
-                </div>
-              </div>
-            </div>
+            <Simple3DFallback
+              shape={shape}
+              dimensions={dimensions}
+              color={color}
+              volume={properties.volume}
+              surfaceArea={properties.surfaceArea}
+            />
           }
         >
           <Canvas
             camera={{ position: [5, 5, 5], fov: 50 }}
             style={{ background: 'linear-gradient(to bottom, #f0f9ff, #e0f2fe)' }}
             onError={handleCanvasError}
-            gl={{ preserveDrawingBuffer: true }}
-            dpr={[1, 2]}
+            gl={{ 
+              preserveDrawingBuffer: true,
+              powerPreference: 'default', // Use default instead of high-performance to reduce context loss
+              antialias: false, // Disable to reduce GPU load
+              alpha: true, // Enable transparency to show background
+              stencil: false, // Disable stencil buffer to save memory
+              depth: true, // Keep depth buffer for 3D rendering
+              failIfMajorPerformanceCaveat: false // Allow software rendering as fallback
+            }}
+            dpr={[1, 1.5]} // Limit device pixel ratio to reduce GPU load
+            onCreated={(state) => {
+              // Add context loss handling to the Three.js renderer
+              try {
+                console.log('✅ Canvas onCreated called, state:', {
+                  hasGl: !!state.gl,
+                  glType: typeof state.gl,
+                  hasGetExtension: state.gl && typeof state.gl.getExtension === 'function',
+                  glConstructor: state.gl && state.gl.constructor.name
+                });
+                
+                // Validate that we have a proper WebGL context
+                if (!state.gl) {
+                  console.error('❌ No WebGL context in onCreated');
+                  return;
+                }
+                
+                if (typeof state.gl.getExtension !== 'function') {
+                  console.error('❌ WebGL context missing getExtension method');
+                  return;
+                }
+                
+                // Validate canvas element
+                const canvas = state.gl.domElement;
+                if (!canvas) {
+                  console.error('❌ No canvas element found in WebGL context');
+                  return;
+                }
+                
+                console.log('✅ WebGL context validated successfully');
+                
+                // Set transparent background
+                state.scene.background = null;
+                
+                // Get context loss extension for debugging
+                const loseContext = state.gl.getExtension('WEBGL_lose_context');
+                if (loseContext) {
+                  console.log('✅ WEBGL_lose_context extension available');
+                } else {
+                  console.warn('⚠️ WEBGL_lose_context extension not available');
+                }
+              } catch (error) {
+                console.error('❌ Error in onCreated callback:', error);
+              }
+            }}
           >
             {/* Enhanced lighting for better 3D appearance */}
             <ambientLight intensity={0.4} />

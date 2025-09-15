@@ -10,6 +10,7 @@ interface VirtualTutorPanelProps {
   lessonTitle: string;
   lessonAnalysis?: any; // Legacy lesson content analysis from OCR
   lessonContent?: any; // Full lesson content for intelligent analysis
+  lessonSummary?: any; // Comprehensive AI-generated lesson summary with vocabulary, examples, etc.
 }
 
 export default function VirtualTutorPanel({ 
@@ -17,7 +18,8 @@ export default function VirtualTutorPanel({
   lessonNumber, 
   lessonTitle,
   lessonAnalysis,
-  lessonContent 
+  lessonContent,
+  lessonSummary
 }: VirtualTutorPanelProps) {
   const [selectedCharacter, setSelectedCharacter] = useState<'somers' | 'gimli'>('somers');
   const [isInitialized, setIsInitialized] = useState(false);
@@ -58,7 +60,7 @@ export default function VirtualTutorPanel({
     }
     
     setIsInitialized(true);
-  }, [documentId, lessonNumber, lessonTitle, lessonAnalysis, lessonContent]);
+  }, [documentId, lessonNumber, lessonTitle, lessonAnalysis, lessonContent, lessonSummary]);
 
   const handleCharacterSwitch = (character: 'somers' | 'gimli') => {
     setSelectedCharacter(character);
@@ -170,7 +172,8 @@ export default function VirtualTutorPanel({
             lessonNumber,
             lessonTitle,
             content: lessonContent, // Pass full content for intelligent analysis
-            analysis: lessonAnalysis // Keep legacy analysis for backward compatibility
+            analysis: lessonAnalysis, // Keep legacy analysis for backward compatibility
+            summary: lessonSummary // Comprehensive AI-generated summary with vocabulary, examples, etc.
           }}
           childFriendlyMode={childFriendlyMode} // Use dynamic mode
           userAge={11} // Default to 11 years old (6th grade)

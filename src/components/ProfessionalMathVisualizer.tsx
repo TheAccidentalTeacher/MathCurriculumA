@@ -62,7 +62,94 @@ export default function ProfessionalMathVisualizer({
   };
 
   const renderGeometry2D = () => {
-    // For now, use Plotly for 2D geometry (can be enhanced with D3.js later)
+    // Handle triangle-specific visualizations
+    if (content.toLowerCase().includes('triangle')) {
+      if (content.toLowerCase().includes('angle')) {
+        // Triangle with angle visualization
+        return (
+          <div className="p-4 border rounded bg-blue-50">
+            <h3 className="text-lg font-semibold mb-4">🔺 Triangle Angle Explorer</h3>
+            <div className="bg-white p-4 rounded border">
+              <svg width="400" height="300" viewBox="0 0 400 300" className="mx-auto">
+                {/* Triangle */}
+                <polygon 
+                  points="200,50 100,200 300,200" 
+                  fill="lightblue" 
+                  stroke="blue" 
+                  strokeWidth="2"
+                />
+                
+                {/* Angle arcs */}
+                <path d="M 180,200 A 20,20 0 0,0 200,180" stroke="red" strokeWidth="2" fill="none"/>
+                <path d="M 120,180 A 20,20 0 0,0 140,200" stroke="green" strokeWidth="2" fill="none"/>
+                <path d="M 280,200 A 20,20 0 0,0 200,70" stroke="orange" strokeWidth="2" fill="none"/>
+                
+                {/* Angle labels */}
+                <text x="190" y="190" fill="red" fontSize="14" fontWeight="bold">∠C</text>
+                <text x="130" y="190" fill="green" fontSize="14" fontWeight="bold">∠A</text>
+                <text x="250" y="190" fill="orange" fontSize="14" fontWeight="bold">∠B</text>
+                
+                {/* Vertex labels */}
+                <text x="195" y="45" fill="black" fontSize="14" fontWeight="bold">A</text>
+                <text x="90" y="215" fill="black" fontSize="14" fontWeight="bold">B</text>
+                <text x="305" y="215" fill="black" fontSize="14" fontWeight="bold">C</text>
+              </svg>
+              
+              <div className="mt-4 text-center">
+                <p className="text-sm text-gray-600 mb-2">
+                  🔺 <strong>Triangle Angle Sum:</strong> ∠A + ∠B + ∠C = 180°
+                </p>
+                <div className="flex justify-center space-x-4 text-sm">
+                  <span className="text-green-600">∠A ≈ 60°</span>
+                  <span className="text-orange-600">∠B ≈ 60°</span>
+                  <span className="text-red-600">∠C ≈ 60°</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      } else {
+        // General triangle area visualization
+        return (
+          <div className="p-4 border rounded bg-green-50">
+            <h3 className="text-lg font-semibold mb-4">🔺 Triangle Area Explorer</h3>
+            <div className="bg-white p-4 rounded border">
+              <svg width="400" height="300" viewBox="0 0 400 300" className="mx-auto">
+                {/* Triangle */}
+                <polygon 
+                  points="200,50 100,200 300,200" 
+                  fill="lightgreen" 
+                  stroke="green" 
+                  strokeWidth="2"
+                  opacity="0.7"
+                />
+                
+                {/* Base line */}
+                <line x1="100" y1="200" x2="300" y2="200" stroke="blue" strokeWidth="3"/>
+                
+                {/* Height line */}
+                <line x1="200" y1="50" x2="200" y2="200" stroke="red" strokeWidth="2" strokeDasharray="5,5"/>
+                
+                {/* Labels */}
+                <text x="190" y="240" fill="blue" fontSize="14" fontWeight="bold">base = 200</text>
+                <text x="150" y="130" fill="red" fontSize="14" fontWeight="bold">height = 150</text>
+              </svg>
+              
+              <div className="mt-4 text-center">
+                <p className="text-sm text-gray-600 mb-2">
+                  📐 <strong>Area Formula:</strong> Area = ½ × base × height
+                </p>
+                <p className="text-lg font-semibold text-green-600">
+                  Area = ½ × 200 × 150 = 15,000 square units
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+    }
+
+    // For other 2D geometry, use Plotly for circles
     const geometryFunctions = ['circle: sqrt(1 - x^2)', 'circle: -sqrt(1 - x^2)'];
     return (
       <PlotlyGrapher
