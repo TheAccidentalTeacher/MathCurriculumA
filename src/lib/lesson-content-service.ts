@@ -96,6 +96,8 @@ interface LessonAnalysis {
 export class LessonContentService {
   private static cache = new Map<string, LessonAnalysis>();
   private static dbPath = path.join(process.cwd(), 'vision_cache.db');
+  private static database: Database.Database | null = null;
+  private static generationLocks = new Map<string, Promise<any>>();
   private static openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
   });
@@ -105,14 +107,70 @@ export class LessonContentService {
    * Comprehensive analysis of ALL lesson pages using OpenAI Vision API
    * Works for any lesson regardless of page count (22, 40, 15, etc.)
    */
+  /**
+   * Initialize database with WAL mode for better concurrency
+   */
+  private static initDatabase(): Database.Database {
+    if (!this.database) {
+      this.database = new Database(this.dbPath);
+      
+      // Enable WAL mode for better concurrent read/write performance
+      this.database.pragma('journal_mode = WAL');
+      this.database.pragma('synchronous = NORMAL');
+      this.database.pragma('cache_size = 1000');
+      this.database.pragma('temp_store = memory');
+      
+      // Create table if it doesn't exist
+      this.database.exec(`
+        CREATE TABLE IF NOT EXISTS vision_analysis_cache (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          cache_key TEXT UNIQUE NOT NULL,
+          document_id TEXT NOT NULL,
+          lesson_number INTEGER NOT NULL,
+          analysis_data TEXT NOT NULL,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          api_cost_estimate DECIMAL(10,4) DEFAULT 0.02
+        )
+      `);
+      
+      console.log('🏗️ [Database] Initialized with WAL mode for concurrent access');
+    }
+    
+    return this.database;
+  }
+
+  /**
+   * Get database instance (singleton pattern for connection pooling)
+   */
+  private static getDatabase(): Database.Database {
+    return this.initDatabase();
+  }
+
+  /**
+   * Cleanup database connection (call on app shutdown)
+   */
+  static closeDatabase(): void {
+    if (this.database) {
+      this.database.close();
+      this.database = null;
+      console.log('🔌 [Database] Connection closed');
+    }
+  }
+
   static async analyzeCompleteVisualLesson(
     documentId: string, 
-    lessonNumber: number,
+    lessonNumber: number, 
     bypassCache: boolean = false
   ): Promise<LessonAnalysis> {
     const cacheKey = `lesson_vision_analysis_${documentId}_${lessonNumber}`;
     console.log(`🔍 [LessonContentService] Starting COMPLETE VISION ANALYSIS for ${documentId} - Lesson ${lessonNumber}${bypassCache ? ' (BYPASSING CACHE)' : ''}`);
-    
+
+    // 🚀 CONCURRENCY PROTECTION: Check if already generating
+    if (this.generationLocks.has(cacheKey)) {
+      console.log(`⏳ [LessonContentService] Already generating ${cacheKey}, waiting for completion...`);
+      return await this.generationLocks.get(cacheKey)!;
+    }
+
     // Skip cache if bypassCache is true
     if (!bypassCache) {
       // LAYER 1: Check in-memory cache first (fastest - microseconds)
@@ -134,7 +192,27 @@ export class LessonContentService {
       console.log(`🔄 [LessonContentService] CACHE BYPASS - forcing fresh analysis`);
     }
 
-    // LAYER 3: Only call API if NO cache exists (expensive - 10-30 seconds)
+    // 🔒 CONCURRENCY PROTECTION: Create generation lock
+    const generationPromise = this.performVisionAnalysis(documentId, lessonNumber, cacheKey);
+    this.generationLocks.set(cacheKey, generationPromise);
+
+    try {
+      const result = await generationPromise;
+      return result;
+    } finally {
+      // Clean up lock when done
+      this.generationLocks.delete(cacheKey);
+    }
+  }
+
+  /**
+   * Perform the actual vision analysis (protected by concurrency locks)
+   */
+  private static async performVisionAnalysis(
+    documentId: string, 
+    lessonNumber: number, 
+    cacheKey: string
+  ): Promise<LessonAnalysis> {    // LAYER 3: Only call API if NO cache exists (expensive - 10-30 seconds)
     console.log(`🔥 [LessonContentService] CACHE MISS - calling OpenAI API for ${cacheKey} (this should be rare!)`);
     console.log(`💰 [Cost] This API call costs ~$0.01-0.05`);
     
@@ -1544,10 +1622,9 @@ Be patient, encouraging, and adapt your explanations to the student's understand
     
     // Remove from persistent cache
     try {
-      const db = new Database(this.dbPath, { readonly: false });
+      const db = this.getDatabase();
       const stmt = db.prepare('DELETE FROM vision_analysis_cache WHERE cache_key = ?');
       stmt.run(cacheKey);
-      db.close();
       console.log(`🗑️ [LessonContentService] Cleared questions cache for ${cacheKey}`);
     } catch (error) {
       console.warn(`⚠️ [LessonContentService] Error clearing questions from persistent cache:`, error);
@@ -1559,7 +1636,7 @@ Be patient, encouraging, and adapt your explanations to the student's understand
    */
   private static async loadFromPersistentCache(cacheKey: string): Promise<LessonAnalysis | null> {
     try {
-      const db = new Database(this.dbPath, { readonly: true });
+      const db = this.getDatabase();
       
       const stmt = db.prepare(`
         SELECT analysis_data, created_at 
@@ -1568,7 +1645,6 @@ Be patient, encouraging, and adapt your explanations to the student's understand
       `);
       
       const row = stmt.get(cacheKey) as any;
-      db.close();
       
       if (row) {
         console.log(`📊 [Cache] Found persistent cache entry from ${row.created_at}`);
@@ -1615,20 +1691,7 @@ Be patient, encouraging, and adapt your explanations to the student's understand
    */
   private static saveToPersistentCache(cacheKey: string, questionsData: any): void {
     try {
-      const db = new Database(this.dbPath);
-      
-      // Create table if it doesn't exist (reuse same table as vision analysis)
-      db.exec(`
-        CREATE TABLE IF NOT EXISTS vision_analysis_cache (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          cache_key TEXT UNIQUE NOT NULL,
-          document_id TEXT NOT NULL,
-          lesson_number INTEGER NOT NULL,
-          analysis_data TEXT NOT NULL,
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-          api_cost_estimate DECIMAL(10,4) DEFAULT 0.02
-        )
-      `);
+      const db = this.getDatabase();
       
       // Extract document ID and lesson number from cache key
       // Format: lesson_questions_RCM07_NA_SW_V1_1
@@ -1650,7 +1713,6 @@ Be patient, encouraging, and adapt your explanations to the student's understand
         JSON.stringify(questionsData)
       );
       
-      db.close();
       console.log(`💾 [Cache] Saved to persistent database: ${cacheKey}`);
       
     } catch (error) {
