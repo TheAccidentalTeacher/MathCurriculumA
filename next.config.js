@@ -2,7 +2,6 @@
 const nextConfig = {
   // Optimize bundle
   experimental: {
-    optimizeCss: true,
     optimizePackageImports: ['react-plotly.js', '@react-three/fiber', '@react-three/drei']
   },
   
