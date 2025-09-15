@@ -43,6 +43,14 @@ README.md
 DEPLOY_TO_RAILWAY.md
 GEOGEBRA_INTEGRATION.md
 
+# Large source files (PDFs should not be deployed)
+PDF files/
+*.pdf
+
+# Temporarily exclude large image directories for faster deployment
+# webapp_pages/ALG01_NA_SW_V1/
+# webapp_pages/ALG01_NA_SW_V2/
+
 # Test files
 *.test.js
 *.test.ts
@@ -73,6 +81,10 @@ copy_*.sh
 *.py
 *.pyc
 __pycache__/
+
+# PDF source files (HUGE - not needed in production!)
+PDF files/
+*.pdf
 
 # Backup files
 *.bak
