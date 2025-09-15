@@ -11,6 +11,9 @@ interface VirtualTutorPanelProps {
   lessonAnalysis?: any; // Legacy lesson content analysis from OCR
   lessonContent?: any; // Full lesson content for intelligent analysis
   lessonSummary?: any; // Comprehensive AI-generated lesson summary with vocabulary, examples, etc.
+  guidedTutoringActive?: boolean; // Whether guided tutoring mode is active
+  guidedTutoringData?: any; // Data about the current guided tutoring session
+  onGuidedTutoringComplete?: () => void; // Callback when guided tutoring is complete
 }
 
 export default function VirtualTutorPanel({ 
@@ -19,7 +22,10 @@ export default function VirtualTutorPanel({
   lessonTitle,
   lessonAnalysis,
   lessonContent,
-  lessonSummary
+  lessonSummary,
+  guidedTutoringActive = false,
+  guidedTutoringData = null,
+  onGuidedTutoringComplete
 }: VirtualTutorPanelProps) {
   const [selectedCharacter, setSelectedCharacter] = useState<'somers' | 'gimli'>('somers');
   const [isInitialized, setIsInitialized] = useState(false);
@@ -177,6 +183,9 @@ export default function VirtualTutorPanel({
           }}
           childFriendlyMode={childFriendlyMode} // Use dynamic mode
           userAge={11} // Default to 11 years old (6th grade)
+          guidedTutoringActive={guidedTutoringActive}
+          guidedTutoringData={guidedTutoringData}
+          onGuidedTutoringComplete={onGuidedTutoringComplete}
         />
       </div>
 

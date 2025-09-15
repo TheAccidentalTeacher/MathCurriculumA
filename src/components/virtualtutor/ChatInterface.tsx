@@ -49,6 +49,10 @@ interface ChatInterfaceProps {
   // CHILD-FRIENDLY OPTIONS
   childFriendlyMode?: boolean; // Enable child-friendly interface
   userAge?: number; // User age for safety and interface customization
+  // GUIDED TUTORING OPTIONS
+  guidedTutoringActive?: boolean; // Whether guided tutoring mode is active
+  guidedTutoringData?: any; // Data about the current guided tutoring session
+  onGuidedTutoringComplete?: () => void; // Callback when guided tutoring is complete
 }
 
 export default function ChatInterface({ 
@@ -56,7 +60,10 @@ export default function ChatInterface({
   onExpressionChange, 
   lessonContext,
   childFriendlyMode = false,
-  userAge = 11
+  userAge = 11,
+  guidedTutoringActive = false,
+  guidedTutoringData = null,
+  onGuidedTutoringComplete
 }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -70,6 +77,11 @@ export default function ChatInterface({
   const [isExpanded, setIsExpanded] = useState(false); // New state for expandable chat
   const [lessonSpecificQuestions, setLessonSpecificQuestions] = useState<string[]>([]); // Kid-friendly questions
   const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
+  // GUIDED TUTORING STATE
+  const [currentStep, setCurrentStep] = useState(0);
+  const [totalSteps, setTotalSteps] = useState(0);
+  const [guidedSteps, setGuidedSteps] = useState<string[]>([]);
+  const [isGeneratingStep, setIsGeneratingStep] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Analyze lesson content when it loads
@@ -231,8 +243,46 @@ export default function ChatInterface({
     }
   }, [lessonContext.summary, lessonSpecificQuestions.length, isGeneratingQuestions]);
 
+  // Initialize guided tutoring when activated
+  useEffect(() => {
+    const initializeGuidedTutoring = async () => {
+      if (!guidedTutoringActive || !guidedTutoringData || guidedSteps.length > 0) {
+        return; // Don't initialize if already initialized or not active
+      }
+
+      console.log(`🎯 [ChatInterface] Initializing guided tutoring for:`, guidedTutoringData);
+      
+      // Clear existing messages and start fresh
+      setMessages([]);
+      
+      // Add initial guided tutoring message
+      const initialMessage: ChatMessage = {
+        id: `guided-init-${Date.now()}`,
+        type: 'assistant',
+        content: `🎯 **Step-by-Step Help Mode Activated!**\n\nI'll help you work through this practice question step by step. Let's start!\n\n**Question:** ${guidedTutoringData.question}\n\n**Learning Goal:** ${guidedTutoringData.learningObjective}\n\nAre you ready to begin? I'll guide you through each step one at a time! 🚀`,
+        timestamp: new Date(),
+        character
+      };
+      
+      setMessages([initialMessage]);
+      setCurrentStep(0);
+      setTotalSteps(0); // Will be determined dynamically
+      setGuidedSteps([]);
+    };
+
+    if (guidedTutoringActive && guidedTutoringData) {
+      initializeGuidedTutoring();
+    }
+  }, [guidedTutoringActive, guidedTutoringData, character]);
+
   // Function to detect and render mathematical content in messages
   const renderMessageWithGraphs = (content: string) => {
+    // Safety check for undefined/null content
+    if (!content || typeof content !== 'string') {
+      console.warn('⚠️ renderMessageWithGraphs called with invalid content:', content);
+      return <span>Error: Invalid message content</span>;
+    }
+    
     // 🐛 DEBUG: Log the full content to analyze
     console.log('📝 Processing message content:', {
       content,
@@ -901,6 +951,159 @@ export default function ChatInterface({
     const messageToSend = customMessage || inputValue.trim();
     if (!messageToSend || isTyping) return;
 
+    // GUIDED TUTORING: Special handling for guided tutoring mode
+    if (guidedTutoringActive && guidedTutoringData) {
+      console.log(`🎯 [ChatInterface] Processing guided tutoring message: "${messageToSend}"`);
+      
+      // Set generating step flag
+      setIsGeneratingStep(true);
+      
+      // Check if this is a step progression request
+      const isNextStep = messageToSend.toLowerCase().includes('next step') || 
+                        messageToSend.toLowerCase().includes('ready');
+      const isHint = messageToSend.toLowerCase().includes('hint');
+      const isCheck = messageToSend.toLowerCase().includes('check');
+      
+      // Add user message
+      const userMessage: ChatMessage = {
+        id: `user-${Date.now()}`,
+        type: 'user',
+        content: messageToSend,
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, userMessage]);
+      if (!customMessage) setInputValue('');
+      setIsTyping(true);
+      onExpressionChange?.('thinking');
+      
+      try {
+        // Generate step-by-step guidance based on request type
+        let guidedPrompt = '';
+        
+        if (isNextStep) {
+          guidedPrompt = `The student is working on this math problem step-by-step: "${guidedTutoringData.question}"
+          
+Learning Objective: ${guidedTutoringData.learningObjective}
+Current Step: ${currentStep + 1}
+Concepts: ${guidedTutoringData.conceptsFocused?.join(', ') || 'General math'}
+
+The student is ready for the next step. Provide ONLY the next single step to solve this problem. 
+- Don't give the full solution
+- Give just one clear, actionable step
+- Include any necessary explanation for that step only
+- End with encouragement to try that step
+
+Be encouraging and age-appropriate for an 11-year-old student.`;
+        } else if (isHint) {
+          guidedPrompt = `The student is working on this math problem: "${guidedTutoringData.question}"
+          
+Learning Objective: ${guidedTutoringData.learningObjective}
+Hint Available: ${guidedTutoringData.hint}
+Current Step: ${currentStep + 1}
+
+The student needs a hint. Provide a helpful hint that guides them toward the next step without giving the answer.
+- Be encouraging and supportive
+- Reference the hint if helpful: ${guidedTutoringData.hint}
+- Don't solve it for them
+- Age-appropriate for an 11-year-old
+
+Give them confidence to keep trying!`;
+        } else if (isCheck) {
+          guidedPrompt = `The student is working on this math problem: "${guidedTutoringData.question}"
+          
+Learning Objective: ${guidedTutoringData.learningObjective}
+Current Step: ${currentStep + 1}
+
+The student wants to check their work. Ask them to share what they've done so far, then provide feedback.
+- Encourage them to show their thinking
+- Don't give answers away
+- Be supportive and positive
+- Age-appropriate for an 11-year-old
+
+Help them build confidence in their problem-solving!`;
+        } else {
+          // General guided tutoring response
+          guidedPrompt = `The student is working on this math problem: "${guidedTutoringData.question}"
+          
+Learning Objective: ${guidedTutoringData.learningObjective}
+Student's message: "${messageToSend}"
+
+Respond helpfully to their question while maintaining the step-by-step tutoring approach.
+- Don't give full solutions
+- Guide them to think through the problem
+- Be encouraging and age-appropriate for an 11-year-old
+- Keep them engaged in the learning process`;
+        }
+        
+        // Generate guided response using GPT-4o
+        const response = await fetch('/api/ai/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            message: guidedPrompt,
+            character: character,
+            lessonContext: {
+              lessonId: lessonContext.documentId + '-' + lessonContext.lessonNumber,
+              lessonTitle: lessonContext.lessonTitle || 'Math Lesson',
+              gradeLevel: 6,
+              guidedTutoring: true,
+              stepByStep: true
+            },
+            temperature: 0.7
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        // If this was a next step, increment step counter
+        if (isNextStep) {
+          setCurrentStep(prev => prev + 1);
+          if (totalSteps === 0) {
+            setTotalSteps(5); // Estimate 5 steps for most problems
+          }
+        }
+        
+        const assistantMessage: ChatMessage = {
+          id: `assistant-${Date.now()}`,
+          type: 'assistant',
+          content: data.content || "I'm having trouble generating a response right now. Please try again! 🤔",
+          timestamp: new Date(),
+          character: character
+        };
+
+        setMessages(prev => [...prev, assistantMessage]);
+        console.log(`✅ [ChatInterface] Guided tutoring response generated`);
+        
+      } catch (error) {
+        console.error('❌ [ChatInterface] Error in guided tutoring:', error);
+        
+        const errorMessage: ChatMessage = {
+          id: `error-${Date.now()}`,
+          type: 'assistant',
+          content: "I'm having trouble right now, but don't give up! Try asking your question in a different way. 🤔",
+          timestamp: new Date(),
+          character: character
+        };
+        
+        setMessages(prev => [...prev, errorMessage]);
+      } finally {
+        setIsTyping(false);
+        setIsGeneratingStep(false);
+        onExpressionChange?.('idle');
+      }
+      
+      return; // Exit early for guided tutoring
+    }
+
+    // REGULAR CHAT: Continue with normal chat processing
+
     // Child-friendly safety check
     if ((childFriendlyMode || showQuickSelect) && userAge <= 13) {
       // Content safety filter for young users
@@ -1173,9 +1376,9 @@ export default function ChatInterface({
               >
                 <div className="text-base leading-relaxed" aria-label="Message content">
                   {message.type === 'user' ? (
-                    <MathRenderer content={message.content} />
+                    <MathRenderer content={message.content || ''} />
                   ) : (
-                    renderMessageWithGraphs(message.content)
+                    renderMessageWithGraphs(message.content || '')
                   )}
                 </div>
                 <div className="text-xs opacity-60 mt-3 flex items-center space-x-2" aria-label="Message time">
@@ -1239,6 +1442,86 @@ export default function ChatInterface({
       }`}>
         <div className="max-w-4xl mx-auto">
           
+          {/* Guided Tutoring Controls */}
+          {guidedTutoringActive && (
+            <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-blue-900 flex items-center">
+                  🎯 Step-by-Step Guidance Mode
+                </h3>
+                <button
+                  onClick={() => {
+                    if (onGuidedTutoringComplete) {
+                      onGuidedTutoringComplete();
+                    }
+                  }}
+                  className="text-sm text-gray-600 hover:text-gray-800 underline"
+                >
+                  Exit Guided Mode
+                </button>
+              </div>
+              
+              {/* Progress Bar */}
+              {totalSteps > 0 && (
+                <div className="mb-4">
+                  <div className="flex justify-between text-sm text-gray-600 mb-1">
+                    <span>Progress</span>
+                    <span>{currentStep}/{totalSteps} steps</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                      style={{ width: `${totalSteps > 0 ? (currentStep / totalSteps) * 100 : 0}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Guided Tutoring Action Buttons */}
+              <div className="flex flex-wrap gap-3 justify-center">
+                <button
+                  onClick={() => handleSendMessage("I'm ready for the next step!")}
+                  disabled={isTyping || isGeneratingStep}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200 flex items-center space-x-2"
+                >
+                  <span>Next Step</span>
+                  <span>➡️</span>
+                </button>
+                
+                <button
+                  onClick={() => handleSendMessage("Can you give me a hint?")}
+                  disabled={isTyping || isGeneratingStep}
+                  className="px-6 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200 flex items-center space-x-2"
+                >
+                  <span>Need a Hint</span>
+                  <span>💡</span>
+                </button>
+                
+                <button
+                  onClick={() => handleSendMessage("I think I understand! Can you check my work?")}
+                  disabled={isTyping || isGeneratingStep}
+                  className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200 flex items-center space-x-2"
+                >
+                  <span>Check My Work</span>
+                  <span>✅</span>
+                </button>
+              </div>
+              
+              {/* Question Context */}
+              {guidedTutoringData && (
+                <div className="mt-4 p-3 bg-white rounded border border-blue-200">
+                  <p className="text-sm text-gray-700">
+                    <strong>Working on:</strong> {guidedTutoringData.question}
+                  </p>
+                  {guidedTutoringData.hint && (
+                    <p className="text-sm text-gray-600 mt-1">
+                      <strong>Remember:</strong> {guidedTutoringData.hint}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
           {/* Child-Friendly Mode Toggle */}
           {!childFriendlyMode && (
             <div className="mb-6 flex items-center justify-center">

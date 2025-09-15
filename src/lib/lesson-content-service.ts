@@ -1801,10 +1801,43 @@ Be patient, encouraging, and adapt your explanations to the student's understand
     }
 
     try {
-      // Extract key concepts and vocabulary from the summary
-      const concepts = lessonSummary.conceptBreakdown?.map((c: any) => c.concept) || [];
-      const vocabulary = lessonSummary.vocabulary?.map((v: any) => v.term) || [];
-      const overallSummary = lessonSummary.overallSummary || '';
+      console.log(`🔍 [LessonContentService] Full lesson summary object:`, JSON.stringify(lessonSummary, null, 2).substring(0, 500));
+      
+      // Try different possible data structures
+      const concepts = lessonSummary.conceptBreakdown?.map((c: any) => c.concept) || 
+                      lessonSummary.concepts?.map((c: any) => c.concept || c.name || c) || 
+                      lessonSummary.analysis?.concepts || [];
+      
+      const vocabulary = lessonSummary.vocabulary?.map((v: any) => v.term) || 
+                        lessonSummary.keyTerms || 
+                        lessonSummary.analysis?.vocabulary || [];
+      
+      const overallSummary = lessonSummary.overallSummary || 
+                            lessonSummary.summary || 
+                            lessonSummary.title || 
+                            lessonSummary.analysis?.summary || '';
+
+      console.log(`🔍 [LessonContentService] Lesson summary structure:`, {
+        hasConceptBreakdown: !!lessonSummary.conceptBreakdown,
+        conceptsCount: concepts.length,
+        hasVocabulary: !!lessonSummary.vocabulary,
+        vocabularyCount: vocabulary.length,
+        overallSummaryLength: overallSummary.length,
+        summaryPreview: overallSummary.substring(0, 200),
+        availableKeys: Object.keys(lessonSummary || {})
+      });
+
+      if (!overallSummary && concepts.length === 0) {
+        console.log(`⚠️ [LessonContentService] No meaningful lesson data found, using fallback questions`);
+        return [
+          "What does this mean?",
+          "How do I solve this?", 
+          "Can you explain this step?",
+          "I don't understand this part",
+          "Can you show me an example?",
+          "Is this the right answer?"
+        ];
+      }
 
       const response = await this.openai.chat.completions.create({
         model: "gpt-4o",
@@ -1847,8 +1880,16 @@ Return exactly 6 questions as a JSON array that sound like real questions 11-yea
         temperature: 0.3
       });
 
+      console.log(`🤖 [LessonContentService] Sent prompt to OpenAI with:`, {
+        overallSummary: overallSummary.substring(0, 100) + '...',
+        concepts: concepts.slice(0, 3),
+        vocabulary: vocabulary.slice(0, 5)
+      });
+
       const responseText = response.choices[0]?.message?.content;
       if (responseText) {
+        console.log(`🔍 [LessonContentService] Raw OpenAI response:`, responseText.substring(0, 300));
+        
         // Clean the response
         let cleanedResponse = responseText.trim();
         if (cleanedResponse.startsWith('```json')) {
@@ -1856,19 +1897,23 @@ Return exactly 6 questions as a JSON array that sound like real questions 11-yea
         } else if (cleanedResponse.startsWith('```')) {
           cleanedResponse = cleanedResponse.replace(/^```\s*/, '').replace(/\s*```$/, '');
         }
+        
+        console.log(`🧹 [LessonContentService] Cleaned response:`, cleanedResponse.substring(0, 300));
 
         try {
           const questions = JSON.parse(cleanedResponse);
-          if (Array.isArray(questions) && questions.length >= 6) {
-            console.log(`✅ [LessonContentService] Generated ${questions.length} kid-friendly questions`);
-            return questions.slice(0, 6); // Ensure exactly 6 questions
+          if (Array.isArray(questions) && questions.length >= 4) {
+            console.log(`✅ [LessonContentService] Generated ${questions.length} kid-friendly questions:`, questions);
+            return questions.slice(0, 6); // Ensure max 6 questions
           } else {
-            console.warn(`⚠️ [LessonContentService] Invalid questions format, using fallback`);
+            console.warn(`⚠️ [LessonContentService] Invalid questions format - expected array with 4+ items, got:`, typeof questions, Array.isArray(questions) ? questions.length : 'not array');
           }
         } catch (parseError) {
           console.error('❌ [LessonContentService] Error parsing AI response:', parseError);
           console.error('Response was:', cleanedResponse.substring(0, 200));
         }
+      } else {
+        console.error('❌ [LessonContentService] No response content from OpenAI');
       }
     } catch (error) {
       console.error(`❌ [LessonContentService] Error generating kid-friendly questions:`, error);

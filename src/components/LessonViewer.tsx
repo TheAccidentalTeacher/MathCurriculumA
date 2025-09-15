@@ -110,6 +110,10 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
   const [showStudentQuestions, setShowStudentQuestions] = useState(false);
   const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
 
+  // Guided tutoring state
+  const [guidedTutoringActive, setGuidedTutoringActive] = useState(false);
+  const [guidedTutoringData, setGuidedTutoringData] = useState<any>(null);
+
   // Mouse drag resize handlers with useCallback to prevent recreation
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!isResizing) return;
@@ -254,9 +258,29 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
     if (isGeneratingQuestions || !lessonSummary) return;
     
     setIsGeneratingQuestions(true);
-    console.log(`🎯 [LessonViewer] Generating student questions for ${documentId} - Lesson ${lessonNumber}`);
+    console.log(`🎯 [LessonViewer] Checking for cached student questions for ${documentId} - Lesson ${lessonNumber}`);
     
     try {
+      // First, check if questions are already cached
+      const getResponse = await fetch(`/api/lessons/${documentId}/${lessonNumber}/generate-questions`);
+      
+      if (getResponse.ok) {
+        const cachedResult = await getResponse.json();
+        
+        if (cachedResult.success && cachedResult.questions) {
+          console.log(`✅ [LessonViewer] Using ${cachedResult.questions.length} cached questions (no API cost!)`);
+          setStudentQuestions(cachedResult.questions);
+          
+          // Show a success message
+          alert(`✅ Loaded ${cachedResult.questions.length} practice questions from cache!`);
+          setIsGeneratingQuestions(false);
+          return; // Exit early with cached questions
+        }
+      }
+      
+      // No cached questions found, generate new ones
+      console.log(`🔄 [LessonViewer] No cached questions found, generating new ones...`);
+      
       const response = await fetch(`/api/lessons/${documentId}/${lessonNumber}/generate-questions`, {
         method: 'POST',
         headers: {
@@ -264,7 +288,7 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
         },
         body: JSON.stringify({
           lessonSummary: lessonSummary,
-          lessonTitle: lessonData?.title || `Lesson ${lessonNumber}`,
+          lessonTitle: lessonData?.lessonTitle || `Lesson ${lessonNumber}`,
           documentId: documentId
         })
       });
@@ -280,7 +304,7 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
         setStudentQuestions(result.questions);
         
         // Show a success message
-        alert(`✅ Generated ${result.questions.length} practice questions for students!`);
+        alert(`✅ Generated ${result.questions.length} NEW practice questions (cached for future use)!`);
         
       } else {
         throw new Error(result.details || 'Question generation failed');
@@ -319,6 +343,86 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
     } catch (error) {
       console.warn('⚠️ [LessonViewer] Error checking for cached questions:', error);
     }
+  };
+
+  // Force regenerate student practice questions (bypassing cache)
+  const forceRegenerateQuestions = async () => {
+    if (isGeneratingQuestions || !lessonSummary) return;
+    
+    if (!confirm('⚠️ This will generate NEW questions and cost API credits. Are you sure?')) {
+      return;
+    }
+    
+    setIsGeneratingQuestions(true);
+    console.log(`🔄 [LessonViewer] FORCE regenerating student questions for ${documentId} - Lesson ${lessonNumber}`);
+    
+    try {
+      // Skip cache check and directly generate new questions
+      const response = await fetch(`/api/lessons/${documentId}/${lessonNumber}/generate-questions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          lessonSummary: lessonSummary,
+          lessonTitle: lessonData?.lessonTitle || `Lesson ${lessonNumber}`,
+          documentId: documentId,
+          forceRegenerate: true // Flag to indicate forced regeneration
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.success && result.questions) {
+        console.log(`✅ [LessonViewer] Successfully FORCE-generated ${result.questions.length} new student questions`);
+        setStudentQuestions(result.questions);
+        
+        // Show a success message
+        alert(`✅ Force-generated ${result.questions.length} BRAND NEW practice questions!`);
+        
+      } else {
+        throw new Error(result.details || 'Question generation failed');
+      }
+      
+    } catch (error) {
+      console.error('❌ [LessonViewer] Error force-regenerating questions:', error);
+      alert(`❌ Error generating new questions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsGeneratingQuestions(false);
+    }
+  };
+
+  // Guided tutoring function to handle practice question tutoring
+  const startGuidedTutoring = (question: any) => {
+    console.log(`🎯 [LessonViewer] Starting guided tutoring for question:`, question);
+    
+    // Set up guided tutoring data with question context
+    setGuidedTutoringData({
+      question: question.question,
+      learningObjective: question.learningObjective,
+      hint: question.hint,
+      difficulty: question.difficulty,
+      conceptsFocused: question.conceptsFocused,
+      vocabularyReinforced: question.vocabularyReinforced,
+      lessonContext: {
+        documentId,
+        lessonNumber,
+        lessonTitle: lessonData?.sessions?.[0]?.sessionName || `Lesson ${lessonNumber}`
+      },
+      currentStep: 0,
+      totalSteps: 0, // Will be determined by the AI
+      isComplete: false
+    });
+    
+    // Activate guided tutoring mode
+    setGuidedTutoringActive(true);
+    
+    // Show success message
+    alert(`🎯 Starting step-by-step guidance for this practice question!`);
   };
 
   // Perform vision analysis after lesson data loads
@@ -1264,9 +1368,9 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
                       ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' 
                       : 'bg-white text-green-700 border-green-300 hover:bg-green-50 hover:border-green-400'
                   }`}
-                  title="Generate new practice questions based on lesson analysis"
+                  title="Load questions from cache or generate new ones if needed"
                 >
-                  {isGeneratingQuestions ? '⚡ Generating...' : '⚡ Generate Questions'}
+                  {isGeneratingQuestions ? '⚡ Loading...' : '📚 Load Questions'}
                 </div>
                 {studentQuestions.length > 0 && (
                   <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded-full">
@@ -1291,7 +1395,7 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
                       No Practice Questions Generated Yet
                     </h4>
                     <p className="text-sm text-gray-600 mb-4">
-                      Click "Generate Questions" to create personalized practice questions based on the lesson analysis.
+                      Click "Load Questions" to check for cached questions or generate new ones if needed.
                     </p>
                     <button
                       onClick={generateStudentQuestions}
@@ -1299,10 +1403,10 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
                       className={`px-4 py-2 rounded-lg transition-colors ${
                         isGeneratingQuestions || !lessonSummary
                           ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                          : 'bg-green-600 text-white hover:bg-green-700'
+                          : 'bg-blue-600 text-white hover:bg-blue-700'
                       }`}
                     >
-                      {isGeneratingQuestions ? '⚡ Generating Questions...' : '⚡ Generate Practice Questions'}
+                      {isGeneratingQuestions ? '⚡ Loading Questions...' : '📚 Load Practice Questions'}
                     </button>
                     {!lessonSummary && (
                       <p className="text-xs text-orange-600 mt-2">
@@ -1364,10 +1468,19 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
                           )}
                           
                           {question.vocabularyReinforced && question.vocabularyReinforced.length > 0 && (
-                            <div className="text-xs text-green-600">
+                            <div className="text-xs text-green-600 mb-3">
                               <strong>Vocabulary:</strong> {question.vocabularyReinforced.join(', ')}
                             </div>
                           )}
+                          
+                          {/* Get Help Button */}
+                          <button
+                            onClick={() => startGuidedTutoring(question)}
+                            className="w-full mt-3 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center space-x-2"
+                          >
+                            <span>🎓</span>
+                            <span>Get Step-by-Step Help</span>
+                          </button>
                         </div>
                       ))}
                     </div>
@@ -1382,6 +1495,25 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
                         <span>• Total Time: {studentQuestions.reduce((sum: number, q: any) => sum + (q.estimatedTimeMinutes || 0), 0)} minutes</span>
                         <span>• Total Questions: {studentQuestions.length}</span>
                       </div>
+                    </div>
+                    
+                    {/* Regenerate Button */}
+                    <div className="mt-4 text-center">
+                      <button
+                        onClick={forceRegenerateQuestions}
+                        disabled={isGeneratingQuestions || !lessonSummary}
+                        className={`px-4 py-2 rounded-lg transition-colors text-sm ${
+                          isGeneratingQuestions || !lessonSummary
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-orange-600 text-white hover:bg-orange-700'
+                        }`}
+                        title="Generate completely new questions (costs API credits)"
+                      >
+                        {isGeneratingQuestions ? '🔄 Regenerating...' : '🔄 Force Regenerate Questions'}
+                      </button>
+                      <p className="text-xs text-gray-500 mt-1">
+                        ⚠️ Only use if you need different questions (costs API credits)
+                      </p>
                     </div>
                   </div>
                 )}
@@ -1460,6 +1592,12 @@ export default function LessonViewer({ documentId, lessonNumber, onClose }: Less
                 lessonAnalysis={lessonAnalysis}
                 lessonContent={lessonData}
                 lessonSummary={lessonSummary}
+                guidedTutoringActive={guidedTutoringActive}
+                guidedTutoringData={guidedTutoringData}
+                onGuidedTutoringComplete={() => {
+                  setGuidedTutoringActive(false);
+                  setGuidedTutoringData(null);
+                }}
               />
             </div>
           </div>
