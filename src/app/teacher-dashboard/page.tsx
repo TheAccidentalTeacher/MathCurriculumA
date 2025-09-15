@@ -90,6 +90,7 @@ export default function TeacherDashboard() {
     try {
       let endpoint = '';
       let method = 'GET';
+      let requestBody = {};
       
       switch (type) {
         case 'visionAnalysis':
@@ -97,8 +98,36 @@ export default function TeacherDashboard() {
           method = 'POST';
           break;
         case 'practiceQuestions':
+          // First try to get cached questions
+          const cacheResponse = await fetch(`/api/lessons/${documentId}/${lessonNumber}/generate-questions`);
+          if (cacheResponse.ok) {
+            // Already cached, no need to regenerate
+            setLessons(prev => prev.map(lesson => 
+              lesson.documentId === documentId && lesson.lessonNumber === lessonNumber
+                ? { 
+                    ...lesson, 
+                    [type]: 'ready',
+                    lastUpdated: new Date().toLocaleTimeString()
+                  }
+                : lesson
+            ));
+            return;
+          }
+          
+          // Need to generate - first get lesson summary
+          const lessonResponse = await fetch(`/api/lessons/${documentId}/${lessonNumber}`);
+          if (!lessonResponse.ok) {
+            throw new Error('Failed to get lesson data');
+          }
+          const lessonData = await lessonResponse.json();
+          
           endpoint = `/api/lessons/${documentId}/${lessonNumber}/generate-questions`;
           method = 'POST';
+          requestBody = {
+            lessonSummary: lessonData,
+            lessonTitle: lessonData.title || `Lesson ${lessonNumber}`,
+            documentId: documentId
+          };
           break;
         case 'kidFriendlyQuestions':
           endpoint = `/api/lessons/${documentId}/${lessonNumber}/kid-friendly-questions`;
@@ -109,7 +138,7 @@ export default function TeacherDashboard() {
       const response = await fetch(endpoint, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        ...(method === 'POST' && { body: JSON.stringify({}) })
+        ...(method === 'POST' && { body: JSON.stringify(requestBody) })
       });
 
       if (response.ok) {
@@ -124,7 +153,8 @@ export default function TeacherDashboard() {
             : lesson
         ));
       } else {
-        throw new Error(`Failed to warm ${type}`);
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(`Failed to warm ${type}: ${errorData.error || response.statusText}`);
       }
     } catch (error) {
       console.error(`Error warming ${type}:`, error);

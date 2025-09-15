@@ -10,8 +10,9 @@ RUN apk add --no-cache \
     g++ \
     sqlite
 
-# Copy package files
+# Copy package files and prisma schema first
 COPY package*.json ./
+COPY prisma/ ./prisma/
 
 # Install ALL dependencies (including dev) for build
 RUN npm ci --prefer-offline --no-audit --no-fund
@@ -22,8 +23,7 @@ COPY . .
 # Copy database file
 RUN cp curriculum_precise.db ./ || cp prisma/curriculum.db ./curriculum.db || true
 
-# Generate Prisma client and build
-RUN npx prisma generate
+# Build the application
 RUN npm run build
 
 # Clean up dev dependencies to reduce image size
