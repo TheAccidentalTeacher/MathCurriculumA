@@ -1,0 +1,14 @@
+# Reduce upload size for faster deployments
+*.md
+docs/
+examples/
+__tests__
+*.test.*
+*.spec.*
+coverage/
+.cache/
+*.log
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
