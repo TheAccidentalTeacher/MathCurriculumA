@@ -509,6 +509,20 @@ export function LessonNavigationGrid() {
 
   const getLessonViewerUrl = (grade: number, volume: number, lessonNumber: number, startPage: number) => {
     // Map to document IDs for the lesson viewer route
+    // Override volume based on actual lesson number ranges from the service
+    let actualVolume = volume;
+    
+    if (grade === 7) {
+      // Grade 7: Lessons 1-19 are in V1, Lessons 20-33 are in V2
+      actualVolume = lessonNumber <= 19 ? 1 : 2;
+    } else if (grade === 6) {
+      // Grade 6: Lessons 1-18 are in V1, Lessons 19-33 are in V2
+      actualVolume = lessonNumber <= 18 ? 1 : 2;
+    } else if (grade === 8) {
+      // Grade 8: Lessons 1-19 are in V1, Lessons 20+ are in V2
+      actualVolume = lessonNumber <= 19 ? 1 : 2;
+    }
+    
     const documentMap: Record<number, Record<number, string>> = {
       6: { 1: 'RCM06_NA_SW_V1', 2: 'RCM06_NA_SW_V2' },
       7: { 1: 'RCM07_NA_SW_V1', 2: 'RCM07_NA_SW_V2' },
@@ -516,9 +530,9 @@ export function LessonNavigationGrid() {
       9: { 1: 'ALG01_NA_SW_V1', 2: 'ALG01_NA_SW_V2' }
     };
     
-    const documentId = documentMap[grade]?.[volume];
+    const documentId = documentMap[grade]?.[actualVolume];
     if (!documentId) {
-      console.error(`No document mapping for Grade ${grade}, Volume ${volume}`);
+      console.error(`No document mapping for Grade ${grade}, Volume ${actualVolume}`);
       return '#';
     }
     
