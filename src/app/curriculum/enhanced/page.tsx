@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useTeacherMode } from '@/contexts/TeacherModeContext';
 
 interface SessionStats {
   totalSessions: number;
@@ -27,6 +28,7 @@ interface GradeDisplayData {
 }
 
 export default function EnhancedCurriculumHome() {
+  const { isTeacherMode } = useTeacherMode();
   const [sessionStats, setSessionStats] = useState<SessionStats | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -266,18 +268,20 @@ export default function EnhancedCurriculumHome() {
               </div>
             </Link>
             
-            <Link
-              href="/pacing-generator"
-              className="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
-            >
-              <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mr-4">
-                <span className="text-white text-xl">⏰</span>
-              </div>
-              <div>
-                <div className="font-semibold text-gray-800">Enhanced Pacing</div>
-                <div className="text-sm text-gray-600">Session-level scheduling</div>
-              </div>
-            </Link>
+            {isTeacherMode && (
+              <Link
+                href="/pacing-generator"
+                className="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
+              >
+                <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mr-4">
+                  <span className="text-white text-xl">⏰</span>
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-800">Enhanced Pacing</div>
+                  <div className="text-sm text-gray-600">Session-level scheduling</div>
+                </div>
+              </Link>
+            )}
 
             <Link
               href="/curriculum/complete-analysis"

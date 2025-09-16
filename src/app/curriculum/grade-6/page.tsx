@@ -2,8 +2,10 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { useTeacherMode } from '@/contexts/TeacherModeContext';
 
 export default function Grade6Curriculum() {
+  const { isTeacherMode } = useTeacherMode();
   const [expandedLessons, setExpandedLessons] = useState<Set<number>>(new Set());
 
   const toggleLesson = (lessonNumber: number) => {
@@ -1744,12 +1746,14 @@ export default function Grade6Curriculum() {
 
         {/* Action Buttons */}
         <div className="mt-8 flex justify-center space-x-4">
-          <Link
-            href="/pacing-generator"
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Generate Custom Pacing Guide
-          </Link>
+          {isTeacherMode && (
+            <Link
+              href="/pacing-generator"
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Generate Custom Pacing Guide
+            </Link>
+          )}
           <Link
             href="/curriculum/grade-7"
             className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"

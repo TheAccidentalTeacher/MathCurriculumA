@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { useTeacherMode } from '@/contexts/TeacherModeContext';
 
 export default function CurriculumHome() {
+  const { isTeacherMode } = useTeacherMode();
   const gradeData = [
     {
       grade: 'Grade 6',
@@ -140,18 +142,20 @@ export default function CurriculumHome() {
               </div>
             </Link>
             
-            <Link
-              href="/pacing-generator"
-              className="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
-            >
-              <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mr-4">
-                <span className="text-white text-xl">⏰</span>
-              </div>
-              <div>
-                <div className="font-semibold text-gray-800">Pacing Generator</div>
-                <div className="text-sm text-gray-600">Create custom schedules</div>
-              </div>
-            </Link>
+            {isTeacherMode && (
+              <Link
+                href="/pacing-generator"
+                className="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
+              >
+                <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mr-4">
+                  <span className="text-white text-xl">⏰</span>
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-800">Pacing Generator</div>
+                  <div className="text-sm text-gray-600">Create custom schedules</div>
+                </div>
+              </Link>
+            )}
             
             <Link
               href="/"

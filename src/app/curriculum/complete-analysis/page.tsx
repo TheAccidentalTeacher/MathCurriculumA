@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { useTeacherMode } from '@/contexts/TeacherModeContext';
 
 export default function CompleteAnalysis() {
+  const { isTeacherMode } = useTeacherMode();
   const gradeData = [
     {
       grade: 'Grade 6',
@@ -260,16 +262,18 @@ export default function CompleteAnalysis() {
         <div className="bg-white rounded-lg shadow-lg p-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Take Action</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Link
-              href="/pacing-generator"
-              className="flex flex-col items-center p-6 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors text-center"
-            >
-              <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-3">
-                <span className="text-white text-xl">⏰</span>
-              </div>
-              <h3 className="font-bold text-blue-600 mb-1">Pacing Generator</h3>
-              <p className="text-sm text-gray-600">Create custom schedules</p>
-            </Link>
+            {isTeacherMode && (
+              <Link
+                href="/pacing-generator"
+                className="flex flex-col items-center p-6 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors text-center"
+              >
+                <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-3">
+                  <span className="text-white text-xl">⏰</span>
+                </div>
+                <h3 className="font-bold text-blue-600 mb-1">Pacing Generator</h3>
+                <p className="text-sm text-gray-600">Create custom schedules</p>
+              </Link>
+            )}
 
             <Link
               href="/curriculum/grade-6"

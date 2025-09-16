@@ -2,9 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { AcceleratedPathwayViewer } from "@/components/AcceleratedPathwayViewer";
+import { TeacherModeToggle } from "@/components/TeacherModeToggle";
+import { useTeacherMode } from "@/contexts/TeacherModeContext";
 import Link from "next/link";
 
 export default function Home() {
+  const { isTeacherMode } = useTeacherMode();
   const [data, setData] = useState<any>({ documents: [], stats: { documents: 0, sections: 0, topics: 0, keywords: 0 } });
   const [results, setResults] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -236,9 +239,12 @@ export default function Home() {
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold">Math Curriculum Database</h1>
-          <div className="text-sm text-slate-400 space-y-1">
-            <div>{data.stats.documents} Documents • {data.stats.sections} Sections</div>
-            <div>{data.stats.topics} Topics • {data.stats.keywords} Keywords</div>
+          <div className="flex items-center gap-6">
+            <TeacherModeToggle />
+            <div className="text-sm text-slate-400 space-y-1">
+              <div>{data.stats.documents} Documents • {data.stats.sections} Sections</div>
+              <div>{data.stats.topics} Topics • {data.stats.keywords} Keywords</div>
+            </div>
           </div>
         </div>
 
@@ -543,12 +549,14 @@ export default function Home() {
             </div>
             
             <div className="flex gap-4">
-              <Link 
-                href="/pacing-generator"
-                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl font-medium transition-all duration-300 transform hover:scale-105 shadow-lg"
-              >
-                🚀 Advanced Pacing Generator
-              </Link>
+              {isTeacherMode && (
+                <Link 
+                  href="/pacing-generator"
+                  className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl font-medium transition-all duration-300 transform hover:scale-105 shadow-lg"
+                >
+                  🚀 Advanced Pacing Generator
+                </Link>
+              )}
               <button
                 onClick={handleShuffle}
                 className="px-6 py-3 bg-gradient-to-r from-slate-700 to-slate-600 hover:from-slate-600 hover:to-slate-500 text-white rounded-xl font-medium transition-all duration-300"
